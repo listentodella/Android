@@ -1,0 +1,62 @@
+binder系统
+binder系统是Android的核心之一
+
+
+A：client    中间：serviceManager          B：server
+----------------binder驱动-------------------------
+
+
+binder系统核心：
+1.IPC
+源：A
+目的：
+  B向serviceManager注册led服务
+  A向serviceManager查询led服务，得到一个handle
+数据：char buf[512]
+
+2.RPC:远程过程调用
+led_open/led_ctl
+  a.封装数据
+  b.发送给另一个程序
+  c.由这个程序去调用open、ctl等
+
+调用哪一个函数？server的函数编号
+  传给它的参数-----\ IPC的buf
+  返回值-----------/
+
+
+
+
+  A：client    中间：serviceManager          B：server
+  ----------------binder驱动-------------------------
+
+  client：
+  1.open binder驱动
+  2.获取数据
+    2.1向servicemanager查询服务
+    2.2获得一个handle
+  3.向handle发数据
+
+  serviceManager：
+  1.open binder驱动
+  2.告诉驱动，它是“serviceManager”
+  3.while(1) {
+    读驱动获取数据
+    解析数据
+    调用
+      a.注册服务
+        a.1 在链表中记录服务
+      b.获取服务
+        b.1在链表中查询有无该服务
+        b.2返回"server进程"的handle
+  }
+
+  server：
+  1.open binder驱动
+  2.注册服务
+    2.1向serviceManager发送服务名
+  3.while(1) {
+    读驱动
+    解析数据
+    调用对应函数
+  }

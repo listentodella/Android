@@ -1,0 +1,71 @@
+源码框架分析
+frameworks\native\cmds\servicemanager
+
+service_manager.c:
+  a.binder_open
+  b.binder_become_context_manager
+  c.binder_loop
+    c.1 res = ioctl(bs->fd, BINDER_WRITE_READ, &bwr);
+    c.2 binder_parse
+      //解析
+      //处理：svcmgr_handler
+              SVC_MGR_GET_SERVICE / SVC_MGR_CHECK_SERVICE 获取服务
+              SVC_MGR_ADD_SERVICE                         注册服务
+      //回复(有必要的话)
+
+bctest.c
+  注册服务的过程
+  a.binder_open
+  b.binder_call(bs, &msg, &reply, 0, SVC_MGR_ADD_SERVICE)
+    //含有服务的名字
+      //它会含有serviceManager回复的数据
+        //0表示serviceManager
+          //code：表示要调用serviceManager中的 addservice函数
+
+  获取服务的过程
+  a.binder_open
+  b.binder_call(bs, &msg, &reply, target, SVC_MGR_CHECK_SERVICE)
+  //含有服务的名字
+    //它会含有serviceManager回复的数据,表示提供服务的进程
+      //0表示serviceManager
+        //code：表示要调用serviceManager中的哪一个操作 getservice函数
+
+
+
+
+binder.c 分析
+binder_call：远程调用
+向谁发数据
+调用哪个函数
+提供哪些参数
+返回值
+
+int binder_call(struct binder_state *bs,
+                struct binder_io *msg, struct binder_io *reply,
+                uint32_t target, uint32_t code)
+
+binder_call 的实现？
+1.构造参数：放在buf[10000]，用binder_io来描述
+  数据转换：binder_io---->>>binder_write_read
+2.调用ioctl发数据         res = ioctl(bs->fd, BINDER_WRITE_READ, &bwr); bwr----struct binder_write_read
+3.ioctl也会收数据，收到binder_write_read
+  转换为binder_io
+
+======================================================================
+
+怎么写APP:
+1.client
+  a.binder_open
+  b.获得服务，得到handle
+  c.构造参数：binder_io
+  d.调用binder_call(handle, code, binder_io)
+  e.分析binder_call返回的binder_io,取出返回值
+
+2.server
+  a.binder_open
+  b.注册服务
+  c.iotcl(读)
+  d.解析数据
+    得到binder_write_read结构体，解析里面的readbuf->binder_transation.data:data 参数
+  e.根据code，决定调用哪个函数
+    从binder_io里取出参数，发给client
