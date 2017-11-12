@@ -2,6 +2,8 @@
  * 在进行对象的向下转换前，必须首先发生对象的向上转换
  * Father f = new Son();
  * Son son = (Son)f;
+ *
+ * 需要使用  类1 instanceof 类2 进行判断 类1是否是类2的实例化
  */
 
 
@@ -77,5 +79,5 @@ public class Cnv_down {
     }
   }
 
-  
+
 }
