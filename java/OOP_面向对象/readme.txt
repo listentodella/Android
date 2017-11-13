@@ -45,5 +45,6 @@
  * Father f = new Son();
  * Son son = (Son)f;
  *
- * 需要使用  类1 instanceof 类2 进行判断 类1是否是类2的实例化
+ * 需要使用  对象 instanceof 类 进行判断 对象是否是类的实例化
+ *				（该对象与类如果是亲缘关系便可以认为是实例化
  */
