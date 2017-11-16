@@ -31,7 +31,7 @@ jint c_hello3(JNIEnv *env, jobject cls, jintArray arr)
 {
   jint *carr;
   jint i, sum = 0;
-  carr = (*env)->GetArrayElements(env, arr, NULL);
+  carr = (*env)->GetIntArrayElements(env, arr, NULL);
   if (carr == NULL) {
     return 0;
   }
@@ -49,7 +49,7 @@ jintArray c_hello4(JNIEnv *env, jobject cls, jintArray arr)
   jint *oarr;
   jintArray rarr;
   jint i, n = 0;
-  carr = (*env)->GetArrayElements(env, arr, NULL);
+  carr = (*env)->GetIntArrayElements(env, arr, NULL);
   if (carr == NULL) {
     return 0;
   }
@@ -114,7 +114,7 @@ JNI_OnLoad(JavaVM *jvm, void *reserved)
   }
 
   /*建立映射关系*/
-  if((*env)->RegisterNative(env, cls, methods, 1) < 0) {
+  if((*env)->RegisterNatives(env, cls, methods, 1) < 0) {
     return JNI_ERR;
   }
 
