@@ -6,7 +6,7 @@
 public class JNIDemo {
   static {//静态代码块只执行一次，适合用来加载C库
     /*1.加载C库 load*/
-    System.loadLibrary("native");//libnative.so
+    System.loadLibrary("native");//libnative.so,这里写作"native"可以看作是一种约定，libnative.so是本地C编译成库时的名字
   }
 
   /*native，本地方法，是指本地的C或者C++提供的方法，而不是java的*/
