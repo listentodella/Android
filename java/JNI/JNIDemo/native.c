@@ -7,7 +7,7 @@
 /*C函数里永远比java多这2个参数*/
 void c_hello(JNIEnv *env, jobject cls)
 {
-  printf("Hello world!\n", );
+  printf("Hello world!\n");
 }
 
 
@@ -25,7 +25,7 @@ static const JNINativeMethod methods[] = {
   {"hello", "()V", (void *)c_hello},
   // {"sd", "()V", (void *)c_bye},
   // {"sdf", "()V", (void *)c_hello},
-}
+};
 
 
 /*System.loadLibrary*/
@@ -44,7 +44,7 @@ JNI_OnLoad(JavaVM *jvm, void *reserved)
   }
 
   /*建立映射关系*/
-  if((*env)->RegisterNative(env, cls, methods, 1) < 0) {
+  if((*env)->RegisterNatives(env, cls, methods, 1) < 0) {
     return JNI_ERR;
   }
 
