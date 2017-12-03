@@ -28,7 +28,7 @@ Point add(Point &p1, Point &p2)
 {
   Point n;
   n.setX(p1.getX() + p2.getX());
-  n.setY(p1.getX() + p2.getY());
+  n.setY(p1.getY() + p2.getY());
 
   return n;
 }
@@ -36,8 +36,8 @@ Point add(Point &p1, Point &p2)
 Point add2(Point &p1, Point &p2)
 {
   Point n;
-  n.x(p1.x + p2.x);
-  n.y(p1.y + p2.y);
+  n.x = (p1.x + p2.x);
+  n.y = (p1.y + p2.y);
 
   return n;
 }
