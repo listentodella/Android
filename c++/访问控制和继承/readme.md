@@ -4,7 +4,7 @@ class A {
   ...
 };
 
-class B : class A {
+class B : public A {
 
 }
 这样B就继承了A，可以使用A提供的接口、成员(当然会有权限的限制)
