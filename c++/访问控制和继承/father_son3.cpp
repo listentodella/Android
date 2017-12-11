@@ -53,6 +53,10 @@ public:
     room_key = 1;
   }
 
+  /*覆写 override*/
+  void it_skill(void){
+    cout << "Son's skill" << '\n';
+  }
 
 };
 
