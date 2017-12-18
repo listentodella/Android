@@ -4,15 +4,12 @@
 #include "iostream"
 #include "string.h"
 #include "unistd.h"
+#include "Human.h"
 
 using namespace std;
 
-class Chinese{
-private:
-  string name;
+class Chinese:public Human{
 public:
-  void setName(string name);
-  string getName();
   void eating(void);
   void wearing(void);
   void driving(void);

@@ -13,6 +13,12 @@ private:
 public:
   void setName(string name);
   string getName();
+  virtual void eating(void){std::cout << "use hand to eat" << '\n';}
+  virtual void wearing(void){}
+  virtual void driving(void){}
+  // virtual void eating(void) = 0;结果同上
+  // virtual void wearing(void) = 0;结果同上
+  // virtual void driving(void) = 0;结果同上
 };
 
 #endif

@@ -4,18 +4,20 @@
 #include "iostream"
 #include "string.h"
 #include "unistd.h"
+#include "Human.h"
 
 using namespace std;
 
-class Englishman{
+class Englishman:public Human{
 private:
-  string name;
+  int age;
+  string address;
 public:
-  void setName(string name);
-  string getName();
   void eating(void);
   void wearing(void);
   void driving(void);
+  Englishman();
+  Englishman(string name, int age, string address);
   ~Englishman();
 };
 

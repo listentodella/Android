@@ -1,28 +1,25 @@
 #include "Englishman.h"
 
-void Englishman::setName(string name)
-{
-  this->name = name;
-}
-
-string Englishman::getName()
-{
-  return this->name;
-}
-
-void Englishman:: eating(void)
+void Englishman::eating(void)
 {
   cout << "use knife to eat" << endl;
 }
-void Englishman:: wearing(void)
+void Englishman::wearing(void)
 {
   cout << "wearing English style" << endl;
 }
-void Englishman:: driving(void)
+void Englishman::driving(void)
 {
   cout << "driving English style" << endl;
 }
-Englishman:: ~Englishman()
+Englishman::~Englishman()
 {
   cout << "~Englishman" << endl;
+}
+Englishman::Englishman(){}
+Englishman::Englishman(string name, int age, string address)
+{
+  setName(name);
+  this->age = age;
+  this->address = address;
 }

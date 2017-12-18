@@ -1,13 +1,4 @@
 #include "Chinese.h"
-void Chinese::setName(string name)
-{
-  this->name = name;
-}
-
-string Chinese::getName()
-{
-  return this->name;
-}
 
 void Chinese:: eating(void)
 {
