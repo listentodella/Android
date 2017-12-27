@@ -1,4 +1,4 @@
-/*增加 * 解引用操作*/
+/*抽象出智能指针*/
 #include "iostream"
 #include "string"
 
