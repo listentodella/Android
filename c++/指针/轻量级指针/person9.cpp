@@ -1,4 +1,4 @@
-/*线程安全*/
+/*线程安全(仅仅对于引用计数罢了)*/
 #include "iostream"
 #include "string"
 #include "RefBase.h"
