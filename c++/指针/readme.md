@@ -35,10 +35,30 @@ main函数执行new时，建立第一个引用对象，计数为1
 ```
 * 缺点：++ -- 并非原子操作，可能会被打断，那样就有潜在的风险
 ## 轻量级指针
-android源码里就有例子：
+android源码里就有例子，具有原子操作：
 ```
 prebuilts\ndk\9\platforms\android-19\arch-x86\usr\include\rs\cpp\util
 RefBase.h
 StrongPointer.h
 TypeHelpers.h
+```
+* 缺点
+1. 只是针对引用计数线程安全而已
+2. 如果a b互相引用，永远都无法释放，因为count无法归零，造成内存泄露
+
+### 强指针与弱指针
+* 强指针/强引用：A指向B,A决定B的生死（增加了对方的引用计数值，交叉引用后会导致内存泄露）
+* 弱指针/弱引用：A指向B,A不能决定B的生死（避免了上面内存泄露的缺点）
+
+![强指针与弱指针](%E5%BC%BA%E6%8C%87%E9%92%88%E4%B8%8E%E5%BC%B1%E6%8C%87%E9%92%88.png)
+
+### 强指针和弱指针的实现与使用
+* 头文件
+```
+system\core\include\cutils
+system\core\include\utils
+```
+* cpp
+```
+system\core\libutils
 ```
