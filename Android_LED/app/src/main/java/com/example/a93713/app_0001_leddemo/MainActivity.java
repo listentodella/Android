@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
+import com.example.hardlibrary.*;
 
 public class MainActivity extends AppCompatActivity {
     private boolean ledon = false;
@@ -21,6 +22,9 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox checkBoxLed4 = null;
     class MyButtonListener implements View.OnClickListener{
         public void onClick(View v) {
+
+            HardControl hardControl = new HardControl();
+
             ledon = !ledon;
             if(ledon){
                 button.setText("ALL OFF");
