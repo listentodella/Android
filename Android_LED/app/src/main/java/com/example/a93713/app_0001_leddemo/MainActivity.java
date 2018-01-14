@@ -11,7 +11,9 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
-import com.example.hardlibrary.*;
+//import com.example.hardlibrary.*;
+
+import android.os.ILedService;
 
 public class MainActivity extends AppCompatActivity {
     private boolean ledon = false;
@@ -20,10 +22,14 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox checkBoxLed2 = null;
     private CheckBox checkBoxLed3 = null;
     private CheckBox checkBoxLed4 = null;
+
+    private  ILedService iLedService = null;
+
+
     class MyButtonListener implements View.OnClickListener{
         public void onClick(View v) {
 
-            HardControl hardControl = new HardControl();
+            iLedService iLedService = new iLedService();
 
             ledon = !ledon;
             if(ledon){
@@ -32,12 +38,24 @@ public class MainActivity extends AppCompatActivity {
                 checkBoxLed2.setChecked(true);
                 checkBoxLed3.setChecked(true);
                 checkBoxLed4.setChecked(true);
+                try {
+                    for(int i = 0; i < 4; i++)
+                        iLedService.ledCtrl(i, 1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }else {
                 button.setText("ALL ON");
                 checkBoxLed1.setChecked(false);
                 checkBoxLed2.setChecked(false);
                 checkBoxLed3.setChecked(false);
                 checkBoxLed4.setChecked(false);
+                try {
+                    for(int i = 0; i < 4; i++)
+                        iLedService.ledCtrl(i, 0);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -46,35 +64,49 @@ public class MainActivity extends AppCompatActivity {
         //is the view now checked?
         boolean checked = ((CheckBox) view).isChecked();
 
-        //check which checkbox was clicked
-        switch (view.getId()) {
-            case R.id.LED1:
-                if(checked) {
-                    Toast.makeText(getApplicationContext(), "LED1 ON", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "LED1 OFF", Toast.LENGTH_SHORT).show();
-                }
+        try {
+            //check which checkbox was clicked
+            switch (view.getId()) {
+                case R.id.LED1:
+                    if(checked) {
+                        Toast.makeText(getApplicationContext(), "LED1 ON", Toast.LENGTH_SHORT).show();
+                        iLedService.ledCtrl(0, 1);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "LED1 OFF", Toast.LENGTH_SHORT).show();
+                        iLedService.ledCtrl(0, 0);
+                    }
 
-            case R.id.LED2:
-                if(checked) {
-                    Toast.makeText(getApplicationContext(), "LED2 ON", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "LED2 OFF", Toast.LENGTH_SHORT).show();
-                }
+                case R.id.LED2:
+                    if(checked) {
+                        Toast.makeText(getApplicationContext(), "LED2 ON", Toast.LENGTH_SHORT).show();
+                        iLedService.ledCtrl(1, 1);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "LED2 OFF", Toast.LENGTH_SHORT).show();
+                        iLedService.ledCtrl(1, 1);
+                    }
 
-            case R.id.LED3:
-                if(checked) {
-                    Toast.makeText(getApplicationContext(), "LED3 ON", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "LED3 OFF", Toast.LENGTH_SHORT).show();
-                }
+                case R.id.LED3:
+                    if(checked) {
+                        Toast.makeText(getApplicationContext(), "LED3 ON", Toast.LENGTH_SHORT).show();
+                        iLedService.ledCtrl(2, 1);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "LED3 OFF", Toast.LENGTH_SHORT).show();
+                        iLedService.ledCtrl(2, 1);
+                    }
 
-            case R.id.LED4:
-                if(checked) {
-                    Toast.makeText(getApplicationContext(), "LED4 ON", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "LED4 OFF", Toast.LENGTH_SHORT).show();
-                }
+                case R.id.LED4:
+                    if(checked) {
+                        Toast.makeText(getApplicationContext(), "LED4 ON", Toast.LENGTH_SHORT).show();
+                        iLedService.ledCtrl(3, 1);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "LED4 OFF", Toast.LENGTH_SHORT).show();
+                        iLedService.ledCtrl(3, 1);
+                    }
+
+                break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -97,6 +129,12 @@ public class MainActivity extends AppCompatActivity {
         });
         /*利用Find id 获取实例化对象*/
         button = (Button)findViewById(R.id.BUTTON);
+
+        iLedService = ILedService.Stub.asInterface(ServiceManager.getService("led"));
+
+        /*静态方法不需要实例化对象*/
+        //iLedService.ledOpen();
+
         checkBoxLed1 = (CheckBox)findViewById(R.id.LED1);
         checkBoxLed2 = (CheckBox)findViewById(R.id.LED2);
         checkBoxLed3 = (CheckBox)findViewById(R.id.LED3);
