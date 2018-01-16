@@ -134,3 +134,7 @@ b.实现一个open函数，它会根据name返回一个设备自定义的结构�
 * log过滤
 1. logcat | grep "LOG_TAG里的设置"
 2. logcat "LOG_TAG":I *:S
+
+
+## 使用反射访问硬件服务
+* 可以不去import各种类、包，但是不如上面的方法直接
