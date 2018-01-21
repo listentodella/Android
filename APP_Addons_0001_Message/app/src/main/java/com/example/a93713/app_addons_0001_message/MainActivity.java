@@ -1,5 +1,8 @@
 package com.example.a93713.app_addons_0001_message;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
@@ -13,6 +16,8 @@ public class MainActivity extends AppCompatActivity {
 	private int ButtonCount = 0;
 	private Thread myThread;
 	private Thread myThread2;
+	private Handler mHandler;
+	private int mMessageCount = 0;
 
 	class MyRunnable implements Runnable {
 		public void run() {
@@ -30,18 +35,35 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	class MyThread extends Thread {
+		private Looper mLooper;
+
 		public void run() {
 			super.run();
-			int count = 0;
-			for(;;) {
-				Log.d(TAG, "MyThread2 " + count);
-				count++;
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+			Looper.prepare();
+			synchronized (this){
+				mLooper = Looper.myLooper();
+				notifyAll();
+			}
+			mLooper = Looper.myLooper();
+			Looper.loop();
+		}
+
+		public Looper getLooper() {
+			if(!isAlive()) {
+				return null;
+			}
+
+			synchronized (this) {
+				while(isAlive() && mLooper == null) {
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
+
+			return Looper.myLooper();
 		}
 	}
 
@@ -55,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
 			public void onClick(View v) {
 				Log.d(TAG, "Send Message " +ButtonCount);
 				ButtonCount++;
+				Message msg = new Message();
+				mHandler.sendMessage(msg);
 			}
 		});
 
@@ -63,5 +87,15 @@ public class MainActivity extends AppCompatActivity {
 
 		myThread2 = new MyThread();
 		myThread2.start();
+
+		mHandler = new Handler(myThread2.getLooper(), new Handler.Callback() {
+			@Override
+			public boolean handleMessage(Message message) {
+				Log.d(TAG, "get Message "+ mMessageCount);
+				mMessageCount++;
+				return false;
+			}
+		});
+
 	}
 }
