@@ -1,3 +1,5 @@
+# 编译出的结果在/out/target/product/tiny4412/system/bin
+
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
