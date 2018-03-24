@@ -49,6 +49,13 @@ echo 100 > sys/class/leds/led1/delay_on
 echo 200 > sys/class/leds/led1/delay_off
     led_delay_off_store()
 
+# HOW to HAL??? 如何写LIGHTS_HAL
+java:frameworks/base/services/java/com/android/server/lights/
+JNI:frameworks/base/services/core/jni/com_android_server_lights_LightsService.cpp
+HAL:lights.c
 
-
-
+a.实现一个名为HMI的hw_module_t的结构体
+b.open() ,根据name返回一个设备自定义的结构体
+这个设备自定义的结构体的第一个成员是hw_device_t结构体
+还可以定义设备相关的成员
+c.实现多个light_device_t结构体，每一个对应一个DEVICE
