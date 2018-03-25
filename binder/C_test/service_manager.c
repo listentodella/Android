@@ -5,15 +5,16 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
-
+#include <linux/types.h>
+#include <stdbool.h>
 #include <private/android_filesystem_config.h>
 
-#include <selinux/android.h>
-#include <selinux/avc.h>
+//#include <selinux/android.h>
+//#include <selinux/avc.h>
 
 #include "binder.h"
 
-#if 0
+#if 1
 #define ALOGI(x...) fprintf(stderr, "svcmgr: " x)
 #define ALOGE(x...) fprintf(stderr, "svcmgr: " x)
 #else
@@ -52,59 +53,21 @@ int str16eq(const uint16_t *a, const char *b)
     return 1;
 }
 
-static int selinux_enabled;
 static char *service_manager_context;
-static struct selabel_handle* sehandle;
 
 static bool check_mac_perms(pid_t spid, const char *tctx, const char *perm, const char *name)
 {
-    char *sctx = NULL;
-    const char *class = "service_manager";
-    bool allowed;
-
-    if (getpidcon(spid, &sctx) < 0) {
-        ALOGE("SELinux: getpidcon(pid=%d) failed to retrieve pid context.\n", spid);
-        return false;
-    }
-
-    int result = selinux_check_access(sctx, tctx, class, perm, (void *) name);
-    allowed = (result == 0);
-
-    freecon(sctx);
-    return allowed;
+    return true;
 }
 
 static bool check_mac_perms_from_getcon(pid_t spid, const char *perm)
 {
-    if (selinux_enabled <= 0) {
-        return true;
-    }
-
-    return check_mac_perms(spid, service_manager_context, perm, NULL);
+    return true;
 }
 
 static bool check_mac_perms_from_lookup(pid_t spid, const char *perm, const char *name)
 {
-    bool allowed;
-    char *tctx = NULL;
-
-    if (selinux_enabled <= 0) {
-        return true;
-    }
-
-    if (!sehandle) {
-        ALOGE("SELinux: Failed to find sehandle. Aborting service_manager.\n");
-        abort();
-    }
-
-    if (selabel_lookup(sehandle, &tctx, name, 0) != 0) {
-        ALOGE("SELinux: No match for %s in service_contexts.\n", name);
-        return false;
-    }
-
-    allowed = check_mac_perms(spid, tctx, perm, name);
-    freecon(tctx);
-    return allowed;
+    return true;
 }
 
 static int svc_can_register(const uint16_t *name, size_t name_len, pid_t spid)
@@ -280,13 +243,7 @@ int svcmgr_handler(struct binder_state *bs,
         return -1;
     }
 
-    if (sehandle && selinux_status_updated() > 0) {
-        struct selabel_handle *tmp_sehandle = selinux_android_service_context_handle();
-        if (tmp_sehandle) {
-            selabel_close(sehandle);
-            sehandle = tmp_sehandle;
-        }
-    }
+    
 
     switch(txn->code) {
     case SVC_MGR_GET_SERVICE:
@@ -340,11 +297,11 @@ int svcmgr_handler(struct binder_state *bs,
 }
 
 
-static int audit_callback(void *data, security_class_t cls, char *buf, size_t len)
+/* static int audit_callback(void *data, security_class_t cls, char *buf, size_t len)
 {
     snprintf(buf, len, "service=%s", !data ? "NULL" : (char *)data);
     return 0;
-}
+} */
 
 int main(int argc, char **argv)
 {
@@ -361,26 +318,11 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    selinux_enabled = is_selinux_enabled();
-    sehandle = selinux_android_service_context_handle();
-
-    if (selinux_enabled > 0) {
-        if (sehandle == NULL) {
-            ALOGE("SELinux: Failed to acquire sehandle. Aborting.\n");
-            abort();
-        }
-
-        if (getcon(&service_manager_context) != 0) {
-            ALOGE("SELinux: Failed to acquire service_manager context. Aborting.\n");
-            abort();
-        }
-    }
-
-    union selinux_callback cb;
+    /* union selinux_callback cb;
     cb.func_audit = audit_callback;
     selinux_set_callback(SELINUX_CB_AUDIT, cb);
     cb.func_log = selinux_log_callback;
-    selinux_set_callback(SELINUX_CB_LOG, cb);
+    selinux_set_callback(SELINUX_CB_LOG, cb); */
 
     svcmgr_handle = BINDER_SERVICE_MANAGER;
     binder_loop(bs, svcmgr_handler);
