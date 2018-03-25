@@ -5,112 +5,127 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Button;
 import android.view.View;
+import android.widget.Button;
 import android.util.Log;
+
 import android.os.HandlerThread;
 
 public class MainActivity extends AppCompatActivity {
+    private Button mButton;
+    private final String TAG = "MSG_TEST";
+    private int ButtonCount = 0;
 
-	private Button mButton;
-	private final String TAG = "MessageTest";
-	private int ButtonCount = 0;
-	private Thread myThread;
-	private Thread myThread2;
-	private Handler mHandler;
-	private Handler mHandler3;
-	private int mMessageCount = 0;
-	private HandlerThread myThread3;
+    private Thread myThread;
+    private MyThread myThread2;
 
-	class MyRunnable implements Runnable {
-		public void run() {
-			int count = 0;
-			for(;;) {
-				Log.d(TAG, "MyThread " + count);
-				count++;
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+    private Handler mHandler;
+    private Handler mHandler3;//for os's use
+    private  int mMessageCount = 0;
 
-	class MyThread extends Thread {
-		private Looper mLooper;
+    private HandlerThread myThread3;
 
-		public void run() {
-			super.run();
-			Looper.prepare();
-			synchronized (this){
-				mLooper = Looper.myLooper();
-				notifyAll();
-			}
-			mLooper = Looper.myLooper();
-			Looper.loop();
-		}
+    class MyRunnable implements Runnable {
+        public void run() {
+            int count = 0;
+            for( ; ; ){
+                Log.d(TAG, "MyThread " +count);
+                count++;
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
-		public Looper getLooper() {
-			if(!isAlive()) {
-				return null;
-			}
+    class MyThread extends Thread {
+        private Looper mLooper;
+        @Override
+        public void run() {
+            super.run();
 
-			synchronized (this) {
-				while(isAlive() && mLooper == null) {
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+            Looper.prepare();
+            //in case of that thread thread2 cannot sync
+            //start
+            synchronized (this) {
+                mLooper = Looper.myLooper();
+                notifyAll();
+            }
+            //end
+            Looper.loop();
+        }
 
-			return Looper.myLooper();
-		}
-	}
+        public Looper getLooper() {
+            //in case of that thread thread2 cannot sync
+            //start
+            if (!isAlive()) {
+                return null;
+            }
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+            synchronized (this) {
+                while (isAlive() && mLooper == null) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            //end
 
-		mButton = (Button)findViewById(R.id.button);
-		mButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Log.d(TAG, "Send Message " +ButtonCount);
-				ButtonCount++;
-				Message msg = new Message();
-				mHandler.sendMessage(msg);
+            return Looper.myLooper();
+        }
+    }
 
-				mHandler3.post(new Runnable() {
-					@Override
-					public void run() {
-						Log.d(TAG, "get Message for Thread3 "+ mMessageCount);
-						mMessageCount++;
-					}
-				});
-			}
-		});
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-		myThread = new Thread(new MyRunnable(), "MessageTestThread");
-		myThread.start();
+        mButton = (Button)findViewById(R.id.button);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Send Message " +ButtonCount);
+                ButtonCount++;
 
-		myThread2 = new MyThread();
-		myThread2.start();
+                Message msg = new Message();
+                mHandler.sendMessage(msg);
 
-		mHandler = new Handler(myThread2.getLooper(), new Handler.Callback() {
-			@Override
-			public boolean handleMessage(Message message) {
-				Log.d(TAG, "get Message "+ mMessageCount);
-				mMessageCount++;
-				return false;
-			}
-		});
+                mHandler3.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(TAG, "get Message for thread3 " +mMessageCount);
+                        mMessageCount++;
+                    }
+                });
+            }
+        });
 
-		myThread3 = new HandlerThread("MessageTestThread3");
-		myThread3.start();
-		mHandler3 = new Handler(myThread3.getLooper());
 
-	}
+        myThread = new Thread(new MyRunnable(), "MsgTestThread");
+        myThread.start();
+
+        //diy thread
+        myThread2 = new MyThread();
+        myThread2.start();
+
+        mHandler = new Handler(myThread2.getLooper(), new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message message) {
+                Log.d(TAG, "get Message " +mMessageCount);
+                mMessageCount++;
+                return false;
+            }
+        });
+
+        //os's thread
+        myThread3 = new HandlerThread("MSGThread3");
+        myThread3.start();
+
+        mHandler3 = new Handler(myThread3.getLooper());
+
+    }
 }
