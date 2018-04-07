@@ -27,6 +27,79 @@ int sayhello_to(char *name)
     return cnt;
 }
 
+
+void saygoodbye(void)
+{
+    static int cnt = 0;
+    fprintf(stderr, "%s: %d\n", __func__, cnt++);
+}
+
+
+int saygoodbye_to(char *name)
+{
+    static int cnt = 0;
+    fprintf(stderr, "%s: %s : %d\n", __func__, name, cnt++);
+    return cnt;
+}
+
+int goodbye_service_handler(struct binder_state *bs,
+                   struct binder_transaction_data *txn,
+                   struct binder_io *msg,
+                   struct binder_io *reply)
+{
+    /*
+     *根据txn->code知道要调用哪一个函数
+     * 如果需要参数，可以从msg取出
+     * 如果要返回结果，可以把结果放入reply
+     * */
+    /* 
+     * sayhello
+     * sayhello_to */
+
+    uint16_t *s;
+    char name[512];
+    size_t len;
+    uint32_t handle;
+    uint32_t strict_policy;
+    int i;
+
+    // Equivalent to Parcel::enforceInterface(), reading the RPC
+    // header with the strict mode policy mask and the interface name.
+    // Note that we ignore the strict_policy and don't propagate it
+    // further (since we do no outbound RPCs anyway).
+    strict_policy = bio_get_uint32(msg);
+
+    switch(txn->code) {
+    case GOODBYE_SVR_CMD_SAYGOODBYE:
+        saygoodbye();
+        return 0;
+
+    case GOODBYE_SVR_CMD_SAYGOODBYE_TO:
+        /*从 msg 里取出字符串  */
+        s = bio_get_string16(msg, &len);
+        if (s == NULL) {
+            return -1;
+        }
+
+        for(i = 0; i < len; i++)
+            name[i] = s[i];
+        name[i] = '\0';
+
+        /*处理  */
+        i = saygoodbye_to(name);
+        /*把结果放入reply*/
+        bio_put_uint32(reply, i);
+        break;
+
+    default:
+        fprintf(stderr, "unknown code %d\n", txn->code);
+        return -1;
+    }
+
+
+    return 0;
+}
+
 int hello_service_handler(struct binder_state *bs,
                    struct binder_transaction_data *txn,
                    struct binder_io *msg,
@@ -73,7 +146,7 @@ int hello_service_handler(struct binder_state *bs,
         /*处理  */
         i = sayhello_to(name);
         /*把结果放入reply*/
-        bio_put_string16(reply, i);
+        bio_put_uint32(reply, i);
         break;
 
     default:
@@ -146,6 +219,32 @@ int svcmgr_publish(struct binder_state *bs, uint32_t target, const char *name, v
 }
 
 //unsigned token;
+int test_server_handler(struct binder_state *bs,
+                   struct binder_transaction_data *txn,
+                   struct binder_io *msg,
+                   struct binder_io *reply)
+{
+    int (*handler)(struct binder_state *bs,
+                   struct binder_transaction_data *txn,
+                   struct binder_io *msg,
+                   struct binder_io *reply);
+    handler = (int (*)(struct binder_state *bs,
+                   struct binder_transaction_data *txn,
+                   struct binder_io *msg,
+                   struct binder_io *reply)) txn->target.ptr;
+    return handler(bs, txn, msg, reply);
+
+#if 0
+    if(txn->target.ptr == 123)
+        return hello_service_handler(bs, txn, msg, reply);
+    else if(txn->target.ptr == 124)
+        return goodbye_service_handler(bs, txn, msg, reply);
+    else
+        return -1;
+#endif
+    
+}
+
 
 int main(int argc, char **argv)
 {
@@ -161,19 +260,33 @@ int main(int argc, char **argv)
     }
 
     /* add service */
-    ret = svcmgr_publish(bs, svcmgr, "hello", (void *)123);
+    ret = svcmgr_publish(bs, svcmgr, "hello", hello_service_handler);
     if (ret) {
         fprintf(stderr, "failed to publish hello service\n");
         return -1;
     }
 
-    ret = svcmgr_publish(bs, svcmgr, "goodbye", (void *)123);
+    ret = svcmgr_publish(bs, svcmgr, "goodbye", goodbye_service_handler);
     //ret = svcmgr_publish(bs, svcmgr, "goodbye", (void *)124);
     if (ret) {
         fprintf(stderr, "failed to publish hello service\n");
         //return -1;
     }
 
+#if 0
+    ret = svcmgr_publish(bs, svcmgr, "hello", (void *)123);
+    if (ret) {
+        fprintf(stderr, "failed to publish hello service\n");
+        return -1;
+    }
+
+    ret = svcmgr_publish(bs, svcmgr, "goodbye", (void *)124);
+    //ret = svcmgr_publish(bs, svcmgr, "goodbye", (void *)124);
+    if (ret) {
+        fprintf(stderr, "failed to publish hello service\n");
+        //return -1;
+    }
+#endif
 
 
 
@@ -187,7 +300,7 @@ int main(int argc, char **argv)
     }
 #endif
 
-    binder_loop(bs, hello_service_handler);
+    binder_loop(bs, test_server_handler);
 
 
 

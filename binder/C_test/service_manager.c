@@ -201,6 +201,7 @@ int do_add_service(struct binder_state *bs,
         svclist = si;
     }
 
+    ALOGI("add_service('%s'), handle = %d\n", str8(s, len), handle);
     binder_acquire(bs, handle);
     binder_link_to_death(bs, handle, &si->death);
     return 0;
