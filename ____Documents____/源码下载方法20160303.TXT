@@ -1,0 +1,184 @@
+源码保存在 github 上，
+可以使用git工具下载。
+
+按照文档“韦东山Android系统视频使用手册.pdf”安装git工具后，
+即可使用下列命令下载：
+
+建议：取出某个版本的代码后，把代码复制到别处去使用，不要直接修改下载目录中的代码。
+
+视频和源码的对应关系:
+视频                                                  源码
+第1课第1节_编写第1个Android应用程序实现按钮和复选框   APP_0001_LEDDemo v1,v2,v3
+第1课第2节_让Android应用程序访问C库                   APP_0001_LEDDemo v4,v5;    HAL_0001_LED v1,v2
+第1课第3节_Android程序操作LED"                        APP_0001_LEDDemo v6;       HAL_0001_LED v3;    DRV_0001_LEDS v1
+
+第2课第1节_Android硬件访问服务框架
+第2课第2节_Android硬件访问服务编写系统代码          SYS_0001_LEDDemo v1
+第2课第3节_Android硬件访问服务编写APP代码           APP_0001_LEDDemo v7;
+第2课第4节_Android硬件访问服务编写HAL代码           APP_0001_LEDDemo v7;       SYS_0001_LEDDemo v2,v3
+第2课第5节_Android硬件访问服务使用反射	            APP_0001_LEDDemo v8;       SYS_0001_LEDDemo v2,v3
+
+第3课第1节_基础知识Android消息处理机制              APP_Addons_0001_Message v1,v2,v3,v4
+
+第4课第2节_Android灯光系统_led_class驱动              DRV_0001_LEDS v2
+第4课第3节_Android灯光系统_编写HAL_lights.c           SYS_0002_Lights v1 ;       DRV_0001_LEDS v2
+第4课第5节_Android灯光系统_源码分析_通知灯            APP_0002_LIGHTDemo v1;     SYS_0002_Lights v1 ;  DRV_0001_LEDS v2
+第4课第6节_Android灯光系统_源码分析_背光灯            APP_0002_LIGHTDemo v2;     SYS_0002_Lights v1 ;  DRV_0001_LEDS v2
+
+第5课第2节_Binder系统_C程序示例_编写程序              APP_0003_Binder_C_App v1
+第5课第3节_Binder系统_C程序示例_编译查错              APP_0003_Binder_C_App v2
+第5课第4节_Binder系统_C程序示例_测试与总结            APP_0003_Binder_C_App v3 
+
+
+第1课
+1. 第1个Android app
+	
+	第一次:
+	git clone https://github.com/weidongshan/APP_0001_LEDDemo.git
+	
+	以下命令要在APP_0001_LEDDemo目录里执行：
+	
+	更新本地代码:
+	git pull origin
+	
+	取出指定版本:
+	git checkout v1  // 系统生成
+	git checkout v2  // 添加了button, checkbox
+	git checkout v3  // 添加了button, checkbox的点击方法
+	git checkout v4  // add jni
+	git checkout v5  // 调用了ledOpen, ledCtrl
+	git checkout v6  // 可以操作LED
+	git checkout v7  // 使用硬件访问服务
+ 
+	
+2. JNI C库 :
+
+	第一次:
+	git clone https://github.com/weidongshan/HAL_0001_LED.git
+	
+	以下命令要在HAL_0001_LED目录里执行：
+
+	更新本地代码:
+	git pull origin
+	
+	取出指定版本:
+	git checkout v1  // 空函数
+	git checkout v2  // 添加打印
+	git checkout v3  // 可以操作LED
+
+
+
+3. LED驱动
+
+	第一次:
+	git clone https://github.com/weidongshan/DRV_0001_LEDS.git
+	
+	更新:
+	git pull origin
+	
+	取出指定版本:
+	git checkout v1  // open, ioctl, 可以操作LED
+
+第2课 硬件访问服务
+
+	第一次:
+	git clone https://github.com/weidongshan/SYS_0001_LEDDemo.git
+
+	更新:
+	git pull origin
+
+	取出指定版本:
+	git checkout v1  // 有JNI没有HAL
+	git checkout v2  // 有JNI,HAL
+	git checkout v3  // add MODULE TAG, DEVICE TAG
+
+第3课 基础知识
+	源码下载方法
+	
+	第一次:
+	git clone https://github.com/weidongshan/APP_Addons_0001_Message.git
+	
+	更新:
+	git pull origin
+	
+	取出指定版本:
+	git checkout v1  // 基本版本,支持按钮 
+	git checkout v2  // create thread
+	git checkout v3  // support Message
+	git checkout v4  // use HandlerThread
+
+
+第4课 
+1. led class 驱动
+
+	源码下载方法
+	
+	第一次:
+	git clone https://github.com/weidongshan/DRV_0001_LEDS.git
+	
+	更新:
+	git pull origin
+	
+	取出指定版本:
+	git checkout v2  // use led class
+
+2. Android灯光系统_编写HAL_lights.c
+	源码下载方法
+	第一次:
+	git clone https://github.com/weidongshan/SYS_0002_Lights.git
+	更新:
+	git pull origin
+	取出指定版本:
+	git checkout v1  
+
+
+3. 源码分析_通知灯
+下载方法:
+	第一次:
+  git clone https://github.com/weidongshan/APP_0002_LIGHTDemo.git
+	更新:
+	git pull origin
+	取出指定版本:
+	git checkout v1  //v1, LIGHTDemo for notification light
+
+4. 源码分析_背光灯
+下载方法:
+	第一次:
+  git clone https://github.com/weidongshan/APP_0002_LIGHTDemo.git
+	更新:
+	git pull origin
+	取出指定版本:
+	git checkout v2  //v2, control backlight
+
+
+第5课 
+第5课第2节_Binder系统_C程序示例_编写程序
+	第一次:
+	git clone https://github.com/weidongshan/APP_0003_Binder_C_App.git
+	
+	更新:
+	git pull origin
+	
+	取出指定版本:
+	git checkout v1  // v1, 未查错, 不能编译
+
+第5课第3节_Binder系统_C程序示例_编译查错
+	第一次:
+	git clone https://github.com/weidongshan/APP_0003_Binder_C_App.git
+	
+	更新:
+	git pull origin
+	
+	取出指定版本:
+	git checkout v2  // v2, 可以编译了, 未验证是否能正常运行
+
+第5课第4节_Binder系统_C程序示例_测试与总结
+	第一次:
+	git clone https://github.com/weidongshan/APP_0003_Binder_C_App.git
+	
+	更新:
+	git pull origin
+	
+	取出指定版本:
+	git checkout v3  // OK
+
