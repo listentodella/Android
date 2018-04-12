@@ -1,4 +1,5 @@
 /* Copyright 2008 The Android Open Source Project
+ * 应用层的binder
  */
 
 #include <inttypes.h>
@@ -113,20 +114,20 @@ struct binder_state *binder_open(size_t mapsize)
         errno = ENOMEM;
         return NULL;
     }
-
+    //调用driver的binder_open
     bs->fd = open("/dev/binder", O_RDWR);
     if (bs->fd < 0) {
         fprintf(stderr,"binder: cannot open device (%s)\n",
                 strerror(errno));
         goto fail_open;
     }
-
+    //取出binder_version
     if ((ioctl(bs->fd, BINDER_VERSION, &vers) == -1) ||
         (vers.protocol_version != BINDER_CURRENT_PROTOCOL_VERSION)) {
         fprintf(stderr, "binder: driver version differs from user space\n");
         goto fail_open;
     }
-
+    //mmap
     bs->mapsize = mapsize;
     bs->mapped = mmap(NULL, mapsize, PROT_READ, MAP_PRIVATE, bs->fd, 0);
     if (bs->mapped == MAP_FAILED) {
@@ -153,6 +154,7 @@ void binder_close(struct binder_state *bs)
 
 int binder_become_context_manager(struct binder_state *bs)
 {
+    //调用驱动层的ioctl
     return ioctl(bs->fd, BINDER_SET_CONTEXT_MGR, 0);
 }
 
@@ -163,10 +165,13 @@ int binder_write(struct binder_state *bs, void *data, size_t len)
 
     bwr.write_size = len;
     bwr.write_consumed = 0;
+    //将传入的data放到bwr的write_buffer
     bwr.write_buffer = (uintptr_t) data;
     bwr.read_size = 0;
     bwr.read_consumed = 0;
     bwr.read_buffer = 0;
+    //调用驱动的ioctl,实际上读写的cmd都是BINDER_WRITE_READ
+    //是读是写还是由write_size和read_size决定的
     res = ioctl(bs->fd, BINDER_WRITE_READ, &bwr);
     if (res < 0) {
         fprintf(stderr,"binder_write: ioctl failed (%s)\n",
@@ -216,6 +221,7 @@ int binder_parse(struct binder_state *bs, struct binder_io *bio,
     uintptr_t end = ptr + (uintptr_t) size;
 
     while (ptr < end) {
+        //ptr是传过来的，里面存放着cmd
         uint32_t cmd = *(uint32_t *) ptr;
         ptr += sizeof(uint32_t);
 #if TRACE
@@ -322,6 +328,36 @@ void binder_link_to_death(struct binder_state *bs, uint32_t target, struct binde
     data.payload.cookie = (uintptr_t) death;
     binder_write(bs, &data, sizeof(data));
 }
+#if 0
+struct binder_transaction_data {
+    /* The first two are only used for bcTRANSACTION and brTRANSACTION,
+     * identifying the target and contents of the transaction.
+     */
+    union {
+        size_t  handle; /* target descriptor of command transaction */    [1]
+        void    *ptr;   /* target descriptor of return transaction */     [2]
+    } target;
+    void        *cookie;    /* target object cookie */                    [3]
+    unsigned int    code;       /* transaction command */                 [4]
+
+    /* General information about the transaction. */
+    unsigned int    flags;
+    pid_t       sender_pid;                                               [5]
+    uid_t       sender_euid;                                              [6]
+    size_t      data_size;  /* number of bytes of data */                 [7]
+    size_t      offsets_size;   /* number of bytes of offsets */          [8]
+
+    union {
+        struct {
+            /* transaction data */
+            const void __user   *buffer;                                  
+            /* offsets from buffer to flat_binder_object structs */
+            const void __user   *offsets;                                
+        } ptr;
+        uint8_t buf[8];                                                  
+    } data;
+};
+#endif
 
 int binder_call(struct binder_state *bs,
                 struct binder_io *msg, struct binder_io *reply,
@@ -341,8 +377,8 @@ int binder_call(struct binder_state *bs,
     }
 
     writebuf.cmd = BC_TRANSACTION;
-    writebuf.txn.target.handle = target;
-    writebuf.txn.code = code;
+    writebuf.txn.target.handle = target;//目的的handle号,如SVCMGR的
+    writebuf.txn.code = code;//cmd code,对于svcmgr_publish,为ADD_SERVICE
     writebuf.txn.flags = 0;
     writebuf.txn.data_size = msg->data - msg->data0;
     writebuf.txn.offsets_size = ((char*) msg->offs) - ((char*) msg->offs0);
@@ -358,14 +394,15 @@ int binder_call(struct binder_state *bs,
         bwr.read_size = sizeof(readbuf);
         bwr.read_consumed = 0;
         bwr.read_buffer = (uintptr_t) readbuf;
-
+        //调用驱动层的binder_ioctl,readsize>0,将会进入读操作
         res = ioctl(bs->fd, BINDER_WRITE_READ, &bwr);
 
         if (res < 0) {
             fprintf(stderr,"binder: ioctl failed (%s)\n", strerror(errno));
             goto fail;
         }
-
+        //最后一项为0说明没有对应的处理函数
+        //readbuf里面存放着cmd，此时的cmd可能已经经过ioctl(读操作,BR_NOOP)后被改动了
         res = binder_parse(bs, reply, (uintptr_t) readbuf, bwr.read_consumed, 0);
         if (res == 0) return 0;
         if (res < 0) goto fail;
@@ -401,7 +438,8 @@ void binder_loop(struct binder_state *bs, binder_handler func)
             ALOGE("binder_loop: ioctl failed (%s)\n", strerror(errno));
             break;
         }
-
+        //func是传过来的函数指针,readbuf里面存放着cmd，此时的cmd可能
+        //已经经过ioctl后被改动了
         res = binder_parse(bs, 0, (uintptr_t) readbuf, bwr.read_consumed, func);
         if (res == 0) {
             ALOGE("binder_loop: unexpected reply?!\n");
@@ -498,6 +536,7 @@ void bio_put_uint32(struct binder_io *bio, uint32_t n)
 
 void bio_put_obj(struct binder_io *bio, void *ptr)
 {
+    //创建flat_binder_object
     struct flat_binder_object *obj;
 
     obj = bio_alloc_obj(bio);
@@ -505,8 +544,8 @@ void bio_put_obj(struct binder_io *bio, void *ptr)
         return;
 
     obj->flags = 0x7f | FLAT_BINDER_FLAG_ACCEPTS_FDS;
-    obj->type = BINDER_TYPE_BINDER;
-    obj->binder = (uintptr_t)ptr;
+    obj->type = BINDER_TYPE_BINDER;//实体？
+    obj->binder = (uintptr_t)ptr;//ptr是对应的处理函数
     obj->cookie = 0;
 }
 

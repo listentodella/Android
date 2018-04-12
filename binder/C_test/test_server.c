@@ -196,13 +196,15 @@ int svcmgr_publish(struct binder_state *bs, uint32_t target, const char *name, v
     int status;
     unsigned iodata[512/4];
     struct binder_io msg, reply;
-
+    //¹¹Ôìbinder_io,µ÷ÓÃÓ¦ÓÃ²ãµÄbinder.c
     bio_init(&msg, iodata, sizeof(iodata), 4);
     bio_put_uint32(&msg, 0);  // strict mode header
-    bio_put_string16_x(&msg, SVC_MGR_NAME);
-    bio_put_string16_x(&msg, name);
+    bio_put_string16_x(&msg, SVC_MGR_NAME);//·ÅÈë¹Ü¼ÒÃû
+    bio_put_string16_x(&msg, name);//·ÅÈë·şÎñÃû
+    //»á´´½¨Ò»¸öflat_binder_obj,²¢½«ptr(¼´´¦Àíº¯Êı)·Å½øÈ¥
     bio_put_obj(&msg, ptr);
-    /* 
+
+    /* µ÷ÓÃÓ¦ÓÃ²ãµÄbinder.c 
      * msg:å«æœ‰æœåŠ¡çš„åå­—
      * reply:å®ƒä¼šå«æœ‰servicemanagerå›å¤çš„æ•°æ®
      * 0 -> servicemanager
@@ -260,6 +262,7 @@ int main(int argc, char **argv)
     }
 
     /* add service */
+    //½«handle¡¢·şÎñÃûservice_name¼°¶ÔÓ¦µÄ´¦Àíº¯Êı´«Èë
     ret = svcmgr_publish(bs, svcmgr, "hello", hello_service_handler);
     if (ret) {
         fprintf(stderr, "failed to publish hello service\n");

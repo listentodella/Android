@@ -307,13 +307,13 @@ int svcmgr_handler(struct binder_state *bs,
 int main(int argc, char **argv)
 {
     struct binder_state *bs;
-
+    //首先调用应用层的binder_open，进而调用到驱动层
     bs = binder_open(128*1024);
     if (!bs) {
         ALOGE("failed to open binder driver\n");
         return -1;
     }
-
+    //成为“大管家”，一系列调用，值得关注
     if (binder_become_context_manager(bs)) {
         ALOGE("cannot become context manager (%s)\n", strerror(errno));
         return -1;
@@ -324,8 +324,11 @@ int main(int argc, char **argv)
     selinux_set_callback(SELINUX_CB_AUDIT, cb);
     cb.func_log = selinux_log_callback;
     selinux_set_callback(SELINUX_CB_LOG, cb); */
-
+    
+    //给handle赋值，由于是mgr,所以值比较特殊
     svcmgr_handle = BINDER_SERVICE_MANAGER;
+    //传入函数指针，即该server对应的处理函数
+    //这里的binder_loop是应用层的binder.c实现
     binder_loop(bs, svcmgr_handler);
 
     return 0;

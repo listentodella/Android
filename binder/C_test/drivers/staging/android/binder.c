@@ -1473,7 +1473,7 @@ static void binder_transaction(struct binder_proc *proc,
 	e->data_size = tr->data_size;
 	e->offsets_size = tr->offsets_size;
 
-	if (reply) {
+	if (reply) {//是reply,即BC_REPLY
 		in_reply_to = thread->transaction_stack;
 		if (in_reply_to == NULL) {
 			binder_user_error("binder: %d:%d got reply transaction "
@@ -1516,8 +1516,8 @@ static void binder_transaction(struct binder_proc *proc,
 			goto err_dead_binder;
 		}
 		target_proc = target_thread->proc;
-	} else {
-		if (tr->target.handle) {
+	} else {//不是reply, 则为BC_TRANSACTION?
+		if (tr->target.handle) {//如果已有目的的handle
 			struct binder_ref *ref;
 			ref = binder_get_ref(proc, tr->target.handle);
 			if (ref == NULL) {
@@ -1528,7 +1528,8 @@ static void binder_transaction(struct binder_proc *proc,
 				goto err_invalid_target_handle;
 			}
 			target_node = ref->node;
-		} else {
+		} else {//没有，则走svc_manager特定的流程
+            //将全局变量(binder_node)节点赋值给target_node
 			target_node = binder_context_mgr_node;
 			if (target_node == NULL) {
 				return_error = BR_DEAD_REPLY;
@@ -1536,6 +1537,7 @@ static void binder_transaction(struct binder_proc *proc,
 			}
 		}
 		e->to_node = target_node->debug_id;
+        //得到目的handle所对应的proc
 		target_proc = target_node->proc;
 		if (target_proc == NULL) {
 			return_error = BR_DEAD_REPLY;
@@ -1703,14 +1705,19 @@ static void binder_transaction(struct binder_proc *proc,
 			return_error = BR_FAILED_REPLY;
 			goto err_bad_offset;
 		}
+        //从数据中取出 flat_binder_object
 		fp = (struct flat_binder_object *)(t->buffer->data + *offp);
 		off_min = *offp + sizeof(struct flat_binder_object);
-		switch (fp->type) {
+        //根据flat_binder_object的type成员
+        //只有server才能传输实体(binder),其他是引用(handle)
+		switch (fp->type) { 
 		case BINDER_TYPE_BINDER:
 		case BINDER_TYPE_WEAK_BINDER: {
 			struct binder_ref *ref;
+            //从红黑树中取出proc对应的binder_node
 			struct binder_node *node = binder_get_node(proc, fp->binder);
-			if (node == NULL) {
+			if (node == NULL) {//若本就没有则新建
+                //为proc(server)构造binder_node
 				node = binder_new_node(proc, fp->binder, fp->cookie);
 				if (node == NULL) {
 					return_error = BR_FAILED_REPLY;
@@ -1731,16 +1738,21 @@ static void binder_transaction(struct binder_proc *proc,
 				return_error = BR_FAILED_REPLY;
 				goto err_binder_get_ref_for_node_failed;
 			}
+            //为target_proc(service manager)构造binder_ref
 			ref = binder_get_ref_for_node(target_proc, node);
 			if (ref == NULL) {
 				return_error = BR_FAILED_REPLY;
 				goto err_binder_get_ref_for_node_failed;
 			}
+            //最后实体要改成引用
 			if (fp->type == BINDER_TYPE_BINDER)
 				fp->type = BINDER_TYPE_HANDLE;
 			else
 				fp->type = BINDER_TYPE_WEAK_HANDLE;
+            //handle=desc,因此desc和handle有对应关系
 			fp->handle = ref->desc;
+
+            //增加引用计数
 			binder_inc_ref(ref, fp->type == BINDER_TYPE_HANDLE,
 				       &thread->todo);
 
@@ -1920,6 +1932,7 @@ int binder_thread_write(struct binder_proc *proc, struct binder_thread *thread,
 	void __user *end = buffer + size;
 
 	while (ptr < end && thread->return_error == BR_OK) {
+        //从ptr(即buffer)里取出用户空间的cmd,如BC_ENTER_LOOPER
 		if (get_user(cmd, (uint32_t __user *)ptr))
 			return -EFAULT;
 		ptr += sizeof(uint32_t);
@@ -1936,8 +1949,8 @@ int binder_thread_write(struct binder_proc *proc, struct binder_thread *thread,
 
 
 		switch (cmd) {
-		case BC_INCREFS:
-		case BC_ACQUIRE:
+		case BC_INCREFS://增加引用计数
+		case BC_ACQUIRE://增加强引用计数
 		case BC_RELEASE:
 		case BC_DECREFS: {
 			uint32_t target;
@@ -2107,7 +2120,7 @@ int binder_thread_write(struct binder_proc *proc, struct binder_thread *thread,
 		case BC_TRANSACTION:
 		case BC_REPLY: {
 			struct binder_transaction_data tr;
-
+            //将ptr(即buffer)指向的用户空间的数据拷贝到内核空间的tr
 			if (copy_from_user(&tr, ptr, sizeof(tr)))
 				return -EFAULT;
 			ptr += sizeof(tr);
@@ -2148,6 +2161,7 @@ int binder_thread_write(struct binder_proc *proc, struct binder_thread *thread,
 					"BC_REGISTER_LOOPER\n",
 					proc->pid, thread->pid);
 			}
+            //给thread->looper 或上一个标志
 			thread->looper |= BINDER_LOOPER_STATE_ENTERED;
 			break;
 		case BC_EXIT_LOOPER:
@@ -2342,7 +2356,7 @@ static int binder_thread_read(struct binder_proc *proc,
         /*print info: proc's name, proc's id, thread, cmd's name*/
         printk("%s (%d, %d), %s, %s\n", proc->tsk->comm, proc->pid,
                 thread->pid, __func__, binder_cmd_name(BR_NOOP));
-
+        //将BR_NOOP放入到用户空间
 		if (put_user(BR_NOOP, (uint32_t __user *)ptr))
 			return -EFAULT;
 		ptr += sizeof(uint32_t);
@@ -2715,7 +2729,7 @@ static struct binder_thread *binder_get_thread(struct binder_proc *proc)
 	struct binder_thread *thread = NULL;
 	struct rb_node *parent = NULL;
 	struct rb_node **p = &proc->threads.rb_node;
-
+    //如果不为空，说明是已经创建过的，取出
 	while (*p) {
 		parent = *p;
 		thread = rb_entry(parent, struct binder_thread, rb_node);
@@ -2727,14 +2741,17 @@ static struct binder_thread *binder_get_thread(struct binder_proc *proc)
 		else
 			break;
 	}
+    //如果为NULL，说明是第一次，需要创建
 	if (*p == NULL) {
 		thread = kzalloc(sizeof(*thread), GFP_KERNEL);
 		if (thread == NULL)
 			return NULL;
 		binder_stats_created(BINDER_STAT_THREAD);
+        //把proc节点也存放到binder_thread中,记录pid
 		thread->proc = proc;
 		thread->pid = current->pid;
 		init_waitqueue_head(&thread->wait);
+        //init binder_thread的todo链表
 		INIT_LIST_HEAD(&thread->todo);
 		rb_link_node(&thread->rb_node, parent, p);
 		rb_insert_color(&thread->rb_node, &proc->threads);
@@ -2819,9 +2836,11 @@ static unsigned int binder_poll(struct file *filp,
 static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	int ret;
+    //取出proc，并创建binder_thread(后面可能用于取出，也可能是新建)
 	struct binder_proc *proc = filp->private_data;
 	struct binder_thread *thread;
 	unsigned int size = _IOC_SIZE(cmd);
+    //将用户空间传入的arg转换为ubuf，供后续使用
 	void __user *ubuf = (void __user *)arg;
 
 	/*printk(KERN_INFO "binder_ioctl: %d:%d %x %lx\n",
@@ -2832,6 +2851,7 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		return ret;
 
 	binder_lock(__func__);
+    //根据proc获取或创建binder_thread
 	thread = binder_get_thread(proc);
 	if (thread == NULL) {
 		ret = -ENOMEM;
@@ -2845,6 +2865,7 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			ret = -EINVAL;
 			goto err;
 		}
+        //将用户空间的ubuf拷贝到内核空间的bwr
 		if (copy_from_user(&bwr, ubuf, sizeof(bwr))) {
 			ret = -EFAULT;
 			goto err;
@@ -2853,8 +2874,9 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			     "binder: %d:%d write %ld at %08lx, read %ld at %08lx\n",
 			     proc->pid, thread->pid, bwr.write_size, bwr.write_buffer,
 			     bwr.read_size, bwr.read_buffer);
-
+        //说明是写操作
 		if (bwr.write_size > 0) {
+            //ubuf，即用户空间的数据已经copy到bwr了，各个值在用户空间时都已经被赋值好了
 			ret = binder_thread_write(proc, thread, (void __user *)bwr.write_buffer, bwr.write_size, &bwr.write_consumed);
 			if (ret < 0) {
 				bwr.read_consumed = 0;
@@ -2863,6 +2885,7 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 				goto err;
 			}
 		}
+        //说明是读操作,似乎read会改变、回传cmd?
 		if (bwr.read_size > 0) {
 			ret = binder_thread_read(proc, thread, (void __user *)bwr.read_buffer, bwr.read_size, &bwr.read_consumed, filp->f_flags & O_NONBLOCK);
 			if (!list_empty(&proc->todo))
@@ -2877,6 +2900,8 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			     "binder: %d:%d wrote %ld of %ld, read return %ld of %ld\n",
 			     proc->pid, thread->pid, bwr.write_consumed, bwr.write_size,
 			     bwr.read_consumed, bwr.read_size);
+
+        //将读写后的内核空间的bwr，再放回到用户空间的ubuf里
 		if (copy_to_user(ubuf, &bwr, sizeof(bwr))) {
 			ret = -EFAULT;
 			goto err;
@@ -2890,11 +2915,13 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		}
 		break;
 	case BINDER_SET_CONTEXT_MGR:
+        //如果不为空，说明已经有 MGR 了
 		if (binder_context_mgr_node != NULL) {
 			printk(KERN_ERR "binder: BINDER_SET_CONTEXT_MGR already set\n");
 			ret = -EBUSY;
 			goto err;
 		}
+        //成为MGR
 		ret = security_binder_set_context_mgr(proc->tsk);
 		if (ret < 0)
 			goto err;
@@ -2909,11 +2936,13 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			}
 		} else
 			binder_context_mgr_uid = current->cred->euid;
+        //创建binder_node,注：赋值给这个全局变量
 		binder_context_mgr_node = binder_new_node(proc, NULL, NULL);
 		if (binder_context_mgr_node == NULL) {
 			ret = -ENOMEM;
 			goto err;
 		}
+        //增加弱、强引用计数？
 		binder_context_mgr_node->local_weak_refs++;
 		binder_context_mgr_node->local_strong_refs++;
 		binder_context_mgr_node->has_strong_ref = 1;
@@ -2930,6 +2959,7 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			ret = -EINVAL;
 			goto err;
 		}
+        //将binder_version返回给应用层
 		if (put_user(BINDER_CURRENT_PROTOCOL_VERSION, &((struct binder_version *)ubuf)->protocol_version)) {
 			ret = -EINVAL;
 			goto err;
@@ -3080,12 +3110,13 @@ static int binder_open(struct inode *nodp, struct file *filp)
 
 	binder_debug(BINDER_DEBUG_OPEN_CLOSE, "binder_open: %d:%d\n",
 		     current->group_leader->pid, current->pid);
-
+    /*创建proc*/
 	proc = kzalloc(sizeof(*proc), GFP_KERNEL);
 	if (proc == NULL)
 		return -ENOMEM;
 	get_task_struct(current);
 	proc->tsk = current;
+    //初始化proc的todo链表
 	INIT_LIST_HEAD(&proc->todo);
 	init_waitqueue_head(&proc->wait);
 	proc->default_priority = task_nice(current);
@@ -3095,6 +3126,7 @@ static int binder_open(struct inode *nodp, struct file *filp)
 	hlist_add_head(&proc->proc_node, &binder_procs);
 	proc->pid = current->group_leader->pid;
 	INIT_LIST_HEAD(&proc->delivered_death);
+    //将创建的proc节点存放到设备的私有数据中，以后就可以直接找到了
 	filp->private_data = proc;
 	binder_unlock(__func__);
 
