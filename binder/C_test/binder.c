@@ -19,11 +19,11 @@
 
 #define TRACE 0
 
-#if TRACE 
+#if TRACE
 #define ALOGI(x...) fprintf(stderr, "binder: " x)
 #define ALOGE(x...) fprintf(stderr, "binder: " x)
 #else
-#define ALOGI(x...) 
+#define ALOGI(x...)
 #define ALOGE(x...)
 #endif
 
@@ -350,15 +350,16 @@ struct binder_transaction_data {
     union {
         struct {
             /* transaction data */
-            const void __user   *buffer;                                  
+            const void __user   *buffer;
             /* offsets from buffer to flat_binder_object structs */
-            const void __user   *offsets;                                
+            const void __user   *offsets;
         } ptr;
-        uint8_t buf[8];                                                  
+        uint8_t buf[8];
     } data;
 };
 #endif
-
+//既会发送数据，也会想获得返回的数据，因此写完之后立马进入读状态
+//一开始会读到BR_NOOP,然后休眠,等待处理
 int binder_call(struct binder_state *bs,
                 struct binder_io *msg, struct binder_io *reply,
                 uint32_t target, uint32_t code)
