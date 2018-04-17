@@ -12,6 +12,7 @@
 #include <linux/types.h>
 #include <stdbool.h>
 #include <string.h>
+#include <pthread.h>
 
 #include "binder.h"
 
@@ -214,6 +215,56 @@ void binder_send_reply(struct binder_state *bs,
     binder_write(bs, &data, sizeof(data));
 }
 
+void binder_thread_loop(struct binder_state *bs, binder_handler func)
+{
+    int res;
+    struct binder_write_read bwr;
+    uint32_t readbuf[32];
+
+    bwr.write_size = 0;
+    bwr.write_consumed = 0;
+    bwr.write_buffer = 0;
+
+    readbuf[0] = BC_REGISTER_LOOPER;
+    binder_write(bs, readbuf, sizeof(uint32_t));
+
+    for (;;) {
+        bwr.read_size = sizeof(readbuf);
+        bwr.read_consumed = 0;
+        bwr.read_buffer = (uintptr_t) readbuf;
+
+        res = ioctl(bs->fd, BINDER_WRITE_READ, &bwr);
+
+        if (res < 0) {
+            ALOGE("binder_loop: ioctl failed (%s)\n", strerror(errno));
+            break;
+        }
+        //func是传过来的函数指针,readbuf里面存放着cmd，此时的cmd可能
+        //已经经过ioctl后被改动了
+        res = binder_parse(bs, 0, (uintptr_t) readbuf, bwr.read_consumed, func);
+        if (res == 0) {
+            ALOGE("binder_loop: unexpected reply?!\n");
+            break;
+        }
+        if (res < 0) {
+            ALOGE("binder_loop: io error %d %s\n", res, strerror(errno));
+            break;
+        }
+    }
+}
+
+//struct binder_state *bs, binder_handler func
+struct binder_thread_desc {
+    struct binder_state *bs;
+    binder_handler func;
+};
+
+static void *binder_thread_routine(struct binder_thread_desc *btd)
+{
+    binder_thread_loop(btd->bs, btd->func);
+    return NULL;
+}
+
 int binder_parse(struct binder_state *bs, struct binder_io *bio,
                  uintptr_t ptr, size_t size, binder_handler func)
 {
@@ -241,6 +292,19 @@ int binder_parse(struct binder_state *bs, struct binder_io *bio,
 #endif
             ptr += sizeof(struct binder_ptr_cookie);
             break;
+
+        case BR_SPAWN_LOOPER: {
+            /*create new thread*/
+            //if(fork() == 0)//WRONG!!!
+            pthread_t tid;
+            struct binder_thread_desc btd;
+            btd.bs = bs;
+            btd.func = func;
+            pthread_create(&tid, NULL, binder_thread_routine, &btd);
+            /*in new thread: ioctl(BC_ENTER_LOOPER), enter binder_looper*/
+            break;
+        }
+
         case BR_TRANSACTION: {
             struct binder_transaction_data *txn = (struct binder_transaction_data *) ptr;
             if ((end - ptr) < sizeof(*txn)) {
@@ -413,6 +477,16 @@ fail:
     memset(reply, 0, sizeof(*reply));
     reply->flags |= BIO_F_IOERROR;
     return -1;
+}
+
+void binder_set_maxthreads(struct binder_state *bs, int threads)
+{
+    int res;
+    res = ioctl(bs->fd, BINDER_SET_MAX_THREADS, &threads);
+    if (res < 0) {
+        ALOGE("binder_set_maxthreads: ioctl failed (%s)\n", strerror(errno));
+        break;
+    }
 }
 
 void binder_loop(struct binder_state *bs, binder_handler func)

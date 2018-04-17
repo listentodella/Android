@@ -52,7 +52,8 @@ const char *binder_cmd_name(uint32_t cmd)
         NAME(BR_REPLY);
         NAME(BR_FAILED_REPLY);
         NAME(BR_DEAD_REPLY);
-        NAME(BR_DEAD_BINDER);
+		NAME(BR_DEAD_BINDER);
+		NAME(BR_SPAWN_LOOPER);
         NAME(BC_TRANSACTION);
         NAME(BC_REPLY);
         NAME(BC_ACQUIRE_RESULT);
