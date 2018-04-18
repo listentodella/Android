@@ -69,3 +69,44 @@ main()
 	sayhello_to();
 }
 ```
+
+## Binder服务的Cpp实现
+* 定义接口类
+```
+IHelloService:
+virtual sayhello()
+virtual sayhello_to()
+则客户端和服务端都要实现这两个函数
+```
+* server端实现
+```
+BnHelloService:IHelloService
+sayhello()
+sayhello_to()
+onTransact()
+```
+* client端实现
+```
+BpHelloService:IHelloService
+sayhello()
+sayhello_to()
+```
+* 实现server
+```
+main() 
+{
+    addService()
+    while (1) {
+        读数据， 解析数据， 调用函数
+    }
+}
+```
+* 实现client
+```
+main() 
+{
+    svr = getService()
+    svr - > sayhello()
+    svr - > sayhello_to()
+}
+```

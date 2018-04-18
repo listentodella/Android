@@ -12,6 +12,8 @@
 #include <system/audio.h>
 
 
+#define HELLO_SVR_CMD_SAYHELLO 0
+#define HELLO_SVR_CMD_SAYHELLO_TO 1
 
 namespace android {
 
