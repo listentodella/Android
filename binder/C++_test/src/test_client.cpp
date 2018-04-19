@@ -12,6 +12,8 @@
 #include <cutils/properties.h>
 #include <utils/Log.h>
 
+#include "IHelloService.h"
+
 using namespace android;
 
 
@@ -45,7 +47,7 @@ int main(int argc, char **argv)
     sp<IHelloService> service = interface_cast<IHelloService>(binder);
     
     /*调用Service的函数*/
-    if (argc < 2) {
+    if (argc < 3) {
         service->sayhello();
         ALOGI("client call sayhello");
     } else { 

@@ -2,6 +2,8 @@
 
 #include "IHelloService.h"
 
+namespace android {
+
 
 class BpHelloService: public BpInterface<IHelloService>
 {
@@ -17,12 +19,12 @@ public:
         Parcel data, reply;
         data.writeInt32(0);
 
-        remote()->transact(HELLO_SVR_CMD_SAYHELLO_TO, data, &reply);
-    }
-
-    int sayhello_to(const char *name)
-    {
-        /*构造、发送数据*/
+        remote()->transact(HELLO_SVR_CMD_SAYHELLO, data, &reply);
+	}
+	
+	int sayhello_to(const char *name)
+	{
+		/* 构造/发送数据 */
         Parcel data, reply;
         data.writeInt32(0);
         data.writeString16(String16(name));
@@ -31,7 +33,10 @@ public:
 
         return reply.readInt32();
     }
+};
+
+
+IMPLEMENT_META_INTERFACE(HelloService, "android.media.IHelloService");
+
+
 }
-
-
-DECLARE_META_INTERFACE(HelloService, "android.media.IHelloService");

@@ -1,15 +1,16 @@
 /*consult: frameworks/av/media/libmedia/IMediaPlayerService.cpp*/
 
-#include "IHelloService.h"
-
 #define LOG_TAG "HelloService"
 
+#include "IHelloService.h"
 
-namespace android{
-status_t BnInterface::onTransact( uint32_t code,
-                                    const Parcel& data,
-                                    Parcel* reply,
-                                    uint32_t flags = 0)
+
+namespace android {
+
+status_t BnHelloService::onTransact( uint32_t code,
+                                const Parcel& data,
+                                Parcel* reply,
+                                uint32_t flags)
 {
     /*解析数据,调用sayhello or sayhello_to*/
     switch (code) {
@@ -36,14 +37,13 @@ status_t BnInterface::onTransact( uint32_t code,
     }
 }
 
-
-void BnInterface::sayhello(void)
+void BnHelloService::sayhello(void)
 {
     static int cnt = 0;
     ALOGI("%s: %d\n", __func__, cnt++);
 }
 
-int BnInterface::sayhello_to(const char *name)
+int BnHelloService::sayhello_to(const char *name)
 {
     static int cnt = 0;
     ALOGI("%s: %s : %d\n", __func__, name, cnt++);

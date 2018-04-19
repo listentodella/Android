@@ -12,9 +12,11 @@
 #include <cutils/properties.h>
 #include <utils/Log.h>
 
+#include "IHelloService.h"
+
 using namespace android;
 
-void main(void)
+int main(void)
 {
     /*add Service*/
 
@@ -32,4 +34,6 @@ void main(void)
     /*循环体*/
     ProcessState::self()->startThreadPool();
     IPCThreadState::self()->joinThreadPool();
+
+    return 0;
 }

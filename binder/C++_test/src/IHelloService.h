@@ -9,7 +9,6 @@
 #include <utils/String8.h>
 #include <binder/IInterface.h>
 #include <binder/Parcel.h>
-#include <system/audio.h>
 
 
 #define HELLO_SVR_CMD_SAYHELLO 0
@@ -24,7 +23,7 @@ public:
     virtual void sayhello(void) = 0;
     virtual int sayhello_to(const char *name) = 0;
 
-}
+};
 
 class BnHelloService: public BnInterface<IHelloService>
 {

@@ -110,3 +110,51 @@ main()
     svr - > sayhello_to()
 }
 ```
+
+## How To Test???
+
+### 编译:
+* a. 文件放入frameworks/testing/APP_0004_Binder_CPP_App
+* b. enviroment
+```
+    cd /work/android-5.0.2/
+    . setenv
+    lunch //选择23. full_tiny4412-eng
+```
+* c. mmm
+```
+    cd frameworks/testing/APP_0004_Binder_CPP_App
+    mmm .   
+```
+
+### 测试:
+* a. 重新编译内核让它支持NFS
+```
+    make menuconfig
+    <*>   NFS client support                                                        | |
+    [*]     NFS client support for NFS version 3                                    | |
+    [*]       NFS client support for the NFSv3 ACL protocol extension               | |
+    [*]     NFS client support for NFS version 4                                    | |
+    [*]       NFS client support for NFSv4.1 (EXPERIMENTAL) 
+
+    make zImage, 并使用新的zImage启动单板
+```
+
+* b. mount nfs
+```
+   su
+   ifconfig eth0 192.168.1.100
+   busybox mount -t nfs -o nolock,vers=2 192.168.1.123:/work/nfs_root /mnt
+```   
+
+* c. 执行 test_server, test_client (cpp or c)
+```
+   ./test_server &
+   logcat HelloService:* *:S &
+   ./test_client hello
+   ./test_client hello weidongshan
+
+```
+
+
+
