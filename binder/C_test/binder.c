@@ -485,7 +485,6 @@ void binder_set_maxthreads(struct binder_state *bs, int threads)
     res = ioctl(bs->fd, BINDER_SET_MAX_THREADS, &threads);
     if (res < 0) {
         ALOGE("binder_set_maxthreads: ioctl failed (%s)\n", strerror(errno));
-        break;
     }
 }
 
