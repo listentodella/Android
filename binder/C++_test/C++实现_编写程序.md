@@ -128,7 +128,7 @@ main()
 ```
 
 ### 测试:
-* a. 重新编译内核让它支持NFS
+* a. 重新编译内核让它支持NFS（即更新Android的bootimage）
 ```
     make menuconfig
     <*>   NFS client support                                                        | |
@@ -140,7 +140,7 @@ main()
     make zImage, 并使用新的zImage启动单板
 ```
 
-* b. mount nfs
+* b. mount nfs：这里使用的是Android系统，因此需要busybox
 ```
    su
    ifconfig eth0 192.168.1.100
