@@ -32,8 +32,10 @@ public:
                                     const Parcel& data,
                                     Parcel* reply,
                                     uint32_t flags = 0);
-    virtual void saygoodbye(void) = 0;
-    virtual int saygoodbye_to(const char *name) = 0;
+
+	virtual void saygoodbye(void);
+	virtual int saygoodbye_to(const char *name);
+
 };
 
 }

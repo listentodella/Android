@@ -15,7 +15,8 @@ LOCAL_SHARED_LIBRARIES := \
 	libcutils \
 	libutils \
 	liblog \
-	libbinder \
+	libbinder 
+
 
 LOCAL_MODULE:= test_server
 LOCAL_32_BIT_ONLY := true
@@ -34,7 +35,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libcutils \
 	libutils \
 	liblog \
-	libbinder \
+	libbinder 
 
 LOCAL_MODULE:= test_client
 LOCAL_32_BIT_ONLY := true

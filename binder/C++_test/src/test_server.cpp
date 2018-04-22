@@ -30,8 +30,8 @@ int main(void)
     sp<IServiceManager> sm = defaultServiceManager();
     //ALOGI("ServiceManager: %p", sm.get());
 
-    sm->addService(String16("hello"), new BnHelloService());
-    sm->addService(String16("goodbye"), new BnGoodbyeService());
+	sm->addService(String16("hello"), new BnHelloService());
+	sm->addService(String16("goodbye"), new BnGoodbyeService());
 
     /*循环体*/
     ProcessState::self()->startThreadPool();//创建子线程
