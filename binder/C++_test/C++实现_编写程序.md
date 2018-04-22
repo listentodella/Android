@@ -155,6 +155,13 @@ main()
    ./test_client hello weidongshan
 
 ```
-
+*****************
+## 添加服务
+BnGoodbyeService.cpp
+.saygoodbye
+.saygoodbye_to
+BpGoodbyeService.cpp
+.saygoodbye
+.saygoodbye_to
 
 

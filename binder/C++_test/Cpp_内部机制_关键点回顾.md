@@ -1,0 +1,122 @@
+# binder系统_内部机制_关键点回顾
+
+![binder系统关键点](binder%E7%B3%BB%E7%BB%9F%E5%85%B3%E9%94%AE%E7%82%B9.png)
+
+## addService
+* test_server为每个服务构造 flat_binder_object,不同的服务,其binder或cookie不同
+```
+struct flat_binder_object {
+	/* 8 bytes for large_flat_header. */
+	unsigned long		type;
+	unsigned long		flags;
+
+	/* 8 bytes of data. */
+	union {
+		void		*binder;	/* local object */
+		signed long	handle;		/* remote object */
+	};
+
+	/* extra data associated with local object */
+	void			*cookie;
+};
+```
+* 调用ioctl发送数据
+数据：flat_binder_objetc + 服务名称
+数据包含有"目的地"：handle = 0,表示发给service_manager
+* 驱动程序对每一个flat_binder_object构造一个binder_node
+```
+struct binder_node {
+	int debug_id;
+	struct binder_work work;
+	union {
+		struct rb_node rb_node;
+		struct hlist_node dead_node;
+	};
+	struct binder_proc *proc;
+	struct hlist_head refs;
+	int internal_strong_refs;
+	int local_weak_refs;
+	int local_strong_refs;
+	void __user *ptr;=========================来自flat_binder_object
+	void __user *cookie;====================///里的binder和cookie
+	unsigned has_strong_ref:1;
+	unsigned pending_strong_ref:1;
+	unsigned has_weak_ref:1;
+	unsigned pending_weak_ref:1;
+	unsigned has_async_transaction:1;
+	unsigned accept_fds:1;
+	unsigned min_priority:8;
+	struct list_head async_todo;
+};
+```
+* 驱动程序根据handle=0，找到svc_mgr，把数据发给svc_mgr并且创建一个binder_ref
+```
+struct binder_ref {
+	/* Lookups needed: */
+	/*   node + proc => ref (transaction) */
+	/*   desc + proc => ref (transaction, inc/dec ref) */
+	/*   node => refs + procs (proc exit) */
+	int debug_id;
+	struct rb_node rb_node_desc;
+	struct rb_node rb_node_node;
+	struct hlist_node node_entry;
+	struct binder_proc *proc;
+	struct binder_node *node;
+	uint32_t desc;
+	int strong;
+	int weak;
+	struct binder_ref_death *death;
+};
+```
+* svc_mgr里，记录服务的名称及desc值
+
+## getService
+* test_client构造数据
+数据 = 名称 + "目的"（handle = 0）
+
+* 调用ioctl发送数据
+* 驱动程序：根据handle=0找到svc_mgr，把数据给svc_mgr
+* svc_mgr从svc_list里找到对应项
+比如根据名称"Hello"找到第一项，handle=1
+* svc_mgr返回数据：调用ioctl
+数据 = flat_binder_object
+```
+struct flat_binder_object {
+	unsigned long		type;=========表示引用，binder_ref
+	unsigned long		flags;
+	union {
+		void		*binder; =================等于1
+		signed long	handle;		
+	};
+	void			*cookie;
+};
+```
+* 驱动程序：发现数据中含有flat_binder_object结构体，且type成员为引用
+从svc_mgr的binder_ref链表中找到对应项（传入的handle==binder_ref.desc）
+再找到binder_node
+最后，为test_client也建立binder_ref
+
+## test_client怎么使用服务
+* 构造数据
+例如HelloService，会提供sayhello、sayhello_to
+数据含有code（调用哪个函数）+ 参数 + "目的"（handle=1）
+* 使用ioctl发送数据
+* 驱动程序：取出handle=1→找到binder_ref→找到binder_node→找到目的进程target_proc：test_server，最后，把数据传给test_server，并且在数据中设置ptr 、cookie为binder_node的ptr、cookie
+* test_server根据传过来的ptr、cookie知道你想调用的哪个服务，再根据其中的code、参数调用对应的函数
+
+# Binder系统最核心函数：ioctl
+# client 最核心的数据：handle
+# server最核心的数据：ptr、cookie
+```
+server注册服务时, 对每个服务都提供不同的ptr/cookie,
+在驱动程序里对每个服务都构造一个binder_node, 它也含有ptr/cookie
+
+client使用服务前要先getService：会在驱动程序里对该服务构造一个binder_ref, 
+binder_ref含有desc, node成员, desc是整数, node指向对应服务的binder_node
+
+使用服务时, client构造数据，调用ioctl：数据里含有handle
+
+驱动程序根据handle找到binder_ref(desc==handle), 找到binder_node, 再找到server,从binder_node取出ptr/cookie连同那些数据发给server
+
+server根据ptr/cookie知道要调用哪一个服务，．．．．
+```
