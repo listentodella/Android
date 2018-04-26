@@ -22,6 +22,8 @@ status_t BnHelloService::onTransact( uint32_t code,
         case HELLO_SVR_CMD_SAYHELLO_TO: {
             /*从data中取出参数*/
             int32_t policy = data.readInt32();
+            //first string not be needed
+            String16 name16_tmp = data.readString16();
             String16 name16 = data.readString16();
             String8 name8(name16);
 
