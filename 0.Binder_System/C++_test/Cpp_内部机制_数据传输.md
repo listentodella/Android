@@ -11,7 +11,7 @@ reply;:ioctl
 }
 
 ## test_server.cpp
-### 
+###
 c 主线程open、mmap后会得到一个fd，那么之后的多个子线程可以共享到主线程的fd及其他资源
 cpp 主线程open、mmap，以某个类的对象来操作————ProcessState，单例模式，每个进程只有一个ProcessState对象，ProcessState::self()来创建对象。
 
@@ -69,7 +69,7 @@ ProcessState::self()->startThreadPool();
 			    }
 ```
 ## addService
-对于不同的服务，构造_flat_binder_object_结构体，里面的_.binder_/_.cookie_对于不同的服务，它们的值不一样
+对于不同的服务，构造 _flat_binder_object_ 结构体，里面的 _.binder_ / _.cookie_ 对于不同的服务，它们的值不一样
 ```
 sm->addService(String16("hello"), new BnHelloService());
 	==>data.writeStrongBinder(service);//service = new BnHelloService()
@@ -82,8 +82,8 @@ sm->addService(String16("hello"), new BnHelloService());
 ```
 ## server如何分辨client想使用哪一个服务
 ## 以及怎么调用到HelloService所提供的函数
-server收到的数据里含有_flat_binder_object_结构体,它可以根据_.binder_/_.cookie_分析client想使用哪一个服务
-把_.cookie_转换为BnXXX对象，然后调用它的函数:
+server收到的数据里含有 _flat_binder_object_ 结构体,它可以根据 _.binder_ / _.cookie_ 分析client想使用哪一个服务
+把 _.cookie_ 转换为BnXXX对象，然后调用它的函数:
 ```
 void IPCThreadState::joinThreadPool(bool isMain)
 ==>status_t IPCThreadState::getAndExecuteCommand()

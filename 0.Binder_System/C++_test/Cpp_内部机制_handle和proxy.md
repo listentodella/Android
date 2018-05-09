@@ -3,7 +3,7 @@
 ![handle_proxy](handle_proxy.png)
 
 * test_server通过BpServiceManager与service_manager通信，使用addService，此时test_server充当client角色，service_manager则是充当server角色
-* test_client也是通过BpServiceManager与service_manager通信，使用getService，此时test_client冲淡client角色，service_manager则是充当server角色
+* test_client也是通过BpServiceManager与service_manager通信，使用getService，此时test_client充当client角色，service_manager则是充当server角色
 * test_client与test_server之间则是通过BpHelloService通讯
 *******
 * BpServiceManager：handle = 0
@@ -14,7 +14,7 @@
 
 
 ## 获得BpServiceManager对象的过程：
-_defaultServiceManager_ 构造了一个_BpServiceManager_对象，其中它的mRemote = new BpBinder(0);//mRemote->mHandle=0;
+_defaultServiceManager_ 构造了一个 _BpServiceManager_ 对象，其中它的mRemote = new BpBinder(0);//mRemote->mHandle=0;
 
 * defaultServiceManager //IServiceManager.cpp
 ```
@@ -38,7 +38,7 @@ sp<IServiceManager> defaultServiceManager()
 
 ```
 * 分析：
-1. 把*BpBinder*对象(mHandle = 0)转换为_IServiceManager_接口(BpServiceManager)
+1. 把*BpBinder*对象(mHandle = 0)转换为 _IServiceManager_ 接口(BpServiceManager)
 gDefaultServiceManager = interface_cast<IServiceManager>(ProcessState::self()->getContextObject(NULL));
 
 2. ProcessState::self()->getContextObject(NULL)
@@ -70,7 +70,7 @@ BpBinder::BpBinder(int32_t handle)
 interface_cast<IServiceManager>(new BpBinder(0)) //IInterface.h
 IServiceManager::asInterface(obj);
 核心：
-	intr = new BpServiceManager(obj); //mRemote obj = new BpBinder(0);                                                                               
+	intr = new BpServiceManager(obj); //mRemote obj = new BpBinder(0);
   	return intr; 
 ```
    const android::String16 IServiceManager::descriptor(NAME);             \
@@ -78,7 +78,7 @@ IServiceManager::asInterface(obj);
             IServiceManager::getInterfaceDescriptor() const {              \
         return IServiceManager::descriptor;                                \
     }                                                                   \
-    android::sp<IServiceManager> I##INTERFACE::asInterface(                \
+    android::sp<IServiceManager> IServiceManager::asInterface(                \
             const android::sp<android::IBinder>& obj)                   \
     {                                                                   \
         android::sp<IServiceManager> intr;                                 \
@@ -97,7 +97,7 @@ IServiceManager::asInterface(obj);
 ```
 
 ## 获得BpHelloService对象的过程：
-调用_BpServiceManager_的_getService_函数，获得一个_flat_binder_object_，从中取出handle，创建一个_BpBinder_(handle),然后使用_interface_case_使用这个BpBinder创建一个_BpHelloService_对象
+调用 _BpServiceManager_ 的 _getService_ 函数，获得一个 _flat_binder_object_ ，从中取出handle，创建一个 _BpBinder_ (handle),然后使用 _interface_cast_ 使用这个BpBinder创建一个 _BpHelloService_ 对象
 
 //binder是BpBinder对象，里面含有HelloService的handle
 sp<IBinder> binder = sm->getService(String16("hello"));//IServiceManager.cpp
@@ -108,7 +108,7 @@ sp<IBinder> binder = sm->getService(String16("hello"));//IServiceManager.cpp
 return reply.readStrongBinder();
 -->  unflatten_binder(ProcessState::self(), *this, &val);
 	-->	*out = proc->getStrongProxyForHandle(flat->handle);
-   		--> new BpBinder(handle);   
+   		--> new BpBinder(handle);
 ```
 //把binder转换为IHelloService接口(BpHelloService对象)
 //binder是BpBinder对象，里面含有HelloService的handle
@@ -124,7 +124,7 @@ sp<IHelloService> service = interface_cast<IHelloService>(binder);
 #### 获得BpServiceManager：
 interface_cast<IServiceManager>(new BpBinder(0))
 #### 获得BpHelloService：
-binder = sm->getService("hello") new BpBinder(handle),handle来自svc_mgr进程回复的数据
+binder = sm->getService("hello") ,最终调用 new BpBinder(handle),handle来自svc_mgr进程回复的数据
 interface_cast<IHelloService>(binder)
 
 
