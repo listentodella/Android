@@ -12,6 +12,8 @@
 #include <cutils/properties.h>
 #include <utils/Log.h>
 
+#include <unistd.h>
+
 #include "IHelloService.h"
 #include "IGoodbyeService.h"
 
@@ -20,6 +22,8 @@ using namespace android;
 
 /* ./test_client sayhello|goodbye
  *  ./test_client hello|goodbye <name>
+ *
+ *  ./test_client readfile
  *
  * */
 int main(int argc, char **argv)
@@ -57,6 +61,34 @@ int main(int argc, char **argv)
             cnt = service->sayhello_to(argv[2]);
             ALOGI("client call sayhello_to, cnt = %d", cnt);
         }
+    } else if (strcmp(argv[1], "readfile") == 0) {
+        sp<IBinder> binder = sm->getService(String16("hello"));
+        if (binder == 0) {
+            ALOGI("cannot get hello service");
+            return -1;
+        }
+        sp<IHelloService> service = interface_cast<IHelloService>(binder);
+    
+        /*调用Service的函数*/
+        int fd = service->get_fd();
+        ALOGI("client call get_fd = %d", fd);
+
+        /* only for test, ls -l /proc/pid/fd 
+         while(1) {
+            lseek(fd, 0, SEEK_SET);
+
+            char buf[512];
+            int len = read(fd, buf, sizeof(buf));
+            buf[len] = '\0';    
+            ALOGI("client read file :%s", buf);
+            sleep(2);
+        } */
+        lseek(fd, 0, SEEK_SET);
+
+        char buf[512];
+        int len = read(fd, buf, sizeof(buf));
+        buf[len] = '\0';    
+        ALOGI("client read file :%s", buf);
     } else {
         sp<IBinder> binder = sm->getService(String16("goodbye"));
         if (binder == 0) {

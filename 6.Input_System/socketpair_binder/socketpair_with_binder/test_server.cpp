@@ -12,13 +12,26 @@
 #include <cutils/properties.h>
 #include <utils/Log.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include "IHelloService.h"
 #include "IGoodbyeService.h"
 
 using namespace android;
-
-int main(void)
+/*
+ * test_server <file>
+ * */
+int main(int argc, char **argv)
 {
+    int fd;
+    if(argc == 2) {
+        fd = open(argv[1], O_RDWR);
+    } else {
+        printf("please input a filename for transferring!\n");
+        return -1;
+    }
     /*add Service*/
 
     /*while(1){read data, parse data, call service_func}*/
@@ -30,7 +43,7 @@ int main(void)
     sp<IServiceManager> sm = defaultServiceManager();
     //ALOGI("ServiceManager: %p", sm.get());
 
-	sm->addService(String16("hello"), new BnHelloService());
+	sm->addService(String16("hello"), new BnHelloService(fd));
 	sm->addService(String16("goodbye"), new BnGoodbyeService());
 
     /*循环体*/
