@@ -17,6 +17,8 @@ Note right of SurfaceFlinger:BufferQueueSlot[ ]
 APP-->Binder:sur = new SurfaceControl()
 
 ```
+![app申请、创建surface的过程](app%E7%94%B3%E8%AF%B7%E3%80%81%E5%88%9B%E5%BB%BAsurface%E7%9A%84%E8%BF%87%E7%A8%8B.png)
+
 `handle`:`sp<IBinder> handle;`
 `gbp`:`sp<IGraphicBufferProducer>`,生产者 代理类`BpGraphicBufferProducer`
 
