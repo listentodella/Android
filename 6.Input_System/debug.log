@@ -1,0 +1,84 @@
+huangminglei@ubuntu:~/Desktop/myEventHub$ ./myEventHub tmp &
+[1] 26650
+huangminglei@ubuntu:~/Desktop/myEventHub$ cd tmp/
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ ls
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ mkfifo hello
+create file : hello
+filepath & name is tmp/hello
+file tmp/hello has been added into epollFd...
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ rm hello
+delete file : hello
+filepath & name is tmp/hello
+epoll_files 0 is (null)
+epoll_files 1 is (null)
+epoll_files 2 is (null)
+epoll_files 3 is (null)
+epoll_files 4 is (null)
+epoll_files 5 is tmp/hello
+find this file fd in the epoll_files ^-^
+Successfully rm this file fd in the epoll_files...
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ mkfifo hello
+create file : hello
+filepath & name is tmp/hello
+file tmp/hello has been added into epollFd...
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ rm hello
+delete file : hello
+filepath & name is tmp/hello
+epoll_files 0 is (null)
+epoll_files 1 is (null)
+epoll_files 2 is (null)
+epoll_files 3 is (null)
+epoll_files 4 is (null)
+epoll_files 5 is tmp/hello
+find this file fd in the epoll_files ^-^
+Successfully rm this file fd in the epoll_files...
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ mkfifo hello
+create file : hello
+filepath & name is tmp/hello
+file tmp/hello has been added into epollFd...
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ mkfifo goodbye
+create file : goodbye
+filepath & name is tmp/goodbye
+file tmp/goodbye has been added into epollFd...
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ touch hello.c
+create file : hello.c
+filepath & name is tmp/hello.c
+file tmp/hello.c has been added into epollFd...
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ rm hello.c
+delete file : hello.c
+filepath & name is tmp/hello.c
+epoll_files 0 is (null)
+epoll_files 1 is (null)
+epoll_files 2 is (null)
+epoll_files 3 is (null)
+epoll_files 4 is (null)
+epoll_files 5 is tmp/hello
+epoll_files 6 is tmp/goodbye
+epoll_files 7 is tmp/hello.c
+find this file fd in the epoll_files ^-^
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ rm_from_epoll:someting is wrong
+: Operation not permitted
+
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ rm hello
+delete file : hello
+filepath & name is tmp/hello
+epoll_files 0 is (null)
+epoll_files 1 is (null)
+epoll_files 2 is (null)
+epoll_files 3 is (null)
+epoll_files 4 is (null)
+epoll_files 5 is tmp/hello
+find this file fd in the epoll_files ^-^
+Successfully rm this file fd in the epoll_files...
+huangminglei@ubuntu:~/Desktop/myEventHub/tmp$ rm goodbye
+delete file : goodbye
+filepath & name is tmp/goodbye
+epoll_files 0 is (null)
+epoll_files 1 is (null)
+epoll_files 2 is (null)
+epoll_files 3 is (null)
+epoll_files 4 is (null)
+epoll_files 5 is (null)
+epoll_files 6 is tmp/goodbye
+find this file fd in the epoll_files ^-^
+Successfully rm this file fd in the epoll_files...

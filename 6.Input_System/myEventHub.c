@@ -39,7 +39,9 @@ struct inotify_event {
 
 
 #include <stdio.h>
+#include <errno.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <string.h>
 #include <fcntl.h>
@@ -55,7 +57,7 @@ static char *base_dir;
 static char *epoll_files[MAX_FILES];
 
 
-int add_to_epoll(int fd, int epollFd)
+int add_to_epoll(char *name, int fd, int epollFd)
 {
     int result;
     struct epoll_event eventItem;
@@ -63,23 +65,46 @@ int add_to_epoll(int fd, int epollFd)
     eventItem.events = EPOLLIN;
     eventItem.data.fd = fd;
     result = epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &eventItem);
-
+    if (name)
+        printf("file %s has been added into epollFd...\n", name);
     return result;
+}
+
+int get_filename_fd(char *name)
+{
+    int i;
+    char name_to_find[512];
+    sprintf(name_to_find, "%s/%s", base_dir, name);
+    printf("filepath & name is %s\n", name_to_find);
+    for(i = 0; i < MAX_FILES; i++) {
+        printf("epoll_files %d is %s\n", i, epoll_files[i]);
+        if (epoll_files[i] == NULL)//it means filename in epoll_files[i] is NULL
+            continue;
+
+        if (!strcmp(epoll_files[i], name_to_find)) {
+            printf("find this file fd in the epoll_files ^-^\n");
+            return i;
+        }
+    }
+    printf("Can not find this file fd in the epoll_files...\n");
+    return -1;
 }
 
 int rm_from_epoll(int fd, int epollFd)
 {
-    // int result;
-    // struct epoll_event eventItem;
-    // memset(&eventItem, 0, sizeof(eventItem));
-    // eventItem.events = EPOLLIN;
-    // eventItem.data.fd = fd;
-    result = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, &eventItem);
+    int result;
+    //result = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, &eventItem);
+    result = epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, NULL);
+    if (result) {
+        perror("rm_from_epoll:someting is wrong->");
+        return result;
+    }
 
+    printf("Successfully rm this file fd in the epoll_files...\n");
     return result;
 }
 
-int read_process_inotify_fd(int inotify_fd)
+int read_process_inotify_fd(int inotify_fd, int mEpollFd)
 {
     int res;
     char event_buf[DATA_MAX_LEN];
@@ -115,19 +140,30 @@ int read_process_inotify_fd(int inotify_fd)
                  *
                  * event->name only include file_name, we need file path
                  */
-                char *name = malloc(512);
+                char *name = malloc(512);//remeber to free it once not use any more
                 sprintf(name, "%s/%s", base_dir, event->name);
-                int tmpFd = open(name, O_RDWR);
-                add_to_epoll(tmpFd, mEpollFd);
+                printf("filepath & name is %s\n", name);
+                int tmpFd = open(name, O_RDWR);//rememer to close it once not use any more
+                add_to_epoll(name, tmpFd, mEpollFd);
+                epoll_files[tmpFd] = name;
             } else {
                 printf("delete file : %s\n", event->name);
                 //ALOGI("Removing device '%s' due to inotify event\n", devname);
                 //closeDeviceByPathLocked(devname);
                 /*for each file:
                  * del it from epoll: epoll_ctl(... EPOLL_CTL_DEL ...)
+                 * event->name only include file_name, we need file path
                  * close it
                  */
-                rm_from_epoll(tmpFd, mEpollFd);
+                int tmpFd = get_filename_fd(event->name);
+                if (tmpFd < 0)
+                    printf("no such file!\n");
+                else {
+                    rm_from_epoll(tmpFd, mEpollFd);
+                    free(epoll_files[tmpFd]);
+                    epoll_files[tmpFd] = NULL;
+                    close(tmpFd);
+                }
             }
         }
         event_size = sizeof(*event) + event->len;
@@ -141,8 +177,12 @@ int read_process_inotify_fd(int inotify_fd)
 
 int main(int argc, char **argv)
 {
-    if (argv != 2) {
+    if (argc != 2) {
         printf("Usage: %s <base dir>\n", argv[0]);
+        return -1;
+    }
+    if (!strcmp(argv[1], '/')) {
+        printf("Please not add '/' after base dir..."\n);
         return -1;
     }
 
@@ -153,7 +193,7 @@ int main(int argc, char **argv)
     int result;
 
     /*inotify_init*/
-    mINotifyFd = inotify_init();
+    int mINotifyFd = inotify_init();
 
     /*add watch, inotify a base dir*/
     //result = inotify_add_watch(mINotifyFd, base_dir, IN_DELETE | IN_CREATE | IN_MODIFY | IN_OPEN);
@@ -169,11 +209,11 @@ int main(int argc, char **argv)
     //the array of pending epoll events and the index of the next event to be handled
     struct epoll_event mPendingEventItems[EPOLL_MAX_EVENTS];
 
-    mEpollFd = epoll_create(8);
+    int mEpollFd = epoll_create(8);
 
     //how to add and track file especially new file?
     //actually we can track the base dir fd
-    add_to_epoll(mINotifyFd, mEpollFd);
+    add_to_epoll(NULL, mINotifyFd, mEpollFd);
 
     /*read*/
     while(1) {
@@ -181,8 +221,8 @@ int main(int argc, char **argv)
                 EPOLL_MAX_EVENTS, -1);
         for(i = 0; i < pollResult; i++) {
             if (mPendingEventItems[i].data.fd == mINotifyFd)//表明是监测的目录发生变化
-                read_process_inotify_fd(mINotifyFd);
-            else {//表明是监测的目录下的文件发生变化
+                read_process_inotify_fd(mINotifyFd, mEpollFd);
+            else {//表明是监测的目录下的文件发生变化, only for FIFO
                 printf("Reason : 0x%x\n", mPendingEventItems[i].events);
                 int len = read(mPendingEventItems[i].data.fd, buf, DATA_MAX_LEN);
                 buf[len] = '\0';
@@ -193,11 +233,6 @@ int main(int argc, char **argv)
     }
 
     //epoll wait
-
-
-
-
-
 
 
     return 0;

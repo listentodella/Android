@@ -1,0 +1,13 @@
+# myEventHub
+## test process
+```
+./myEventHub <base dir> 注意基地址最后不要加'/',否则用于判断的字符串里会多出来一个，造成各种错误
+mkfifo hello
+mkfifo goodbye
+...
+echo "xxx" > ...
+rm hello
+rm goodbye
+...
+```
+似乎除了`FIFO`以外的文件暂时无法捕获内容,待扩展...
