@@ -1,0 +1,6 @@
+class CheckForTap
+!!!2039682.java!!!	run() : void
+            if (mTouchMode == TOUCH_MODE_DOWN_IN_CURRENT_VIEW) {
+                View v = getCurrentView();
+                showTapFeedback(v);
+            }

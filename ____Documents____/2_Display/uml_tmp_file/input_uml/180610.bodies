@@ -1,0 +1,50 @@
+class SortedVector
+!!!402562.cpp!!!	~SortedVector()
+    finish_vector();
+!!!402690.cpp!!!	operator =(in rhs : SortedVector) : SortedVector
+    SortedVectorImpl::operator = (rhs);
+    return *this; 
+!!!402818.cpp!!!	operator =(in rhs : SortedVector) : SortedVector
+    SortedVectorImpl::operator = (rhs);
+    return *this; 
+!!!403586.cpp!!!	array() : TYPE
+    return static_cast<const TYPE *>(arrayImpl());
+!!!403714.cpp!!!	editArray() : TYPE
+    return static_cast<TYPE *>(editArrayImpl());
+!!!403842.cpp!!!	indexOf(in item : TYPE) : ssize_t
+    return SortedVectorImpl::indexOf(&item);
+!!!403970.cpp!!!	orderOf(in item : TYPE) : size_t
+    return SortedVectorImpl::orderOf(&item);
+!!!404098.cpp!!!	operator [](in index : size_t) : TYPE
+    LOG_FATAL_IF(index>=size(),
+            "%s: index=%u out of range (%u)", __PRETTY_FUNCTION__,
+            int(index), int(size()));
+    return *(array() + index);
+!!!404226.cpp!!!	itemAt(in index : size_t) : TYPE
+    return operator[](index);
+!!!404354.cpp!!!	top() : TYPE
+    return *(array() + size() - 1);
+!!!404482.cpp!!!	add(in item : TYPE) : ssize_t
+    return SortedVectorImpl::add(&item);
+!!!404738.cpp!!!	merge(in vector : Vector<TYPE>) : ssize_t
+    return SortedVectorImpl::merge(reinterpret_cast<const VectorImpl&>(vector));
+!!!404866.cpp!!!	merge(in vector : SortedVector) : ssize_t
+    return SortedVectorImpl::merge(reinterpret_cast<const SortedVectorImpl&>(vector));
+!!!404994.cpp!!!	remove(in item : TYPE) : ssize_t
+    return SortedVectorImpl::remove(&item);
+!!!405122.cpp!!!	removeItemsAt(in index : size_t, in count : size_t = 1) : ssize_t
+    return VectorImpl::removeItemsAt(index, count);
+!!!405378.cpp!!!	do_construct(inout storage : void, in num : size_t) : void
+    construct_type( reinterpret_cast<TYPE*>(storage), num );
+!!!405506.cpp!!!	do_destroy(inout storage : void, in num : size_t) : void
+    destroy_type( reinterpret_cast<TYPE*>(storage), num );
+!!!405634.cpp!!!	do_copy(inout dest : void, in from : void, in num : size_t) : void
+    copy_type( reinterpret_cast<TYPE*>(dest), reinterpret_cast<const TYPE*>(from), num );
+!!!405762.cpp!!!	do_splat(inout dest : void, in item : void, in num : size_t) : void
+    splat_type( reinterpret_cast<TYPE*>(dest), reinterpret_cast<const TYPE*>(item), num );
+!!!405890.cpp!!!	do_move_forward(inout dest : void, in from : void, in num : size_t) : void
+    move_forward_type( reinterpret_cast<TYPE*>(dest), reinterpret_cast<const TYPE*>(from), num );
+!!!406018.cpp!!!	do_move_backward(inout dest : void, in from : void, in num : size_t) : void
+    move_backward_type( reinterpret_cast<TYPE*>(dest), reinterpret_cast<const TYPE*>(from), num );
+!!!406146.cpp!!!	do_compare(in lhs : void, in rhs : void) : int
+    return compare_type( *reinterpret_cast<const TYPE*>(lhs), *reinterpret_cast<const TYPE*>(rhs) );

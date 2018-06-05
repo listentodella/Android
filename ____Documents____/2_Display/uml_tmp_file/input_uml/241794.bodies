@@ -1,0 +1,3 @@
+class ConsumeBatchedInputImmediatelyRunnable
+!!!971906.java!!!	run() : void
+            doConsumeBatchedInput(-1);

@@ -1,0 +1,96 @@
+class NotificationManager
+!!!1707394.java!!!	getService() : INotificationManager
+        if (sService != null) {
+            return sService;
+        }
+        IBinder b = ServiceManager.getService("notification");
+        sService = INotificationManager.Stub.asInterface(b);
+        return sService;
+!!!1707522.java!!!	NotificationManager(inout context : Context, inout handler : Handler)
+        mContext = context;
+!!!1707650.java!!!	from(inout context : Context) : NotificationManager
+        return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+!!!1707778.java!!!	notify(in id : int, inout notification : Notification) : void
+        notify(null, id, notification);
+!!!1707906.java!!!	notify(in tag : String, in id : int, inout notification : Notification) : void
+        int[] idOut = new int[1];
+        INotificationManager service = getService();
+        String pkg = mContext.getPackageName();
+        if (notification.sound != null) {
+            notification.sound = notification.sound.getCanonicalUri();
+            if (StrictMode.vmFileUriExposureEnabled()) {
+                notification.sound.checkFileUriExposed("Notification.sound");
+            }
+        }
+        if (localLOGV) Log.v(TAG, pkg + ": notify(" + id + ", " + notification + ")");
+        Notification stripped = notification.clone();
+        Builder.stripForDelivery(stripped);
+        try {
+            service.enqueueNotificationWithTag(pkg, mContext.getOpPackageName(), tag, id,
+                    stripped, idOut, UserHandle.myUserId());
+            if (id != idOut[0]) {
+                Log.w(TAG, "notify: id corrupted: sent " + id + ", got back " + idOut[0]);
+            }
+        } catch (RemoteException e) {
+        }
+!!!1708034.java!!!	notifyAsUser(in tag : String, in id : int, inout notification : Notification, inout user : UserHandle) : void
+        int[] idOut = new int[1];
+        INotificationManager service = getService();
+        String pkg = mContext.getPackageName();
+        if (notification.sound != null) {
+            notification.sound = notification.sound.getCanonicalUri();
+            if (StrictMode.vmFileUriExposureEnabled()) {
+                notification.sound.checkFileUriExposed("Notification.sound");
+            }
+        }
+        if (localLOGV) Log.v(TAG, pkg + ": notify(" + id + ", " + notification + ")");
+        Notification stripped = notification.clone();
+        Builder.stripForDelivery(stripped);
+        try {
+            service.enqueueNotificationWithTag(pkg, mContext.getOpPackageName(), tag, id,
+                    stripped, idOut, user.getIdentifier());
+            if (id != idOut[0]) {
+                Log.w(TAG, "notify: id corrupted: sent " + id + ", got back " + idOut[0]);
+            }
+        } catch (RemoteException e) {
+        }
+!!!1708162.java!!!	cancel(in id : int) : void
+        cancel(null, id);
+!!!1708290.java!!!	cancel(in tag : String, in id : int) : void
+        INotificationManager service = getService();
+        String pkg = mContext.getPackageName();
+        if (localLOGV) Log.v(TAG, pkg + ": cancel(" + id + ")");
+        try {
+            service.cancelNotificationWithTag(pkg, tag, id, UserHandle.myUserId());
+        } catch (RemoteException e) {
+        }
+!!!1708418.java!!!	cancelAsUser(in tag : String, in id : int, inout user : UserHandle) : void
+        INotificationManager service = getService();
+        String pkg = mContext.getPackageName();
+        if (localLOGV) Log.v(TAG, pkg + ": cancel(" + id + ")");
+        try {
+            service.cancelNotificationWithTag(pkg, tag, id, user.getIdentifier());
+        } catch (RemoteException e) {
+        }
+!!!1708546.java!!!	cancelAll() : void
+        INotificationManager service = getService();
+        String pkg = mContext.getPackageName();
+        if (localLOGV) Log.v(TAG, pkg + ": cancelAll()");
+        try {
+            service.cancelAllNotifications(pkg, UserHandle.myUserId());
+        } catch (RemoteException e) {
+        }
+!!!1708674.java!!!	getEffectsSuppressor() : ComponentName
+        INotificationManager service = getService();
+        try {
+            return service.getEffectsSuppressor();
+        } catch (RemoteException e) {
+            return null;
+        }
+!!!1708802.java!!!	matchesCallFilter(inout extras : Bundle) : boolean
+        INotificationManager service = getService();
+        try {
+            return service.matchesCallFilter(extras);
+        } catch (RemoteException e) {
+            return false;
+        }

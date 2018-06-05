@@ -1,0 +1,3 @@
+class CalendarGestureListener
+!!!2146690.java!!!	onSingleTapUp(inout e : MotionEvent) : boolean
+                    return true;

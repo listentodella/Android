@@ -1,0 +1,43 @@
+class HardwareLayer
+!!!726402.java!!!	HardwareLayer(inout renderer : HardwareRenderer, in deferredUpdater : long)
+        if (renderer == null || deferredUpdater == 0) {
+            throw new IllegalArgumentException("Either hardware renderer: " + renderer
+                    + " or deferredUpdater: " + deferredUpdater + " is invalid");
+        }
+        mRenderer = renderer;
+        mFinalizer = new VirtualRefBasePtr(deferredUpdater);
+!!!726530.java!!!	setLayerPaint(inout paint : Paint) : void
+        nSetLayerPaint(mFinalizer.get(), paint.mNativePaint);
+        mRenderer.pushLayerUpdate(this);
+!!!726658.java!!!	isValid() : boolean
+        return mFinalizer != null && mFinalizer.get() != 0;
+!!!726786.java!!!	destroy() : void
+        if (!isValid()) {
+            // Already destroyed
+            return;
+        }
+        mRenderer.onLayerDestroyed(this);
+        mRenderer = null;
+        mFinalizer.release();
+        mFinalizer = null;
+!!!726914.java!!!	getDeferredLayerUpdater() : long
+        return mFinalizer.get();
+!!!727042.java!!!	copyInto(inout bitmap : Bitmap) : boolean
+        return mRenderer.copyLayerInto(this, bitmap);
+!!!727170.java!!!	prepare(in width : int, in height : int, inout isOpaque : boolean) : boolean
+        return nPrepare(mFinalizer.get(), width, height, isOpaque);
+!!!727298.java!!!	setTransform(inout matrix : Matrix) : void
+        nSetTransform(mFinalizer.get(), matrix.native_instance);
+        mRenderer.pushLayerUpdate(this);
+!!!727426.java!!!	detachSurfaceTexture() : void
+        mRenderer.detachSurfaceTexture(mFinalizer.get());
+!!!727554.java!!!	getLayer() : long
+        return nGetLayer(mFinalizer.get());
+!!!727682.java!!!	setSurfaceTexture(inout surface : SurfaceTexture) : void
+        nSetSurfaceTexture(mFinalizer.get(), surface, false);
+        mRenderer.pushLayerUpdate(this);
+!!!727810.java!!!	updateSurfaceTexture() : void
+        nUpdateSurfaceTexture(mFinalizer.get());
+        mRenderer.pushLayerUpdate(this);
+!!!727938.java!!!	adoptTextureLayer(inout renderer : HardwareRenderer, in layer : long) : HardwareLayer
+        return new HardwareLayer(renderer, layer);

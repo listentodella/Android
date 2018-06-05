@@ -1,0 +1,15 @@
+class InputWindowInfo
+!!!257154.cpp!!!	addTouchableRegion(in region : Rect) : void
+    touchableRegion.orSelf(region);
+!!!257282.cpp!!!	touchableRegionContainsPoint(in x : int32_t, in y : int32_t) : bool
+    return touchableRegion.contains(x,y);
+!!!257410.cpp!!!	frameContainsPoint(in x : int32_t, in y : int32_t) : bool
+    return x >= frameLeft && x <= frameRight
+            && y >= frameTop && y <= frameBottom;
+!!!257538.cpp!!!	isTrustedOverlay() : bool
+    return layoutParamsType == TYPE_INPUT_METHOD
+            || layoutParamsType == TYPE_INPUT_METHOD_DIALOG
+            || layoutParamsType == TYPE_MAGNIFICATION_OVERLAY
+            || layoutParamsType == TYPE_SECURE_SYSTEM_OVERLAY;
+!!!257666.cpp!!!	supportsSplitTouch() : bool
+    return layoutParamsFlags & FLAG_SPLIT_TOUCH;

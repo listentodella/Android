@@ -1,0 +1,162 @@
+class ViewPostImeInputStage
+!!!961026.java!!!	ViewPostImeInputStage(inout next : ViewRootImpl::InputStage)
+            super(next);
+!!!961154.java!!!	onProcess(inout q : ViewRootImpl::QueuedInputEvent) : int
+            if (q.mEvent instanceof KeyEvent) {
+                return processKeyEvent(q);
+            } else {
+                // If delivering a new non-key event, make sure the window is
+                // now allowed to start updating.
+                handleDispatchDoneAnimating();
+                final int source = q.mEvent.getSource();
+                if ((source & InputDevice.SOURCE_CLASS_POINTER) != 0) {
+                    return processPointerEvent(q);
+                } else if ((source & InputDevice.SOURCE_CLASS_TRACKBALL) != 0) {
+                    return processTrackballEvent(q);
+                } else {
+                    return processGenericMotionEvent(q);
+                }
+            }
+!!!961282.java!!!	onDeliverToNext(inout q : ViewRootImpl::QueuedInputEvent) : void
+            if (mUnbufferedInputDispatch
+                    && q.mEvent instanceof MotionEvent
+                    && ((MotionEvent)q.mEvent).isTouchEvent()
+                    && isTerminalInputEvent(q.mEvent)) {
+                mUnbufferedInputDispatch = false;
+                scheduleConsumeBatchedInput();
+            }
+            super.onDeliverToNext(q);
+!!!961410.java!!!	processKeyEvent(inout q : ViewRootImpl::QueuedInputEvent) : int
+            final KeyEvent event = (KeyEvent)q.mEvent;
+
+            if (event.getAction() != KeyEvent.ACTION_UP) {
+                // If delivering a new key event, make sure the window is
+                // now allowed to start updating.
+                handleDispatchDoneAnimating();
+            }
+
+            // Deliver the key to the view hierarchy.
+            if (mView.dispatchKeyEvent(event)) {
+                return FINISH_HANDLED;
+            }
+
+            if (shouldDropInputEvent(q)) {
+                return FINISH_NOT_HANDLED;
+            }
+
+            // If the Control modifier is held, try to interpret the key as a shortcut.
+            if (event.getAction() == KeyEvent.ACTION_DOWN
+                    && event.isCtrlPressed()
+                    && event.getRepeatCount() == 0
+                    && !KeyEvent.isModifierKey(event.getKeyCode())) {
+                if (mView.dispatchKeyShortcutEvent(event)) {
+                    return FINISH_HANDLED;
+                }
+                if (shouldDropInputEvent(q)) {
+                    return FINISH_NOT_HANDLED;
+                }
+            }
+
+            // Apply the fallback event policy.
+            if (mFallbackEventHandler.dispatchKeyEvent(event)) {
+                return FINISH_HANDLED;
+            }
+            if (shouldDropInputEvent(q)) {
+                return FINISH_NOT_HANDLED;
+            }
+
+            // Handle automatic focus changes.
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                int direction = 0;
+                switch (event.getKeyCode()) {
+                    case KeyEvent.KEYCODE_DPAD_LEFT:
+                        if (event.hasNoModifiers()) {
+                            direction = View.FOCUS_LEFT;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_RIGHT:
+                        if (event.hasNoModifiers()) {
+                            direction = View.FOCUS_RIGHT;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_UP:
+                        if (event.hasNoModifiers()) {
+                            direction = View.FOCUS_UP;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_DOWN:
+                        if (event.hasNoModifiers()) {
+                            direction = View.FOCUS_DOWN;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_TAB:
+                        if (event.hasNoModifiers()) {
+                            direction = View.FOCUS_FORWARD;
+                        } else if (event.hasModifiers(KeyEvent.META_SHIFT_ON)) {
+                            direction = View.FOCUS_BACKWARD;
+                        }
+                        break;
+                }
+                if (direction != 0) {
+                    View focused = mView.findFocus();
+                    if (focused != null) {
+                        View v = focused.focusSearch(direction);
+                        if (v != null && v != focused) {
+                            // do the math the get the interesting rect
+                            // of previous focused into the coord system of
+                            // newly focused view
+                            focused.getFocusedRect(mTempRect);
+                            if (mView instanceof ViewGroup) {
+                                ((ViewGroup) mView).offsetDescendantRectToMyCoords(
+                                        focused, mTempRect);
+                                ((ViewGroup) mView).offsetRectIntoDescendantCoords(
+                                        v, mTempRect);
+                            }
+                            if (v.requestFocus(direction, mTempRect)) {
+                                playSoundEffect(SoundEffectConstants
+                                        .getContantForFocusDirection(direction));
+                                return FINISH_HANDLED;
+                            }
+                        }
+
+                        // Give the focused view a last chance to handle the dpad key.
+                        if (mView.dispatchUnhandledMove(focused, direction)) {
+                            return FINISH_HANDLED;
+                        }
+                    } else {
+                        // find the best view to give focus to in this non-touch-mode with no-focus
+                        View v = focusSearch(null, direction);
+                        if (v != null && v.requestFocus(direction)) {
+                            return FINISH_HANDLED;
+                        }
+                    }
+                }
+            }
+            return FORWARD;
+!!!961538.java!!!	processPointerEvent(inout q : ViewRootImpl::QueuedInputEvent) : int
+            final MotionEvent event = (MotionEvent)q.mEvent;
+
+            mAttachInfo.mUnbufferedDispatchRequested = false;
+            boolean handled = mView.dispatchPointerEvent(event);
+            if (mAttachInfo.mUnbufferedDispatchRequested && !mUnbufferedInputDispatch) {
+                mUnbufferedInputDispatch = true;
+                if (mConsumeBatchedInputScheduled) {
+                    scheduleConsumeBatchedInputImmediately();
+                }
+            }
+            return handled ? FINISH_HANDLED : FORWARD;
+!!!961666.java!!!	processTrackballEvent(inout q : ViewRootImpl::QueuedInputEvent) : int
+            final MotionEvent event = (MotionEvent)q.mEvent;
+
+            if (mView.dispatchTrackballEvent(event)) {
+                return FINISH_HANDLED;
+            }
+            return FORWARD;
+!!!961794.java!!!	processGenericMotionEvent(inout q : ViewRootImpl::QueuedInputEvent) : int
+            final MotionEvent event = (MotionEvent)q.mEvent;
+
+            // Deliver the event to the view.
+            if (mView.dispatchGenericMotionEvent(event)) {
+                return FINISH_HANDLED;
+            }
+            return FORWARD;

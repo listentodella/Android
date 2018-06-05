@@ -1,0 +1,60 @@
+class SparseRectFArrayBuilder
+!!!1166850.java!!!	checkIndex(in key : int) : void
+            if (mCount == 0) {
+                return;
+            }
+            if (mKeys[mCount - 1] >= key) {
+                throw new IllegalArgumentException("key must be greater than all existing keys.");
+            }
+!!!1166978.java!!!	ensureBufferSize() : void
+            if (mKeys == null) {
+                mKeys = new int[INITIAL_SIZE];
+            }
+            if (mCoordinates == null) {
+                mCoordinates = new float[INITIAL_SIZE * 4];
+            }
+            if (mFlagsArray == null) {
+                mFlagsArray = new int[INITIAL_SIZE];
+            }
+            final int requiredIndexArraySize = mCount + 1;
+            if (mKeys.length <= requiredIndexArraySize) {
+                final int[] newArray = new int[requiredIndexArraySize * 2];
+                System.arraycopy(mKeys, 0, newArray, 0, mCount);
+                mKeys = newArray;
+            }
+            final int requiredCoordinatesArraySize = (mCount + 1) * 4;
+            if (mCoordinates.length <= requiredCoordinatesArraySize) {
+                final float[] newArray = new float[requiredCoordinatesArraySize * 2];
+                System.arraycopy(mCoordinates, 0, newArray, 0, mCount * 4);
+                mCoordinates = newArray;
+            }
+            final int requiredFlagsArraySize = requiredIndexArraySize;
+            if (mFlagsArray.length <= requiredFlagsArraySize) {
+                final int[] newArray = new int[requiredFlagsArraySize * 2];
+                System.arraycopy(mFlagsArray, 0, newArray, 0, mCount);
+                mFlagsArray = newArray;
+            }
+!!!1167106.java!!!	append(in key : int, in left : float, in top : float, in right : float, in bottom : float, in flags : int) : SparseRectFArray::SparseRectFArrayBuilder
+            checkIndex(key);
+            ensureBufferSize();
+            final int baseCoordinatesIndex = mCount * 4;
+            mCoordinates[baseCoordinatesIndex + 0] = left;
+            mCoordinates[baseCoordinatesIndex + 1] = top;
+            mCoordinates[baseCoordinatesIndex + 2] = right;
+            mCoordinates[baseCoordinatesIndex + 3] = bottom;
+            final int flagsIndex = mCount;
+            mFlagsArray[flagsIndex] = flags;
+            mKeys[mCount] = key;
+            ++mCount;
+            return this;
+!!!1167234.java!!!	isEmpty() : boolean
+            return mCount <= 0;
+!!!1167362.java!!!	build() : SparseRectFArray
+            return new SparseRectFArray(this);
+!!!1167490.java!!!	reset() : void
+            if (mCount == 0) {
+                mKeys = null;
+                mCoordinates = null;
+                mFlagsArray = null;
+            }
+            mCount = 0;

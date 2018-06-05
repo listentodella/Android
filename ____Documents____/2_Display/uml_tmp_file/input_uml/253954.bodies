@@ -1,0 +1,30 @@
+class InputMethodSubtypeBuilder
+!!!1160706.java!!!	setIsAuxiliary(inout isAuxiliary : boolean) : InputMethodSubtype::InputMethodSubtypeBuilder
+            mIsAuxiliary = isAuxiliary;
+            return this;
+!!!1160834.java!!!	setOverridesImplicitlyEnabledSubtype(inout overridesImplicitlyEnabledSubtype : boolean) : InputMethodSubtype::InputMethodSubtypeBuilder
+            mOverridesImplicitlyEnabledSubtype = overridesImplicitlyEnabledSubtype;
+            return this;
+!!!1160962.java!!!	setIsAsciiCapable(inout isAsciiCapable : boolean) : InputMethodSubtype::InputMethodSubtypeBuilder
+            mIsAsciiCapable = isAsciiCapable;
+            return this;
+!!!1161090.java!!!	setSubtypeIconResId(in subtypeIconResId : int) : InputMethodSubtype::InputMethodSubtypeBuilder
+            mSubtypeIconResId = subtypeIconResId;
+            return this;
+!!!1161218.java!!!	setSubtypeNameResId(in subtypeNameResId : int) : InputMethodSubtype::InputMethodSubtypeBuilder
+            mSubtypeNameResId = subtypeNameResId;
+            return this;
+!!!1161346.java!!!	setSubtypeId(in subtypeId : int) : InputMethodSubtype::InputMethodSubtypeBuilder
+            mSubtypeId = subtypeId;
+            return this;
+!!!1161474.java!!!	setSubtypeLocale(in subtypeLocale : String) : InputMethodSubtype::InputMethodSubtypeBuilder
+            mSubtypeLocale = subtypeLocale == null ? "" : subtypeLocale;
+            return this;
+!!!1161602.java!!!	setSubtypeMode(in subtypeMode : String) : InputMethodSubtype::InputMethodSubtypeBuilder
+            mSubtypeMode = subtypeMode == null ? "" : subtypeMode;
+            return this;
+!!!1161730.java!!!	setSubtypeExtraValue(in subtypeExtraValue : String) : InputMethodSubtype::InputMethodSubtypeBuilder
+            mSubtypeExtraValue = subtypeExtraValue == null ? "" : subtypeExtraValue;
+            return this;
+!!!1161858.java!!!	build() : InputMethodSubtype
+            return new InputMethodSubtype(this);

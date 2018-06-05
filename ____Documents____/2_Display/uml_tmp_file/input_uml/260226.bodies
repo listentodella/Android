@@ -1,0 +1,67 @@
+class EmulatorDisplayOverlay
+!!!1208450.java!!!	EmulatorDisplayOverlay(inout context : Context, inout display : Display, inout session : SurfaceSession, in zOrder : int)
+        mScreenSize = new Point();
+        display.getSize(mScreenSize);
+
+        SurfaceControl ctrl = null;
+        try {
+            if (WindowManagerService.DEBUG_SURFACE_TRACE) {
+                ctrl = new WindowStateAnimator.SurfaceTrace(session, "EmulatorDisplayOverlay",
+                        mScreenSize.x, mScreenSize.y, PixelFormat.TRANSLUCENT,
+                        SurfaceControl.HIDDEN);
+            } else {
+                ctrl = new SurfaceControl(session, "EmulatorDisplayOverlay", mScreenSize.x,
+                        mScreenSize.y, PixelFormat.TRANSLUCENT, SurfaceControl.HIDDEN);
+            }
+            ctrl.setLayerStack(display.getLayerStack());
+            ctrl.setLayer(zOrder);
+            ctrl.setPosition(0, 0);
+            ctrl.show();
+            mSurface.copyFrom(ctrl);
+        } catch (OutOfResourcesException e) {
+        }
+        mSurfaceControl = ctrl;
+        mDrawNeeded = true;
+        mOverlay = context.getDrawable(
+                com.android.internal.R.drawable.emulator_circular_window_overlay);
+!!!1208578.java!!!	drawIfNeeded() : void
+        if (!mDrawNeeded || !mVisible) {
+            return;
+        }
+        mDrawNeeded = false;
+
+        Rect dirty = new Rect(0, 0, mScreenSize.x, mScreenSize.y);
+        Canvas c = null;
+        try {
+            c = mSurface.lockCanvas(dirty);
+        } catch (IllegalArgumentException e) {
+        } catch (OutOfResourcesException e) {
+        }
+        if (c == null) {
+            return;
+        }
+        c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
+        mSurfaceControl.setPosition(0, 0);
+        mOverlay.setBounds(0, 0, mScreenSize.x, mScreenSize.y);
+        mOverlay.draw(c);
+        mSurface.unlockCanvasAndPost(c);
+!!!1208706.java!!!	setVisibility(inout on : boolean) : void
+        if (mSurfaceControl == null) {
+            return;
+        }
+        mVisible = on;
+        drawIfNeeded();
+        if (on) {
+            mSurfaceControl.show();
+        } else {
+            mSurfaceControl.hide();
+        }
+!!!1208834.java!!!	positionSurface(in dw : int, in dh : int, in rotation : int) : void
+        if (mLastDW == dw && mLastDH == dh && mRotation == rotation) {
+            return;
+        }
+        mLastDW = dw;
+        mLastDH = dh;
+        mDrawNeeded = true;
+        mRotation = rotation;
+        drawIfNeeded();

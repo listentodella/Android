@@ -1,0 +1,15 @@
+class CustomPopupWindow
+!!!2243970.java!!!	CustomPopupWindow(inout context : Context, in defStyleAttr : int)
+                super(context, null, defStyleAttr);
+!!!2244098.java!!!	dismiss() : void
+                super.dismiss();
+
+                getPositionListener().removeSubscriber(SuggestionsPopupWindow.this);
+
+                // Safe cast since show() checks that mTextView.getText() is an Editable
+                ((Spannable) mTextView.getText()).removeSpan(mSuggestionRangeSpan);
+
+                mTextView.setCursorVisible(mCursorWasVisibleBeforeSuggestions);
+                if (hasInsertionController()) {
+                    getInsertionController().show();
+                }

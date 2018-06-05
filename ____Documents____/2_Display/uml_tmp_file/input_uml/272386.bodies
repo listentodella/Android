@@ -1,0 +1,1905 @@
+class Activity
+!!!1308034.java!!!	getIntent() : Intent
+        return mIntent;
+!!!1308162.java!!!	setIntent(inout newIntent : Intent) : void
+        mIntent = newIntent;
+!!!1308290.java!!!	getApplication() : Application
+        return mApplication;
+!!!1308418.java!!!	isChild() : boolean
+        return mParent != null;
+!!!1308546.java!!!	getParent() : Activity
+        return mParent;
+!!!1308674.java!!!	getWindowManager() : WindowManager
+        return mWindowManager;
+!!!1308802.java!!!	getWindow() : Window
+        return mWindow;
+!!!1308930.java!!!	getLoaderManager() : LoaderManager
+        if (mLoaderManager != null) {
+            return mLoaderManager;
+        }
+        mCheckedForLoaderManager = true;
+        mLoaderManager = getLoaderManager("(root)", mLoadersStarted, true);
+        return mLoaderManager;
+!!!1309058.java!!!	getLoaderManager(in who : String, inout started : boolean, inout create : boolean) : LoaderManagerImpl
+        if (mAllLoaderManagers == null) {
+            mAllLoaderManagers = new ArrayMap<String, LoaderManagerImpl>();
+        }
+        LoaderManagerImpl lm = mAllLoaderManagers.get(who);
+        if (lm == null) {
+            if (create) {
+                lm = new LoaderManagerImpl(who, this, started);
+                mAllLoaderManagers.put(who, lm);
+            }
+        } else {
+            lm.updateActivity(this);
+        }
+        return lm;
+!!!1309186.java!!!	getCurrentFocus() : View
+        return mWindow != null ? mWindow.getCurrentFocus() : null;
+!!!1309314.java!!!	onCreate(inout savedInstanceState : Bundle) : void
+        if (DEBUG_LIFECYCLE) Slog.v(TAG, "onCreate " + this + ": " + savedInstanceState);
+        if (mLastNonConfigurationInstances != null) {
+            mAllLoaderManagers = mLastNonConfigurationInstances.loaders;
+        }
+        if (mActivityInfo.parentActivityName != null) {
+            if (mActionBar == null) {
+                mEnableDefaultActionBarUp = true;
+            } else {
+                mActionBar.setDefaultDisplayHomeAsUpEnabled(true);
+            }
+        }
+        if (savedInstanceState != null) {
+            Parcelable p = savedInstanceState.getParcelable(FRAGMENTS_TAG);
+            mFragments.restoreAllState(p, mLastNonConfigurationInstances != null
+                    ? mLastNonConfigurationInstances.fragments : null);
+        }
+        mFragments.dispatchCreate();
+        getApplication().dispatchActivityCreated(this, savedInstanceState);
+        if (mVoiceInteractor != null) {
+            mVoiceInteractor.attachActivity(this);
+        }
+        mCalled = true;
+!!!1309442.java!!!	onCreate(inout savedInstanceState : Bundle, inout persistentState : PersistableBundle) : void
+        onCreate(savedInstanceState);
+!!!1309570.java!!!	performRestoreInstanceState(inout savedInstanceState : Bundle) : void
+        onRestoreInstanceState(savedInstanceState);
+        restoreManagedDialogs(savedInstanceState);
+!!!1309698.java!!!	performRestoreInstanceState(inout savedInstanceState : Bundle, inout persistentState : PersistableBundle) : void
+        onRestoreInstanceState(savedInstanceState, persistentState);
+        if (savedInstanceState != null) {
+            restoreManagedDialogs(savedInstanceState);
+        }
+!!!1309826.java!!!	onRestoreInstanceState(inout savedInstanceState : Bundle) : void
+        if (mWindow != null) {
+            Bundle windowState = savedInstanceState.getBundle(WINDOW_HIERARCHY_TAG);
+            if (windowState != null) {
+                mWindow.restoreHierarchyState(windowState);
+            }
+        }
+!!!1309954.java!!!	onRestoreInstanceState(inout savedInstanceState : Bundle, inout persistentState : PersistableBundle) : void
+        if (savedInstanceState != null) {
+            onRestoreInstanceState(savedInstanceState);
+        }
+!!!1310082.java!!!	restoreManagedDialogs(inout savedInstanceState : Bundle) : void
+        final Bundle b = savedInstanceState.getBundle(SAVED_DIALOGS_TAG);
+        if (b == null) {
+            return;
+        }
+
+        final int[] ids = b.getIntArray(SAVED_DIALOG_IDS_KEY);
+        final int numDialogs = ids.length;
+        mManagedDialogs = new SparseArray<ManagedDialog>(numDialogs);
+        for (int i = 0; i < numDialogs; i++) {
+            final Integer dialogId = ids[i];
+            Bundle dialogState = b.getBundle(savedDialogKeyFor(dialogId));
+            if (dialogState != null) {
+                // Calling onRestoreInstanceState() below will invoke dispatchOnCreate
+                // so tell createDialog() not to do it, otherwise we get an exception
+                final ManagedDialog md = new ManagedDialog();
+                md.mArgs = b.getBundle(savedDialogArgsKeyFor(dialogId));
+                md.mDialog = createDialog(dialogId, dialogState, md.mArgs);
+                if (md.mDialog != null) {
+                    mManagedDialogs.put(dialogId, md);
+                    onPrepareDialog(dialogId, md.mDialog, md.mArgs);
+                    md.mDialog.onRestoreInstanceState(dialogState);
+                }
+            }
+        }
+!!!1310210.java!!!	createDialog(inout dialogId : Integer, inout state : Bundle, inout args : Bundle) : Dialog
+        final Dialog dialog = onCreateDialog(dialogId, args);
+        if (dialog == null) {
+            return null;
+        }
+        dialog.dispatchOnCreate(state);
+        return dialog;
+!!!1310338.java!!!	savedDialogKeyFor(in key : int) : String
+        return SAVED_DIALOG_KEY_PREFIX + key;
+!!!1310466.java!!!	savedDialogArgsKeyFor(in key : int) : String
+        return SAVED_DIALOG_ARGS_KEY_PREFIX + key;
+!!!1310594.java!!!	onPostCreate(inout savedInstanceState : Bundle) : void
+        if (!isChild()) {
+            mTitleReady = true;
+            onTitleChanged(getTitle(), getTitleColor());
+        }
+        mCalled = true;
+!!!1310722.java!!!	onPostCreate(inout savedInstanceState : Bundle, inout persistentState : PersistableBundle) : void
+        onPostCreate(savedInstanceState);
+!!!1310850.java!!!	onStart() : void
+        if (DEBUG_LIFECYCLE) Slog.v(TAG, "onStart " + this);
+        mCalled = true;
+
+        if (!mLoadersStarted) {
+            mLoadersStarted = true;
+            if (mLoaderManager != null) {
+                mLoaderManager.doStart();
+            } else if (!mCheckedForLoaderManager) {
+                mLoaderManager = getLoaderManager("(root)", mLoadersStarted, false);
+            }
+            mCheckedForLoaderManager = true;
+        }
+
+        getApplication().dispatchActivityStarted(this);
+!!!1310978.java!!!	onRestart() : void
+        mCalled = true;
+!!!1311106.java!!!	onResume() : void
+        if (DEBUG_LIFECYCLE) Slog.v(TAG, "onResume " + this);
+        getApplication().dispatchActivityResumed(this);
+        mActivityTransitionState.onResume();
+        mCalled = true;
+!!!1311234.java!!!	onPostResume() : void
+        final Window win = getWindow();
+        if (win != null) win.makeActive();
+        if (mActionBar != null) mActionBar.setShowHideAnimationEnabled(true);
+        mCalled = true;
+!!!1311362.java!!!	isVoiceInteraction() : boolean
+        return mVoiceInteractor != null;
+!!!1311490.java!!!	getVoiceInteractor() : VoiceInteractor
+        return mVoiceInteractor;
+!!!1311746.java!!!	performSaveInstanceState(inout outState : Bundle) : void
+        onSaveInstanceState(outState);
+        saveManagedDialogs(outState);
+        mActivityTransitionState.saveState(outState);
+        if (DEBUG_LIFECYCLE) Slog.v(TAG, "onSaveInstanceState " + this + ": " + outState);
+!!!1311874.java!!!	performSaveInstanceState(inout outState : Bundle, inout outPersistentState : PersistableBundle) : void
+        onSaveInstanceState(outState, outPersistentState);
+        saveManagedDialogs(outState);
+        if (DEBUG_LIFECYCLE) Slog.v(TAG, "onSaveInstanceState " + this + ": " + outState +
+                ", " + outPersistentState);
+!!!1312002.java!!!	onSaveInstanceState(inout outState : Bundle) : void
+        outState.putBundle(WINDOW_HIERARCHY_TAG, mWindow.saveHierarchyState());
+        Parcelable p = mFragments.saveAllState();
+        if (p != null) {
+            outState.putParcelable(FRAGMENTS_TAG, p);
+        }
+        getApplication().dispatchActivitySaveInstanceState(this, outState);
+!!!1312130.java!!!	onSaveInstanceState(inout outState : Bundle, inout outPersistentState : PersistableBundle) : void
+        onSaveInstanceState(outState);
+!!!1312258.java!!!	saveManagedDialogs(inout outState : Bundle) : void
+        if (mManagedDialogs == null) {
+            return;
+        }
+
+        final int numDialogs = mManagedDialogs.size();
+        if (numDialogs == 0) {
+            return;
+        }
+
+        Bundle dialogState = new Bundle();
+
+        int[] ids = new int[mManagedDialogs.size()];
+
+        // save each dialog's bundle, gather the ids
+        for (int i = 0; i < numDialogs; i++) {
+            final int key = mManagedDialogs.keyAt(i);
+            ids[i] = key;
+            final ManagedDialog md = mManagedDialogs.valueAt(i);
+            dialogState.putBundle(savedDialogKeyFor(key), md.mDialog.onSaveInstanceState());
+            if (md.mArgs != null) {
+                dialogState.putBundle(savedDialogArgsKeyFor(key), md.mArgs);
+            }
+        }
+
+        dialogState.putIntArray(SAVED_DIALOG_IDS_KEY, ids);
+        outState.putBundle(SAVED_DIALOGS_TAG, dialogState);
+!!!1312386.java!!!	onPause() : void
+        if (DEBUG_LIFECYCLE) Slog.v(TAG, "onPause " + this);
+        getApplication().dispatchActivityPaused(this);
+        mCalled = true;
+!!!1312642.java!!!	onCreateThumbnail(inout outBitmap : Bitmap, inout canvas : Canvas) : boolean
+        return false;
+!!!1312770.java!!!	onCreateDescription() : CharSequence
+        return null;
+!!!1313026.java!!!	onStop() : void
+        if (DEBUG_LIFECYCLE) Slog.v(TAG, "onStop " + this);
+        if (mActionBar != null) mActionBar.setShowHideAnimationEnabled(false);
+        mActivityTransitionState.onStop();
+        getApplication().dispatchActivityStopped(this);
+        mTranslucentCallback = null;
+        mCalled = true;
+!!!1313154.java!!!	onDestroy() : void
+        if (DEBUG_LIFECYCLE) Slog.v(TAG, "onDestroy " + this);
+        mCalled = true;
+
+        // dismiss any dialogs we are managing.
+        if (mManagedDialogs != null) {
+            final int numDialogs = mManagedDialogs.size();
+            for (int i = 0; i < numDialogs; i++) {
+                final ManagedDialog md = mManagedDialogs.valueAt(i);
+                if (md.mDialog.isShowing()) {
+                    md.mDialog.dismiss();
+                }
+            }
+            mManagedDialogs = null;
+        }
+
+        // close any cursors we are managing.
+        synchronized (mManagedCursors) {
+            int numCursors = mManagedCursors.size();
+            for (int i = 0; i < numCursors; i++) {
+                ManagedCursor c = mManagedCursors.get(i);
+                if (c != null) {
+                    c.mCursor.close();
+                }
+            }
+            mManagedCursors.clear();
+        }
+
+        // Close any open search dialog
+        if (mSearchManager != null) {
+            mSearchManager.stopSearch();
+        }
+
+        getApplication().dispatchActivityDestroyed(this);
+!!!1313282.java!!!	reportFullyDrawn() : void
+        if (mDoReportFullyDrawn) {
+            mDoReportFullyDrawn = false;
+            try {
+                ActivityManagerNative.getDefault().reportActivityFullyDrawn(mToken);
+            } catch (RemoteException e) {
+            }
+        }
+!!!1313410.java!!!	onConfigurationChanged(inout newConfig : Configuration) : void
+        if (DEBUG_LIFECYCLE) Slog.v(TAG, "onConfigurationChanged " + this + ": " + newConfig);
+        mCalled = true;
+
+        mFragments.dispatchConfigurationChanged(newConfig);
+
+        if (mWindow != null) {
+            // Pass the configuration changed event to the window
+            mWindow.onConfigurationChanged(newConfig);
+        }
+
+        if (mActionBar != null) {
+            // Do this last; the action bar will need to access
+            // view changes from above.
+            mActionBar.onConfigurationChanged(newConfig);
+        }
+!!!1313538.java!!!	getChangingConfigurations() : int
+        return mConfigChangeFlags;
+!!!1313666.java!!!	getLastNonConfigurationInstance() : Object
+        return mLastNonConfigurationInstances != null
+                ? mLastNonConfigurationInstances.activity : null;
+!!!1313794.java!!!	onRetainNonConfigurationInstance() : Object
+        return null;
+!!!1313922.java!!!	getLastNonConfigurationChildInstances() : HashMap<String, Object>
+        return mLastNonConfigurationInstances != null
+                ? mLastNonConfigurationInstances.children : null;
+!!!1314050.java!!!	onRetainNonConfigurationChildInstances() : HashMap<String,Object>
+        return null;
+!!!1314178.java!!!	retainNonConfigurationInstances() : Activity::NonConfigurationInstances
+        Object activity = onRetainNonConfigurationInstance();
+        HashMap<String, Object> children = onRetainNonConfigurationChildInstances();
+        ArrayList<Fragment> fragments = mFragments.retainNonConfig();
+        boolean retainLoaders = false;
+        if (mAllLoaderManagers != null) {
+            // prune out any loader managers that were already stopped and so
+            // have nothing useful to retain.
+            final int N = mAllLoaderManagers.size();
+            LoaderManagerImpl loaders[] = new LoaderManagerImpl[N];
+            for (int i=N-1; i>=0; i--) {
+                loaders[i] = mAllLoaderManagers.valueAt(i);
+            }
+            for (int i=0; i<N; i++) {
+                LoaderManagerImpl lm = loaders[i];
+                if (lm.mRetaining) {
+                    retainLoaders = true;
+                } else {
+                    lm.doDestroy();
+                    mAllLoaderManagers.remove(lm.mWho);
+                }
+            }
+        }
+        if (activity == null && children == null && fragments == null && !retainLoaders
+                && mVoiceInteractor == null) {
+            return null;
+        }
+
+        NonConfigurationInstances nci = new NonConfigurationInstances();
+        nci.activity = activity;
+        nci.children = children;
+        nci.fragments = fragments;
+        nci.loaders = mAllLoaderManagers;
+        nci.voiceInteractor = mVoiceInteractor;
+        return nci;
+!!!1314306.java!!!	onLowMemory() : void
+        if (DEBUG_LIFECYCLE) Slog.v(TAG, "onLowMemory " + this);
+        mCalled = true;
+        mFragments.dispatchLowMemory();
+!!!1314434.java!!!	onTrimMemory(in level : int) : void
+        if (DEBUG_LIFECYCLE) Slog.v(TAG, "onTrimMemory " + this + ": " + level);
+        mCalled = true;
+        mFragments.dispatchTrimMemory(level);
+!!!1314562.java!!!	getFragmentManager() : FragmentManager
+        return mFragments;
+!!!1314690.java!!!	invalidateFragment(in who : String) : void
+        //Log.v(TAG, "invalidateFragmentIndex: index=" + index);
+        if (mAllLoaderManagers != null) {
+            LoaderManagerImpl lm = mAllLoaderManagers.get(who);
+            if (lm != null && !lm.mRetaining) {
+                lm.doDestroy();
+                mAllLoaderManagers.remove(who);
+            }
+        }
+!!!1314946.java!!!	managedQuery(inout uri : Uri, inout projection : String, in selection : String, in sortOrder : String) : Cursor
+        Cursor c = getContentResolver().query(uri, projection, selection, null, sortOrder);
+        if (c != null) {
+            startManagingCursor(c);
+        }
+        return c;
+!!!1315074.java!!!	managedQuery(inout uri : Uri, inout projection : String, in selection : String, inout selectionArgs : String, in sortOrder : String) : Cursor
+        Cursor c = getContentResolver().query(uri, projection, selection, selectionArgs, sortOrder);
+        if (c != null) {
+            startManagingCursor(c);
+        }
+        return c;
+!!!1315202.java!!!	startManagingCursor(inout c : Cursor) : void
+        synchronized (mManagedCursors) {
+            mManagedCursors.add(new ManagedCursor(c));
+        }
+!!!1315330.java!!!	stopManagingCursor(inout c : Cursor) : void
+        synchronized (mManagedCursors) {
+            final int N = mManagedCursors.size();
+            for (int i=0; i<N; i++) {
+                ManagedCursor mc = mManagedCursors.get(i);
+                if (mc.mCursor == c) {
+                    mManagedCursors.remove(i);
+                    break;
+                }
+            }
+        }
+!!!1315586.java!!!	findViewById(in id : int) : View
+        return getWindow().findViewById(id);
+!!!1315714.java!!!	getActionBar() : ActionBar
+        initWindowDecorActionBar();
+        return mActionBar;
+!!!1315842.java!!!	setActionBar(inout toolbar : Toolbar) : void
+        if (getActionBar() instanceof WindowDecorActionBar) {
+            throw new IllegalStateException("This Activity already has an action bar supplied " +
+                    "by the window decor. Do not request Window.FEATURE_ACTION_BAR and set " +
+                    "android:windowActionBar to false in your theme to use a Toolbar instead.");
+        }
+        ToolbarActionBar tbab = new ToolbarActionBar(toolbar, getTitle(), this);
+        mActionBar = tbab;
+        mWindow.setCallback(tbab.getWrappedWindowCallback());
+        mActionBar.invalidateOptionsMenu();
+!!!1315970.java!!!	initWindowDecorActionBar() : void
+        Window window = getWindow();
+
+        // Initializing the window decor can change window feature flags.
+        // Make sure that we have the correct set before performing the test below.
+        window.getDecorView();
+
+        if (isChild() || !window.hasFeature(Window.FEATURE_ACTION_BAR) || mActionBar != null) {
+            return;
+        }
+
+        mActionBar = new WindowDecorActionBar(this);
+        mActionBar.setDefaultDisplayHomeAsUpEnabled(mEnableDefaultActionBarUp);
+
+        mWindow.setDefaultIcon(mActivityInfo.getIconResource());
+        mWindow.setDefaultLogo(mActivityInfo.getLogoResource());
+!!!1316098.java!!!	setContentView(in layoutResID : int) : void
+        getWindow().setContentView(layoutResID);
+        initWindowDecorActionBar();
+!!!1316226.java!!!	setContentView(inout view : View) : void
+        getWindow().setContentView(view);
+        initWindowDecorActionBar();
+!!!1316354.java!!!	setContentView(inout view : View, inout params : ViewGroup::LayoutParams) : void
+        getWindow().setContentView(view, params);
+        initWindowDecorActionBar();
+!!!1316482.java!!!	addContentView(inout view : View, inout params : ViewGroup::LayoutParams) : void
+        getWindow().addContentView(view, params);
+        initWindowDecorActionBar();
+!!!1316610.java!!!	getContentTransitionManager() : TransitionManager
+        return getWindow().getTransitionManager();
+!!!1316738.java!!!	setContentTransitionManager(inout tm : TransitionManager) : void
+        getWindow().setTransitionManager(tm);
+!!!1316866.java!!!	getContentScene() : Scene
+        return getWindow().getContentScene();
+!!!1316994.java!!!	setFinishOnTouchOutside(inout finish : boolean) : void
+        mWindow.setCloseOnTouchOutside(finish);
+!!!1317122.java!!!	setDefaultKeyMode(in mode : int) : void
+        mDefaultKeyMode = mode;
+
+        // Some modes use a SpannableStringBuilder to track & dispatch input events
+        // This list must remain in sync with the switch in onKeyDown()
+        switch (mode) {
+        case DEFAULT_KEYS_DISABLE:
+        case DEFAULT_KEYS_SHORTCUT:
+            mDefaultKeySsb = null;      // not used in these modes
+            break;
+        case DEFAULT_KEYS_DIALER:
+        case DEFAULT_KEYS_SEARCH_LOCAL:
+        case DEFAULT_KEYS_SEARCH_GLOBAL:
+            mDefaultKeySsb = new SpannableStringBuilder();
+            Selection.setSelection(mDefaultKeySsb,0);
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+!!!1317250.java!!!	onKeyDown(in keyCode : int, inout event : KeyEvent) : boolean
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (getApplicationInfo().targetSdkVersion
+                    >= Build.VERSION_CODES.ECLAIR) {
+                event.startTracking();
+            } else {
+                onBackPressed();
+            }
+            return true;
+        }
+
+        if (mDefaultKeyMode == DEFAULT_KEYS_DISABLE) {
+            return false;
+        } else if (mDefaultKeyMode == DEFAULT_KEYS_SHORTCUT) {
+            if (getWindow().performPanelShortcut(Window.FEATURE_OPTIONS_PANEL,
+                    keyCode, event, Menu.FLAG_ALWAYS_PERFORM_CLOSE)) {
+                return true;
+            }
+            return false;
+        } else {
+            // Common code for DEFAULT_KEYS_DIALER & DEFAULT_KEYS_SEARCH_*
+            boolean clearSpannable = false;
+            boolean handled;
+            if ((event.getRepeatCount() != 0) || event.isSystem()) {
+                clearSpannable = true;
+                handled = false;
+            } else {
+                handled = TextKeyListener.getInstance().onKeyDown(
+                        null, mDefaultKeySsb, keyCode, event);
+                if (handled && mDefaultKeySsb.length() > 0) {
+                    // something useable has been typed - dispatch it now.
+
+                    final String str = mDefaultKeySsb.toString();
+                    clearSpannable = true;
+
+                    switch (mDefaultKeyMode) {
+                    case DEFAULT_KEYS_DIALER:
+                        Intent intent = new Intent(Intent.ACTION_DIAL,  Uri.parse("tel:" + str));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        break;
+                    case DEFAULT_KEYS_SEARCH_LOCAL:
+                        startSearch(str, false, null, false);
+                        break;
+                    case DEFAULT_KEYS_SEARCH_GLOBAL:
+                        startSearch(str, false, null, true);
+                        break;
+                    }
+                }
+            }
+            if (clearSpannable) {
+                mDefaultKeySsb.clear();
+                mDefaultKeySsb.clearSpans();
+                Selection.setSelection(mDefaultKeySsb,0);
+            }
+            return handled;
+        }
+!!!1317378.java!!!	onKeyLongPress(in keyCode : int, inout event : KeyEvent) : boolean
+        return false;
+!!!1317506.java!!!	onKeyUp(in keyCode : int, inout event : KeyEvent) : boolean
+        if (getApplicationInfo().targetSdkVersion
+                >= Build.VERSION_CODES.ECLAIR) {
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.isTracking()
+                    && !event.isCanceled()) {
+                onBackPressed();
+                return true;
+            }
+        }
+        return false;
+!!!1317634.java!!!	onKeyMultiple(in keyCode : int, in repeatCount : int, inout event : KeyEvent) : boolean
+        return false;
+!!!1317762.java!!!	onBackPressed() : void
+        if (mActionBar != null && mActionBar.collapseActionView()) {
+            return;
+        }
+
+        if (!mFragments.popBackStackImmediate()) {
+            finishAfterTransition();
+        }
+!!!1317890.java!!!	onKeyShortcut(in keyCode : int, inout event : KeyEvent) : boolean
+        return false;
+!!!1318018.java!!!	onTouchEvent(inout event : MotionEvent) : boolean
+        if (mWindow.shouldCloseOnTouch(this, event)) {
+            finish();
+            return true;
+        }
+
+        return false;
+!!!1318146.java!!!	onTrackballEvent(inout event : MotionEvent) : boolean
+        return false;
+!!!1318274.java!!!	onGenericMotionEvent(inout event : MotionEvent) : boolean
+        return false;
+!!!1318530.java!!!	onWindowAttributesChanged(inout params : WindowManager::LayoutParams) : void
+        // Update window manager if: we have a view, that view is
+        // attached to its parent (which will be a RootView), and
+        // this activity is not embedded.
+        if (mParent == null) {
+            View decor = mDecor;
+            if (decor != null && decor.getParent() != null) {
+                getWindowManager().updateViewLayout(decor, params);
+            }
+        }
+!!!1319170.java!!!	hasWindowFocus() : boolean
+        Window w = getWindow();
+        if (w != null) {
+            View d = w.getDecorView();
+            if (d != null) {
+                return d.hasWindowFocus();
+            }
+        }
+        return false;
+!!!1319298.java!!!	onWindowDismissed() : void
+        finish();
+!!!1319426.java!!!	dispatchKeyEvent(inout event : KeyEvent) : boolean
+        onUserInteraction();
+
+        // Let action bars open menus in response to the menu key prioritized over
+        // the window handling it
+        if (event.getKeyCode() == KeyEvent.KEYCODE_MENU &&
+                mActionBar != null && mActionBar.onMenuKeyEvent(event)) {
+            return true;
+        }
+
+        Window win = getWindow();
+        if (win.superDispatchKeyEvent(event)) {
+            return true;
+        }
+        View decor = mDecor;
+        if (decor == null) decor = win.getDecorView();
+        return event.dispatch(this, decor != null
+                ? decor.getKeyDispatcherState() : null, this);
+!!!1319554.java!!!	dispatchKeyShortcutEvent(inout event : KeyEvent) : boolean
+        onUserInteraction();
+        if (getWindow().superDispatchKeyShortcutEvent(event)) {
+            return true;
+        }
+        return onKeyShortcut(event.getKeyCode(), event);
+!!!1319682.java!!!	dispatchTouchEvent(inout ev : MotionEvent) : boolean
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            onUserInteraction();
+        }
+        if (getWindow().superDispatchTouchEvent(ev)) {
+            return true;
+        }
+        return onTouchEvent(ev);
+!!!1319810.java!!!	dispatchTrackballEvent(inout ev : MotionEvent) : boolean
+        onUserInteraction();
+        if (getWindow().superDispatchTrackballEvent(ev)) {
+            return true;
+        }
+        return onTrackballEvent(ev);
+!!!1319938.java!!!	dispatchGenericMotionEvent(inout ev : MotionEvent) : boolean
+        onUserInteraction();
+        if (getWindow().superDispatchGenericMotionEvent(ev)) {
+            return true;
+        }
+        return onGenericMotionEvent(ev);
+!!!1320066.java!!!	dispatchPopulateAccessibilityEvent(inout event : AccessibilityEvent) : boolean
+        event.setClassName(getClass().getName());
+        event.setPackageName(getPackageName());
+
+        LayoutParams params = getWindow().getAttributes();
+        boolean isFullScreen = (params.width == LayoutParams.MATCH_PARENT) &&
+            (params.height == LayoutParams.MATCH_PARENT);
+        event.setFullScreen(isFullScreen);
+
+        CharSequence title = getTitle();
+        if (!TextUtils.isEmpty(title)) {
+           event.getText().add(title);
+        }
+
+        return true;
+!!!1320194.java!!!	onCreatePanelView(in featureId : int) : View
+        return null;
+!!!1320322.java!!!	onCreatePanelMenu(in featureId : int, inout menu : Menu) : boolean
+        if (featureId == Window.FEATURE_OPTIONS_PANEL) {
+            boolean show = onCreateOptionsMenu(menu);
+            show |= mFragments.dispatchCreateOptionsMenu(menu, getMenuInflater());
+            return show;
+        }
+        return false;
+!!!1320450.java!!!	onPreparePanel(in featureId : int, inout view : View, inout menu : Menu) : boolean
+        if (featureId == Window.FEATURE_OPTIONS_PANEL && menu != null) {
+            boolean goforit = onPrepareOptionsMenu(menu);
+            goforit |= mFragments.dispatchPrepareOptionsMenu(menu);
+            return goforit;
+        }
+        return true;
+!!!1320578.java!!!	onMenuOpened(in featureId : int, inout menu : Menu) : boolean
+        if (featureId == Window.FEATURE_ACTION_BAR) {
+            initWindowDecorActionBar();
+            if (mActionBar != null) {
+                mActionBar.dispatchMenuVisibilityChanged(true);
+            } else {
+                Log.e(TAG, "Tried to open action bar menu with no action bar");
+            }
+        }
+        return true;
+!!!1320706.java!!!	onMenuItemSelected(in featureId : int, inout item : MenuItem) : boolean
+        CharSequence titleCondensed = item.getTitleCondensed();
+
+        switch (featureId) {
+            case Window.FEATURE_OPTIONS_PANEL:
+                // Put event logging here so it gets called even if subclass
+                // doesn't call through to superclass's implmeentation of each
+                // of these methods below
+                if(titleCondensed != null) {
+                    EventLog.writeEvent(50000, 0, titleCondensed.toString());
+                }
+                if (onOptionsItemSelected(item)) {
+                    return true;
+                }
+                if (mFragments.dispatchOptionsItemSelected(item)) {
+                    return true;
+                }
+                if (item.getItemId() == android.R.id.home && mActionBar != null &&
+                        (mActionBar.getDisplayOptions() & ActionBar.DISPLAY_HOME_AS_UP) != 0) {
+                    if (mParent == null) {
+                        return onNavigateUp();
+                    } else {
+                        return mParent.onNavigateUpFromChild(this);
+                    }
+                }
+                return false;
+
+            case Window.FEATURE_CONTEXT_MENU:
+                if(titleCondensed != null) {
+                    EventLog.writeEvent(50000, 1, titleCondensed.toString());
+                }
+                if (onContextItemSelected(item)) {
+                    return true;
+                }
+                return mFragments.dispatchContextItemSelected(item);
+
+            default:
+                return false;
+        }
+!!!1320834.java!!!	onPanelClosed(in featureId : int, inout menu : Menu) : void
+        switch (featureId) {
+            case Window.FEATURE_OPTIONS_PANEL:
+                mFragments.dispatchOptionsMenuClosed(menu);
+                onOptionsMenuClosed(menu);
+                break;
+
+            case Window.FEATURE_CONTEXT_MENU:
+                onContextMenuClosed(menu);
+                break;
+
+            case Window.FEATURE_ACTION_BAR:
+                initWindowDecorActionBar();
+                mActionBar.dispatchMenuVisibilityChanged(false);
+                break;
+        }
+!!!1320962.java!!!	invalidateOptionsMenu() : void
+        if (mActionBar == null || !mActionBar.invalidateOptionsMenu()) {
+            mWindow.invalidatePanelMenu(Window.FEATURE_OPTIONS_PANEL);
+        }
+!!!1321090.java!!!	onCreateOptionsMenu(inout menu : Menu) : boolean
+        if (mParent != null) {
+            return mParent.onCreateOptionsMenu(menu);
+        }
+        return true;
+!!!1321218.java!!!	onPrepareOptionsMenu(inout menu : Menu) : boolean
+        if (mParent != null) {
+            return mParent.onPrepareOptionsMenu(menu);
+        }
+        return true;
+!!!1321346.java!!!	onOptionsItemSelected(inout item : MenuItem) : boolean
+        if (mParent != null) {
+            return mParent.onOptionsItemSelected(item);
+        }
+        return false;
+!!!1321474.java!!!	onNavigateUp() : boolean
+        // Automatically handle hierarchical Up navigation if the proper
+        // metadata is available.
+        Intent upIntent = getParentActivityIntent();
+        if (upIntent != null) {
+            if (mActivityInfo.taskAffinity == null) {
+                // Activities with a null affinity are special; they really shouldn't
+                // specify a parent activity intent in the first place. Just finish
+                // the current activity and call it a day.
+                finish();
+            } else if (shouldUpRecreateTask(upIntent)) {
+                TaskStackBuilder b = TaskStackBuilder.create(this);
+                onCreateNavigateUpTaskStack(b);
+                onPrepareNavigateUpTaskStack(b);
+                b.startActivities();
+
+                // We can't finishAffinity if we have a result.
+                // Fall back and simply finish the current activity instead.
+                if (mResultCode != RESULT_CANCELED || mResultData != null) {
+                    // Tell the developer what's going on to avoid hair-pulling.
+                    Log.i(TAG, "onNavigateUp only finishing topmost activity to return a result");
+                    finish();
+                } else {
+                    finishAffinity();
+                }
+            } else {
+                navigateUpTo(upIntent);
+            }
+            return true;
+        }
+        return false;
+!!!1321602.java!!!	onNavigateUpFromChild(inout child : Activity) : boolean
+        return onNavigateUp();
+!!!1321730.java!!!	onCreateNavigateUpTaskStack(inout builder : TaskStackBuilder) : void
+        builder.addParentStack(this);
+!!!1321986.java!!!	onOptionsMenuClosed(inout menu : Menu) : void
+        if (mParent != null) {
+            mParent.onOptionsMenuClosed(menu);
+        }
+!!!1322114.java!!!	openOptionsMenu() : void
+        if (mActionBar == null || !mActionBar.openOptionsMenu()) {
+            mWindow.openPanel(Window.FEATURE_OPTIONS_PANEL, null);
+        }
+!!!1322242.java!!!	closeOptionsMenu() : void
+        mWindow.closePanel(Window.FEATURE_OPTIONS_PANEL);
+!!!1322498.java!!!	registerForContextMenu(inout view : View) : void
+        view.setOnCreateContextMenuListener(this);
+!!!1322626.java!!!	unregisterForContextMenu(inout view : View) : void
+        view.setOnCreateContextMenuListener(null);
+!!!1322754.java!!!	openContextMenu(inout view : View) : void
+        view.showContextMenu();
+!!!1322882.java!!!	closeContextMenu() : void
+        mWindow.closePanel(Window.FEATURE_CONTEXT_MENU);
+!!!1323010.java!!!	onContextItemSelected(inout item : MenuItem) : boolean
+        if (mParent != null) {
+            return mParent.onContextItemSelected(item);
+        }
+        return false;
+!!!1323138.java!!!	onContextMenuClosed(inout menu : Menu) : void
+        if (mParent != null) {
+            mParent.onContextMenuClosed(menu);
+        }
+!!!1323266.java!!!	onCreateDialog(in id : int) : Dialog
+        return null;
+!!!1323394.java!!!	onCreateDialog(in id : int, inout args : Bundle) : Dialog
+        return onCreateDialog(id);
+!!!1323522.java!!!	onPrepareDialog(in id : int, inout dialog : Dialog) : void
+        dialog.setOwnerActivity(this);
+!!!1323650.java!!!	onPrepareDialog(in id : int, inout dialog : Dialog, inout args : Bundle) : void
+        onPrepareDialog(id, dialog);
+!!!1323778.java!!!	showDialog(in id : int) : void
+        showDialog(id, null);
+!!!1323906.java!!!	showDialog(in id : int, inout args : Bundle) : boolean
+        if (mManagedDialogs == null) {
+            mManagedDialogs = new SparseArray<ManagedDialog>();
+        }
+        ManagedDialog md = mManagedDialogs.get(id);
+        if (md == null) {
+            md = new ManagedDialog();
+            md.mDialog = createDialog(id, null, args);
+            if (md.mDialog == null) {
+                return false;
+            }
+            mManagedDialogs.put(id, md);
+        }
+
+        md.mArgs = args;
+        onPrepareDialog(id, md.mDialog, args);
+        md.mDialog.show();
+        return true;
+!!!1324034.java!!!	dismissDialog(in id : int) : void
+        if (mManagedDialogs == null) {
+            throw missingDialog(id);
+        }
+
+        final ManagedDialog md = mManagedDialogs.get(id);
+        if (md == null) {
+            throw missingDialog(id);
+        }
+        md.mDialog.dismiss();
+!!!1324162.java!!!	missingDialog(in id : int) : IllegalArgumentException
+        return new IllegalArgumentException("no dialog with id " + id + " was ever "
+                + "shown via Activity#showDialog");
+!!!1324290.java!!!	removeDialog(in id : int) : void
+        if (mManagedDialogs != null) {
+            final ManagedDialog md = mManagedDialogs.get(id);
+            if (md != null) {
+                md.mDialog.dismiss();
+                mManagedDialogs.remove(id);
+            }
+        }
+!!!1324418.java!!!	onSearchRequested() : boolean
+        if ((getResources().getConfiguration().uiMode&Configuration.UI_MODE_TYPE_MASK)
+                != Configuration.UI_MODE_TYPE_TELEVISION) {
+            startSearch(null, false, null, false);
+            return true;
+        } else {
+            return false;
+        }
+!!!1324546.java!!!	startSearch(in initialQuery : String, inout selectInitialQuery : boolean, inout appSearchData : Bundle, inout globalSearch : boolean) : void
+        ensureSearchManager();
+        mSearchManager.startSearch(initialQuery, selectInitialQuery, getComponentName(),
+                appSearchData, globalSearch);
+!!!1324674.java!!!	triggerSearch(in query : String, inout appSearchData : Bundle) : void
+        ensureSearchManager();
+        mSearchManager.triggerSearch(query, getComponentName(), appSearchData);
+!!!1324802.java!!!	takeKeyEvents(inout get : boolean) : void
+        getWindow().takeKeyEvents(get);
+!!!1324930.java!!!	requestWindowFeature(in featureId : int) : boolean
+        return getWindow().requestFeature(featureId);
+!!!1325058.java!!!	setFeatureDrawableResource(in featureId : int, in resId : int) : void
+        getWindow().setFeatureDrawableResource(featureId, resId);
+!!!1325186.java!!!	setFeatureDrawableUri(in featureId : int, inout uri : Uri) : void
+        getWindow().setFeatureDrawableUri(featureId, uri);
+!!!1325314.java!!!	setFeatureDrawable(in featureId : int, inout drawable : Drawable) : void
+        getWindow().setFeatureDrawable(featureId, drawable);
+!!!1325442.java!!!	setFeatureDrawableAlpha(in featureId : int, in alpha : int) : void
+        getWindow().setFeatureDrawableAlpha(featureId, alpha);
+!!!1325570.java!!!	getLayoutInflater() : LayoutInflater
+        return getWindow().getLayoutInflater();
+!!!1325698.java!!!	getMenuInflater() : MenuInflater
+        // Make sure that action views can get an appropriate theme.
+        if (mMenuInflater == null) {
+            initWindowDecorActionBar();
+            if (mActionBar != null) {
+                mMenuInflater = new MenuInflater(mActionBar.getThemedContext(), this);
+            } else {
+                mMenuInflater = new MenuInflater(this);
+            }
+        }
+        return mMenuInflater;
+!!!1325826.java!!!	onApplyThemeResource(inout theme : Resources.Theme, in resid : int, inout first : boolean) : void
+        if (mParent == null) {
+            super.onApplyThemeResource(theme, resid, first);
+        } else {
+            try {
+                theme.setTo(mParent.getTheme());
+            } catch (Exception e) {
+                // Empty
+            }
+            theme.applyStyle(resid, false);
+        }
+
+        // Get the primary color and update the TaskDescription for this activity
+        if (theme != null) {
+            TypedArray a = theme.obtainStyledAttributes(com.android.internal.R.styleable.Theme);
+            int colorPrimary = a.getColor(com.android.internal.R.styleable.Theme_colorPrimary, 0);
+            a.recycle();
+            if (colorPrimary != 0) {
+                ActivityManager.TaskDescription v = new ActivityManager.TaskDescription(null, null,
+                        colorPrimary);
+                setTaskDescription(v);
+            }
+        }
+!!!1325954.java!!!	startActivityForResult(inout intent : Intent, in requestCode : int) : void
+        startActivityForResult(intent, requestCode, null);
+!!!1326082.java!!!	startActivityForResult(inout intent : Intent, in requestCode : int, inout options : Bundle) : void
+        if (mParent == null) {
+            Instrumentation.ActivityResult ar =
+                mInstrumentation.execStartActivity(
+                    this, mMainThread.getApplicationThread(), mToken, this,
+                    intent, requestCode, options);
+            if (ar != null) {
+                mMainThread.sendActivityResult(
+                    mToken, mEmbeddedID, requestCode, ar.getResultCode(),
+                    ar.getResultData());
+            }
+            if (requestCode >= 0) {
+                // If this start is requesting a result, we can avoid making
+                // the activity visible until the result is received.  Setting
+                // this code during onCreate(Bundle savedInstanceState) or onResume() will keep the
+                // activity hidden during this time, to avoid flickering.
+                // This can only be done when a result is requested because
+                // that guarantees we will get information back when the
+                // activity is finished, no matter what happens to it.
+                mStartedActivity = true;
+            }
+
+            final View decor = mWindow != null ? mWindow.peekDecorView() : null;
+            if (decor != null) {
+                decor.cancelPendingInputEvents();
+            }
+            // TODO Consider clearing/flushing other event sources and events for child windows.
+        } else {
+            if (options != null) {
+                mParent.startActivityFromChild(this, intent, requestCode, options);
+            } else {
+                // Note we want to go through this method for compatibility with
+                // existing applications that may have overridden it.
+                mParent.startActivityFromChild(this, intent, requestCode);
+            }
+        }
+        if (options != null && !isTopOfTask()) {
+            mActivityTransitionState.startExitOutTransition(this, options);
+        }
+!!!1326210.java!!!	startActivityForResultAsUser(inout intent : Intent, in requestCode : int, inout user : UserHandle) : void
+        startActivityForResultAsUser(intent, requestCode, null, user);
+!!!1326338.java!!!	startActivityForResultAsUser(inout intent : Intent, in requestCode : int, inout options : Bundle, inout user : UserHandle) : void
+        if (options != null) {
+            mActivityTransitionState.startExitOutTransition(this, options);
+        }
+        if (mParent != null) {
+            throw new RuntimeException("Can't be called from a child");
+        }
+        Instrumentation.ActivityResult ar = mInstrumentation.execStartActivity(
+                this, mMainThread.getApplicationThread(), mToken, this, intent, requestCode,
+                options, user);
+        if (ar != null) {
+            mMainThread.sendActivityResult(
+                mToken, mEmbeddedID, requestCode, ar.getResultCode(), ar.getResultData());
+        }
+        if (requestCode >= 0) {
+            // If this start is requesting a result, we can avoid making
+            // the activity visible until the result is received.  Setting
+            // this code during onCreate(Bundle savedInstanceState) or onResume() will keep the
+            // activity hidden during this time, to avoid flickering.
+            // This can only be done when a result is requested because
+            // that guarantees we will get information back when the
+            // activity is finished, no matter what happens to it.
+            mStartedActivity = true;
+        }
+
+        final View decor = mWindow != null ? mWindow.peekDecorView() : null;
+        if (decor != null) {
+            decor.cancelPendingInputEvents();
+        }
+!!!1326466.java!!!	startActivityAsUser(inout intent : Intent, inout user : UserHandle) : void
+        startActivityAsUser(intent, null, user);
+!!!1326594.java!!!	startActivityAsUser(inout intent : Intent, inout options : Bundle, inout user : UserHandle) : void
+        if (mParent != null) {
+            throw new RuntimeException("Can't be called from a child");
+        }
+        Instrumentation.ActivityResult ar =
+                mInstrumentation.execStartActivity(
+                        this, mMainThread.getApplicationThread(), mToken, this,
+                        intent, -1, options, user);
+        if (ar != null) {
+            mMainThread.sendActivityResult(
+                mToken, mEmbeddedID, -1, ar.getResultCode(),
+                ar.getResultData());
+        }
+!!!1326722.java!!!	startActivityAsCaller(inout intent : Intent, inout options : Bundle, in userId : int) : void
+        if (mParent != null) {
+            throw new RuntimeException("Can't be called from a child");
+        }
+        Instrumentation.ActivityResult ar =
+                mInstrumentation.execStartActivityAsCaller(
+                        this, mMainThread.getApplicationThread(), mToken, this,
+                        intent, -1, options, userId);
+        if (ar != null) {
+            mMainThread.sendActivityResult(
+                mToken, mEmbeddedID, -1, ar.getResultCode(),
+                ar.getResultData());
+        }
+!!!1326850.java!!!	startIntentSenderForResult(inout intent : IntentSender, in requestCode : int, inout fillInIntent : Intent, in flagsMask : int, in flagsValues : int, in extraFlags : int) : void
+        startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask,
+                flagsValues, extraFlags, null);
+!!!1326978.java!!!	startIntentSenderForResult(inout intent : IntentSender, in requestCode : int, inout fillInIntent : Intent, in flagsMask : int, in flagsValues : int, in extraFlags : int, inout options : Bundle) : void
+        if (mParent == null) {
+            startIntentSenderForResultInner(intent, requestCode, fillInIntent,
+                    flagsMask, flagsValues, this, options);
+        } else if (options != null) {
+            mParent.startIntentSenderFromChild(this, intent, requestCode,
+                    fillInIntent, flagsMask, flagsValues, extraFlags, options);
+        } else {
+            // Note we want to go through this call for compatibility with
+            // existing applications that may have overridden the method.
+            mParent.startIntentSenderFromChild(this, intent, requestCode,
+                    fillInIntent, flagsMask, flagsValues, extraFlags);
+        }
+!!!1327106.java!!!	startIntentSenderForResultInner(inout intent : IntentSender, in requestCode : int, inout fillInIntent : Intent, in flagsMask : int, in flagsValues : int, inout activity : Activity, inout options : Bundle) : void
+        try {
+            String resolvedType = null;
+            if (fillInIntent != null) {
+                fillInIntent.migrateExtraStreamToClipData();
+                fillInIntent.prepareToLeaveProcess();
+                resolvedType = fillInIntent.resolveTypeIfNeeded(getContentResolver());
+            }
+            int result = ActivityManagerNative.getDefault()
+                .startActivityIntentSender(mMainThread.getApplicationThread(), intent,
+                        fillInIntent, resolvedType, mToken, activity.mEmbeddedID,
+                        requestCode, flagsMask, flagsValues, options);
+            if (result == ActivityManager.START_CANCELED) {
+                throw new IntentSender.SendIntentException();
+            }
+            Instrumentation.checkStartActivityResult(result, null);
+        } catch (RemoteException e) {
+        }
+        if (requestCode >= 0) {
+            // If this start is requesting a result, we can avoid making
+            // the activity visible until the result is received.  Setting
+            // this code during onCreate(Bundle savedInstanceState) or onResume() will keep the
+            // activity hidden during this time, to avoid flickering.
+            // This can only be done when a result is requested because
+            // that guarantees we will get information back when the
+            // activity is finished, no matter what happens to it.
+            mStartedActivity = true;
+        }
+!!!1327234.java!!!	startActivity(inout intent : Intent) : void
+        this.startActivity(intent, null);
+!!!1327362.java!!!	startActivity(inout intent : Intent, inout options : Bundle) : void
+        if (options != null) {
+            startActivityForResult(intent, -1, options);
+        } else {
+            // Note we want to go through this call for compatibility with
+            // applications that may have overridden the method.
+            startActivityForResult(intent, -1);
+        }
+!!!1327490.java!!!	startActivities(inout intents : Intent) : void
+        startActivities(intents, null);
+!!!1327618.java!!!	startActivities(inout intents : Intent, inout options : Bundle) : void
+        mInstrumentation.execStartActivities(this, mMainThread.getApplicationThread(),
+                mToken, this, intents, options);
+!!!1327746.java!!!	startIntentSender(inout intent : IntentSender, inout fillInIntent : Intent, in flagsMask : int, in flagsValues : int, in extraFlags : int) : void
+        startIntentSender(intent, fillInIntent, flagsMask, flagsValues,
+                extraFlags, null);
+!!!1327874.java!!!	startIntentSender(inout intent : IntentSender, inout fillInIntent : Intent, in flagsMask : int, in flagsValues : int, in extraFlags : int, inout options : Bundle) : void
+        if (options != null) {
+            startIntentSenderForResult(intent, -1, fillInIntent, flagsMask,
+                    flagsValues, extraFlags, options);
+        } else {
+            // Note we want to go through this call for compatibility with
+            // applications that may have overridden the method.
+            startIntentSenderForResult(intent, -1, fillInIntent, flagsMask,
+                    flagsValues, extraFlags);
+        }
+!!!1328002.java!!!	startActivityIfNeeded(inout intent : Intent, in requestCode : int) : boolean
+        return startActivityIfNeeded(intent, requestCode, null);
+!!!1328130.java!!!	startActivityIfNeeded(inout intent : Intent, in requestCode : int, inout options : Bundle) : boolean
+        if (mParent == null) {
+            int result = ActivityManager.START_RETURN_INTENT_TO_CALLER;
+            try {
+                intent.migrateExtraStreamToClipData();
+                intent.prepareToLeaveProcess();
+                result = ActivityManagerNative.getDefault()
+                    .startActivity(mMainThread.getApplicationThread(), getBasePackageName(),
+                            intent, intent.resolveTypeIfNeeded(getContentResolver()), mToken,
+                            mEmbeddedID, requestCode, ActivityManager.START_FLAG_ONLY_IF_NEEDED,
+                            null, options);
+            } catch (RemoteException e) {
+                // Empty
+            }
+
+            Instrumentation.checkStartActivityResult(result, intent);
+
+            if (requestCode >= 0) {
+                // If this start is requesting a result, we can avoid making
+                // the activity visible until the result is received.  Setting
+                // this code during onCreate(Bundle savedInstanceState) or onResume() will keep the
+                // activity hidden during this time, to avoid flickering.
+                // This can only be done when a result is requested because
+                // that guarantees we will get information back when the
+                // activity is finished, no matter what happens to it.
+                mStartedActivity = true;
+            }
+            return result != ActivityManager.START_RETURN_INTENT_TO_CALLER;
+        }
+
+        throw new UnsupportedOperationException(
+            "startActivityIfNeeded can only be called from a top-level activity");
+!!!1328258.java!!!	startNextMatchingActivity(inout intent : Intent) : boolean
+        return startNextMatchingActivity(intent, null);
+!!!1328386.java!!!	startNextMatchingActivity(inout intent : Intent, inout options : Bundle) : boolean
+        if (mParent == null) {
+            try {
+                intent.migrateExtraStreamToClipData();
+                intent.prepareToLeaveProcess();
+                return ActivityManagerNative.getDefault()
+                    .startNextMatchingActivity(mToken, intent, options);
+            } catch (RemoteException e) {
+                // Empty
+            }
+            return false;
+        }
+
+        throw new UnsupportedOperationException(
+            "startNextMatchingActivity can only be called from a top-level activity");
+!!!1328514.java!!!	startActivityFromChild(inout child : Activity, inout intent : Intent, in requestCode : int) : void
+        startActivityFromChild(child, intent, requestCode, null);
+!!!1328642.java!!!	startActivityFromChild(inout child : Activity, inout intent : Intent, in requestCode : int, inout options : Bundle) : void
+        Instrumentation.ActivityResult ar =
+            mInstrumentation.execStartActivity(
+                this, mMainThread.getApplicationThread(), mToken, child,
+                intent, requestCode, options);
+        if (ar != null) {
+            mMainThread.sendActivityResult(
+                mToken, child.mEmbeddedID, requestCode,
+                ar.getResultCode(), ar.getResultData());
+        }
+!!!1328770.java!!!	startActivityFromFragment(inout fragment : Fragment, inout intent : Intent, in requestCode : int) : void
+        startActivityFromFragment(fragment, intent, requestCode, null);
+!!!1328898.java!!!	startActivityFromFragment(inout fragment : Fragment, inout intent : Intent, in requestCode : int, inout options : Bundle) : void
+        if (options != null) {
+            mActivityTransitionState.startExitOutTransition(this, options);
+        }
+        Instrumentation.ActivityResult ar =
+            mInstrumentation.execStartActivity(
+                this, mMainThread.getApplicationThread(), mToken, fragment,
+                intent, requestCode, options);
+        if (ar != null) {
+            mMainThread.sendActivityResult(
+                mToken, fragment.mWho, requestCode,
+                ar.getResultCode(), ar.getResultData());
+        }
+!!!1329026.java!!!	startIntentSenderFromChild(inout child : Activity, inout intent : IntentSender, in requestCode : int, inout fillInIntent : Intent, in flagsMask : int, in flagsValues : int, in extraFlags : int) : void
+        startIntentSenderFromChild(child, intent, requestCode, fillInIntent,
+                flagsMask, flagsValues, extraFlags, null);
+!!!1329154.java!!!	startIntentSenderFromChild(inout child : Activity, inout intent : IntentSender, in requestCode : int, inout fillInIntent : Intent, in flagsMask : int, in flagsValues : int, in extraFlags : int, inout options : Bundle) : void
+        startIntentSenderForResultInner(intent, requestCode, fillInIntent,
+                flagsMask, flagsValues, child, options);
+!!!1329282.java!!!	overridePendingTransition(in enterAnim : int, in exitAnim : int) : void
+        try {
+            ActivityManagerNative.getDefault().overridePendingTransition(
+                    mToken, getPackageName(), enterAnim, exitAnim);
+        } catch (RemoteException e) {
+        }
+!!!1329410.java!!!	setResult(in resultCode : int) : void
+        synchronized (this) {
+            mResultCode = resultCode;
+            mResultData = null;
+        }
+!!!1329538.java!!!	setResult(in resultCode : int, inout data : Intent) : void
+        synchronized (this) {
+            mResultCode = resultCode;
+            mResultData = data;
+        }
+!!!1329666.java!!!	getCallingPackage() : String
+        try {
+            return ActivityManagerNative.getDefault().getCallingPackage(mToken);
+        } catch (RemoteException e) {
+            return null;
+        }
+!!!1329794.java!!!	getCallingActivity() : ComponentName
+        try {
+            return ActivityManagerNative.getDefault().getCallingActivity(mToken);
+        } catch (RemoteException e) {
+            return null;
+        }
+!!!1329922.java!!!	setVisible(inout visible : boolean) : void
+        if (mVisibleFromClient != visible) {
+            mVisibleFromClient = visible;
+            if (mVisibleFromServer) {
+                if (visible) makeVisible();
+                else mDecor.setVisibility(View.INVISIBLE);
+            }
+        }
+!!!1330050.java!!!	makeVisible() : void
+        if (!mWindowAdded) {
+            ViewManager wm = getWindowManager();
+            wm.addView(mDecor, getWindow().getAttributes());
+            mWindowAdded = true;
+        }
+        mDecor.setVisibility(View.VISIBLE);
+!!!1330178.java!!!	isFinishing() : boolean
+        return mFinished;
+!!!1330306.java!!!	isDestroyed() : boolean
+        return mDestroyed;
+!!!1330434.java!!!	isChangingConfigurations() : boolean
+        return mChangingConfigurations;
+!!!1330562.java!!!	recreate() : void
+        if (mParent != null) {
+            throw new IllegalStateException("Can only be called on top-level activity");
+        }
+        if (Looper.myLooper() != mMainThread.getLooper()) {
+            throw new IllegalStateException("Must be called from main thread");
+        }
+        mMainThread.requestRelaunchActivity(mToken, null, null, 0, false, null, false);
+!!!1330690.java!!!	finish(inout finishTask : boolean) : void
+        if (mParent == null) {
+            int resultCode;
+            Intent resultData;
+            synchronized (this) {
+                resultCode = mResultCode;
+                resultData = mResultData;
+            }
+            if (false) Log.v(TAG, "Finishing self: token=" + mToken);
+            try {
+                if (resultData != null) {
+                    resultData.prepareToLeaveProcess();
+                }
+                if (ActivityManagerNative.getDefault()
+                        .finishActivity(mToken, resultCode, resultData, finishTask)) {
+                    mFinished = true;
+                }
+            } catch (RemoteException e) {
+                // Empty
+            }
+        } else {
+            mParent.finishFromChild(this);
+        }
+!!!1330818.java!!!	finish() : void
+        finish(false);
+!!!1330946.java!!!	finishAffinity() : void
+        if (mParent != null) {
+            throw new IllegalStateException("Can not be called from an embedded activity");
+        }
+        if (mResultCode != RESULT_CANCELED || mResultData != null) {
+            throw new IllegalStateException("Can not be called to deliver a result");
+        }
+        try {
+            if (ActivityManagerNative.getDefault().finishActivityAffinity(mToken)) {
+                mFinished = true;
+            }
+        } catch (RemoteException e) {
+            // Empty
+        }
+!!!1331074.java!!!	finishFromChild(inout child : Activity) : void
+        finish();
+!!!1331202.java!!!	finishAfterTransition() : void
+        if (!mActivityTransitionState.startExitBackTransition(this)) {
+            finish();
+        }
+!!!1331330.java!!!	finishActivity(in requestCode : int) : void
+        if (mParent == null) {
+            try {
+                ActivityManagerNative.getDefault()
+                    .finishSubActivity(mToken, mEmbeddedID, requestCode);
+            } catch (RemoteException e) {
+                // Empty
+            }
+        } else {
+            mParent.finishActivityFromChild(this, requestCode);
+        }
+!!!1331458.java!!!	finishActivityFromChild(inout child : Activity, in requestCode : int) : void
+        try {
+            ActivityManagerNative.getDefault()
+                .finishSubActivity(mToken, child.mEmbeddedID, requestCode);
+        } catch (RemoteException e) {
+            // Empty
+        }
+!!!1331586.java!!!	finishAndRemoveTask() : void
+        finish(true);
+!!!1331714.java!!!	releaseInstance() : boolean
+        try {
+            return ActivityManagerNative.getDefault().releaseActivityInstance(mToken);
+        } catch (RemoteException e) {
+            // Empty
+        }
+        return false;
+!!!1332098.java!!!	createPendingResult(in requestCode : int, inout data : Intent, in flags : int) : PendingIntent
+        String packageName = getPackageName();
+        try {
+            data.prepareToLeaveProcess();
+            IIntentSender target =
+                ActivityManagerNative.getDefault().getIntentSender(
+                        ActivityManager.INTENT_SENDER_ACTIVITY_RESULT, packageName,
+                        mParent == null ? mToken : mParent.mToken,
+                        mEmbeddedID, requestCode, new Intent[] { data }, null, flags, null,
+                        UserHandle.myUserId());
+            return target != null ? new PendingIntent(target) : null;
+        } catch (RemoteException e) {
+            // Empty
+        }
+        return null;
+!!!1332226.java!!!	setRequestedOrientation(in requestedOrientation : int) : void
+        if (mParent == null) {
+            try {
+                ActivityManagerNative.getDefault().setRequestedOrientation(
+                        mToken, requestedOrientation);
+            } catch (RemoteException e) {
+                // Empty
+            }
+        } else {
+            mParent.setRequestedOrientation(requestedOrientation);
+        }
+!!!1332354.java!!!	getRequestedOrientation() : int
+        if (mParent == null) {
+            try {
+                return ActivityManagerNative.getDefault()
+                        .getRequestedOrientation(mToken);
+            } catch (RemoteException e) {
+                // Empty
+            }
+        } else {
+            return mParent.getRequestedOrientation();
+        }
+        return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+!!!1332482.java!!!	getTaskId() : int
+        try {
+            return ActivityManagerNative.getDefault()
+                .getTaskForActivity(mToken, false);
+        } catch (RemoteException e) {
+            return -1;
+        }
+!!!1332610.java!!!	isTaskRoot() : boolean
+        try {
+            return ActivityManagerNative.getDefault()
+                .getTaskForActivity(mToken, true) >= 0;
+        } catch (RemoteException e) {
+            return false;
+        }
+!!!1332738.java!!!	moveTaskToBack(inout nonRoot : boolean) : boolean
+        try {
+            return ActivityManagerNative.getDefault().moveActivityTaskToBack(
+                    mToken, nonRoot);
+        } catch (RemoteException e) {
+            // Empty
+        }
+        return false;
+!!!1332866.java!!!	getLocalClassName() : String
+        final String pkg = getPackageName();
+        final String cls = mComponent.getClassName();
+        int packageLen = pkg.length();
+        if (!cls.startsWith(pkg) || cls.length() <= packageLen
+                || cls.charAt(packageLen) != '.') {
+            return cls;
+        }
+        return cls.substring(packageLen+1);
+!!!1332994.java!!!	getComponentName() : ComponentName
+        return mComponent;
+!!!1333122.java!!!	getPreferences(in mode : int) : SharedPreferences
+        return getSharedPreferences(getLocalClassName(), mode);
+!!!1333250.java!!!	ensureSearchManager() : void
+        if (mSearchManager != null) {
+            return;
+        }
+
+        mSearchManager = new SearchManager(this, null);
+!!!1333378.java!!!	getSystemService(in name : String) : Object
+        if (getBaseContext() == null) {
+            throw new IllegalStateException(
+                    "System services not available to Activities before onCreate()");
+        }
+
+        if (WINDOW_SERVICE.equals(name)) {
+            return mWindowManager;
+        } else if (SEARCH_SERVICE.equals(name)) {
+            ensureSearchManager();
+            return mSearchManager;
+        }
+        return super.getSystemService(name);
+!!!1333506.java!!!	setTitle(inout title : CharSequence) : void
+        mTitle = title;
+        onTitleChanged(title, mTitleColor);
+
+        if (mParent != null) {
+            mParent.onChildTitleChanged(this, title);
+        }
+!!!1333634.java!!!	setTitle(in titleId : int) : void
+        setTitle(getText(titleId));
+!!!1333762.java!!!	setTitleColor(in textColor : int) : void
+        mTitleColor = textColor;
+        onTitleChanged(mTitle, textColor);
+!!!1333890.java!!!	getTitle() : CharSequence
+        return mTitle;
+!!!1334018.java!!!	getTitleColor() : int
+        return mTitleColor;
+!!!1334146.java!!!	onTitleChanged(inout title : CharSequence, in color : int) : void
+        if (mTitleReady) {
+            final Window win = getWindow();
+            if (win != null) {
+                win.setTitle(title);
+                if (color != 0) {
+                    win.setTitleColor(color);
+                }
+            }
+            if (mActionBar != null) {
+                mActionBar.setWindowTitle(title);
+            }
+        }
+!!!1334402.java!!!	setTaskDescription(inout taskDescription : ActivityManager::TaskDescription) : void
+        ActivityManager.TaskDescription td;
+        // Scale the icon down to something reasonable if it is provided
+        if (taskDescription.getIconFilename() == null && taskDescription.getIcon() != null) {
+            final int size = ActivityManager.getLauncherLargeIconSizeInner(this);
+            final Bitmap icon = Bitmap.createScaledBitmap(taskDescription.getIcon(), size, size, true);
+            td = new ActivityManager.TaskDescription(taskDescription.getLabel(), icon,
+                    taskDescription.getPrimaryColor());
+        } else {
+            td = taskDescription;
+        }
+        try {
+            ActivityManagerNative.getDefault().setTaskDescription(mToken, td);
+        } catch (RemoteException e) {
+        }
+!!!1334530.java!!!	setProgressBarVisibility(inout visible : boolean) : void
+        getWindow().setFeatureInt(Window.FEATURE_PROGRESS, visible ? Window.PROGRESS_VISIBILITY_ON :
+            Window.PROGRESS_VISIBILITY_OFF);
+!!!1334658.java!!!	setProgressBarIndeterminateVisibility(inout visible : boolean) : void
+        getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS,
+                visible ? Window.PROGRESS_VISIBILITY_ON : Window.PROGRESS_VISIBILITY_OFF);
+!!!1334786.java!!!	setProgressBarIndeterminate(inout indeterminate : boolean) : void
+        getWindow().setFeatureInt(Window.FEATURE_PROGRESS,
+                indeterminate ? Window.PROGRESS_INDETERMINATE_ON
+                        : Window.PROGRESS_INDETERMINATE_OFF);
+!!!1334914.java!!!	setProgress(in progress : int) : void
+        getWindow().setFeatureInt(Window.FEATURE_PROGRESS, progress + Window.PROGRESS_START);
+!!!1335042.java!!!	setSecondaryProgress(in secondaryProgress : int) : void
+        getWindow().setFeatureInt(Window.FEATURE_PROGRESS,
+                secondaryProgress + Window.PROGRESS_SECONDARY_START);
+!!!1335170.java!!!	setVolumeControlStream(in streamType : int) : void
+        getWindow().setVolumeControlStream(streamType);
+!!!1335298.java!!!	getVolumeControlStream() : int
+        return getWindow().getVolumeControlStream();
+!!!1335426.java!!!	setMediaController(inout controller : MediaController) : void
+        getWindow().setMediaController(controller);
+!!!1335554.java!!!	getMediaController() : MediaController
+        return getWindow().getMediaController();
+!!!1335682.java!!!	runOnUiThread(inout action : Runnable) : void
+        if (Thread.currentThread() != mUiThread) {
+            mHandler.post(action);
+        } else {
+            action.run();
+        }
+!!!1335810.java!!!	onCreateView(in name : String, inout context : Context, inout attrs : AttributeSet) : View
+        return null;
+!!!1335938.java!!!	onCreateView(inout parent : View, in name : String, inout context : Context, inout attrs : AttributeSet) : View
+        if (!"fragment".equals(name)) {
+            return onCreateView(name, context, attrs);
+        }
+
+        return mFragments.onCreateView(parent, name, context, attrs);
+!!!1336066.java!!!	dump(in prefix : String, inout fd : FileDescriptor, inout writer : PrintWriter, inout args : String) : void
+        dumpInner(prefix, fd, writer, args);
+!!!1336194.java!!!	dumpInner(in prefix : String, inout fd : FileDescriptor, inout writer : PrintWriter, inout args : String) : void
+        writer.print(prefix); writer.print("Local Activity ");
+                writer.print(Integer.toHexString(System.identityHashCode(this)));
+                writer.println(" State:");
+        String innerPrefix = prefix + "  ";
+        writer.print(innerPrefix); writer.print("mResumed=");
+                writer.print(mResumed); writer.print(" mStopped=");
+                writer.print(mStopped); writer.print(" mFinished=");
+                writer.println(mFinished);
+        writer.print(innerPrefix); writer.print("mLoadersStarted=");
+                writer.println(mLoadersStarted);
+        writer.print(innerPrefix); writer.print("mChangingConfigurations=");
+                writer.println(mChangingConfigurations);
+        writer.print(innerPrefix); writer.print("mCurrentConfig=");
+                writer.println(mCurrentConfig);
+
+        if (mLoaderManager != null) {
+            writer.print(prefix); writer.print("Loader Manager ");
+                    writer.print(Integer.toHexString(System.identityHashCode(mLoaderManager)));
+                    writer.println(":");
+            mLoaderManager.dump(prefix + "  ", fd, writer, args);
+        }
+
+        mFragments.dump(prefix, fd, writer, args);
+
+        if (getWindow() != null &&
+                getWindow().peekDecorView() != null &&
+                getWindow().peekDecorView().getViewRootImpl() != null) {
+            getWindow().peekDecorView().getViewRootImpl().dump(prefix, fd, writer, args);
+        }
+
+        mHandler.getLooper().dump(new PrintWriterPrinter(writer), prefix);
+!!!1336322.java!!!	isImmersive() : boolean
+        try {
+            return ActivityManagerNative.getDefault().isImmersive(mToken);
+        } catch (RemoteException e) {
+            return false;
+        }
+!!!1336450.java!!!	isTopOfTask() : boolean
+        try {
+            return ActivityManagerNative.getDefault().isTopOfTask(mToken);
+        } catch (RemoteException e) {
+            return false;
+        }
+!!!1336578.java!!!	convertFromTranslucent() : void
+        try {
+            mTranslucentCallback = null;
+            if (ActivityManagerNative.getDefault().convertFromTranslucent(mToken)) {
+                WindowManagerGlobal.getInstance().changeCanvasOpacity(mToken, true);
+            }
+        } catch (RemoteException e) {
+            // pass
+        }
+!!!1336706.java!!!	convertToTranslucent(inout callback : Activity::TranslucentConversionListener, inout options : ActivityOptions) : boolean
+        boolean drawComplete;
+        try {
+            mTranslucentCallback = callback;
+            mChangeCanvasToTranslucent =
+                    ActivityManagerNative.getDefault().convertToTranslucent(mToken, options);
+            WindowManagerGlobal.getInstance().changeCanvasOpacity(mToken, false);
+            drawComplete = true;
+        } catch (RemoteException e) {
+            // Make callback return as though it timed out.
+            mChangeCanvasToTranslucent = false;
+            drawComplete = false;
+        }
+        if (!mChangeCanvasToTranslucent && mTranslucentCallback != null) {
+            // Window is already translucent.
+            mTranslucentCallback.onTranslucentConversionComplete(drawComplete);
+        }
+        return mChangeCanvasToTranslucent;
+!!!1336834.java!!!	onTranslucentConversionComplete(inout drawComplete : boolean) : void
+        if (mTranslucentCallback != null) {
+            mTranslucentCallback.onTranslucentConversionComplete(drawComplete);
+            mTranslucentCallback = null;
+        }
+        if (mChangeCanvasToTranslucent) {
+            WindowManagerGlobal.getInstance().changeCanvasOpacity(mToken, false);
+        }
+!!!1336962.java!!!	onNewActivityOptions(inout options : ActivityOptions) : void
+        mActivityTransitionState.setEnterActivityOptions(this, options);
+        if (!mStopped) {
+            mActivityTransitionState.enterReady(this);
+        }
+!!!1337090.java!!!	getActivityOptions() : ActivityOptions
+        try {
+            return ActivityManagerNative.getDefault().getActivityOptions(mToken);
+        } catch (RemoteException e) {
+        }
+        return null;
+!!!1337218.java!!!	requestVisibleBehind(inout visible : boolean) : boolean
+        if (!mResumed) {
+            // Do not permit paused or stopped activities to do this.
+            visible = false;
+        }
+        try {
+            mVisibleBehind = ActivityManagerNative.getDefault()
+                    .requestVisibleBehind(mToken, visible) && visible;
+        } catch (RemoteException e) {
+            mVisibleBehind = false;
+        }
+        return mVisibleBehind;
+!!!1337346.java!!!	onVisibleBehindCanceled() : void
+        mCalled = true;
+!!!1337474.java!!!	isBackgroundVisibleBehind() : boolean
+        try {
+            return ActivityManagerNative.getDefault().isBackgroundVisibleBehind(mToken);
+        } catch (RemoteException e) {
+        }
+        return false;
+!!!1337858.java!!!	setImmersive(inout i : boolean) : void
+        try {
+            ActivityManagerNative.getDefault().setImmersive(mToken, i);
+        } catch (RemoteException e) {
+            // pass
+        }
+!!!1337986.java!!!	startActionMode(inout callback : ActionMode::Callback) : ActionMode
+        return mWindow.getDecorView().startActionMode(callback);
+!!!1338114.java!!!	onWindowStartingActionMode(inout callback : ActionMode::Callback) : ActionMode
+        initWindowDecorActionBar();
+        if (mActionBar != null) {
+            return mActionBar.startActionMode(callback);
+        }
+        return null;
+!!!1338498.java!!!	shouldUpRecreateTask(inout targetIntent : Intent) : boolean
+        try {
+            PackageManager pm = getPackageManager();
+            ComponentName cn = targetIntent.getComponent();
+            if (cn == null) {
+                cn = targetIntent.resolveActivity(pm);
+            }
+            ActivityInfo info = pm.getActivityInfo(cn, 0);
+            if (info.taskAffinity == null) {
+                return false;
+            }
+            return ActivityManagerNative.getDefault()
+                    .shouldUpRecreateTask(mToken, info.taskAffinity);
+        } catch (RemoteException e) {
+            return false;
+        } catch (NameNotFoundException e) {
+            return false;
+        }
+!!!1338626.java!!!	navigateUpTo(inout upIntent : Intent) : boolean
+        if (mParent == null) {
+            ComponentName destInfo = upIntent.getComponent();
+            if (destInfo == null) {
+                destInfo = upIntent.resolveActivity(getPackageManager());
+                if (destInfo == null) {
+                    return false;
+                }
+                upIntent = new Intent(upIntent);
+                upIntent.setComponent(destInfo);
+            }
+            int resultCode;
+            Intent resultData;
+            synchronized (this) {
+                resultCode = mResultCode;
+                resultData = mResultData;
+            }
+            if (resultData != null) {
+                resultData.prepareToLeaveProcess();
+            }
+            try {
+                upIntent.prepareToLeaveProcess();
+                return ActivityManagerNative.getDefault().navigateUpTo(mToken, upIntent,
+                        resultCode, resultData);
+            } catch (RemoteException e) {
+                return false;
+            }
+        } else {
+            return mParent.navigateUpToFromChild(this, upIntent);
+        }
+!!!1338754.java!!!	navigateUpToFromChild(inout child : Activity, inout upIntent : Intent) : boolean
+        return navigateUpTo(upIntent);
+!!!1338882.java!!!	getParentActivityIntent() : Intent
+        final String parentName = mActivityInfo.parentActivityName;
+        if (TextUtils.isEmpty(parentName)) {
+            return null;
+        }
+
+        // If the parent itself has no parent, generate a main activity intent.
+        final ComponentName target = new ComponentName(this, parentName);
+        try {
+            final ActivityInfo parentInfo = getPackageManager().getActivityInfo(target, 0);
+            final String parentActivity = parentInfo.parentActivityName;
+            final Intent parentIntent = parentActivity == null
+                    ? Intent.makeMainActivity(target)
+                    : new Intent().setComponent(target);
+            return parentIntent;
+        } catch (NameNotFoundException e) {
+            Log.e(TAG, "getParentActivityIntent: bad parentActivityName '" + parentName +
+                    "' in manifest");
+            return null;
+        }
+!!!1339010.java!!!	setEnterSharedElementCallback(inout callback : SharedElementCallback) : void
+        if (callback == null) {
+            callback = SharedElementCallback.NULL_CALLBACK;
+        }
+        mEnterTransitionListener = callback;
+!!!1339138.java!!!	setExitSharedElementCallback(inout callback : SharedElementCallback) : void
+        if (callback == null) {
+            callback = SharedElementCallback.NULL_CALLBACK;
+        }
+        mExitTransitionListener = callback;
+!!!1339266.java!!!	postponeEnterTransition() : void
+        mActivityTransitionState.postponeEnterTransition();
+!!!1339394.java!!!	startPostponedEnterTransition() : void
+        mActivityTransitionState.startPostponedEnterTransition();
+!!!1339522.java!!!	setParent(inout parent : Activity) : void
+        mParent = parent;
+!!!1339650.java!!!	attach(inout context : Context, inout aThread : ActivityThread, inout instr : Instrumentation, inout token : IBinder, in ident : int, inout application : Application, inout intent : Intent, inout info : ActivityInfo, inout title : CharSequence, inout parent : Activity, in id : String, inout lastNonConfigurationInstances : Activity::NonConfigurationInstances, inout config : Configuration, inout voiceInteractor : IVoiceInteractor) : void
+        attachBaseContext(context);
+
+        mFragments.attachActivity(this, mContainer, null);
+
+        mWindow = PolicyManager.makeNewWindow(this);
+        mWindow.setCallback(this);
+        mWindow.setOnWindowDismissedCallback(this);
+        mWindow.getLayoutInflater().setPrivateFactory(this);
+        if (info.softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED) {
+            mWindow.setSoftInputMode(info.softInputMode);
+        }
+        if (info.uiOptions != 0) {
+            mWindow.setUiOptions(info.uiOptions);
+        }
+        mUiThread = Thread.currentThread();
+
+        mMainThread = aThread;
+        mInstrumentation = instr;
+        mToken = token;
+        mIdent = ident;
+        mApplication = application;
+        mIntent = intent;
+        mComponent = intent.getComponent();
+        mActivityInfo = info;
+        mTitle = title;
+        mParent = parent;
+        mEmbeddedID = id;
+        mLastNonConfigurationInstances = lastNonConfigurationInstances;
+        if (voiceInteractor != null) {
+            if (lastNonConfigurationInstances != null) {
+                mVoiceInteractor = lastNonConfigurationInstances.voiceInteractor;
+            } else {
+                mVoiceInteractor = new VoiceInteractor(voiceInteractor, this, this,
+                        Looper.myLooper());
+            }
+        }
+
+        mWindow.setWindowManager(
+                (WindowManager)context.getSystemService(Context.WINDOW_SERVICE),
+                mToken, mComponent.flattenToString(),
+                (info.flags & ActivityInfo.FLAG_HARDWARE_ACCELERATED) != 0);
+        if (mParent != null) {
+            mWindow.setContainer(mParent.getWindow());
+        }
+        mWindowManager = mWindow.getWindowManager();
+        mCurrentConfig = config;
+!!!1339778.java!!!	getActivityToken() : IBinder
+        return mParent != null ? mParent.getActivityToken() : mToken;
+!!!1339906.java!!!	performCreateCommon() : void
+        mVisibleFromClient = !mWindow.getWindowStyle().getBoolean(
+                com.android.internal.R.styleable.Window_windowNoDisplay, false);
+        mFragments.dispatchActivityCreated();
+        mActivityTransitionState.setEnterActivityOptions(this, getActivityOptions());
+!!!1340034.java!!!	performCreate(inout icicle : Bundle) : void
+        onCreate(icicle);
+        mActivityTransitionState.readState(icicle);
+        performCreateCommon();
+!!!1340162.java!!!	performCreate(inout icicle : Bundle, inout persistentState : PersistableBundle) : void
+        onCreate(icicle, persistentState);
+        mActivityTransitionState.readState(icicle);
+        performCreateCommon();
+!!!1340290.java!!!	performStart() : void
+        mActivityTransitionState.setEnterActivityOptions(this, getActivityOptions());
+        mFragments.noteStateNotSaved();
+        mCalled = false;
+        mFragments.execPendingActions();
+        mInstrumentation.callActivityOnStart(this);
+        if (!mCalled) {
+            throw new SuperNotCalledException(
+                "Activity " + mComponent.toShortString() +
+                " did not call through to super.onStart()");
+        }
+        mFragments.dispatchStart();
+        if (mAllLoaderManagers != null) {
+            final int N = mAllLoaderManagers.size();
+            LoaderManagerImpl loaders[] = new LoaderManagerImpl[N];
+            for (int i=N-1; i>=0; i--) {
+                loaders[i] = mAllLoaderManagers.valueAt(i);
+            }
+            for (int i=0; i<N; i++) {
+                LoaderManagerImpl lm = loaders[i];
+                lm.finishRetain();
+                lm.doReportStart();
+            }
+        }
+        mActivityTransitionState.enterReady(this);
+!!!1340418.java!!!	performRestart() : void
+        mFragments.noteStateNotSaved();
+
+        if (mStopped) {
+            mStopped = false;
+            if (mToken != null && mParent == null) {
+                WindowManagerGlobal.getInstance().setStoppedState(mToken, false);
+            }
+
+            synchronized (mManagedCursors) {
+                final int N = mManagedCursors.size();
+                for (int i=0; i<N; i++) {
+                    ManagedCursor mc = mManagedCursors.get(i);
+                    if (mc.mReleased || mc.mUpdated) {
+                        if (!mc.mCursor.requery()) {
+                            if (getApplicationInfo().targetSdkVersion
+                                    >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                                throw new IllegalStateException(
+                                        "trying to requery an already closed cursor  "
+                                        + mc.mCursor);
+                            }
+                        }
+                        mc.mReleased = false;
+                        mc.mUpdated = false;
+                    }
+                }
+            }
+
+            mCalled = false;
+            mInstrumentation.callActivityOnRestart(this);
+            if (!mCalled) {
+                throw new SuperNotCalledException(
+                    "Activity " + mComponent.toShortString() +
+                    " did not call through to super.onRestart()");
+            }
+            performStart();
+        }
+!!!1340546.java!!!	performResume() : void
+        performRestart();
+
+        mFragments.execPendingActions();
+
+        mLastNonConfigurationInstances = null;
+
+        mCalled = false;
+        // mResumed is set by the instrumentation
+        mInstrumentation.callActivityOnResume(this);
+        if (!mCalled) {
+            throw new SuperNotCalledException(
+                "Activity " + mComponent.toShortString() +
+                " did not call through to super.onResume()");
+        }
+
+        // Now really resume, and install the current status bar and menu.
+        mCalled = false;
+
+        mFragments.dispatchResume();
+        mFragments.execPendingActions();
+
+        onPostResume();
+        if (!mCalled) {
+            throw new SuperNotCalledException(
+                "Activity " + mComponent.toShortString() +
+                " did not call through to super.onPostResume()");
+        }
+!!!1340674.java!!!	performPause() : void
+        mDoReportFullyDrawn = false;
+        mFragments.dispatchPause();
+        mCalled = false;
+        onPause();
+        mResumed = false;
+        if (!mCalled && getApplicationInfo().targetSdkVersion
+                >= android.os.Build.VERSION_CODES.GINGERBREAD) {
+            throw new SuperNotCalledException(
+                    "Activity " + mComponent.toShortString() +
+                    " did not call through to super.onPause()");
+        }
+        mResumed = false;
+!!!1340802.java!!!	performUserLeaving() : void
+        onUserInteraction();
+        onUserLeaveHint();
+!!!1340930.java!!!	performStop() : void
+        mDoReportFullyDrawn = false;
+        if (mLoadersStarted) {
+            mLoadersStarted = false;
+            if (mLoaderManager != null) {
+                if (!mChangingConfigurations) {
+                    mLoaderManager.doStop();
+                } else {
+                    mLoaderManager.doRetain();
+                }
+            }
+        }
+
+        if (!mStopped) {
+            if (mWindow != null) {
+                mWindow.closeAllPanels();
+            }
+
+            if (mToken != null && mParent == null) {
+                WindowManagerGlobal.getInstance().setStoppedState(mToken, true);
+            }
+
+            mFragments.dispatchStop();
+
+            mCalled = false;
+            mInstrumentation.callActivityOnStop(this);
+            if (!mCalled) {
+                throw new SuperNotCalledException(
+                    "Activity " + mComponent.toShortString() +
+                    " did not call through to super.onStop()");
+            }
+
+            synchronized (mManagedCursors) {
+                final int N = mManagedCursors.size();
+                for (int i=0; i<N; i++) {
+                    ManagedCursor mc = mManagedCursors.get(i);
+                    if (!mc.mReleased) {
+                        mc.mCursor.deactivate();
+                        mc.mReleased = true;
+                    }
+                }
+            }
+
+            mStopped = true;
+        }
+        mResumed = false;
+!!!1341058.java!!!	performDestroy() : void
+        mDestroyed = true;
+        mWindow.destroy();
+        mFragments.dispatchDestroy();
+        onDestroy();
+        if (mLoaderManager != null) {
+            mLoaderManager.doDestroy();
+        }
+        if (mVoiceInteractor != null) {
+            mVoiceInteractor.detachActivity();
+        }
+!!!1341186.java!!!	isResumed() : boolean
+        return mResumed;
+!!!1341314.java!!!	dispatchActivityResult(in who : String, in requestCode : int, in resultCode : int, inout data : Intent) : void
+        if (false) Log.v(
+            TAG, "Dispatching result: who=" + who + ", reqCode=" + requestCode
+            + ", resCode=" + resultCode + ", data=" + data);
+        mFragments.noteStateNotSaved();
+        if (who == null) {
+            onActivityResult(requestCode, resultCode, data);
+        } else {
+            Fragment frag = mFragments.findFragmentByWho(who);
+            if (frag != null) {
+                frag.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+!!!1341442.java!!!	startLockTask() : void
+        try {
+            ActivityManagerNative.getDefault().startLockTaskMode(mToken);
+        } catch (RemoteException e) {
+        }
+!!!1341570.java!!!	stopLockTask() : void
+        try {
+            ActivityManagerNative.getDefault().stopLockTaskMode();
+        } catch (RemoteException e) {
+        }

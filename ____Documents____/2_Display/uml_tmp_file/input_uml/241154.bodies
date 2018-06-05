@@ -1,0 +1,24 @@
+class SyntheticKeyboardHandler
+!!!965250.java!!!	process(inout event : KeyEvent) : void
+            if ((event.getFlags() & KeyEvent.FLAG_FALLBACK) != 0) {
+                return;
+            }
+
+            final KeyCharacterMap kcm = event.getKeyCharacterMap();
+            final int keyCode = event.getKeyCode();
+            final int metaState = event.getMetaState();
+
+            // Check for fallback actions specified by the key character map.
+            KeyCharacterMap.FallbackAction fallbackAction =
+                    kcm.getFallbackAction(keyCode, metaState);
+            if (fallbackAction != null) {
+                final int flags = event.getFlags() | KeyEvent.FLAG_FALLBACK;
+                KeyEvent fallbackEvent = KeyEvent.obtain(
+                        event.getDownTime(), event.getEventTime(),
+                        event.getAction(), fallbackAction.keyCode,
+                        event.getRepeatCount(), fallbackAction.metaState,
+                        event.getDeviceId(), event.getScanCode(),
+                        flags, event.getSource(), null);
+                fallbackAction.recycle();
+                enqueueInputEvent(fallbackEvent);
+            }

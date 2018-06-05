@@ -1,0 +1,286 @@
+format 76
+
+classinstance 128002 class_ref 131586 // SystemServer
+  name ""   xyz 278.2 54.6 2000 life_line_z 2000
+classinstance 128514 class_ref 131842 // InputManagerService
+  name ""   xyz 568.9 50.4 2000 life_line_z 2000
+classinstance 129154 class_ref 129794 // NativeInputManager
+ color red  name ""   xyz 761.3 50.9 2000 life_line_z 2000
+note 129538 "com_android_server_input_InputManagerService.cpp"
+  xyzwh 745.7 101.6 2005 170 52
+classinstance 129666 class_ref 135298 // EventHub
+ color red  name ""   xyz 1042.1 47.2 2000 life_line_z 2000
+classinstance 130050 class_ref 141954 // InputManager
+ color red  name ""   xyz 1168.3 50 2000 life_line_z 2000
+note 130434 "EventHub.cpp"
+  xyzwh 1033.7 100.6 2005 101 41
+note 130562 "InputManager.cpp"
+  xyzwh 1153.4 99.9 2005 122 37
+classinstance 130690 class_ref 136962 // InputDispatcher
+ color red  name ""   xyz 1805.1 13.3 2000 life_line_z 2000
+classinstance 130818 class_ref 143234 // InputReader
+ color red  name ""   xyz 1642.5 50.5 2000 life_line_z 2000
+classinstance 131714 class_ref 142210 // InputReaderThread
+ color red  name ""   xyz 1728.5 51.2 2000 life_line_z 2000
+classinstance 131842 class_ref 141314 // InputDispatcherThread
+ color red  name ""   xyz 1860.4 52.3 2000 life_line_z 2000
+note 132482 "InputDispatcher.cpp"
+  xyzwh 1793.5 156.8 2005 130 34
+note 132610 "InputReader.cpp"
+  xyzwh 1611.6 100.2 2005 114 36
+note 132738 "InputReader.cpp"
+  xyzwh 1735.2 98.8 2005 114 36
+note 132866 "InputDispatcher.cpp"
+  xyzwh 1889.8 102.4 2005 128 37
+note 132994 "mEpollFd = epoll_create(EPOLL_SIZE_HINT);
+mINotifyFd = inotify_init();"
+  xyzwh 1082.6 196.8 2000 270 50
+classinstance 136962 class_ref 141698 // QueuedInputListener
+ color red  name ""   xyz 2010.5 50.5 2000 life_line_z 2000
+note 137090 "InputListener.cpp"
+  xyzwh 2041.5 104 2005 117 37
+note 137986 "dispatcherPolicy = im"
+  xyzwh 1412.9 215.9 3005 143 36
+note 138114 "readerPolicy = im"
+  xyzwh 1414.7 291.4 3005 111 36
+fragment 139522 "loop"
+  xyzwh 1658 753.1 2020 252 117
+end
+fragment 140162 "loop"
+  xyzwh 1816.2 563.1 3005 252 111
+end
+durationcanvas 128130 classinstance_ref 128002 // :SystemServer
+  xyzwh 318 130.4 2010 11 627
+end
+durationcanvas 128642 classinstance_ref 128514 // :InputManagerService
+  xyzwh 627 154 2010 11 313
+  overlappingdurationcanvas 128898
+    xyzwh 633 182.6 2020 11 270
+  end
+end
+durationcanvas 129282 classinstance_ref 129154 // :NativeInputManager
+  xyzwh 817 188.6 2010 11 268
+  overlappingdurationcanvas 133890
+    xyzwh 823 201.6 2020 11 232
+  end
+end
+durationcanvas 130178 classinstance_ref 130050 // :InputManager
+  xyzwh 1207 264.6 2010 11 216
+  overlappingdurationcanvas 131458
+    xyzwh 1213 372.6 2020 11 100
+  end
+end
+durationcanvas 130946 classinstance_ref 130690 // :InputDispatcher
+  xyzwh 1848 242.4 2010 11 63
+  overlappingdurationcanvas 138242
+    xyzwh 1854 262 2020 11 28
+  end
+end
+durationcanvas 131202 classinstance_ref 130818 // :InputReader
+  xyzwh 1678 284.4 2010 11 89
+  overlappingdurationcanvas 138754
+    xyzwh 1684 290.6 2020 11 24
+  end
+  overlappingdurationcanvas 140290
+    xyzwh 1684 321.4 2020 11 25
+  end
+end
+durationcanvas 131970 classinstance_ref 131714 // :InputReaderThread
+  xyzwh 1783 369.2 2010 11 52
+end
+durationcanvas 132226 classinstance_ref 131842 // :InputDispatcherThread
+  xyzwh 1925 411.4 2010 11 65
+end
+durationcanvas 133122 classinstance_ref 128514 // :InputManagerService
+  xyzwh 627 601 2010 11 150
+  overlappingdurationcanvas 133378
+    xyzwh 633 625.4 2020 11 117
+  end
+end
+durationcanvas 134402 classinstance_ref 129666 // :EventHub
+  xyzwh 1069 205.4 2010 11 37
+end
+durationcanvas 135938 classinstance_ref 129154 // :NativeInputManager
+  xyzwh 817 642.4 2010 11 103
+end
+durationcanvas 136194 classinstance_ref 130050 // :InputManager
+  xyzwh 1207 585.8 2010 11 222
+end
+durationcanvas 136450 classinstance_ref 131842 // :InputDispatcherThread
+  xyzwh 1925 586.4 2010 11 106
+  overlappingdurationcanvas 139650
+    xyzwh 1931 601.4 2020 11 66
+  end
+end
+durationcanvas 136706 classinstance_ref 131714 // :InputReaderThread
+  xyzwh 1783 782.7 2010 11 90
+  overlappingdurationcanvas 139010
+    xyzwh 1789 797.8 2020 11 69
+  end
+end
+durationcanvas 137474 classinstance_ref 136962 // :QueuedInputListener
+  xyzwh 2070 329.8 2010 11 44
+  overlappingdurationcanvas 137730
+    xyzwh 2076 344.8 2020 11 25
+  end
+end
+durationcanvas 139266 classinstance_ref 130818 // :InputReader
+  xyzwh 1678 833.4 2010 11 32
+end
+durationcanvas 139906 classinstance_ref 130690 // :InputDispatcher
+  xyzwh 1848 638 2010 11 25
+end
+lostfoundmsgsupport 128258 xyz 216 144.2 2015
+msg 128386 found_synchronous
+  from lostfoundmsgsupport_ref 128258
+  to durationcanvas_ref 128130
+  yz 142 2015 explicitmsg "startOtherServices"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 213 126
+msg 128770 synchronous
+  from durationcanvas_ref 128130
+  to durationcanvas_ref 128642
+  yz 165 2015 explicitmsg "A1. inputManager = new InputManagerService(context)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 330 146
+reflexivemsg 129026 synchronous
+  to durationcanvas_ref 128898
+  yz 182 2025 explicitmsg "B1. nativeInit"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 643 165
+msg 129410 synchronous
+  from durationcanvas_ref 128898
+  to durationcanvas_ref 129282
+  yz 217 2030 explicitmsg "C1. nativeInit"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 695 202
+msg 131074 synchronous
+  from durationcanvas_ref 130178
+  to durationcanvas_ref 130946
+  yz 268 2015 explicitmsg "F1. mDispatcher = new InputDispatcher(dispatcherPolicy)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1226 252
+msg 131330 synchronous
+  from durationcanvas_ref 130178
+  to durationcanvas_ref 131202
+  yz 336 2020 explicitmsg "F2. mReader = new InputReader(eventHub, readerPolicy, mDispatcher)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1227 324
+reflexivemsg 131586 synchronous
+  to durationcanvas_ref 131458
+  yz 372 2025 explicitmsg "F3. initialize()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1225 356
+msg 132098 synchronous
+  from durationcanvas_ref 131458
+  to durationcanvas_ref 131970
+  yz 386 2030 explicitmsg "G1. mReaderThread = new InputReaderThread(mReader)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1344 371
+msg 132354 synchronous
+  from durationcanvas_ref 131458
+  to durationcanvas_ref 132226
+  yz 438 2025 explicitmsg "G2. mDispatcherThread = new InputDispatcherThread(mDispatcher)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1346 430
+msg 133250 synchronous
+  from durationcanvas_ref 128130
+  to durationcanvas_ref 133122
+  yz 615 2015 explicitmsg "A2. inputManager.start()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 339 600
+reflexivemsg 133506 synchronous
+  to durationcanvas_ref 133378
+  yz 625 2025 explicitmsg "B1. nativeStart(mPtr)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 652 610
+reflexivemsg 134018 synchronous
+  to durationcanvas_ref 133890
+  yz 201 3005 explicitmsg "D1. im = new NativeInputManager(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 833 182
+msg 134530 synchronous
+  from durationcanvas_ref 133890
+  to durationcanvas_ref 134402
+  yz 220 3010 explicitmsg "E1. eventHub = new EventHub()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 857 206
+msg 135554 synchronous
+  from durationcanvas_ref 133890
+  to durationcanvas_ref 130178
+  yz 310 2025 explicitmsg "E2. mInputManager = new InputManager(eventHub, this, this)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 854 295
+msg 136066 synchronous
+  from durationcanvas_ref 133378
+  to durationcanvas_ref 135938
+  yz 655 2030 explicitmsg "C1. nativeStart"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 691 640
+msg 136322 synchronous
+  from durationcanvas_ref 135938
+  to durationcanvas_ref 136194
+  yz 661 2015 explicitmsg "D1. im->getInputManager()->start()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 839 645
+msg 136578 synchronous
+  from durationcanvas_ref 136194
+  to durationcanvas_ref 136450
+  yz 594 2020 explicitmsg "E1. mDispatcherThread->run(\"InputDispatcher\", PRIORITY_URGENT_DISPLAY)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1225 579
+msg 136834 synchronous
+  from durationcanvas_ref 136194
+  to durationcanvas_ref 136706
+  yz 795 2015 explicitmsg "E2. mReaderThread->run(\"InputReader\", PRIORITY_URGENT_DISPLAY)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1219 775
+msg 137602 synchronous
+  from durationcanvas_ref 131202
+  to durationcanvas_ref 137474
+  yz 353 2025 explicitmsg "G3. mQueuedListener = new QueuedInputListener(listener)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1701 336
+reflexivemsg 137858 synchronous
+  to durationcanvas_ref 137730
+  yz 344 2025 explicitmsg "H1. mInnerListener = listener = mDispathcer"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2079 327
+reflexivemsg 138370 synchronous
+  to durationcanvas_ref 138242
+  yz 262 2025 explicitmsg "G1. mPolicy = im"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1862 245
+reflexivemsg 138882 synchronous
+  to durationcanvas_ref 138754
+  yz 290 2025 explicitmsg "G1. mEventHub = ..."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1705 277
+reflexivemsg 139138 synchronous
+  to durationcanvas_ref 139010
+  yz 797 2025 explicitmsg "F1. threadLoop()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1796 777
+msg 139394 synchronous
+  from durationcanvas_ref 139010
+  to durationcanvas_ref 139266
+  yz 845 2025 explicitmsg "G1. mReader->loopOnce()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1692 827
+reflexivemsg 139778 synchronous
+  to durationcanvas_ref 139650
+  yz 601 2025 explicitmsg "F1. threadLoop()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1943 584
+msg 140034 synchronous
+  from durationcanvas_ref 139650
+  to durationcanvas_ref 139906
+  yz 638 2025 explicitmsg "G1. mDispatcher->dispatchOnce()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1869 624
+reflexivemsg 140418 synchronous
+  to durationcanvas_ref 140290
+  yz 321 3005 explicitmsg "G2. mPolicy = im"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1701 307
+end

@@ -1,0 +1,14 @@
+class LayerDim
+!!!190338.cpp!!!	onDraw(in hw : sp<const DisplayDevice>, in clip : Region, in useIdentityTransform : bool) : void
+    const State& s(getDrawingState());
+    if (s.alpha>0) {
+        Mesh mesh(Mesh::TRIANGLE_FAN, 4, 2);
+        computeGeometry(hw, mesh, useIdentityTransform);
+        RenderEngine& engine(mFlinger->getRenderEngine());
+        engine.setupDimLayerBlending(s.alpha);
+        engine.drawMesh(mesh);
+        engine.disableBlending();
+    }
+!!!190850.cpp!!!	isVisible() : bool
+    const Layer::State& s(getDrawingState());
+    return !(s.flags & layer_state_t::eLayerHidden) && s.alpha;

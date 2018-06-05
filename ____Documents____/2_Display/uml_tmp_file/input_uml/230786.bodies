@@ -1,0 +1,211 @@
+class SurfaceControl
+!!!833026.java!!!	SurfaceControl(inout session : SurfaceSession, in name : String, in w : int, in h : int, in format : int, in flags : int)
+        if (session == null) {
+            throw new IllegalArgumentException("session must not be null");
+        }
+        if (name == null) {
+            throw new IllegalArgumentException("name must not be null");
+        }
+
+        if ((flags & SurfaceControl.HIDDEN) == 0) {
+            Log.w(TAG, "Surfaces should always be created with the HIDDEN flag set "
+                    + "to ensure that they are not made visible prematurely before "
+                    + "all of the surface's properties have been configured.  "
+                    + "Set the other properties and make the surface visible within "
+                    + "a transaction.  New surface name: " + name,
+                    new Throwable());
+        }
+
+        mName = name;
+        mNativeObject = nativeCreate(session, name, w, h, format, flags);
+        if (mNativeObject == 0) {
+            throw new OutOfResourcesException(
+                    "Couldn't allocate SurfaceControl native object");
+        }
+
+        mCloseGuard.open("release");
+!!!833154.java!!!	finalize() : void
+        try {
+            if (mCloseGuard != null) {
+                mCloseGuard.warnIfOpen();
+            }
+            if (mNativeObject != 0) {
+                nativeRelease(mNativeObject);
+            }
+        } finally {
+            super.finalize();
+        }
+!!!833282.java!!!	toString() : String
+        return "Surface(name=" + mName + ")";
+!!!833410.java!!!	release() : void
+        if (mNativeObject != 0) {
+            nativeRelease(mNativeObject);
+            mNativeObject = 0;
+        }
+        mCloseGuard.close();
+!!!833538.java!!!	destroy() : void
+        if (mNativeObject != 0) {
+            nativeDestroy(mNativeObject);
+            mNativeObject = 0;
+        }
+        mCloseGuard.close();
+!!!833666.java!!!	checkNotReleased() : void
+        if (mNativeObject == 0) throw new NullPointerException(
+                "mNativeObject is null. Have you called release() already?");
+!!!833794.java!!!	openTransaction() : void
+        nativeOpenTransaction();
+!!!833922.java!!!	closeTransaction() : void
+        nativeCloseTransaction();
+!!!834050.java!!!	setAnimationTransaction() : void
+        nativeSetAnimationTransaction();
+!!!834178.java!!!	setLayer(in zorder : int) : void
+        checkNotReleased();
+        nativeSetLayer(mNativeObject, zorder);
+!!!834306.java!!!	setPosition(in x : float, in y : float) : void
+        checkNotReleased();
+        nativeSetPosition(mNativeObject, x, y);
+!!!834434.java!!!	setSize(in w : int, in h : int) : void
+        checkNotReleased();
+        nativeSetSize(mNativeObject, w, h);
+!!!834562.java!!!	hide() : void
+        checkNotReleased();
+        nativeSetFlags(mNativeObject, SURFACE_HIDDEN, SURFACE_HIDDEN);
+!!!834690.java!!!	show() : void
+        checkNotReleased();
+        nativeSetFlags(mNativeObject, 0, SURFACE_HIDDEN);
+!!!834818.java!!!	setTransparentRegionHint(inout region : Region) : void
+        checkNotReleased();
+        nativeSetTransparentRegionHint(mNativeObject, region);
+!!!834946.java!!!	clearContentFrameStats() : boolean
+        checkNotReleased();
+        return nativeClearContentFrameStats(mNativeObject);
+!!!835074.java!!!	getContentFrameStats(inout outStats : WindowContentFrameStats) : boolean
+        checkNotReleased();
+        return nativeGetContentFrameStats(mNativeObject, outStats);
+!!!835202.java!!!	clearAnimationFrameStats() : boolean
+        return nativeClearAnimationFrameStats();
+!!!835330.java!!!	getAnimationFrameStats(inout outStats : WindowAnimationFrameStats) : boolean
+        return nativeGetAnimationFrameStats(outStats);
+!!!835458.java!!!	setAlpha(in alpha : float) : void
+        checkNotReleased();
+        nativeSetAlpha(mNativeObject, alpha);
+!!!835586.java!!!	setMatrix(in dsdx : float, in dtdx : float, in dsdy : float, in dtdy : float) : void
+        checkNotReleased();
+        nativeSetMatrix(mNativeObject, dsdx, dtdx, dsdy, dtdy);
+!!!835714.java!!!	setWindowCrop(inout crop : Rect) : void
+        checkNotReleased();
+        if (crop != null) {
+            nativeSetWindowCrop(mNativeObject,
+                crop.left, crop.top, crop.right, crop.bottom);
+        } else {
+            nativeSetWindowCrop(mNativeObject, 0, 0, 0, 0);
+        }
+!!!835842.java!!!	setLayerStack(in layerStack : int) : void
+        checkNotReleased();
+        nativeSetLayerStack(mNativeObject, layerStack);
+!!!835970.java!!!	setOpaque(inout isOpaque : boolean) : void
+        checkNotReleased();
+        if (isOpaque) {
+            nativeSetFlags(mNativeObject, SURFACE_OPAQUE, SURFACE_OPAQUE);
+        } else {
+            nativeSetFlags(mNativeObject, 0, SURFACE_OPAQUE);
+        }
+!!!836994.java!!!	setDisplayPowerMode(inout displayToken : IBinder, in mode : int) : void
+        if (displayToken == null) {
+            throw new IllegalArgumentException("displayToken must not be null");
+        }
+        nativeSetDisplayPowerMode(displayToken, mode);
+!!!837122.java!!!	getDisplayConfigs(inout displayToken : IBinder) : SurfaceControl::PhysicalDisplayInfo
+        if (displayToken == null) {
+            throw new IllegalArgumentException("displayToken must not be null");
+        }
+        return nativeGetDisplayConfigs(displayToken);
+!!!837250.java!!!	getActiveConfig(inout displayToken : IBinder) : int
+        if (displayToken == null) {
+            throw new IllegalArgumentException("displayToken must not be null");
+        }
+        return nativeGetActiveConfig(displayToken);
+!!!837378.java!!!	setActiveConfig(inout displayToken : IBinder, in id : int) : boolean
+        if (displayToken == null) {
+            throw new IllegalArgumentException("displayToken must not be null");
+        }
+        return nativeSetActiveConfig(displayToken, id);
+!!!837506.java!!!	setDisplayProjection(inout displayToken : IBinder, in orientation : int, inout layerStackRect : Rect, inout displayRect : Rect) : void
+        if (displayToken == null) {
+            throw new IllegalArgumentException("displayToken must not be null");
+        }
+        if (layerStackRect == null) {
+            throw new IllegalArgumentException("layerStackRect must not be null");
+        }
+        if (displayRect == null) {
+            throw new IllegalArgumentException("displayRect must not be null");
+        }
+        nativeSetDisplayProjection(displayToken, orientation,
+                layerStackRect.left, layerStackRect.top, layerStackRect.right, layerStackRect.bottom,
+                displayRect.left, displayRect.top, displayRect.right, displayRect.bottom);
+!!!837634.java!!!	setDisplayLayerStack(inout displayToken : IBinder, in layerStack : int) : void
+        if (displayToken == null) {
+            throw new IllegalArgumentException("displayToken must not be null");
+        }
+        nativeSetDisplayLayerStack(displayToken, layerStack);
+!!!837762.java!!!	setDisplaySurface(inout displayToken : IBinder, inout surface : Surface) : void
+        if (displayToken == null) {
+            throw new IllegalArgumentException("displayToken must not be null");
+        }
+
+        if (surface != null) {
+            synchronized (surface.mLock) {
+                nativeSetDisplaySurface(displayToken, surface.mNativeObject);
+            }
+        } else {
+            nativeSetDisplaySurface(displayToken, 0);
+        }
+!!!837890.java!!!	setDisplaySize(inout displayToken : IBinder, in width : int, in height : int) : void
+        if (displayToken == null) {
+            throw new IllegalArgumentException("displayToken must not be null");
+        }
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("width and height must be positive");
+        }
+
+        nativeSetDisplaySize(displayToken, width, height);
+!!!838018.java!!!	createDisplay(in name : String, inout secure : boolean) : IBinder
+        if (name == null) {
+            throw new IllegalArgumentException("name must not be null");
+        }
+        return nativeCreateDisplay(name, secure);
+!!!838146.java!!!	destroyDisplay(inout displayToken : IBinder) : void
+        if (displayToken == null) {
+            throw new IllegalArgumentException("displayToken must not be null");
+        }
+        nativeDestroyDisplay(displayToken);
+!!!838274.java!!!	getBuiltInDisplay(in builtInDisplayId : int) : IBinder
+        return nativeGetBuiltInDisplay(builtInDisplayId);
+!!!838402.java!!!	screenshot(inout display : IBinder, inout consumer : Surface, in width : int, in height : int, in minLayer : int, in maxLayer : int, inout useIdentityTransform : boolean) : void
+        screenshot(display, consumer, new Rect(), width, height, minLayer, maxLayer,
+                false, useIdentityTransform);
+!!!838530.java!!!	screenshot(inout display : IBinder, inout consumer : Surface, in width : int, in height : int) : void
+        screenshot(display, consumer, new Rect(), width, height, 0, 0, true, false);
+!!!838658.java!!!	screenshot(inout display : IBinder, inout consumer : Surface) : void
+        screenshot(display, consumer, new Rect(), 0, 0, 0, 0, true, false);
+!!!838786.java!!!	screenshot(inout sourceCrop : Rect, in width : int, in height : int, in minLayer : int, in maxLayer : int, inout useIdentityTransform : boolean, in rotation : int) : Bitmap
+        // TODO: should take the display as a parameter
+        IBinder displayToken = SurfaceControl.getBuiltInDisplay(
+                SurfaceControl.BUILT_IN_DISPLAY_ID_MAIN);
+        return nativeScreenshot(displayToken, sourceCrop, width, height,
+                minLayer, maxLayer, false, useIdentityTransform, rotation);
+!!!838914.java!!!	screenshot(in width : int, in height : int) : Bitmap
+        // TODO: should take the display as a parameter
+        IBinder displayToken = SurfaceControl.getBuiltInDisplay(
+                SurfaceControl.BUILT_IN_DISPLAY_ID_MAIN);
+        return nativeScreenshot(displayToken, new Rect(), width, height, 0, 0, true,
+                false, Surface.ROTATION_0);
+!!!839042.java!!!	screenshot(inout display : IBinder, inout consumer : Surface, inout sourceCrop : Rect, in width : int, in height : int, in minLayer : int, in maxLayer : int, inout allLayers : boolean, inout useIdentityTransform : boolean) : void
+        if (display == null) {
+            throw new IllegalArgumentException("displayToken must not be null");
+        }
+        if (consumer == null) {
+            throw new IllegalArgumentException("consumer must not be null");
+        }
+        nativeScreenshot(display, consumer, sourceCrop, width, height,
+                minLayer, maxLayer, allLayers, useIdentityTransform);

@@ -1,0 +1,11 @@
+class InputWindowHandle
+!!!157570.java!!!	InputWindowHandle(inout inputApplicationHandle : InputApplicationHandle, inout windowState : Object, in displayId : int)
+        this.inputApplicationHandle = inputApplicationHandle;
+        this.windowState = windowState;
+        this.displayId = displayId;
+!!!157698.java!!!	finalize() : void
+        try {
+            nativeDispose();
+        } finally {
+            super.finalize();
+        }

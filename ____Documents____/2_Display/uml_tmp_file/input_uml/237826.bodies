@@ -1,0 +1,36 @@
+class SendWindowContentChangedAccessibilityEvent
+!!!988162.java!!!	run() : void
+            // The accessibility may be turned off while we were waiting so check again.
+            if (AccessibilityManager.getInstance(mContext).isEnabled()) {
+                mLastEventTimeMillis = SystemClock.uptimeMillis();
+                AccessibilityEvent event = AccessibilityEvent.obtain();
+                event.setEventType(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED);
+                event.setContentChangeTypes(mChangeTypes);
+                mSource.sendAccessibilityEventUnchecked(event);
+            } else {
+                mLastEventTimeMillis = 0;
+            }
+            // In any case reset to initial state.
+            mSource.resetSubtreeAccessibilityStateChanged();
+            mSource = null;
+            mChangeTypes = 0;
+!!!988290.java!!!	runOrPost(inout source : View, in changeType : int) : void
+            if (mSource != null) {
+                // If there is no common predecessor, then mSource points to
+                // a removed view, hence in this case always prefer the source.
+                View predecessor = getCommonPredecessor(mSource, source);
+                mSource = (predecessor != null) ? predecessor : source;
+                mChangeTypes |= changeType;
+                return;
+            }
+            mSource = source;
+            mChangeTypes = changeType;
+            final long timeSinceLastMillis = SystemClock.uptimeMillis() - mLastEventTimeMillis;
+            final long minEventIntevalMillis =
+                    ViewConfiguration.getSendRecurringAccessibilityEventsInterval();
+            if (timeSinceLastMillis >= minEventIntevalMillis) {
+                mSource.removeCallbacks(this);
+                run();
+            } else {
+                mSource.postDelayed(this, minEventIntevalMillis - timeSinceLastMillis);
+            }

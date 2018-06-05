@@ -1,0 +1,12 @@
+class AddNodeInfosForViewId
+!!!541826.java!!!	init(in viewId : int, inout infos : List<AccessibilityNodeInfo>) : void
+            mViewId = viewId;
+            mInfos = infos;
+!!!541954.java!!!	reset() : void
+            mViewId = View.NO_ID;
+            mInfos = null;
+!!!542082.java!!!	apply(inout view : View) : boolean
+            if (view.getId() == mViewId && isShown(view)) {
+                mInfos.add(view.createAccessibilityNodeInfo());
+            }
+            return false;

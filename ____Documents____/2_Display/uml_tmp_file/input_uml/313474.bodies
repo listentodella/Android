@@ -1,0 +1,11 @@
+class Event
+!!!1825026.java!!!	getPackageName() : String
+            return mPackage;
+!!!1825154.java!!!	getClassName() : String
+            return mClass;
+!!!1825282.java!!!	getTimeStamp() : long
+            return mTimeStamp;
+!!!1825410.java!!!	getEventType() : int
+            return mEventType;
+!!!1825538.java!!!	getConfiguration() : Configuration
+            return mConfiguration;

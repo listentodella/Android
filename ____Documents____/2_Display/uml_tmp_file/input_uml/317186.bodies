@@ -1,0 +1,15 @@
+class AlarmImplAlarmDriver
+!!!1862402.cpp!!!	set(in type : int, inout ts : timespec) : int
+    return ioctl(fds[0], ANDROID_ALARM_SET(type), ts);
+!!!1862530.cpp!!!	setTime(inout tv : timeval) : int
+    struct timespec ts;
+    int res;
+
+    ts.tv_sec = tv->tv_sec;
+    ts.tv_nsec = tv->tv_usec * 1000;
+    res = ioctl(fds[0], ANDROID_ALARM_SET_RTC, &ts);
+    if (res < 0)
+        ALOGV("ANDROID_ALARM_SET_RTC ioctl failed: %s\n", strerror(errno));
+    return res;
+!!!1862658.cpp!!!	waitForAlarm() : int
+    return ioctl(fds[0], ANDROID_ALARM_WAIT);

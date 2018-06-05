@@ -1,0 +1,45 @@
+class StackTapPointerEventListener
+!!!1221506.java!!!	StackTapPointerEventListener(inout service : WindowManagerService, inout displayContent : DisplayContent)
+        mService = service;
+        mDisplayContent = displayContent;
+        mTouchExcludeRegion = displayContent.mTouchExcludeRegion;
+        DisplayInfo info = displayContent.getDisplayInfo();
+        mMotionSlop = (int)(info.logicalDensityDpi * TAP_MOTION_SLOP_INCHES);
+!!!1221634.java!!!	onPointerEvent(inout motionEvent : MotionEvent) : void
+        final int action = motionEvent.getAction();
+        switch (action & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                mPointerId = motionEvent.getPointerId(0);
+                mDownX = motionEvent.getX();
+                mDownY = motionEvent.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (mPointerId >= 0) {
+                    int index = motionEvent.findPointerIndex(mPointerId);
+                    if ((motionEvent.getEventTime() - motionEvent.getDownTime()) > TAP_TIMEOUT_MSEC
+                            || (motionEvent.getX(index) - mDownX) > mMotionSlop
+                            || (motionEvent.getY(index) - mDownY) > mMotionSlop) {
+                        mPointerId = -1;
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_POINTER_UP: {
+                int index = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+                        >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                // Extract the index of the pointer that left the touch sensor
+                if (mPointerId == motionEvent.getPointerId(index)) {
+                    final int x = (int)motionEvent.getX(index);
+                    final int y = (int)motionEvent.getY(index);
+                    if ((motionEvent.getEventTime() - motionEvent.getDownTime())
+                            < TAP_TIMEOUT_MSEC
+                            && (x - mDownX) < mMotionSlop && (y - mDownY) < mMotionSlop
+                            && !mTouchExcludeRegion.contains(x, y)) {
+                        mService.mH.obtainMessage(H.TAP_OUTSIDE_STACK, x, y,
+                                mDisplayContent).sendToTarget();
+                    }
+                    mPointerId = -1;
+                }
+                break;
+            }
+        }

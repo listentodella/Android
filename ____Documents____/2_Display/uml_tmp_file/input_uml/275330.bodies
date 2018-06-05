@@ -1,0 +1,108 @@
+class TaskDescription
+!!!1345538.java!!!	TaskDescription(in label : String, inout icon : Bitmap, in colorPrimary : int)
+            if ((colorPrimary != 0) && (Color.alpha(colorPrimary) != 255)) {
+                throw new RuntimeException("A TaskDescription's primary color should be opaque");
+            }
+
+            mLabel = label;
+            mIcon = icon;
+            mColorPrimary = colorPrimary;
+!!!1345666.java!!!	TaskDescription(in label : String, in colorPrimary : int, in iconFilename : String)
+            this(label, null, colorPrimary);
+            mIconFilename = iconFilename;
+!!!1345794.java!!!	TaskDescription(in label : String, inout icon : Bitmap)
+            this(label, icon, 0);
+!!!1345922.java!!!	TaskDescription(in label : String)
+            this(label, null, 0);
+!!!1346050.java!!!	TaskDescription()
+            this(null, null, 0);
+!!!1346178.java!!!	TaskDescription(inout td : ActivityManager::TaskDescription)
+            mLabel = td.mLabel;
+            mIcon = td.mIcon;
+            mColorPrimary = td.mColorPrimary;
+            mIconFilename = td.mIconFilename;
+!!!1346306.java!!!	TaskDescription(inout source : Parcel)
+            readFromParcel(source);
+!!!1346434.java!!!	setLabel(in label : String) : void
+            mLabel = label;
+!!!1346562.java!!!	setPrimaryColor(in primaryColor : int) : void
+            // Ensure that the given color is valid
+            if ((primaryColor != 0) && (Color.alpha(primaryColor) != 255)) {
+                throw new RuntimeException("A TaskDescription's primary color should be opaque");
+            }
+            mColorPrimary = primaryColor;
+!!!1346690.java!!!	setIcon(inout icon : Bitmap) : void
+            mIcon = icon;
+!!!1346818.java!!!	setIconFilename(in iconFilename : String) : void
+            mIconFilename = iconFilename;
+            mIcon = null;
+!!!1346946.java!!!	getLabel() : String
+            return mLabel;
+!!!1347074.java!!!	getIcon() : Bitmap
+            if (mIcon != null) {
+                return mIcon;
+            }
+            return loadTaskDescriptionIcon(mIconFilename);
+!!!1347202.java!!!	getIconFilename() : String
+            return mIconFilename;
+!!!1347330.java!!!	getInMemoryIcon() : Bitmap
+            return mIcon;
+!!!1347458.java!!!	loadTaskDescriptionIcon(in iconFilename : String) : Bitmap
+            if (iconFilename != null) {
+                try {
+                    return ActivityManagerNative.getDefault().
+                            getTaskDescriptionIcon(iconFilename);
+                } catch (RemoteException e) {
+                }
+            }
+            return null;
+!!!1347586.java!!!	getPrimaryColor() : int
+            return mColorPrimary;
+!!!1347714.java!!!	saveToXml(inout out : XmlSerializer) : void
+            if (mLabel != null) {
+                out.attribute(null, ATTR_TASKDESCRIPTIONLABEL, mLabel);
+            }
+            if (mColorPrimary != 0) {
+                out.attribute(null, ATTR_TASKDESCRIPTIONCOLOR, Integer.toHexString(mColorPrimary));
+            }
+            if (mIconFilename != null) {
+                out.attribute(null, ATTR_TASKDESCRIPTIONICONFILENAME, mIconFilename);
+            }
+!!!1347842.java!!!	restoreFromXml(in attrName : String, in attrValue : String) : void
+            if (ATTR_TASKDESCRIPTIONLABEL.equals(attrName)) {
+                setLabel(attrValue);
+            } else if (ATTR_TASKDESCRIPTIONCOLOR.equals(attrName)) {
+                setPrimaryColor((int) Long.parseLong(attrValue, 16));
+            } else if (ATTR_TASKDESCRIPTIONICONFILENAME.equals(attrName)) {
+                setIconFilename(attrValue);
+            }
+!!!1347970.java!!!	describeContents() : int
+            return 0;
+!!!1348098.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            if (mLabel == null) {
+                dest.writeInt(0);
+            } else {
+                dest.writeInt(1);
+                dest.writeString(mLabel);
+            }
+            if (mIcon == null) {
+                dest.writeInt(0);
+            } else {
+                dest.writeInt(1);
+                mIcon.writeToParcel(dest, 0);
+            }
+            dest.writeInt(mColorPrimary);
+            if (mIconFilename == null) {
+                dest.writeInt(0);
+            } else {
+                dest.writeInt(1);
+                dest.writeString(mIconFilename);
+            }
+!!!1348226.java!!!	readFromParcel(inout source : Parcel) : void
+            mLabel = source.readInt() > 0 ? source.readString() : null;
+            mIcon = source.readInt() > 0 ? Bitmap.CREATOR.createFromParcel(source) : null;
+            mColorPrimary = source.readInt();
+            mIconFilename = source.readInt() > 0 ? source.readString() : null;
+!!!1348354.java!!!	toString() : String
+            return "TaskDescription Label: " + mLabel + " Icon: " + mIcon +
+                    " colorPrimary: " + mColorPrimary;

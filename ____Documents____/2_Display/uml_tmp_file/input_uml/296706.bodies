@@ -1,0 +1,3 @@
+class ServiceConnectionLeaked
+!!!1649154.java!!!	ServiceConnectionLeaked(in msg : String)
+        super(msg);

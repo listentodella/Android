@@ -1,0 +1,27 @@
+class ApplicationContentResolver
+!!!1581058.java!!!	ApplicationContentResolver(inout context : Context, inout mainThread : ActivityThread, inout user : UserHandle)
+            super(context);
+            mMainThread = Preconditions.checkNotNull(mainThread);
+            mUser = Preconditions.checkNotNull(user);
+!!!1581186.java!!!	acquireProvider(inout context : Context, in auth : String) : IContentProvider
+            return mMainThread.acquireProvider(context,
+                    ContentProvider.getAuthorityWithoutUserId(auth),
+                    resolveUserIdFromAuthority(auth), true);
+!!!1581314.java!!!	acquireExistingProvider(inout context : Context, in auth : String) : IContentProvider
+            return mMainThread.acquireExistingProvider(context,
+                    ContentProvider.getAuthorityWithoutUserId(auth),
+                    resolveUserIdFromAuthority(auth), true);
+!!!1581442.java!!!	releaseProvider(inout provider : IContentProvider) : boolean
+            return mMainThread.releaseProvider(provider, true);
+!!!1581570.java!!!	acquireUnstableProvider(inout c : Context, in auth : String) : IContentProvider
+            return mMainThread.acquireProvider(c,
+                    ContentProvider.getAuthorityWithoutUserId(auth),
+                    resolveUserIdFromAuthority(auth), false);
+!!!1581698.java!!!	releaseUnstableProvider(inout icp : IContentProvider) : boolean
+            return mMainThread.releaseProvider(icp, false);
+!!!1581826.java!!!	unstableProviderDied(inout icp : IContentProvider) : void
+            mMainThread.handleUnstableProviderDied(icp.asBinder(), true);
+!!!1581954.java!!!	appNotRespondingViaProvider(inout icp : IContentProvider) : void
+            mMainThread.appNotRespondingViaProvider(icp.asBinder());
+!!!1582082.java!!!	resolveUserIdFromAuthority(in auth : String) : int
+            return ContentProvider.getUserIdFromAuthority(auth, mUser.getIdentifier());

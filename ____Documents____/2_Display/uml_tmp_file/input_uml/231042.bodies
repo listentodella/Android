@@ -1,0 +1,13 @@
+class SurfaceSession
+!!!841986.java!!!	SurfaceSession()
+        mNativeClient = nativeCreate();
+!!!842114.java!!!	finalize() : void
+        try {
+            if (mNativeClient != 0) {
+                nativeDestroy(mNativeClient);
+            }
+        } finally {
+            super.finalize();
+        }
+!!!842242.java!!!	kill() : void
+        nativeKill(mNativeClient);

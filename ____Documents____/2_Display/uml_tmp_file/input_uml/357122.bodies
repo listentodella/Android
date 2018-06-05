@@ -1,0 +1,3 @@
+class ActionMenuPresenterCallback
+!!!2012162.java!!!	onOpenSubMenu(inout subMenu : MenuBuilder) : boolean
+            return false;

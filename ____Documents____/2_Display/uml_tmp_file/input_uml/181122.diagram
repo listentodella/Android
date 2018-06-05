@@ -1,0 +1,455 @@
+format 76
+
+classinstance 128002 class_ref 142210 // InputReaderThread
+  name ""   xyz 138.5 32.1 2000 life_line_z 2000
+classinstance 128514 class_ref 143234 // InputReader
+  name ""   xyz 364 33.7 2000 life_line_z 2000
+classinstance 128898 class_ref 135298 // EventHub
+  name ""   xyz 649.4 41.2 2000 life_line_z 2000
+fragment 129922 "opt"
+  xyzwh 626.4 136.2 2030 856 527
+end
+note 130818 "open
+ioctl
+...."
+  xyzwh 948.4 209.4 2000 77 67
+classinstance 131330 class_ref 164994 // KeyMap
+  name ""   xyz 985.2 44.8 2000 life_line_z 2000
+note 131714 "read input device configuration file (*.idc)"
+  xyzwh 940.2 312 2000 269 36
+note 133122 "// Grab the next input event"
+  xyzwh 750.2 959.4 2000 175 37
+note 133506 "// which device?"
+  xyzwh 749.8 1028.6 2000 179 35
+fragment 134658 "loop"
+  xyzwh 629.8 935.1 3005 493 442
+end
+note 134786 "struct RawEvent {
+    nsecs_t when;
+    int32_t deviceId;
+    int32_t type;
+    int32_t code;
+    int32_t value;
+};"
+  xyzwh 914.4 1182.6 3010 137 127
+classinstance 135938 class_ref 143618 // InputMapper
+  name ""   xyz 1182.1 45.9 2000 life_line_z 2000
+note 136322 "mDevices.add(device->id, device);
+device->next = mOpeningDevices;
+mOpeningDevices = device;"
+  xyzwh 755.6 471.9 2000 214 70
+fragment 136834 "opt"
+  xyzwh 627.7 722.7 2030 283 76
+end
+fragment 137218 "opt"
+  xyzwh 627.1 842.9 2035 281 63
+end
+classinstance 138114 class_ref 143106 // InputDevice
+  name ""   xyz 813.6 39.4 2000 life_line_z 2000
+classinstance 138754 class_ref 149250 // MultiTouchInputMapper
+  name ""   xyz 862.8 8.6 2000 life_line_z 2000
+note 139650 "Keyboard.cpp"
+  xyzwh 975 92.8 2005 101 35
+note 139778 "InputReader.cpp"
+  xyzwh 868.9 66 2005 111 35
+note 141058 "InputReader.cpp"
+  xyzwh 159.9 75.6 2005 111 37
+note 141186 "InputReader.cpp"
+  xyzwh 357.3 82.2 2005 117 35
+note 141314 "EventHub.cpp"
+  xyzwh 642.5 87.9 2005 108 36
+note 141442 "InputReader.cpp"
+  xyzwh 795.3 98.1 2005 111 35
+note 141570 "InputListener.cpp"
+  xyzwh 1088.3 93.5 2005 115 35
+note 141698 "InputReader.cpp"
+  xyzwh 1212.1 94.1 2005 111 35
+note 141954 "for mClosingDevices:"
+  xyzwh 626 688 2035 147 35
+note 142082 "for mOpeningDevices:"
+  xyzwh 627.5 807.5 2035 147 35
+fragment 143618 "opt"
+  xyzwh 361 1475.5 3010 625 144
+end
+fragment 143874 "opt"
+  xyzwh 360 1636 3005 625 81
+end
+classinstance 146050 class_ref 146562 // TouchInputMapper
+  name ""   xyz 1278.4 39.8 2000 life_line_z 2000
+classinstance 146178 class_ref 145026 // MultiTouchMotionAccumulator
+  name ""   xyz 1296.5 4.3 2000 life_line_z 2000
+note 146306 "InputReader.cpp"
+  xyzwh 1317.1 84.6 2005 111 35
+note 146946 "Only record:
+Slot* slot = &mSlots[mCurrentSlot];
+slot->mInUse = true;
+slot->mAbsMTPositionX = rawEvent->value;
+slot->mAbsMTPositionY = rawEvent->value;
+if (rawEvent->type == EV_SYN && rawEvent->code == SYN_MT_REPORT) {
+        // MultiTouch Sync: The driver has returned all data for *one* of the pointers.
+        mCurrentSlot += 1;
+    }"
+  xyzwh 1401.8 1831.4 2005 501 161
+note 147330 "    if (rawEvent->type == EV_SYN && rawEvent->code == SYN_REPORT) {
+        sync(rawEvent->when);
+    }
+"
+  xyzwh 1513.3 2000.3 2005 427 69
+note 147970 "if (!havePointerIds) {
+    assignPointerIds();
+}
+"
+  xyzwh 1510.4 2094.4 2005 157 65
+classinstance 148866 class_ref 137346 // NotifyMotionArgs
+  name ""   xyz 1496.4 34.6 2000 life_line_z 2000
+note 148994 "InputListener.cpp"
+  xyzwh 1506.6 84.1 2005 117 35
+classinstance 149378 class_ref 141698 // QueuedInputListener
+  name ""   xyz 1571.4 4.3 2000 life_line_z 2000
+note 149506 "InputListener.cpp"
+  xyzwh 1590.7 50 2005 117 35
+note 149890 "mArgsQueue.push(new NotifyMotionArgs(*args));"
+  xyzwh 1655 2330.1 2000 311 39
+durationcanvas 128130 classinstance_ref 128002 // :InputReaderThread
+  xyzwh 193 131.4 2010 11 2031
+end
+durationcanvas 128642 classinstance_ref 128514 // :InputReader
+  xyzwh 400 145.7 2010 11 2323
+  overlappingdurationcanvas 134914
+    xyzwh 406 1454.1 2020 11 512
+    overlappingdurationcanvas 135170
+      xyzwh 412 1791.1 2030 11 158
+      overlappingdurationcanvas 135426
+	xyzwh 418 1817.4 2040 11 119
+	overlappingdurationcanvas 135682
+	  xyzwh 424 1838.6 2050 11 33
+	end
+      end
+    end
+    overlappingdurationcanvas 142338
+      xyzwh 412 1491.8 2030 11 122
+      overlappingdurationcanvas 142850
+	xyzwh 418 1517.8 2040 11 90
+      end
+    end
+    overlappingdurationcanvas 142594
+      xyzwh 412 1662.9 2030 11 38
+    end
+  end
+end
+durationcanvas 129026 classinstance_ref 128898 // :EventHub
+  xyzwh 677 150 2010 11 1242
+  overlappingdurationcanvas 129666
+    xyzwh 683 167.4 2020 11 400
+    overlappingdurationcanvas 130050
+      xyzwh 689 191.8 2030 11 342
+      overlappingdurationcanvas 130562
+	xyzwh 695 246.9 2040 11 271
+	overlappingdurationcanvas 131074
+	  xyzwh 701 330.4 2050 11 34
+	end
+	overlappingdurationcanvas 131842
+	  xyzwh 701 380.8 2050 11 64
+	end
+	overlappingdurationcanvas 136066
+	  xyzwh 701 466 2050 11 30
+	end
+	overlappingdurationcanvas 145794
+	  xyzwh 701 285.3 2050 11 25
+	end
+      end
+    end
+  end
+  overlappingdurationcanvas 132866
+    xyzwh 683 956.2 2020 11 25
+  end
+  overlappingdurationcanvas 133250
+    xyzwh 683 1031.7 2020 11 25
+  end
+  overlappingdurationcanvas 133634
+    xyzwh 683 1100.8 2020 11 25
+  end
+  overlappingdurationcanvas 133890
+    xyzwh 683 1156.2 2020 11 25
+  end
+  overlappingdurationcanvas 134146
+    xyzwh 683 1208 2020 11 25
+  end
+  overlappingdurationcanvas 134402
+    xyzwh 683 1343.5 2020 11 25
+  end
+  overlappingdurationcanvas 136450
+    xyzwh 683 752.6 2020 11 25
+  end
+  overlappingdurationcanvas 136962
+    xyzwh 683 853.9 2020 11 36
+  end
+end
+durationcanvas 143106 classinstance_ref 138114 // :InputDevice
+  xyzwh 847 1524.8 2010 11 36
+end
+durationcanvas 143362 classinstance_ref 138114 // :InputDevice
+  xyzwh 847 1577.3 2010 11 41
+end
+durationcanvas 144258 classinstance_ref 138754 // :MultiTouchInputMapper
+  xyzwh 927 1880.9 2010 11 274
+  overlappingdurationcanvas 147458
+    xyzwh 933 2072.2 2020 11 76
+  end
+end
+durationcanvas 146434 classinstance_ref 146050 // :TouchInputMapper
+  xyzwh 1331 2000.7 2010 11 366
+  overlappingdurationcanvas 147074
+    xyzwh 1337 2071.9 2020 11 290
+    overlappingdurationcanvas 147714
+      xyzwh 1343 2138 2030 11 25
+    end
+    overlappingdurationcanvas 148098
+      xyzwh 1343 2191.4 2030 11 25
+    end
+    overlappingdurationcanvas 148354
+      xyzwh 1343 2240.7 2030 11 115
+      overlappingdurationcanvas 148610
+	xyzwh 1349 2265.7 2040 11 85
+      end
+    end
+  end
+end
+durationcanvas 146690 classinstance_ref 146178 // :MultiTouchMotionAccumulator
+  xyzwh 1379 1891 2010 11 45
+end
+durationcanvas 149122 classinstance_ref 148866 // :NotifyMotionArgs
+  xyzwh 1543 2297.1 2010 11 25
+end
+durationcanvas 149634 classinstance_ref 149378 // :QueuedInputListener
+  xyzwh 1631 2339.9 2010 11 25
+end
+durationcanvas 150018 classinstance_ref 149378 // :QueuedInputListener
+  xyzwh 1631 2427 2010 11 89
+end
+durationcanvas 150274 classinstance_ref 148866 // :NotifyMotionArgs
+  xyzwh 1543 2461 2010 11 69
+  overlappingdurationcanvas 150530
+    xyzwh 1549 2495 2020 11 25
+  end
+end
+lostfoundmsgsupport 128258 xyz 86 144 2015
+msg 128386 found_synchronous
+  from lostfoundmsgsupport_ref 128258
+  to durationcanvas_ref 128130
+  yz 142 2015 explicitmsg "threadLoop"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 113 127
+msg 128770 synchronous
+  from durationcanvas_ref 128130
+  to durationcanvas_ref 128642
+  yz 166 2020 explicitmsg "mReader->loopOnce()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 226 152
+msg 129154 synchronous
+  from durationcanvas_ref 128642
+  to durationcanvas_ref 129026
+  yz 166 2025 explicitmsg "A1. count = mEventHub->getEvents(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 413 154
+reflexivemsg 129794 synchronous
+  to durationcanvas_ref 129666
+  yz 167 2025 explicitmsg "B1. scanDevicesLocked()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 690 150
+reflexivemsg 130178 synchronous
+  to durationcanvas_ref 130050
+  yz 191 2035 explicitmsg "C1. scanDirLocked(DEVICE_PATH)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 710 181
+reflexivemsg 130690 synchronous
+  to durationcanvas_ref 130562
+  yz 246 2045 explicitmsg "D1. openDeviceLocked(devname)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 709 232
+reflexivemsg 131202 synchronous
+  to durationcanvas_ref 131074
+  yz 330 2055 explicitmsg "E2. loadConfigurationLocked(device);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 723 317
+reflexivemsg 131970 synchronous
+  to durationcanvas_ref 131842
+  yz 380 2055 explicitmsg "E3. device->classes |= INPUT_DEVICE_CLASS_TOUCH | INPUT_DEVICE_CLASS_TOUCH_MT;"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 713 360
+reflexivemsg 132994 synchronous
+  to durationcanvas_ref 132866
+  yz 956 2025 explicitmsg "B4. eventItem = mPendingEventItems[mPendingEventIndex++]"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 693 941
+reflexivemsg 133378 synchronous
+  to durationcanvas_ref 133250
+  yz 1031 2025 explicitmsg "B5. deviceIndex = mDevices.indexOfKey(eventItem.data.u32)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 693 1011
+reflexivemsg 133762 synchronous
+  to durationcanvas_ref 133634
+  yz 1100 2025 explicitmsg "B6. Device* device = mDevices.valueAt(deviceIndex)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 696 1078
+reflexivemsg 134018 synchronous
+  to durationcanvas_ref 133890
+  yz 1156 2025 explicitmsg "B7. read(device->fd, readBuffer,...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 695 1138
+reflexivemsg 134274 synchronous
+  to durationcanvas_ref 134146
+  yz 1208 2025 explicitmsg "B8. set the RawEvent from input_event"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 693 1191
+reflexivemsg 134530 synchronous
+  to durationcanvas_ref 134402
+  yz 1343 2025 explicitmsg "B9. epoll_wait(mEpollFd, mPendingEventItems,...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 692 1326
+reflexivemsg 135042 synchronous
+  to durationcanvas_ref 134914
+  yz 1454 2025 explicitmsg "A2. processEventsLocked(mEventBuffer, count)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 421 1437
+reflexivemsg 135298 synchronous
+  to durationcanvas_ref 135170
+  yz 1791 2035 explicitmsg "B3. processEventsForDeviceLocked(deviceId, rawEvent, batchSize)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 425 1774
+reflexivemsg 135554 synchronous
+  to durationcanvas_ref 135426
+  yz 1817 2045 explicitmsg "C1. device->process(rawEvents, count)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 436 1801
+reflexivemsg 135810 synchronous
+  to durationcanvas_ref 135682
+  yz 1838 2055 explicitmsg "D1. InputMapper* mapper = mMappers[i]"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 450 1825
+reflexivemsg 136194 synchronous
+  to durationcanvas_ref 136066
+  yz 466 2055 explicitmsg "E4. addDeviceLocked(device)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 711 450
+reflexivemsg 136578 synchronous
+  to durationcanvas_ref 136450
+  yz 752 2025 explicitmsg "B2. event->type = DEVICE_REMOVED;"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 695 735
+reflexivemsg 137090 synchronous
+  to durationcanvas_ref 136962
+  yz 853 2025 explicitmsg "B3. event->type = DEVICE_ADDED"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 691 843
+reflexivemsg 142466 synchronous
+  to durationcanvas_ref 142338
+  yz 1491 2035 explicitmsg "B1. addDeviceLocked(rawEvent->when, rawEvent->deviceId);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 441 1482
+reflexivemsg 142722 synchronous
+  to durationcanvas_ref 142594
+  yz 1662 2035 explicitmsg "B2. removeDeviceLocked(rawEvent->when, rawEvent->deviceId);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 431 1647
+reflexivemsg 142978 synchronous
+  to durationcanvas_ref 142850
+  yz 1517 3005 explicitmsg "C1. InputDevice* device = createDeviceLocked(deviceId,...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 447 1507
+msg 143234 synchronous
+  from durationcanvas_ref 142850
+  to durationcanvas_ref 143106
+  yz 1547 3010 explicitmsg "D1. InputDevice* device = new InputDevice(&mContext, ...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 459 1534
+msg 143490 synchronous
+  from durationcanvas_ref 142850
+  to durationcanvas_ref 143362
+  yz 1593 2045 explicitmsg "D2. device->addMapper(new MultiTouchInputMapper(device));"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 539 1574
+msg 144386 synchronous
+  from durationcanvas_ref 135426
+  to durationcanvas_ref 144258
+  yz 1888 2055 explicitmsg "D2. mapper->process(rawEvent)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 448 1876
+reflexivemsg 145922 synchronous
+  to durationcanvas_ref 145794
+  yz 285 2055 explicitmsg "E1. Device* device = new Device(fd, ...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 722 267
+msg 146562 synchronous
+  from durationcanvas_ref 144258
+  to durationcanvas_ref 146434
+  yz 2016 2015 explicitmsg "E2. TouchInputMapper::process(rawEvent);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 956 2003
+msg 146818 synchronous
+  from durationcanvas_ref 144258
+  to durationcanvas_ref 146690
+  yz 1893 2015 explicitmsg "E1. mMultiTouchMotionAccumulator.process(rawEvent);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 951 1880
+reflexivemsg 147202 synchronous
+  to durationcanvas_ref 147074
+  yz 2071 2025 explicitmsg "F1. sync(rawEvent->when);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1356 2049
+msg 147586 synchronous
+  from durationcanvas_ref 147074
+  to durationcanvas_ref 147458
+  yz 2107 2025 explicitmsg "G1. syncTouch(when, &havePointerIds);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 966 2092
+reflexivemsg 147842 synchronous
+  to durationcanvas_ref 147714
+  yz 2138 2035 explicitmsg "G2. assignPointerIds();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1356 2122
+reflexivemsg 148226 synchronous
+  to durationcanvas_ref 148098
+  yz 2191 2035 explicitmsg "G3. cookPointerData();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1359 2172
+reflexivemsg 148482 synchronous
+  to durationcanvas_ref 148354
+  yz 2240 2035 explicitmsg "G4. dispatchTouches(when, policyFlags);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1361 2223
+reflexivemsg 148738 synchronous
+  to durationcanvas_ref 148610
+  yz 2265 2045 explicitmsg "H1. dispatchMotion(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1374 2252
+msg 149250 synchronous
+  from durationcanvas_ref 148610
+  to durationcanvas_ref 149122
+  yz 2298 2045 explicitmsg "I1. NotifyMotionArgs args(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1373 2286
+msg 149762 synchronous
+  from durationcanvas_ref 148610
+  to durationcanvas_ref 149634
+  yz 2339 2045 explicitmsg "I2. getListener()->notifyMotion(&args);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1373 2324
+msg 150146 synchronous
+  from durationcanvas_ref 128642
+  to durationcanvas_ref 150018
+  yz 2427 2015 explicitmsg "A3. mQueuedListener->flush();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 432 2413
+msg 150402 synchronous
+  from durationcanvas_ref 150018
+  to durationcanvas_ref 150274
+  yz 2461 2015 explicitmsg "B1. args->notify(mInnerListener);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1561 2448
+reflexivemsg 150658 synchronous
+  to durationcanvas_ref 150530
+  yz 2495 2025 explicitmsg "C1. listener->notifyMotion(this);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1560 2479
+end

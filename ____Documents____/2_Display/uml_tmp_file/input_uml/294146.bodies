@@ -1,0 +1,9 @@
+class ActivityGoing
+!!!1634562.java!!!	ActivityGoing(inout waiter : Instrumentation::ActivityWaiter)
+            mWaiter = waiter;
+!!!1634690.java!!!	queueIdle() : boolean
+            synchronized (mSync) {
+                mWaitingActivities.remove(mWaiter);
+                mSync.notifyAll();
+            }
+            return false;

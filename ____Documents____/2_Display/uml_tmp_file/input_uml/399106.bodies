@@ -1,0 +1,1013 @@
+class Toolbar
+!!!2535170.java!!!	Toolbar(inout context : Context)
+        this(context, null);
+!!!2535298.java!!!	Toolbar(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, com.android.internal.R.attr.toolbarStyle);
+!!!2535426.java!!!	Toolbar(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2535554.java!!!	Toolbar(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Toolbar,
+                defStyleAttr, defStyleRes);
+
+        mTitleTextAppearance = a.getResourceId(R.styleable.Toolbar_titleTextAppearance, 0);
+        mSubtitleTextAppearance = a.getResourceId(R.styleable.Toolbar_subtitleTextAppearance, 0);
+        mNavButtonStyle = a.getResourceId(R.styleable.Toolbar_navigationButtonStyle, 0);
+        mGravity = a.getInteger(R.styleable.Toolbar_gravity, mGravity);
+        mButtonGravity = a.getInteger(R.styleable.Toolbar_buttonGravity, Gravity.TOP);
+        mTitleMarginStart = mTitleMarginEnd = mTitleMarginTop = mTitleMarginBottom =
+                a.getDimensionPixelOffset(R.styleable.Toolbar_titleMargins, 0);
+
+        final int marginStart = a.getDimensionPixelOffset(R.styleable.Toolbar_titleMarginStart, -1);
+        if (marginStart >= 0) {
+            mTitleMarginStart = marginStart;
+        }
+
+        final int marginEnd = a.getDimensionPixelOffset(R.styleable.Toolbar_titleMarginEnd, -1);
+        if (marginEnd >= 0) {
+            mTitleMarginEnd = marginEnd;
+        }
+
+        final int marginTop = a.getDimensionPixelOffset(R.styleable.Toolbar_titleMarginTop, -1);
+        if (marginTop >= 0) {
+            mTitleMarginTop = marginTop;
+        }
+
+        final int marginBottom = a.getDimensionPixelOffset(R.styleable.Toolbar_titleMarginBottom,
+                -1);
+        if (marginBottom >= 0) {
+            mTitleMarginBottom = marginBottom;
+        }
+
+        mMaxButtonHeight = a.getDimensionPixelSize(R.styleable.Toolbar_maxButtonHeight, -1);
+
+        final int contentInsetStart =
+                a.getDimensionPixelOffset(R.styleable.Toolbar_contentInsetStart,
+                        RtlSpacingHelper.UNDEFINED);
+        final int contentInsetEnd =
+                a.getDimensionPixelOffset(R.styleable.Toolbar_contentInsetEnd,
+                        RtlSpacingHelper.UNDEFINED);
+        final int contentInsetLeft =
+                a.getDimensionPixelSize(R.styleable.Toolbar_contentInsetLeft, 0);
+        final int contentInsetRight =
+                a.getDimensionPixelSize(R.styleable.Toolbar_contentInsetRight, 0);
+
+        mContentInsets.setAbsolute(contentInsetLeft, contentInsetRight);
+
+        if (contentInsetStart != RtlSpacingHelper.UNDEFINED ||
+                contentInsetEnd != RtlSpacingHelper.UNDEFINED) {
+            mContentInsets.setRelative(contentInsetStart, contentInsetEnd);
+        }
+
+        mCollapseIcon = a.getDrawable(R.styleable.Toolbar_collapseIcon);
+
+        final CharSequence title = a.getText(R.styleable.Toolbar_title);
+        if (!TextUtils.isEmpty(title)) {
+            setTitle(title);
+        }
+
+        final CharSequence subtitle = a.getText(R.styleable.Toolbar_subtitle);
+        if (!TextUtils.isEmpty(subtitle)) {
+            setSubtitle(subtitle);
+        }
+
+        // Set the default context, since setPopupTheme() may be a no-op.
+        mPopupContext = mContext;
+        setPopupTheme(a.getResourceId(R.styleable.Toolbar_popupTheme, 0));
+
+        final Drawable navIcon = a.getDrawable(R.styleable.Toolbar_navigationIcon);
+        if (navIcon != null) {
+            setNavigationIcon(navIcon);
+        }
+
+        final CharSequence navDesc = a.getText(
+                R.styleable.Toolbar_navigationContentDescription);
+        if (!TextUtils.isEmpty(navDesc)) {
+            setNavigationContentDescription(navDesc);
+        }
+        a.recycle();
+!!!2535682.java!!!	setPopupTheme(in resId : int) : void
+        if (mPopupTheme != resId) {
+            mPopupTheme = resId;
+            if (resId == 0) {
+                mPopupContext = mContext;
+            } else {
+                mPopupContext = new ContextThemeWrapper(mContext, resId);
+            }
+        }
+!!!2535810.java!!!	getPopupTheme() : int
+        return mPopupTheme;
+!!!2535938.java!!!	onRtlPropertiesChanged(in layoutDirection : int) : void
+        super.onRtlPropertiesChanged(layoutDirection);
+        mContentInsets.setDirection(layoutDirection == LAYOUT_DIRECTION_RTL);
+!!!2536066.java!!!	setLogo(in resId : int) : void
+        setLogo(getContext().getDrawable(resId));
+!!!2536194.java!!!	canShowOverflowMenu() : boolean
+        return getVisibility() == VISIBLE && mMenuView != null && mMenuView.isOverflowReserved();
+!!!2536322.java!!!	isOverflowMenuShowing() : boolean
+        return mMenuView != null && mMenuView.isOverflowMenuShowing();
+!!!2536450.java!!!	isOverflowMenuShowPending() : boolean
+        return mMenuView != null && mMenuView.isOverflowMenuShowPending();
+!!!2536578.java!!!	showOverflowMenu() : boolean
+        return mMenuView != null && mMenuView.showOverflowMenu();
+!!!2536706.java!!!	hideOverflowMenu() : boolean
+        return mMenuView != null && mMenuView.hideOverflowMenu();
+!!!2536834.java!!!	setMenu(inout menu : MenuBuilder, inout outerPresenter : ActionMenuPresenter) : void
+        if (menu == null && mMenuView == null) {
+            return;
+        }
+
+        ensureMenuView();
+        final MenuBuilder oldMenu = mMenuView.peekMenu();
+        if (oldMenu == menu) {
+            return;
+        }
+
+        if (oldMenu != null) {
+            oldMenu.removeMenuPresenter(mOuterActionMenuPresenter);
+            oldMenu.removeMenuPresenter(mExpandedMenuPresenter);
+        }
+
+        if (mExpandedMenuPresenter == null) {
+            mExpandedMenuPresenter = new ExpandedActionViewMenuPresenter();
+        }
+
+        outerPresenter.setExpandedActionViewsExclusive(true);
+        if (menu != null) {
+            menu.addMenuPresenter(outerPresenter, mPopupContext);
+            menu.addMenuPresenter(mExpandedMenuPresenter, mPopupContext);
+        } else {
+            outerPresenter.initForMenu(mPopupContext, null);
+            mExpandedMenuPresenter.initForMenu(mPopupContext, null);
+            outerPresenter.updateMenuView(true);
+            mExpandedMenuPresenter.updateMenuView(true);
+        }
+        mMenuView.setPopupTheme(mPopupTheme);
+        mMenuView.setPresenter(outerPresenter);
+        mOuterActionMenuPresenter = outerPresenter;
+!!!2536962.java!!!	dismissPopupMenus() : void
+        if (mMenuView != null) {
+            mMenuView.dismissPopupMenus();
+        }
+!!!2537090.java!!!	isTitleTruncated() : boolean
+        if (mTitleTextView == null) {
+            return false;
+        }
+
+        final Layout titleLayout = mTitleTextView.getLayout();
+        if (titleLayout == null) {
+            return false;
+        }
+
+        final int lineCount = titleLayout.getLineCount();
+        for (int i = 0; i < lineCount; i++) {
+            if (titleLayout.getEllipsisCount(i) > 0) {
+                return true;
+            }
+        }
+        return false;
+!!!2537218.java!!!	setLogo(inout drawable : Drawable) : void
+        if (drawable != null) {
+            ensureLogoView();
+            if (mLogoView.getParent() == null) {
+                addSystemView(mLogoView);
+                updateChildVisibilityForExpandedActionView(mLogoView);
+            }
+        } else if (mLogoView != null && mLogoView.getParent() != null) {
+            removeView(mLogoView);
+        }
+        if (mLogoView != null) {
+            mLogoView.setImageDrawable(drawable);
+        }
+!!!2537346.java!!!	getLogo() : Drawable
+        return mLogoView != null ? mLogoView.getDrawable() : null;
+!!!2537474.java!!!	setLogoDescription(in resId : int) : void
+        setLogoDescription(getContext().getText(resId));
+!!!2537602.java!!!	setLogoDescription(inout description : CharSequence) : void
+        if (!TextUtils.isEmpty(description)) {
+            ensureLogoView();
+        }
+        if (mLogoView != null) {
+            mLogoView.setContentDescription(description);
+        }
+!!!2537730.java!!!	getLogoDescription() : CharSequence
+        return mLogoView != null ? mLogoView.getContentDescription() : null;
+!!!2537858.java!!!	ensureLogoView() : void
+        if (mLogoView == null) {
+            mLogoView = new ImageView(getContext());
+        }
+!!!2537986.java!!!	hasExpandedActionView() : boolean
+        return mExpandedMenuPresenter != null &&
+                mExpandedMenuPresenter.mCurrentExpandedItem != null;
+!!!2538114.java!!!	collapseActionView() : void
+        final MenuItemImpl item = mExpandedMenuPresenter == null ? null :
+                mExpandedMenuPresenter.mCurrentExpandedItem;
+        if (item != null) {
+            item.collapseActionView();
+        }
+!!!2538242.java!!!	getTitle() : CharSequence
+        return mTitleText;
+!!!2538370.java!!!	setTitle(in resId : int) : void
+        setTitle(getContext().getText(resId));
+!!!2538498.java!!!	setTitle(inout title : CharSequence) : void
+        if (!TextUtils.isEmpty(title)) {
+            if (mTitleTextView == null) {
+                final Context context = getContext();
+                mTitleTextView = new TextView(context);
+                mTitleTextView.setSingleLine();
+                mTitleTextView.setEllipsize(TextUtils.TruncateAt.END);
+                if (mTitleTextAppearance != 0) {
+                    mTitleTextView.setTextAppearance(context, mTitleTextAppearance);
+                }
+                if (mTitleTextColor != 0) {
+                    mTitleTextView.setTextColor(mTitleTextColor);
+                }
+            }
+            if (mTitleTextView.getParent() == null) {
+                addSystemView(mTitleTextView);
+                updateChildVisibilityForExpandedActionView(mTitleTextView);
+            }
+        } else if (mTitleTextView != null && mTitleTextView.getParent() != null) {
+            removeView(mTitleTextView);
+        }
+        if (mTitleTextView != null) {
+            mTitleTextView.setText(title);
+        }
+        mTitleText = title;
+!!!2538626.java!!!	getSubtitle() : CharSequence
+        return mSubtitleText;
+!!!2538754.java!!!	setSubtitle(in resId : int) : void
+        setSubtitle(getContext().getText(resId));
+!!!2538882.java!!!	setSubtitle(inout subtitle : CharSequence) : void
+        if (!TextUtils.isEmpty(subtitle)) {
+            if (mSubtitleTextView == null) {
+                final Context context = getContext();
+                mSubtitleTextView = new TextView(context);
+                mSubtitleTextView.setSingleLine();
+                mSubtitleTextView.setEllipsize(TextUtils.TruncateAt.END);
+                if (mSubtitleTextAppearance != 0) {
+                    mSubtitleTextView.setTextAppearance(context, mSubtitleTextAppearance);
+                }
+                if (mSubtitleTextColor != 0) {
+                    mSubtitleTextView.setTextColor(mSubtitleTextColor);
+                }
+            }
+            if (mSubtitleTextView.getParent() == null) {
+                addSystemView(mSubtitleTextView);
+                updateChildVisibilityForExpandedActionView(mSubtitleTextView);
+            }
+        } else if (mSubtitleTextView != null && mSubtitleTextView.getParent() != null) {
+            removeView(mSubtitleTextView);
+        }
+        if (mSubtitleTextView != null) {
+            mSubtitleTextView.setText(subtitle);
+        }
+        mSubtitleText = subtitle;
+!!!2539010.java!!!	setTitleTextAppearance(inout context : Context, in resId : int) : void
+        mTitleTextAppearance = resId;
+        if (mTitleTextView != null) {
+            mTitleTextView.setTextAppearance(context, resId);
+        }
+!!!2539138.java!!!	setSubtitleTextAppearance(inout context : Context, in resId : int) : void
+        mSubtitleTextAppearance = resId;
+        if (mSubtitleTextView != null) {
+            mSubtitleTextView.setTextAppearance(context, resId);
+        }
+!!!2539266.java!!!	setTitleTextColor(in color : int) : void
+        mTitleTextColor = color;
+        if (mTitleTextView != null) {
+            mTitleTextView.setTextColor(color);
+        }
+!!!2539394.java!!!	setSubtitleTextColor(in color : int) : void
+        mSubtitleTextColor = color;
+        if (mSubtitleTextView != null) {
+            mSubtitleTextView.setTextColor(color);
+        }
+!!!2539522.java!!!	getNavigationContentDescription() : CharSequence
+        return mNavButtonView != null ? mNavButtonView.getContentDescription() : null;
+!!!2539650.java!!!	setNavigationContentDescription(in resId : int) : void
+        setNavigationContentDescription(resId != 0 ? getContext().getText(resId) : null);
+!!!2539778.java!!!	setNavigationContentDescription(inout description : CharSequence) : void
+        if (!TextUtils.isEmpty(description)) {
+            ensureNavButtonView();
+        }
+        if (mNavButtonView != null) {
+            mNavButtonView.setContentDescription(description);
+        }
+!!!2539906.java!!!	setNavigationIcon(in resId : int) : void
+        setNavigationIcon(getContext().getDrawable(resId));
+!!!2540034.java!!!	setNavigationIcon(inout icon : Drawable) : void
+        if (icon != null) {
+            ensureNavButtonView();
+            if (mNavButtonView.getParent() == null) {
+                addSystemView(mNavButtonView);
+                updateChildVisibilityForExpandedActionView(mNavButtonView);
+            }
+        } else if (mNavButtonView != null && mNavButtonView.getParent() != null) {
+            removeView(mNavButtonView);
+        }
+        if (mNavButtonView != null) {
+            mNavButtonView.setImageDrawable(icon);
+        }
+!!!2540162.java!!!	getNavigationIcon() : Drawable
+        return mNavButtonView != null ? mNavButtonView.getDrawable() : null;
+!!!2540290.java!!!	setNavigationOnClickListener(inout listener : OnClickListener) : void
+        ensureNavButtonView();
+        mNavButtonView.setOnClickListener(listener);
+!!!2540418.java!!!	getMenu() : Menu
+        ensureMenu();
+        return mMenuView.getMenu();
+!!!2540546.java!!!	ensureMenu() : void
+        ensureMenuView();
+        if (mMenuView.peekMenu() == null) {
+            // Initialize a new menu for the first time.
+            final MenuBuilder menu = (MenuBuilder) mMenuView.getMenu();
+            if (mExpandedMenuPresenter == null) {
+                mExpandedMenuPresenter = new ExpandedActionViewMenuPresenter();
+            }
+            mMenuView.setExpandedActionViewsExclusive(true);
+            menu.addMenuPresenter(mExpandedMenuPresenter, mPopupContext);
+        }
+!!!2540674.java!!!	ensureMenuView() : void
+        if (mMenuView == null) {
+            mMenuView = new ActionMenuView(getContext());
+            mMenuView.setPopupTheme(mPopupTheme);
+            mMenuView.setOnMenuItemClickListener(mMenuViewItemClickListener);
+            mMenuView.setMenuCallbacks(mActionMenuPresenterCallback, mMenuBuilderCallback);
+            final LayoutParams lp = generateDefaultLayoutParams();
+            lp.gravity = Gravity.END | (mButtonGravity & Gravity.VERTICAL_GRAVITY_MASK);
+            mMenuView.setLayoutParams(lp);
+            addSystemView(mMenuView);
+        }
+!!!2540802.java!!!	getMenuInflater() : MenuInflater
+        return new MenuInflater(getContext());
+!!!2540930.java!!!	inflateMenu(in resId : int) : void
+        getMenuInflater().inflate(resId, getMenu());
+!!!2541058.java!!!	setOnMenuItemClickListener(inout listener : Toolbar::OnMenuItemClickListener) : void
+        mOnMenuItemClickListener = listener;
+!!!2541186.java!!!	setContentInsetsRelative(in contentInsetStart : int, in contentInsetEnd : int) : void
+        mContentInsets.setRelative(contentInsetStart, contentInsetEnd);
+!!!2541314.java!!!	getContentInsetStart() : int
+        return mContentInsets.getStart();
+!!!2541442.java!!!	getContentInsetEnd() : int
+        return mContentInsets.getEnd();
+!!!2541570.java!!!	setContentInsetsAbsolute(in contentInsetLeft : int, in contentInsetRight : int) : void
+        mContentInsets.setAbsolute(contentInsetLeft, contentInsetRight);
+!!!2541698.java!!!	getContentInsetLeft() : int
+        return mContentInsets.getLeft();
+!!!2541826.java!!!	getContentInsetRight() : int
+        return mContentInsets.getRight();
+!!!2541954.java!!!	ensureNavButtonView() : void
+        if (mNavButtonView == null) {
+            mNavButtonView = new ImageButton(getContext(), null, 0, mNavButtonStyle);
+            final LayoutParams lp = generateDefaultLayoutParams();
+            lp.gravity = Gravity.START | (mButtonGravity & Gravity.VERTICAL_GRAVITY_MASK);
+            mNavButtonView.setLayoutParams(lp);
+        }
+!!!2542082.java!!!	ensureCollapseButtonView() : void
+        if (mCollapseButtonView == null) {
+            mCollapseButtonView = new ImageButton(getContext(), null, 0, mNavButtonStyle);
+            mCollapseButtonView.setImageDrawable(mCollapseIcon);
+            final LayoutParams lp = generateDefaultLayoutParams();
+            lp.gravity = Gravity.START | (mButtonGravity & Gravity.VERTICAL_GRAVITY_MASK);
+            lp.mViewType = LayoutParams.EXPANDED;
+            mCollapseButtonView.setLayoutParams(lp);
+            mCollapseButtonView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    collapseActionView();
+                }
+            });
+        }
+!!!2542210.java!!!	addSystemView(inout v : View) : void
+        final ViewGroup.LayoutParams vlp = v.getLayoutParams();
+        final LayoutParams lp;
+        if (vlp == null) {
+            lp = generateDefaultLayoutParams();
+        } else if (!checkLayoutParams(vlp)) {
+            lp = generateLayoutParams(vlp);
+        } else {
+            lp = (LayoutParams) vlp;
+        }
+        lp.mViewType = LayoutParams.SYSTEM;
+        addView(v, lp);
+!!!2542338.java!!!	onSaveInstanceState() : Parcelable
+        SavedState state = new SavedState(super.onSaveInstanceState());
+
+        if (mExpandedMenuPresenter != null && mExpandedMenuPresenter.mCurrentExpandedItem != null) {
+            state.expandedMenuItemId = mExpandedMenuPresenter.mCurrentExpandedItem.getItemId();
+        }
+
+        state.isOverflowOpen = isOverflowMenuShowing();
+
+        return state;
+!!!2542466.java!!!	onRestoreInstanceState(inout state : Parcelable) : void
+        final SavedState ss = (SavedState) state;
+        super.onRestoreInstanceState(ss.getSuperState());
+
+        final Menu menu = mMenuView != null ? mMenuView.peekMenu() : null;
+        if (ss.expandedMenuItemId != 0 && mExpandedMenuPresenter != null && menu != null) {
+            final MenuItem item = menu.findItem(ss.expandedMenuItemId);
+            if (item != null) {
+                item.expandActionView();
+            }
+        }
+
+        if (ss.isOverflowOpen) {
+            postShowOverflowMenu();
+        }
+!!!2542594.java!!!	postShowOverflowMenu() : void
+        removeCallbacks(mShowOverflowMenuRunnable);
+        post(mShowOverflowMenuRunnable);
+!!!2542722.java!!!	onDetachedFromWindow() : void
+        super.onDetachedFromWindow();
+        removeCallbacks(mShowOverflowMenuRunnable);
+!!!2542850.java!!!	onTouchEvent(inout ev : MotionEvent) : boolean
+        // Toolbars always eat touch events, but should still respect the touch event dispatch
+        // contract. If the normal View implementation doesn't want the events, we'll just silently
+        // eat the rest of the gesture without reporting the events to the default implementation
+        // since that's what it expects.
+
+        final int action = ev.getActionMasked();
+        if (action == MotionEvent.ACTION_DOWN) {
+            mEatingTouch = false;
+        }
+
+        if (!mEatingTouch) {
+            final boolean handled = super.onTouchEvent(ev);
+            if (action == MotionEvent.ACTION_DOWN && !handled) {
+                mEatingTouch = true;
+            }
+        }
+
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+            mEatingTouch = false;
+        }
+
+        return true;
+!!!2542978.java!!!	onSetLayoutParams(inout child : View, inout lp : ViewGroup::LayoutParams) : void
+        /*
+         * Apps may set ActionBar.LayoutParams on their action bar custom views when
+         * a Toolbar is actually acting in the role of the action bar. Perform a quick
+         * switch with Toolbar.LayoutParams whenever this happens. This does leave open
+         * one potential gotcha: if an app retains the ActionBar.LayoutParams reference
+         * and attempts to keep making changes to it before layout those changes won't
+         * be reflected in the final results.
+         */
+        if (!checkLayoutParams(lp)) {
+            child.setLayoutParams(generateLayoutParams(lp));
+        }
+!!!2543106.java!!!	measureChildConstrained(inout child : View, in parentWidthSpec : int, in widthUsed : int, in parentHeightSpec : int, in heightUsed : int, in heightConstraint : int) : void
+        final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+
+        int childWidthSpec = getChildMeasureSpec(parentWidthSpec,
+                mPaddingLeft + mPaddingRight + lp.leftMargin + lp.rightMargin
+                        + widthUsed, lp.width);
+        int childHeightSpec = getChildMeasureSpec(parentHeightSpec,
+                mPaddingTop + mPaddingBottom + lp.topMargin + lp.bottomMargin
+                        + heightUsed, lp.height);
+
+        final int childHeightMode = MeasureSpec.getMode(childHeightSpec);
+        if (childHeightMode != MeasureSpec.EXACTLY && heightConstraint >= 0) {
+            final int size = childHeightMode != MeasureSpec.UNSPECIFIED ?
+                    Math.min(MeasureSpec.getSize(childHeightSpec), heightConstraint) :
+                    heightConstraint;
+            childHeightSpec = MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY);
+        }
+        child.measure(childWidthSpec, childHeightSpec);
+!!!2543234.java!!!	measureChildCollapseMargins(inout child : View, in parentWidthMeasureSpec : int, in widthUsed : int, in parentHeightMeasureSpec : int, in heightUsed : int, inout collapsingMargins : int) : int
+        final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+
+        final int leftDiff = lp.leftMargin - collapsingMargins[0];
+        final int rightDiff = lp.rightMargin - collapsingMargins[1];
+        final int leftMargin = Math.max(0, leftDiff);
+        final int rightMargin = Math.max(0, rightDiff);
+        final int hMargins = leftMargin + rightMargin;
+        collapsingMargins[0] = Math.max(0, -leftDiff);
+        collapsingMargins[1] = Math.max(0, -rightDiff);
+
+        final int childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,
+                mPaddingLeft + mPaddingRight + hMargins + widthUsed, lp.width);
+        final int childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,
+                mPaddingTop + mPaddingBottom + lp.topMargin + lp.bottomMargin
+                        + heightUsed, lp.height);
+
+        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+        return child.getMeasuredWidth() + hMargins;
+!!!2543362.java!!!	shouldCollapse() : boolean
+        if (!mCollapsible) return false;
+
+        final int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            final View child = getChildAt(i);
+            if (shouldLayout(child) && child.getMeasuredWidth() > 0 &&
+                    child.getMeasuredHeight() > 0) {
+                return false;
+            }
+        }
+        return true;
+!!!2543490.java!!!	onMeasure(in widthMeasureSpec : int, in heightMeasureSpec : int) : void
+        int width = 0;
+        int height = 0;
+        int childState = 0;
+
+        final int[] collapsingMargins = mTempMargins;
+        final int marginStartIndex;
+        final int marginEndIndex;
+        if (isLayoutRtl()) {
+            marginStartIndex = 1;
+            marginEndIndex = 0;
+        } else {
+            marginStartIndex = 0;
+            marginEndIndex = 1;
+        }
+
+        // System views measure first.
+
+        int navWidth = 0;
+        if (shouldLayout(mNavButtonView)) {
+            measureChildConstrained(mNavButtonView, widthMeasureSpec, width, heightMeasureSpec, 0,
+                    mMaxButtonHeight);
+            navWidth = mNavButtonView.getMeasuredWidth() + getHorizontalMargins(mNavButtonView);
+            height = Math.max(height, mNavButtonView.getMeasuredHeight() +
+                    getVerticalMargins(mNavButtonView));
+            childState = combineMeasuredStates(childState, mNavButtonView.getMeasuredState());
+        }
+
+        if (shouldLayout(mCollapseButtonView)) {
+            measureChildConstrained(mCollapseButtonView, widthMeasureSpec, width,
+                    heightMeasureSpec, 0, mMaxButtonHeight);
+            navWidth = mCollapseButtonView.getMeasuredWidth() +
+                    getHorizontalMargins(mCollapseButtonView);
+            height = Math.max(height, mCollapseButtonView.getMeasuredHeight() +
+                    getVerticalMargins(mCollapseButtonView));
+            childState = combineMeasuredStates(childState, mCollapseButtonView.getMeasuredState());
+        }
+
+        final int contentInsetStart = getContentInsetStart();
+        width += Math.max(contentInsetStart, navWidth);
+        collapsingMargins[marginStartIndex] = Math.max(0, contentInsetStart - navWidth);
+
+        int menuWidth = 0;
+        if (shouldLayout(mMenuView)) {
+            measureChildConstrained(mMenuView, widthMeasureSpec, width, heightMeasureSpec, 0,
+                    mMaxButtonHeight);
+            menuWidth = mMenuView.getMeasuredWidth() + getHorizontalMargins(mMenuView);
+            height = Math.max(height, mMenuView.getMeasuredHeight() +
+                    getVerticalMargins(mMenuView));
+            childState = combineMeasuredStates(childState, mMenuView.getMeasuredState());
+        }
+
+        final int contentInsetEnd = getContentInsetEnd();
+        width += Math.max(contentInsetEnd, menuWidth);
+        collapsingMargins[marginEndIndex] = Math.max(0, contentInsetEnd - menuWidth);
+
+        if (shouldLayout(mExpandedActionView)) {
+            width += measureChildCollapseMargins(mExpandedActionView, widthMeasureSpec, width,
+                    heightMeasureSpec, 0, collapsingMargins);
+            height = Math.max(height, mExpandedActionView.getMeasuredHeight() +
+                    getVerticalMargins(mExpandedActionView));
+            childState = combineMeasuredStates(childState, mExpandedActionView.getMeasuredState());
+        }
+
+        if (shouldLayout(mLogoView)) {
+            width += measureChildCollapseMargins(mLogoView, widthMeasureSpec, width,
+                    heightMeasureSpec, 0, collapsingMargins);
+            height = Math.max(height, mLogoView.getMeasuredHeight() +
+                    getVerticalMargins(mLogoView));
+            childState = combineMeasuredStates(childState, mLogoView.getMeasuredState());
+        }
+
+        final int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            final View child = getChildAt(i);
+            final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+            if (lp.mViewType != LayoutParams.CUSTOM || !shouldLayout(child)) {
+                // We already got all system views above. Skip them and GONE views.
+                continue;
+            }
+
+            width += measureChildCollapseMargins(child, widthMeasureSpec, width,
+                    heightMeasureSpec, 0, collapsingMargins);
+            height = Math.max(height, child.getMeasuredHeight() + getVerticalMargins(child));
+            childState = combineMeasuredStates(childState, child.getMeasuredState());
+        }
+
+        int titleWidth = 0;
+        int titleHeight = 0;
+        final int titleVertMargins = mTitleMarginTop + mTitleMarginBottom;
+        final int titleHorizMargins = mTitleMarginStart + mTitleMarginEnd;
+        if (shouldLayout(mTitleTextView)) {
+            titleWidth = measureChildCollapseMargins(mTitleTextView, widthMeasureSpec,
+                    width + titleHorizMargins, heightMeasureSpec, titleVertMargins,
+                    collapsingMargins);
+            titleWidth = mTitleTextView.getMeasuredWidth() + getHorizontalMargins(mTitleTextView);
+            titleHeight = mTitleTextView.getMeasuredHeight() + getVerticalMargins(mTitleTextView);
+            childState = combineMeasuredStates(childState, mTitleTextView.getMeasuredState());
+        }
+        if (shouldLayout(mSubtitleTextView)) {
+            titleWidth = Math.max(titleWidth, measureChildCollapseMargins(mSubtitleTextView,
+                    widthMeasureSpec, width + titleHorizMargins,
+                    heightMeasureSpec, titleHeight + titleVertMargins,
+                    collapsingMargins));
+            titleHeight += mSubtitleTextView.getMeasuredHeight() +
+                    getVerticalMargins(mSubtitleTextView);
+            childState = combineMeasuredStates(childState, mSubtitleTextView.getMeasuredState());
+        }
+
+        width += titleWidth;
+        height = Math.max(height, titleHeight);
+
+        // Measurement already took padding into account for available space for the children,
+        // add it in for the final size.
+        width += getPaddingLeft() + getPaddingRight();
+        height += getPaddingTop() + getPaddingBottom();
+
+        final int measuredWidth = resolveSizeAndState(
+                Math.max(width, getSuggestedMinimumWidth()),
+                widthMeasureSpec, childState & MEASURED_STATE_MASK);
+        final int measuredHeight = resolveSizeAndState(
+                Math.max(height, getSuggestedMinimumHeight()),
+                heightMeasureSpec, childState << MEASURED_HEIGHT_STATE_SHIFT);
+
+        setMeasuredDimension(measuredWidth, shouldCollapse() ? 0 : measuredHeight);
+!!!2543618.java!!!	onLayout(inout changed : boolean, in l : int, in t : int, in r : int, in b : int) : void
+        final boolean isRtl = getLayoutDirection() == LAYOUT_DIRECTION_RTL;
+        final int width = getWidth();
+        final int height = getHeight();
+        final int paddingLeft = getPaddingLeft();
+        final int paddingRight = getPaddingRight();
+        final int paddingTop = getPaddingTop();
+        final int paddingBottom = getPaddingBottom();
+        int left = paddingLeft;
+        int right = width - paddingRight;
+
+        final int[] collapsingMargins = mTempMargins;
+        collapsingMargins[0] = collapsingMargins[1] = 0;
+
+        // Align views within the minimum toolbar height, if set.
+        final int alignmentHeight = getMinimumHeight();
+
+        if (shouldLayout(mNavButtonView)) {
+            if (isRtl) {
+                right = layoutChildRight(mNavButtonView, right, collapsingMargins,
+                        alignmentHeight);
+            } else {
+                left = layoutChildLeft(mNavButtonView, left, collapsingMargins,
+                        alignmentHeight);
+            }
+        }
+
+        if (shouldLayout(mCollapseButtonView)) {
+            if (isRtl) {
+                right = layoutChildRight(mCollapseButtonView, right, collapsingMargins,
+                        alignmentHeight);
+            } else {
+                left = layoutChildLeft(mCollapseButtonView, left, collapsingMargins,
+                        alignmentHeight);
+            }
+        }
+
+        if (shouldLayout(mMenuView)) {
+            if (isRtl) {
+                left = layoutChildLeft(mMenuView, left, collapsingMargins,
+                        alignmentHeight);
+            } else {
+                right = layoutChildRight(mMenuView, right, collapsingMargins,
+                        alignmentHeight);
+            }
+        }
+
+        collapsingMargins[0] = Math.max(0, getContentInsetLeft() - left);
+        collapsingMargins[1] = Math.max(0, getContentInsetRight() - (width - paddingRight - right));
+        left = Math.max(left, getContentInsetLeft());
+        right = Math.min(right, width - paddingRight - getContentInsetRight());
+
+        if (shouldLayout(mExpandedActionView)) {
+            if (isRtl) {
+                right = layoutChildRight(mExpandedActionView, right, collapsingMargins,
+                        alignmentHeight);
+            } else {
+                left = layoutChildLeft(mExpandedActionView, left, collapsingMargins,
+                        alignmentHeight);
+            }
+        }
+
+        if (shouldLayout(mLogoView)) {
+            if (isRtl) {
+                right = layoutChildRight(mLogoView, right, collapsingMargins,
+                        alignmentHeight);
+            } else {
+                left = layoutChildLeft(mLogoView, left, collapsingMargins,
+                        alignmentHeight);
+            }
+        }
+
+        final boolean layoutTitle = shouldLayout(mTitleTextView);
+        final boolean layoutSubtitle = shouldLayout(mSubtitleTextView);
+        int titleHeight = 0;
+        if (layoutTitle) {
+            final LayoutParams lp = (LayoutParams) mTitleTextView.getLayoutParams();
+            titleHeight += lp.topMargin + mTitleTextView.getMeasuredHeight() + lp.bottomMargin;
+        }
+        if (layoutSubtitle) {
+            final LayoutParams lp = (LayoutParams) mSubtitleTextView.getLayoutParams();
+            titleHeight += lp.topMargin + mSubtitleTextView.getMeasuredHeight() + lp.bottomMargin;
+        }
+
+        if (layoutTitle || layoutSubtitle) {
+            int titleTop;
+            final View topChild = layoutTitle ? mTitleTextView : mSubtitleTextView;
+            final View bottomChild = layoutSubtitle ? mSubtitleTextView : mTitleTextView;
+            final LayoutParams toplp = (LayoutParams) topChild.getLayoutParams();
+            final LayoutParams bottomlp = (LayoutParams) bottomChild.getLayoutParams();
+            final boolean titleHasWidth = layoutTitle && mTitleTextView.getMeasuredWidth() > 0
+                    || layoutSubtitle && mSubtitleTextView.getMeasuredWidth() > 0;
+
+            switch (mGravity & Gravity.VERTICAL_GRAVITY_MASK) {
+                case Gravity.TOP:
+                    titleTop = getPaddingTop() + toplp.topMargin + mTitleMarginTop;
+                    break;
+                default:
+                case Gravity.CENTER_VERTICAL:
+                    final int space = height - paddingTop - paddingBottom;
+                    int spaceAbove = (space - titleHeight) / 2;
+                    if (spaceAbove < toplp.topMargin + mTitleMarginTop) {
+                        spaceAbove = toplp.topMargin + mTitleMarginTop;
+                    } else {
+                        final int spaceBelow = height - paddingBottom - titleHeight -
+                                spaceAbove - paddingTop;
+                        if (spaceBelow < toplp.bottomMargin + mTitleMarginBottom) {
+                            spaceAbove = Math.max(0, spaceAbove -
+                                    (bottomlp.bottomMargin + mTitleMarginBottom - spaceBelow));
+                        }
+                    }
+                    titleTop = paddingTop + spaceAbove;
+                    break;
+                case Gravity.BOTTOM:
+                    titleTop = height - paddingBottom - bottomlp.bottomMargin - mTitleMarginBottom -
+                            titleHeight;
+                    break;
+            }
+            if (isRtl) {
+                final int rd = (titleHasWidth ? mTitleMarginStart : 0) - collapsingMargins[1];
+                right -= Math.max(0, rd);
+                collapsingMargins[1] = Math.max(0, -rd);
+                int titleRight = right;
+                int subtitleRight = right;
+
+                if (layoutTitle) {
+                    final LayoutParams lp = (LayoutParams) mTitleTextView.getLayoutParams();
+                    final int titleLeft = titleRight - mTitleTextView.getMeasuredWidth();
+                    final int titleBottom = titleTop + mTitleTextView.getMeasuredHeight();
+                    mTitleTextView.layout(titleLeft, titleTop, titleRight, titleBottom);
+                    titleRight = titleLeft - mTitleMarginEnd;
+                    titleTop = titleBottom + lp.bottomMargin;
+                }
+                if (layoutSubtitle) {
+                    final LayoutParams lp = (LayoutParams) mSubtitleTextView.getLayoutParams();
+                    titleTop += lp.topMargin;
+                    final int subtitleLeft = subtitleRight - mSubtitleTextView.getMeasuredWidth();
+                    final int subtitleBottom = titleTop + mSubtitleTextView.getMeasuredHeight();
+                    mSubtitleTextView.layout(subtitleLeft, titleTop, subtitleRight, subtitleBottom);
+                    subtitleRight = subtitleRight - mTitleMarginEnd;
+                    titleTop = subtitleBottom + lp.bottomMargin;
+                }
+                if (titleHasWidth) {
+                    right = Math.min(titleRight, subtitleRight);
+                }
+            } else {
+                final int ld = (titleHasWidth ? mTitleMarginStart : 0) - collapsingMargins[0];
+                left += Math.max(0, ld);
+                collapsingMargins[0] = Math.max(0, -ld);
+                int titleLeft = left;
+                int subtitleLeft = left;
+
+                if (layoutTitle) {
+                    final LayoutParams lp = (LayoutParams) mTitleTextView.getLayoutParams();
+                    final int titleRight = titleLeft + mTitleTextView.getMeasuredWidth();
+                    final int titleBottom = titleTop + mTitleTextView.getMeasuredHeight();
+                    mTitleTextView.layout(titleLeft, titleTop, titleRight, titleBottom);
+                    titleLeft = titleRight + mTitleMarginEnd;
+                    titleTop = titleBottom + lp.bottomMargin;
+                }
+                if (layoutSubtitle) {
+                    final LayoutParams lp = (LayoutParams) mSubtitleTextView.getLayoutParams();
+                    titleTop += lp.topMargin;
+                    final int subtitleRight = subtitleLeft + mSubtitleTextView.getMeasuredWidth();
+                    final int subtitleBottom = titleTop + mSubtitleTextView.getMeasuredHeight();
+                    mSubtitleTextView.layout(subtitleLeft, titleTop, subtitleRight, subtitleBottom);
+                    subtitleLeft = subtitleRight + mTitleMarginEnd;
+                    titleTop = subtitleBottom + lp.bottomMargin;
+                }
+                if (titleHasWidth) {
+                    left = Math.max(titleLeft, subtitleLeft);
+                }
+            }
+        }
+
+        // Get all remaining children sorted for layout. This is all prepared
+        // such that absolute layout direction can be used below.
+
+        addCustomViewsWithGravity(mTempViews, Gravity.LEFT);
+        final int leftViewsCount = mTempViews.size();
+        for (int i = 0; i < leftViewsCount; i++) {
+            left = layoutChildLeft(mTempViews.get(i), left, collapsingMargins,
+                    alignmentHeight);
+        }
+
+        addCustomViewsWithGravity(mTempViews, Gravity.RIGHT);
+        final int rightViewsCount = mTempViews.size();
+        for (int i = 0; i < rightViewsCount; i++) {
+            right = layoutChildRight(mTempViews.get(i), right, collapsingMargins,
+                    alignmentHeight);
+        }
+
+        // Centered views try to center with respect to the whole bar, but views pinned
+        // to the left or right can push the mass of centered views to one side or the other.
+        addCustomViewsWithGravity(mTempViews, Gravity.CENTER_HORIZONTAL);
+        final int centerViewsWidth = getViewListMeasuredWidth(mTempViews, collapsingMargins);
+        final int parentCenter = paddingLeft + (width - paddingLeft - paddingRight) / 2;
+        final int halfCenterViewsWidth = centerViewsWidth / 2;
+        int centerLeft = parentCenter - halfCenterViewsWidth;
+        final int centerRight = centerLeft + centerViewsWidth;
+        if (centerLeft < left) {
+            centerLeft = left;
+        } else if (centerRight > right) {
+            centerLeft -= centerRight - right;
+        }
+
+        final int centerViewsCount = mTempViews.size();
+        for (int i = 0; i < centerViewsCount; i++) {
+            centerLeft = layoutChildLeft(mTempViews.get(i), centerLeft, collapsingMargins,
+                    alignmentHeight);
+        }
+
+        mTempViews.clear();
+!!!2543746.java!!!	getViewListMeasuredWidth(inout views : List<View>, inout collapsingMargins : int) : int
+        int collapseLeft = collapsingMargins[0];
+        int collapseRight = collapsingMargins[1];
+        int width = 0;
+        final int count = views.size();
+        for (int i = 0; i < count; i++) {
+            final View v = views.get(i);
+            final LayoutParams lp = (LayoutParams) v.getLayoutParams();
+            final int l = lp.leftMargin - collapseLeft;
+            final int r = lp.rightMargin - collapseRight;
+            final int leftMargin = Math.max(0, l);
+            final int rightMargin = Math.max(0, r);
+            collapseLeft = Math.max(0, -l);
+            collapseRight = Math.max(0, -r);
+            width += leftMargin + v.getMeasuredWidth() + rightMargin;
+        }
+        return width;
+!!!2543874.java!!!	layoutChildLeft(inout child : View, in left : int, inout collapsingMargins : int, in alignmentHeight : int) : int
+        final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+        final int l = lp.leftMargin - collapsingMargins[0];
+        left += Math.max(0, l);
+        collapsingMargins[0] = Math.max(0, -l);
+        final int top = getChildTop(child, alignmentHeight);
+        final int childWidth = child.getMeasuredWidth();
+        child.layout(left, top, left + childWidth, top + child.getMeasuredHeight());
+        left += childWidth + lp.rightMargin;
+        return left;
+!!!2544002.java!!!	layoutChildRight(inout child : View, in right : int, inout collapsingMargins : int, in alignmentHeight : int) : int
+        final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+        final int r = lp.rightMargin - collapsingMargins[1];
+        right -= Math.max(0, r);
+        collapsingMargins[1] = Math.max(0, -r);
+        final int top = getChildTop(child, alignmentHeight);
+        final int childWidth = child.getMeasuredWidth();
+        child.layout(right - childWidth, top, right, top + child.getMeasuredHeight());
+        right -= childWidth + lp.leftMargin;
+        return right;
+!!!2544130.java!!!	getChildTop(inout child : View, in alignmentHeight : int) : int
+        final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+        final int childHeight = child.getMeasuredHeight();
+        final int alignmentOffset = alignmentHeight > 0 ? (childHeight - alignmentHeight) / 2 : 0;
+        switch (getChildVerticalGravity(lp.gravity)) {
+            case Gravity.TOP:
+                return getPaddingTop() - alignmentOffset;
+
+            case Gravity.BOTTOM:
+                return getHeight() - getPaddingBottom() - childHeight
+                        - lp.bottomMargin - alignmentOffset;
+
+            default:
+            case Gravity.CENTER_VERTICAL:
+                final int paddingTop = getPaddingTop();
+                final int paddingBottom = getPaddingBottom();
+                final int height = getHeight();
+                final int space = height - paddingTop - paddingBottom;
+                int spaceAbove = (space - childHeight) / 2;
+                if (spaceAbove < lp.topMargin) {
+                    spaceAbove = lp.topMargin;
+                } else {
+                    final int spaceBelow = height - paddingBottom - childHeight -
+                            spaceAbove - paddingTop;
+                    if (spaceBelow < lp.bottomMargin) {
+                        spaceAbove = Math.max(0, spaceAbove - (lp.bottomMargin - spaceBelow));
+                    }
+                }
+                return paddingTop + spaceAbove;
+        }
+!!!2544258.java!!!	getChildVerticalGravity(in gravity : int) : int
+        final int vgrav = gravity & Gravity.VERTICAL_GRAVITY_MASK;
+        switch (vgrav) {
+            case Gravity.TOP:
+            case Gravity.BOTTOM:
+            case Gravity.CENTER_VERTICAL:
+                return vgrav;
+            default:
+                return mGravity & Gravity.VERTICAL_GRAVITY_MASK;
+        }
+!!!2544386.java!!!	addCustomViewsWithGravity(inout views : List<View>, in gravity : int) : void
+        final boolean isRtl = getLayoutDirection() == LAYOUT_DIRECTION_RTL;
+        final int childCount = getChildCount();
+        final int absGrav = Gravity.getAbsoluteGravity(gravity, getLayoutDirection());
+
+        views.clear();
+
+        if (isRtl) {
+            for (int i = childCount - 1; i >= 0; i--) {
+                final View child = getChildAt(i);
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                if (lp.mViewType == LayoutParams.CUSTOM && shouldLayout(child) &&
+                        getChildHorizontalGravity(lp.gravity) == absGrav) {
+                    views.add(child);
+                }
+            }
+        } else {
+            for (int i = 0; i < childCount; i++) {
+                final View child = getChildAt(i);
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                if (lp.mViewType == LayoutParams.CUSTOM && shouldLayout(child) &&
+                        getChildHorizontalGravity(lp.gravity) == absGrav) {
+                    views.add(child);
+                }
+            }
+        }
+!!!2544514.java!!!	getChildHorizontalGravity(in gravity : int) : int
+        final int ld = getLayoutDirection();
+        final int absGrav = Gravity.getAbsoluteGravity(gravity, ld);
+        final int hGrav = absGrav & Gravity.HORIZONTAL_GRAVITY_MASK;
+        switch (hGrav) {
+            case Gravity.LEFT:
+            case Gravity.RIGHT:
+            case Gravity.CENTER_HORIZONTAL:
+                return hGrav;
+            default:
+                return ld == LAYOUT_DIRECTION_RTL ? Gravity.RIGHT : Gravity.LEFT;
+        }
+!!!2544642.java!!!	shouldLayout(inout view : View) : boolean
+        return view != null && view.getParent() == this && view.getVisibility() != GONE;
+!!!2544770.java!!!	getHorizontalMargins(inout v : View) : int
+        final MarginLayoutParams mlp = (MarginLayoutParams) v.getLayoutParams();
+        return mlp.getMarginStart() + mlp.getMarginEnd();
+!!!2544898.java!!!	getVerticalMargins(inout v : View) : int
+        final MarginLayoutParams mlp = (MarginLayoutParams) v.getLayoutParams();
+        return mlp.topMargin + mlp.bottomMargin;
+!!!2545026.java!!!	generateLayoutParams(inout attrs : AttributeSet) : Toolbar::LayoutParams
+        return new LayoutParams(getContext(), attrs);
+!!!2545154.java!!!	generateLayoutParams(inout p : ViewGroup::LayoutParams) : Toolbar::LayoutParams
+        if (p instanceof LayoutParams) {
+            return new LayoutParams((LayoutParams) p);
+        } else if (p instanceof ActionBar.LayoutParams) {
+            return new LayoutParams((ActionBar.LayoutParams) p);
+        } else if (p instanceof MarginLayoutParams) {
+            return new LayoutParams((MarginLayoutParams) p);
+        } else {
+            return new LayoutParams(p);
+        }
+!!!2545282.java!!!	generateDefaultLayoutParams() : Toolbar::LayoutParams
+        return new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+!!!2545410.java!!!	checkLayoutParams(inout p : ViewGroup::LayoutParams) : boolean
+        return super.checkLayoutParams(p) && p instanceof LayoutParams;
+!!!2545538.java!!!	isCustomView(inout child : View) : boolean
+        return ((LayoutParams) child.getLayoutParams()).mViewType == LayoutParams.CUSTOM;
+!!!2545666.java!!!	getWrapper() : DecorToolbar
+        if (mWrapper == null) {
+            mWrapper = new ToolbarWidgetWrapper(this, true);
+        }
+        return mWrapper;
+!!!2545794.java!!!	setChildVisibilityForExpandedActionView(inout expand : boolean) : void
+        final int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            final View child = getChildAt(i);
+            final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+            if (lp.mViewType != LayoutParams.EXPANDED && child != mMenuView) {
+                child.setVisibility(expand ? GONE : VISIBLE);
+            }
+        }
+!!!2545922.java!!!	updateChildVisibilityForExpandedActionView(inout child : View) : void
+        final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+        if (lp.mViewType != LayoutParams.EXPANDED && child != mMenuView) {
+            child.setVisibility(mExpandedActionView != null ? GONE : VISIBLE);
+        }
+!!!2546050.java!!!	setCollapsible(inout collapsible : boolean) : void
+        mCollapsible = collapsible;
+        requestLayout();
+!!!2546178.java!!!	setMenuCallbacks(inout pcb : MenuPresenter.Callback, inout mcb : MenuBuilder.Callback) : void
+        mActionMenuPresenterCallback = pcb;
+        mMenuBuilderCallback = mcb;

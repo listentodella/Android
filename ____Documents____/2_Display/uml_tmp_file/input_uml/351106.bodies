@@ -1,0 +1,175 @@
+class EdgeEffect
+!!!2226562.java!!!	EdgeEffect(inout context : Context)
+        mPaint.setAntiAlias(true);
+        final TypedArray a = context.obtainStyledAttributes(
+                com.android.internal.R.styleable.EdgeEffect);
+        final int themeColor = a.getColor(
+                com.android.internal.R.styleable.EdgeEffect_colorEdgeEffect, 0xff666666);
+        a.recycle();
+        mPaint.setColor((themeColor & 0xffffff) | 0x33000000);
+        mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+        mInterpolator = new DecelerateInterpolator();
+!!!2226690.java!!!	setSize(in width : int, in height : int) : void
+        final float r = width * 0.75f / SIN;
+        final float y = COS * r;
+        final float h = r - y;
+        final float or = height * 0.75f / SIN;
+        final float oy = COS * or;
+        final float oh = or - oy;
+
+        mRadius = r;
+        mBaseGlowScale = h > 0 ? Math.min(oh / h, 1.f) : 1.f;
+
+        mBounds.set(mBounds.left, mBounds.top, width, (int) Math.min(height, h));
+!!!2226818.java!!!	isFinished() : boolean
+        return mState == STATE_IDLE;
+!!!2226946.java!!!	finish() : void
+        mState = STATE_IDLE;
+!!!2227074.java!!!	onPull(in deltaDistance : float) : void
+        onPull(deltaDistance, 0.5f);
+!!!2227202.java!!!	onPull(in deltaDistance : float, in displacement : float) : void
+        final long now = AnimationUtils.currentAnimationTimeMillis();
+        mTargetDisplacement = displacement;
+        if (mState == STATE_PULL_DECAY && now - mStartTime < mDuration) {
+            return;
+        }
+        if (mState != STATE_PULL) {
+            mGlowScaleY = Math.max(PULL_GLOW_BEGIN, mGlowScaleY);
+        }
+        mState = STATE_PULL;
+
+        mStartTime = now;
+        mDuration = PULL_TIME;
+
+        mPullDistance += deltaDistance;
+
+        final float absdd = Math.abs(deltaDistance);
+        mGlowAlpha = mGlowAlphaStart = Math.min(MAX_ALPHA,
+                mGlowAlpha + (absdd * PULL_DISTANCE_ALPHA_GLOW_FACTOR));
+
+        if (mPullDistance == 0) {
+            mGlowScaleY = mGlowScaleYStart = 0;
+        } else {
+            final float scale = Math.max(0, 1 - 1 /
+                    FloatMath.sqrt(Math.abs(mPullDistance) * mBounds.height()) - 0.3f) / 0.7f;
+
+            mGlowScaleY = mGlowScaleYStart = scale;
+        }
+
+        mGlowAlphaFinish = mGlowAlpha;
+        mGlowScaleYFinish = mGlowScaleY;
+!!!2227330.java!!!	onRelease() : void
+        mPullDistance = 0;
+
+        if (mState != STATE_PULL && mState != STATE_PULL_DECAY) {
+            return;
+        }
+
+        mState = STATE_RECEDE;
+        mGlowAlphaStart = mGlowAlpha;
+        mGlowScaleYStart = mGlowScaleY;
+
+        mGlowAlphaFinish = 0.f;
+        mGlowScaleYFinish = 0.f;
+
+        mStartTime = AnimationUtils.currentAnimationTimeMillis();
+        mDuration = RECEDE_TIME;
+!!!2227458.java!!!	onAbsorb(in velocity : int) : void
+        mState = STATE_ABSORB;
+        velocity = Math.min(Math.max(MIN_VELOCITY, Math.abs(velocity)), MAX_VELOCITY);
+
+        mStartTime = AnimationUtils.currentAnimationTimeMillis();
+        mDuration = 0.15f + (velocity * 0.02f);
+
+        // The glow depends more on the velocity, and therefore starts out
+        // nearly invisible.
+        mGlowAlphaStart = 0.3f;
+        mGlowScaleYStart = Math.max(mGlowScaleY, 0.f);
+
+
+        // Growth for the size of the glow should be quadratic to properly
+        // respond
+        // to a user's scrolling speed. The faster the scrolling speed, the more
+        // intense the effect should be for both the size and the saturation.
+        mGlowScaleYFinish = Math.min(0.025f + (velocity * (velocity / 100) * 0.00015f) / 2, 1.f);
+        // Alpha should change for the glow as well as size.
+        mGlowAlphaFinish = Math.max(
+                mGlowAlphaStart, Math.min(velocity * VELOCITY_GLOW_FACTOR * .00001f, MAX_ALPHA));
+        mTargetDisplacement = 0.5f;
+!!!2227586.java!!!	setColor(in color : int) : void
+        mPaint.setColor(color);
+!!!2227714.java!!!	getColor() : int
+        return mPaint.getColor();
+!!!2227842.java!!!	draw(inout canvas : Canvas) : boolean
+        update();
+
+        final int count = canvas.save();
+
+        final float centerX = mBounds.centerX();
+        final float centerY = mBounds.height() - mRadius;
+
+        canvas.scale(1.f, Math.min(mGlowScaleY, 1.f) * mBaseGlowScale, centerX, 0);
+
+        final float displacement = Math.max(0, Math.min(mDisplacement, 1.f)) - 0.5f;
+        float translateX = mBounds.width() * displacement / 2;
+
+        canvas.clipRect(mBounds);
+        canvas.translate(translateX, 0);
+        mPaint.setAlpha((int) (0xff * mGlowAlpha));
+        canvas.drawCircle(centerX, centerY, mRadius, mPaint);
+        canvas.restoreToCount(count);
+
+        boolean oneLastFrame = false;
+        if (mState == STATE_RECEDE && mGlowScaleY == 0) {
+            mState = STATE_IDLE;
+            oneLastFrame = true;
+        }
+
+        return mState != STATE_IDLE || oneLastFrame;
+!!!2227970.java!!!	getMaxHeight() : int
+        return (int) (mBounds.height() * MAX_GLOW_SCALE + 0.5f);
+!!!2228098.java!!!	update() : void
+        final long time = AnimationUtils.currentAnimationTimeMillis();
+        final float t = Math.min((time - mStartTime) / mDuration, 1.f);
+
+        final float interp = mInterpolator.getInterpolation(t);
+
+        mGlowAlpha = mGlowAlphaStart + (mGlowAlphaFinish - mGlowAlphaStart) * interp;
+        mGlowScaleY = mGlowScaleYStart + (mGlowScaleYFinish - mGlowScaleYStart) * interp;
+        mDisplacement = (mDisplacement + mTargetDisplacement) / 2;
+
+        if (t >= 1.f - EPSILON) {
+            switch (mState) {
+                case STATE_ABSORB:
+                    mState = STATE_RECEDE;
+                    mStartTime = AnimationUtils.currentAnimationTimeMillis();
+                    mDuration = RECEDE_TIME;
+
+                    mGlowAlphaStart = mGlowAlpha;
+                    mGlowScaleYStart = mGlowScaleY;
+
+                    // After absorb, the glow should fade to nothing.
+                    mGlowAlphaFinish = 0.f;
+                    mGlowScaleYFinish = 0.f;
+                    break;
+                case STATE_PULL:
+                    mState = STATE_PULL_DECAY;
+                    mStartTime = AnimationUtils.currentAnimationTimeMillis();
+                    mDuration = PULL_DECAY_TIME;
+
+                    mGlowAlphaStart = mGlowAlpha;
+                    mGlowScaleYStart = mGlowScaleY;
+
+                    // After pull, the glow should fade to nothing.
+                    mGlowAlphaFinish = 0.f;
+                    mGlowScaleYFinish = 0.f;
+                    break;
+                case STATE_PULL_DECAY:
+                    mState = STATE_RECEDE;
+                    break;
+                case STATE_RECEDE:
+                    mState = STATE_IDLE;
+                    break;
+            }
+        }

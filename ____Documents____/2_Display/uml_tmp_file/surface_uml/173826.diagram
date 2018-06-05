@@ -1,0 +1,314 @@
+format 76
+
+classinstance 129794 class_ref 144898 // SurfaceFlinger
+  name ""   xyz 403.2 51.6 2000 life_line_z 2000
+classinstance 135042 class_ref 249090 // ANativeWindow
+  name ""   xyz 1510.9 56.5 2000 life_line_z 2000
+classinstance 135682 class_ref 170114 // BufferQueue
+  name ""   xyz 608.3 48.8 2000 life_line_z 2000
+classinstance 136066 class_ref 172034 // BufferQueueConsumer
+  name ""   xyz 964 55.5 2000 life_line_z 2000
+classinstance 142082 class_ref 183682 // Surface
+  name ""   xyz 1635.4 57.5 2000 life_line_z 2000
+classinstance 154754 class_ref 154242 // FramebufferSurface
+  name ""   xyz 787.7 49.9 2000 life_line_z 2000
+note 155394 "mCore->mConsumerUsageBits = usage;"
+  xyzwh 1047.1 299.9 2015 238 36
+classinstance 156034 class_ref 145410 // DisplayDevice
+  name ""   xyz 514.1 52.9 2000 life_line_z 2000
+classinstance 156930 class_ref 242306 // egl.cpp
+  name ""   xyz 1205 55.7 2000 life_line_z 2000
+classinstance 157826 class_ref 242434 // egl_window_surface_v2_t
+  name ""   xyz 1306.8 56.5 2000 life_line_z 2000
+note 159362 "// Initialize the ANativeWindow function pointers.
+ANativeWindow::setSwapInterval  = hook_setSwapInterval;
+ANativeWindow::dequeueBuffer    = hook_dequeueBuffer;
+ANativeWindow::cancelBuffer     = hook_cancelBuffer;
+ANativeWindow::queueBuffer      = hook_queueBuffer;
+ANativeWindow::query            = hook_query;
+ANativeWindow::perform          = hook_perform;
+"
+  xyzwh 1687.1 411.5 2000 394 132
+classinstance 160258 class_ref 172674 // BufferQueueProducer
+  name ""   xyz 1759.2 56.2 2000 life_line_z 2000
+classinstance 160898 class_ref 176898 // GraphicBufferAlloc
+  name ""   xyz 1928.8 57.6 2000 life_line_z 2000
+note 163714 "mCore->mQueue.push_back(item);
+listener = mCore->mConsumerListener;
+"
+  xyzwh 1862.4 1562.8 2000 259 51
+durationcanvas 154114 classinstance_ref 129794 // :SurfaceFlinger
+  xyzwh 445 163.7 2010 11 640
+end
+durationcanvas 154498 classinstance_ref 135682 // :BufferQueue
+  xyzwh 644 184.1 2010 11 80
+end
+durationcanvas 154882 classinstance_ref 154754 // :FramebufferSurface
+  xyzwh 841 269.2 2010 11 91
+end
+durationcanvas 155138 classinstance_ref 136066 // :BufferQueueConsumer
+  xyzwh 1030 287.7 2010 11 53
+end
+durationcanvas 156162 classinstance_ref 156034 // :DisplayDevice
+  xyzwh 551 407.5 2010 11 400
+  overlappingdurationcanvas 157314
+    xyzwh 557 731.5 2020 11 68
+  end
+end
+durationcanvas 156418 classinstance_ref 142082 // :Surface
+  xyzwh 1658 422.8 2010 11 130
+end
+durationcanvas 156674 classinstance_ref 142082 // :Surface
+  xyzwh 1658 615.7 2010 11 57
+end
+durationcanvas 157058 classinstance_ref 156930 // :egl.cpp
+  xyzwh 1225 679.9 2010 11 143
+  overlappingdurationcanvas 157570
+    xyzwh 1231 719.2 2020 11 97
+    overlappingdurationcanvas 158210
+      xyzwh 1237 785.2 2030 11 25
+    end
+  end
+end
+durationcanvas 157954 classinstance_ref 157826 // :egl_window_surface_v2_t
+  xyzwh 1375 726.4 2010 11 50
+end
+durationcanvas 158466 classinstance_ref 156930 // :egl.cpp
+  xyzwh 1225 927.6 2010 11 292
+  overlappingdurationcanvas 158850
+    xyzwh 1231 968 2020 11 25
+  end
+end
+durationcanvas 159106 classinstance_ref 157826 // :egl_window_surface_v2_t
+  xyzwh 1375 1040 2010 11 187
+end
+durationcanvas 159490 classinstance_ref 135042 // :ANativeWindow
+  xyzwh 1552 1042 2010 11 185
+end
+durationcanvas 159746 classinstance_ref 142082 // :Surface
+  xyzwh 1658 1066.1 2010 11 163
+  overlappingdurationcanvas 160002
+    xyzwh 1664 1091.2 2020 11 131
+  end
+end
+durationcanvas 160386 classinstance_ref 160258 // :BufferQueueProducer
+  xyzwh 1817 1133.9 2010 11 98
+  overlappingdurationcanvas 160642
+    xyzwh 1823 1155.4 2020 11 25
+  end
+end
+durationcanvas 161026 classinstance_ref 160898 // :GraphicBufferAlloc
+  xyzwh 1978 1206 2010 11 30
+end
+durationcanvas 161282 classinstance_ref 156034 // :DisplayDevice
+  xyzwh 551 1404.7 2010 11 304
+end
+durationcanvas 161666 classinstance_ref 156930 // :egl.cpp
+  xyzwh 1225 1415.9 2010 11 263
+end
+durationcanvas 161922 classinstance_ref 157826 // :egl_window_surface_v2_t
+  xyzwh 1375 1435.4 2010 11 392
+end
+durationcanvas 162178 classinstance_ref 135042 // :ANativeWindow
+  xyzwh 1552 1456.6 2010 11 227
+end
+durationcanvas 162434 classinstance_ref 142082 // :Surface
+  xyzwh 1658 1480.6 2010 11 207
+  overlappingdurationcanvas 162946
+    xyzwh 1664 1507.2 2020 11 174
+  end
+end
+durationcanvas 163202 classinstance_ref 160258 // :BufferQueueProducer
+  xyzwh 1818 1541.2 2010 11 141
+  overlappingdurationcanvas 163458
+    xyzwh 1824 1562.8 2020 11 58
+  end
+end
+durationcanvas 163842 classinstance_ref 154754 // :FramebufferSurface
+  xyzwh 841 1646.6 2010 11 25
+end
+durationcanvas 164098 classinstance_ref 135042 // :ANativeWindow
+  xyzwh 1552 1785 2010 11 25
+end
+lostfoundmsgsupport 154242 xyz 186.7 177 2015
+lostfoundmsgsupport 158594 xyz 236.1 942 2015
+lostfoundmsgsupport 161410 xyz 149.6 1410 2015
+msg 154370 found_synchronous
+  from lostfoundmsgsupport_ref 154242
+  to durationcanvas_ref 154114
+  yz 175 2015 explicitmsg "init()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 216 161
+msg 154626 synchronous
+  from durationcanvas_ref 154114
+  to durationcanvas_ref 154498
+  yz 198 2015 explicitmsg "A1. BufferQueue::createBufferQueue(&producer, &consumer, new GraphicBufferAlloc())"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 461 183
+msg 155266 synchronous
+  from durationcanvas_ref 154882
+  to durationcanvas_ref 155138
+  yz 297 2020 explicitmsg "C1. mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_FB ...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 849 275
+msg 155906 synchronous
+  from durationcanvas_ref 154114
+  to durationcanvas_ref 154882
+  yz 293 2025 explicitmsg "A2. fbs = new FramebufferSurface(*mHwc, i, consumer);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 459 278
+msg 156290 synchronous
+  from durationcanvas_ref 154114
+  to durationcanvas_ref 156162
+  yz 417 2015 explicitmsg "A3. hw = new DisplayDevice(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 468 395
+msg 156546 synchronous
+  from durationcanvas_ref 156162
+  to durationcanvas_ref 156418
+  yz 438 2015 explicitmsg "B1. mNativeWindow = new Surface(producer, false);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 572 420
+msg 156802 synchronous
+  from durationcanvas_ref 156162
+  to durationcanvas_ref 156674
+  yz 628 2015 explicitmsg "B2. ANativeWindow* const window = mNativeWindow.get();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 563 616
+msg 157186 synchronous
+  from durationcanvas_ref 156162
+  to durationcanvas_ref 157058
+  yz 692 2015 explicitmsg "B3. surface = eglCreateWindowSurface(display, config, window, NULL);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 559 676
+reflexivemsg 157442 synchronous
+  to durationcanvas_ref 157314
+  yz 731 2025 explicitmsg "B4. mSurface = surface;"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 567 720
+reflexivemsg 157698 synchronous
+  to durationcanvas_ref 157570
+  yz 719 2025 explicitmsg "C1. createWindowSurface"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1233 700
+msg 158082 synchronous
+  from durationcanvas_ref 157570
+  to durationcanvas_ref 157954
+  yz 752 2025 explicitmsg "D1. surface = new egl_window_surface_v2_t(dpy, config, depthFormat, static_cast<ANativeWindow*>(window));"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1236 736
+reflexivemsg 158338 synchronous
+  to durationcanvas_ref 158210
+  yz 785 2035 explicitmsg "D2. return surface;"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1243 770
+msg 158722 found_synchronous
+  from lostfoundmsgsupport_ref 158594
+  to durationcanvas_ref 158466
+  yz 940 2015 explicitmsg "eglMakeCurrent(  EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 59 921
+reflexivemsg 158978 synchronous
+  to durationcanvas_ref 158850
+  yz 968 2025 explicitmsg "A1. egl_surface_t* d = (egl_surface_t*)draw;"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1247 946
+msg 159234 synchronous
+  from durationcanvas_ref 158466
+  to durationcanvas_ref 159106
+  yz 1055 2015 explicitmsg "A2. d->connect()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1249 1040
+msg 159618 synchronous
+  from durationcanvas_ref 159106
+  to durationcanvas_ref 159490
+  yz 1048 2015 explicitmsg "B1. nativeWindow->dequeueBuffer(nativeWindow, &buffer, &fenceFd)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1389 1030
+msg 159874 synchronous
+  from durationcanvas_ref 159490
+  to durationcanvas_ref 159746
+  yz 1070 2015 explicitmsg "C1. hook_dequeueBuffer"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1571 1053
+reflexivemsg 160130 synchronous
+  to durationcanvas_ref 160002
+  yz 1091 2025 explicitmsg "D1. c->dequeueBuffer(buffer, fenceFd)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1678 1074
+msg 160514 synchronous
+  from durationcanvas_ref 160002
+  to durationcanvas_ref 160386
+  yz 1136 2025 explicitmsg "E1. mGraphicBufferProducer->dequeueBuffer"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1680 1121
+reflexivemsg 160770 synchronous
+  to durationcanvas_ref 160642
+  yz 1155 2025 explicitmsg "F1. usage |= mCore->mConsumerUsageBits;"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1832 1139
+msg 161154 synchronous
+  from durationcanvas_ref 160386
+  to durationcanvas_ref 161026
+  yz 1209 2015 explicitmsg "F2. graphicBuffer(mCore->mAllocator->createGraphicBuffer(width, height, format, usage, &error))"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1827 1191
+msg 161538 found_synchronous
+  from lostfoundmsgsupport_ref 161410
+  to durationcanvas_ref 161282
+  yz 1408 2015 explicitmsg "swapBuffers(HWComposer& hwc)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 176 1388
+msg 161794 synchronous
+  from durationcanvas_ref 161282
+  to durationcanvas_ref 161666
+  yz 1421 2015 explicitmsg "A1. eglSwapBuffers(mDisplay, mSurface)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 576 1406
+msg 162050 synchronous
+  from durationcanvas_ref 161666
+  to durationcanvas_ref 161922
+  yz 1436 2015 explicitmsg "B1. d->swapBuffers();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1246 1421
+msg 162306 synchronous
+  from durationcanvas_ref 161922
+  to durationcanvas_ref 162178
+  yz 1458 2020 explicitmsg "C1. nativeWindow->queueBuffer(nativeWindow, buffer, -1);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1390 1441
+msg 162562 synchronous
+  from durationcanvas_ref 162178
+  to durationcanvas_ref 162434
+  yz 1481 2015 explicitmsg "D1. hook_queueBuffer"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1575 1465
+reflexivemsg 163074 synchronous
+  to durationcanvas_ref 162946
+  yz 1507 2025 explicitmsg "E1. c->queueBuffer(buffer, fenceFd);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1675 1489
+msg 163330 synchronous
+  from durationcanvas_ref 162946
+  to durationcanvas_ref 163202
+  yz 1543 2025 explicitmsg "F1. mGraphicBufferProducer->queueBuffer(i, input, &output);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1680 1530
+reflexivemsg 163586 synchronous
+  to durationcanvas_ref 163458
+  yz 1562 2025 explicitmsg "G1. //"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1843 1548
+msg 163970 synchronous
+  from durationcanvas_ref 163202
+  to durationcanvas_ref 163842
+  yz 1647 2015 explicitmsg "G2. listener->onFrameAvailable();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1734 1635
+msg 164226 synchronous
+  from durationcanvas_ref 161922
+  to durationcanvas_ref 164098
+  yz 1784 2015 explicitmsg "C2. nativeWindow->dequeueBuffer(nativeWindow, &buffer, &fenceFd)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1389 1766
+end

@@ -1,0 +1,26 @@
+class DecelerateInterpolator
+!!!1123330.java!!!	DecelerateInterpolator(in factor : float)
+        mFactor = factor;
+!!!1123458.java!!!	DecelerateInterpolator(inout context : Context, inout attrs : AttributeSet)
+        this(context.getResources(), context.getTheme(), attrs);
+!!!1123586.java!!!	DecelerateInterpolator(inout res : Resources, inout theme : Theme, inout attrs : AttributeSet)
+        TypedArray a;
+        if (theme != null) {
+            a = theme.obtainStyledAttributes(attrs, R.styleable.DecelerateInterpolator, 0, 0);
+        } else {
+            a = res.obtainAttributes(attrs, R.styleable.DecelerateInterpolator);
+        }
+
+        mFactor = a.getFloat(R.styleable.DecelerateInterpolator_factor, 1.0f);
+
+        a.recycle();
+!!!1123714.java!!!	getInterpolation(in input : float) : float
+        float result;
+        if (mFactor == 1.0f) {
+            result = (float)(1.0f - (1.0f - input) * (1.0f - input));
+        } else {
+            result = (float)(1.0f - Math.pow((1.0f - input), 2 * mFactor));
+        }
+        return result;
+!!!1123842.java!!!	createNativeInterpolator() : long
+        return NativeInterpolatorFactoryHelper.createDecelerateInterpolator(mFactor);

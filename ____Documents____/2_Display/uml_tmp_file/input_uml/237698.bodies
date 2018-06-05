@@ -1,0 +1,11 @@
+class HighContrastTextManager
+!!!986882.java!!!	HighContrastTextManager()
+            mAttachInfo.mHighContrastText = mAccessibilityManager.isHighTextContrastEnabled();
+!!!987010.java!!!	onHighTextContrastStateChanged(inout enabled : boolean) : void
+            mAttachInfo.mHighContrastText = enabled;
+
+            // Destroy Displaylists so they can be recreated with high contrast recordings
+            destroyHardwareResources();
+
+            // Schedule redraw, which will rerecord + redraw all text
+            invalidate();

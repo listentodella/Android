@@ -1,0 +1,666 @@
+class PopupWindow
+!!!2022402.java!!!	PopupWindow(inout context : Context)
+        this(context, null);
+!!!2022530.java!!!	PopupWindow(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, com.android.internal.R.attr.popupWindowStyle);
+!!!2022658.java!!!	PopupWindow(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2022786.java!!!	PopupWindow(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        mContext = context;
+        mWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, com.android.internal.R.styleable.PopupWindow, defStyleAttr, defStyleRes);
+
+        mBackground = a.getDrawable(R.styleable.PopupWindow_popupBackground);
+        mElevation = a.getDimension(R.styleable.PopupWindow_popupElevation, 0);
+        mOverlapAnchor = a.getBoolean(R.styleable.PopupWindow_overlapAnchor, false);
+
+        final int animStyle = a.getResourceId(R.styleable.PopupWindow_popupAnimationStyle, -1);
+        mAnimationStyle = animStyle == com.android.internal.R.style.Animation_PopupWindow ? -1 :
+                animStyle;
+
+        // If this is a StateListDrawable, try to find and store the drawable to be
+        // used when the drop-down is placed above its anchor view, and the one to be
+        // used when the drop-down is placed below its anchor view. We extract
+        // the drawables ourselves to work around a problem with using refreshDrawableState
+        // that it will take into account the padding of all drawables specified in a
+        // StateListDrawable, thus adding superfluous padding to drop-down views.
+        //
+        // We assume a StateListDrawable will have a drawable for ABOVE_ANCHOR_STATE_SET and
+        // at least one other drawable, intended for the 'below-anchor state'.
+        if (mBackground instanceof StateListDrawable) {
+            StateListDrawable background = (StateListDrawable) mBackground;
+
+            // Find the above-anchor view - this one's easy, it should be labeled as such.
+            int aboveAnchorStateIndex = background.getStateDrawableIndex(ABOVE_ANCHOR_STATE_SET);
+            
+            // Now, for the below-anchor view, look for any other drawable specified in the
+            // StateListDrawable which is not for the above-anchor state and use that.
+            int count = background.getStateCount();
+            int belowAnchorStateIndex = -1;
+            for (int i = 0; i < count; i++) {
+                if (i != aboveAnchorStateIndex) {
+                    belowAnchorStateIndex = i;
+                    break;
+                }
+            }
+            
+            // Store the drawables we found, if we found them. Otherwise, set them both
+            // to null so that we'll just use refreshDrawableState.
+            if (aboveAnchorStateIndex != -1 && belowAnchorStateIndex != -1) {
+                mAboveAnchorBackgroundDrawable = background.getStateDrawable(aboveAnchorStateIndex);
+                mBelowAnchorBackgroundDrawable = background.getStateDrawable(belowAnchorStateIndex);
+            } else {
+                mBelowAnchorBackgroundDrawable = null;
+                mAboveAnchorBackgroundDrawable = null;
+            }
+        }
+        
+        a.recycle();
+!!!2022914.java!!!	PopupWindow()
+        this(null, 0, 0);
+!!!2023042.java!!!	PopupWindow(inout contentView : View)
+        this(contentView, 0, 0);
+!!!2023170.java!!!	PopupWindow(in width : int, in height : int)
+        this(null, width, height);
+!!!2023298.java!!!	PopupWindow(inout contentView : View, in width : int, in height : int)
+        this(contentView, width, height, false);
+!!!2023426.java!!!	PopupWindow(inout contentView : View, in width : int, in height : int, inout focusable : boolean)
+        if (contentView != null) {
+            mContext = contentView.getContext();
+            mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        }
+        setContentView(contentView);
+        setWidth(width);
+        setHeight(height);
+        setFocusable(focusable);
+!!!2023554.java!!!	getBackground() : Drawable
+        return mBackground;
+!!!2023682.java!!!	setBackgroundDrawable(inout background : Drawable) : void
+        mBackground = background;
+!!!2023810.java!!!	getElevation() : float
+        return mElevation;
+!!!2023938.java!!!	setElevation(in elevation : float) : void
+        mElevation = elevation;
+!!!2024066.java!!!	getAnimationStyle() : int
+        return mAnimationStyle;
+!!!2024194.java!!!	setIgnoreCheekPress() : void
+        mIgnoreCheekPress = true;
+!!!2024322.java!!!	setAnimationStyle(in animationStyle : int) : void
+        mAnimationStyle = animationStyle;
+!!!2024450.java!!!	getContentView() : View
+        return mContentView;
+!!!2024578.java!!!	setContentView(inout contentView : View) : void
+        if (isShowing()) {
+            return;
+        }
+
+        mContentView = contentView;
+
+        if (mContext == null && mContentView != null) {
+            mContext = mContentView.getContext();
+        }
+
+        if (mWindowManager == null && mContentView != null) {
+            mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        }
+!!!2024706.java!!!	setTouchInterceptor(inout l : View::OnTouchListener) : void
+        mTouchInterceptor = l;
+!!!2024834.java!!!	isFocusable() : boolean
+        return mFocusable;
+!!!2024962.java!!!	setFocusable(inout focusable : boolean) : void
+        mFocusable = focusable;
+!!!2025090.java!!!	getInputMethodMode() : int
+        return mInputMethodMode;
+        
+!!!2025218.java!!!	setInputMethodMode(in mode : int) : void
+        mInputMethodMode = mode;
+!!!2025346.java!!!	setSoftInputMode(in mode : int) : void
+        mSoftInputMode = mode;
+!!!2025474.java!!!	getSoftInputMode() : int
+        return mSoftInputMode;
+!!!2025602.java!!!	isTouchable() : boolean
+        return mTouchable;
+!!!2025730.java!!!	setTouchable(inout touchable : boolean) : void
+        mTouchable = touchable;
+!!!2025858.java!!!	isOutsideTouchable() : boolean
+        return mOutsideTouchable;
+!!!2025986.java!!!	setOutsideTouchable(inout touchable : boolean) : void
+        mOutsideTouchable = touchable;
+!!!2026114.java!!!	isClippingEnabled() : boolean
+        return mClippingEnabled;
+!!!2026242.java!!!	setClippingEnabled(inout enabled : boolean) : void
+        mClippingEnabled = enabled;
+!!!2026370.java!!!	setClipToScreenEnabled(inout enabled : boolean) : void
+        mClipToScreen = enabled;
+        setClippingEnabled(!enabled);
+!!!2026498.java!!!	setAllowScrollingAnchorParent(inout enabled : boolean) : void
+        mAllowScrollingAnchorParent = enabled;
+!!!2026626.java!!!	isSplitTouchEnabled() : boolean
+        if (mSplitTouchEnabled < 0 && mContext != null) {
+            return mContext.getApplicationInfo().targetSdkVersion >= Build.VERSION_CODES.HONEYCOMB;
+        }
+        return mSplitTouchEnabled == 1;
+!!!2026754.java!!!	setSplitTouchEnabled(inout enabled : boolean) : void
+        mSplitTouchEnabled = enabled ? 1 : 0;
+!!!2026882.java!!!	isLayoutInScreenEnabled() : boolean
+        return mLayoutInScreen;
+!!!2027010.java!!!	setLayoutInScreenEnabled(inout enabled : boolean) : void
+        mLayoutInScreen = enabled;
+!!!2027138.java!!!	setLayoutInsetDecor(inout enabled : boolean) : void
+        mLayoutInsetDecor = enabled;
+!!!2027266.java!!!	setWindowLayoutType(in layoutType : int) : void
+        mWindowLayoutType = layoutType;
+!!!2027394.java!!!	getWindowLayoutType() : int
+        return mWindowLayoutType;
+!!!2027522.java!!!	setTouchModal(inout touchModal : boolean) : void
+        mNotTouchModal = !touchModal;
+!!!2027650.java!!!	setWindowLayoutMode(in widthSpec : int, in heightSpec : int) : void
+        mWidthMode = widthSpec;
+        mHeightMode = heightSpec;
+!!!2027778.java!!!	getHeight() : int
+        return mHeight;
+!!!2027906.java!!!	setHeight(in height : int) : void
+        mHeight = height;
+!!!2028034.java!!!	getWidth() : int
+        return mWidth;
+!!!2028162.java!!!	setWidth(in width : int) : void
+        mWidth = width;
+!!!2028290.java!!!	isShowing() : boolean
+        return mIsShowing;
+!!!2028418.java!!!	showAtLocation(inout parent : View, in gravity : int, in x : int, in y : int) : void
+        showAtLocation(parent.getWindowToken(), gravity, x, y);
+!!!2028546.java!!!	showAtLocation(inout token : IBinder, in gravity : int, in x : int, in y : int) : void
+        if (isShowing() || mContentView == null) {
+            return;
+        }
+
+        unregisterForScrollChanged();
+
+        mIsShowing = true;
+        mIsDropdown = false;
+
+        WindowManager.LayoutParams p = createPopupLayout(token);
+        p.windowAnimations = computeAnimationResource();
+       
+        preparePopup(p);
+        if (gravity == Gravity.NO_GRAVITY) {
+            gravity = Gravity.TOP | Gravity.START;
+        }
+        p.gravity = gravity;
+        p.x = x;
+        p.y = y;
+        if (mHeightMode < 0) p.height = mLastHeight = mHeightMode;
+        if (mWidthMode < 0) p.width = mLastWidth = mWidthMode;
+        invokePopup(p);
+!!!2028674.java!!!	showAsDropDown(inout anchor : View) : void
+        showAsDropDown(anchor, 0, 0);
+!!!2028802.java!!!	showAsDropDown(inout anchor : View, in xoff : int, in yoff : int) : void
+        showAsDropDown(anchor, xoff, yoff, DEFAULT_ANCHORED_GRAVITY);
+!!!2028930.java!!!	showAsDropDown(inout anchor : View, in xoff : int, in yoff : int, in gravity : int) : void
+        if (isShowing() || mContentView == null) {
+            return;
+        }
+
+        registerForScrollChanged(anchor, xoff, yoff, gravity);
+
+        mIsShowing = true;
+        mIsDropdown = true;
+
+        WindowManager.LayoutParams p = createPopupLayout(anchor.getWindowToken());
+        preparePopup(p);
+
+        updateAboveAnchor(findDropDownPosition(anchor, p, xoff, yoff, gravity));
+
+        if (mHeightMode < 0) p.height = mLastHeight = mHeightMode;
+        if (mWidthMode < 0) p.width = mLastWidth = mWidthMode;
+
+        p.windowAnimations = computeAnimationResource();
+
+        invokePopup(p);
+!!!2029058.java!!!	updateAboveAnchor(inout aboveAnchor : boolean) : void
+        if (aboveAnchor != mAboveAnchor) {
+            mAboveAnchor = aboveAnchor;
+
+            if (mBackground != null) {
+                // If the background drawable provided was a StateListDrawable with above-anchor
+                // and below-anchor states, use those. Otherwise rely on refreshDrawableState to
+                // do the job.
+                if (mAboveAnchorBackgroundDrawable != null) {
+                    if (mAboveAnchor) {
+                        mPopupView.setBackground(mAboveAnchorBackgroundDrawable);
+                    } else {
+                        mPopupView.setBackground(mBelowAnchorBackgroundDrawable);
+                    }
+                } else {
+                    mPopupView.refreshDrawableState();
+                }
+            }
+        }
+!!!2029186.java!!!	isAboveAnchor() : boolean
+        return mAboveAnchor;
+!!!2029314.java!!!	preparePopup(inout p : WindowManager::LayoutParams) : void
+        if (mContentView == null || mContext == null || mWindowManager == null) {
+            throw new IllegalStateException("You must specify a valid content view by "
+                    + "calling setContentView() before attempting to show the popup.");
+        }
+
+        if (mBackground != null) {
+            final ViewGroup.LayoutParams layoutParams = mContentView.getLayoutParams();
+            int height = ViewGroup.LayoutParams.MATCH_PARENT;
+            if (layoutParams != null &&
+                    layoutParams.height == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            }
+
+            // when a background is available, we embed the content view
+            // within another view that owns the background drawable
+            PopupViewContainer popupViewContainer = new PopupViewContainer(mContext);
+            PopupViewContainer.LayoutParams listParams = new PopupViewContainer.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, height
+            );
+            popupViewContainer.setBackground(mBackground);
+            popupViewContainer.addView(mContentView, listParams);
+
+            mPopupView = popupViewContainer;
+        } else {
+            mPopupView = mContentView;
+        }
+
+        mPopupView.setElevation(mElevation);
+        mPopupViewInitialLayoutDirectionInherited =
+                (mPopupView.getRawLayoutDirection() == View.LAYOUT_DIRECTION_INHERIT);
+        mPopupWidth = p.width;
+        mPopupHeight = p.height;
+!!!2029442.java!!!	invokePopup(inout p : WindowManager::LayoutParams) : void
+        if (mContext != null) {
+            p.packageName = mContext.getPackageName();
+        }
+        mPopupView.setFitsSystemWindows(mLayoutInsetDecor);
+        setLayoutDirectionFromAnchor();
+        mWindowManager.addView(mPopupView, p);
+!!!2029570.java!!!	setLayoutDirectionFromAnchor() : void
+        if (mAnchor != null) {
+            View anchor = mAnchor.get();
+            if (anchor != null && mPopupViewInitialLayoutDirectionInherited) {
+                mPopupView.setLayoutDirection(anchor.getLayoutDirection());
+            }
+        }
+!!!2029698.java!!!	createPopupLayout(inout token : IBinder) : WindowManager::LayoutParams
+        // generates the layout parameters for the drop down
+        // we want a fixed size view located at the bottom left of the anchor
+        WindowManager.LayoutParams p = new WindowManager.LayoutParams();
+        // these gravity settings put the view at the top left corner of the
+        // screen. The view is then positioned to the appropriate location
+        // by setting the x and y offsets to match the anchor's bottom
+        // left corner
+        p.gravity = Gravity.START | Gravity.TOP;
+        p.width = mLastWidth = mWidth;
+        p.height = mLastHeight = mHeight;
+        if (mBackground != null) {
+            p.format = mBackground.getOpacity();
+        } else {
+            p.format = PixelFormat.TRANSLUCENT;
+        }
+        p.flags = computeFlags(p.flags);
+        p.type = mWindowLayoutType;
+        p.token = token;
+        p.softInputMode = mSoftInputMode;
+        p.setTitle("PopupWindow:" + Integer.toHexString(hashCode()));
+
+        return p;
+!!!2029826.java!!!	computeFlags(in curFlags : int) : int
+        curFlags &= ~(
+                WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES |
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE |
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH |
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
+                WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM |
+                WindowManager.LayoutParams.FLAG_SPLIT_TOUCH);
+        if(mIgnoreCheekPress) {
+            curFlags |= WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES;
+        }
+        if (!mFocusable) {
+            curFlags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+            if (mInputMethodMode == INPUT_METHOD_NEEDED) {
+                curFlags |= WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
+            }
+        } else if (mInputMethodMode == INPUT_METHOD_NOT_NEEDED) {
+            curFlags |= WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
+        }
+        if (!mTouchable) {
+            curFlags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        }
+        if (mOutsideTouchable) {
+            curFlags |= WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+        }
+        if (!mClippingEnabled) {
+            curFlags |= WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+        }
+        if (isSplitTouchEnabled()) {
+            curFlags |= WindowManager.LayoutParams.FLAG_SPLIT_TOUCH;
+        }
+        if (mLayoutInScreen) {
+            curFlags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        }
+        if (mLayoutInsetDecor) {
+            curFlags |= WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR;
+        }
+        if (mNotTouchModal) {
+            curFlags |= WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        }
+        return curFlags;
+!!!2029954.java!!!	computeAnimationResource() : int
+        if (mAnimationStyle == -1) {
+            if (mIsDropdown) {
+                return mAboveAnchor
+                        ? com.android.internal.R.style.Animation_DropDownUp
+                        : com.android.internal.R.style.Animation_DropDownDown;
+            }
+            return 0;
+        }
+        return mAnimationStyle;
+!!!2030082.java!!!	findDropDownPosition(inout anchor : View, inout p : WindowManager::LayoutParams, in xoff : int, in yoff : int, in gravity : int) : boolean
+        final int anchorHeight = anchor.getHeight();
+        final int anchorWidth = anchor.getWidth();
+        if (mOverlapAnchor) {
+            yoff -= anchorHeight;
+        }
+
+        anchor.getLocationInWindow(mDrawingLocation);
+        p.x = mDrawingLocation[0] + xoff;
+        p.y = mDrawingLocation[1] + anchorHeight + yoff;
+
+        final int hgrav = Gravity.getAbsoluteGravity(gravity, anchor.getLayoutDirection())
+                & Gravity.HORIZONTAL_GRAVITY_MASK;
+        if (hgrav == Gravity.RIGHT) {
+            // Flip the location to align the right sides of the popup and
+            // anchor instead of left.
+            p.x -= mPopupWidth - anchorWidth;
+        }
+
+        boolean onTop = false;
+
+        p.gravity = Gravity.LEFT | Gravity.TOP;
+
+        anchor.getLocationOnScreen(mScreenLocation);
+        final Rect displayFrame = new Rect();
+        anchor.getWindowVisibleDisplayFrame(displayFrame);
+
+        final int screenY = mScreenLocation[1] + anchorHeight + yoff;
+        final View root = anchor.getRootView();
+        if (screenY + mPopupHeight > displayFrame.bottom
+                || p.x + mPopupWidth - root.getWidth() > 0) {
+            // If the drop down disappears at the bottom of the screen, we try
+            // to scroll a parent scrollview or move the drop down back up on
+            // top of the edit box.
+            if (mAllowScrollingAnchorParent) {
+                final int scrollX = anchor.getScrollX();
+                final int scrollY = anchor.getScrollY();
+                final Rect r = new Rect(scrollX, scrollY, scrollX + mPopupWidth + xoff,
+                        scrollY + mPopupHeight + anchorHeight + yoff);
+                anchor.requestRectangleOnScreen(r, true);
+            }
+
+            // Now we re-evaluate the space available, and decide from that
+            // whether the pop-up will go above or below the anchor.
+            anchor.getLocationInWindow(mDrawingLocation);
+            p.x = mDrawingLocation[0] + xoff;
+            p.y = mDrawingLocation[1] + anchorHeight + yoff;
+
+            // Preserve the gravity adjustment.
+            if (hgrav == Gravity.RIGHT) {
+                p.x -= mPopupWidth - anchorWidth;
+            }
+
+            // Determine whether there is more space above or below the anchor.
+            anchor.getLocationOnScreen(mScreenLocation);
+            onTop = (displayFrame.bottom - mScreenLocation[1] - anchorHeight - yoff) <
+                    (mScreenLocation[1] - yoff - displayFrame.top);
+            if (onTop) {
+                p.gravity = Gravity.LEFT | Gravity.BOTTOM;
+                p.y = root.getHeight() - mDrawingLocation[1] + yoff;
+            } else {
+                p.y = mDrawingLocation[1] + anchorHeight + yoff;
+            }
+        }
+
+        if (mClipToScreen) {
+            final int displayFrameWidth = displayFrame.right - displayFrame.left;
+            final int right = p.x + p.width;
+            if (right > displayFrameWidth) {
+                p.x -= right - displayFrameWidth;
+            }
+
+            if (p.x < displayFrame.left) {
+                p.x = displayFrame.left;
+                p.width = Math.min(p.width, displayFrameWidth);
+            }
+
+            if (onTop) {
+                final int popupTop = mScreenLocation[1] + yoff - mPopupHeight;
+                if (popupTop < 0) {
+                    p.y += popupTop;
+                }
+            } else {
+                p.y = Math.max(p.y, displayFrame.top);
+            }
+        }
+
+        p.gravity |= Gravity.DISPLAY_CLIP_VERTICAL;
+
+        // Compute the position of the anchor relative to the popup.
+        mAnchorRelativeX = mDrawingLocation[0] - p.x + anchorHeight / 2;
+        mAnchorRelativeY = mDrawingLocation[1] - p.y + anchorWidth / 2;
+
+        return onTop;
+!!!2030210.java!!!	getMaxAvailableHeight(inout anchor : View) : int
+        return getMaxAvailableHeight(anchor, 0);
+!!!2030338.java!!!	getMaxAvailableHeight(inout anchor : View, in yOffset : int) : int
+        return getMaxAvailableHeight(anchor, yOffset, false);
+!!!2030466.java!!!	getMaxAvailableHeight(inout anchor : View, in yOffset : int, inout ignoreBottomDecorations : boolean) : int
+        final Rect displayFrame = new Rect();
+        anchor.getWindowVisibleDisplayFrame(displayFrame);
+
+        final int[] anchorPos = mDrawingLocation;
+        anchor.getLocationOnScreen(anchorPos);
+        
+        int bottomEdge = displayFrame.bottom;
+        if (ignoreBottomDecorations) {
+            Resources res = anchor.getContext().getResources();
+            bottomEdge = res.getDisplayMetrics().heightPixels;
+        }
+        final int distanceToBottom = bottomEdge - (anchorPos[1] + anchor.getHeight()) - yOffset;
+        final int distanceToTop = anchorPos[1] - displayFrame.top + yOffset;
+
+        // anchorPos[1] is distance from anchor to top of screen
+        int returnedHeight = Math.max(distanceToBottom, distanceToTop);
+        if (mBackground != null) {
+            mBackground.getPadding(mTempRect);
+            returnedHeight -= mTempRect.top + mTempRect.bottom; 
+        }
+        
+        return returnedHeight;
+!!!2030594.java!!!	dismiss() : void
+        if (isShowing() && mPopupView != null) {
+            mIsShowing = false;
+
+            unregisterForScrollChanged();
+
+            try {
+                mWindowManager.removeViewImmediate(mPopupView);
+            } finally {
+                if (mPopupView != mContentView && mPopupView instanceof ViewGroup) {
+                    ((ViewGroup) mPopupView).removeView(mContentView);
+                }
+                mPopupView = null;
+
+                if (mOnDismissListener != null) {
+                    mOnDismissListener.onDismiss();
+                }
+            }
+        }
+!!!2030722.java!!!	setOnDismissListener(inout onDismissListener : PopupWindow::OnDismissListener) : void
+        mOnDismissListener = onDismissListener;
+!!!2030850.java!!!	update() : void
+        if (!isShowing() || mContentView == null) {
+            return;
+        }
+        
+        WindowManager.LayoutParams p = (WindowManager.LayoutParams)
+                mPopupView.getLayoutParams();
+        
+        boolean update = false;
+        
+        final int newAnim = computeAnimationResource();
+        if (newAnim != p.windowAnimations) {
+            p.windowAnimations = newAnim;
+            update = true;
+        }
+
+        final int newFlags = computeFlags(p.flags);
+        if (newFlags != p.flags) {
+            p.flags = newFlags;
+            update = true;
+        }
+
+        if (update) {
+            setLayoutDirectionFromAnchor();
+            mWindowManager.updateViewLayout(mPopupView, p);
+        }
+!!!2030978.java!!!	update(in width : int, in height : int) : void
+        WindowManager.LayoutParams p = (WindowManager.LayoutParams)
+                mPopupView.getLayoutParams();
+        update(p.x, p.y, width, height, false);
+!!!2031106.java!!!	update(in x : int, in y : int, in width : int, in height : int) : void
+        update(x, y, width, height, false);
+!!!2031234.java!!!	update(in x : int, in y : int, in width : int, in height : int, inout force : boolean) : void
+        if (width != -1) {
+            mLastWidth = width;
+            setWidth(width);
+        }
+
+        if (height != -1) {
+            mLastHeight = height;
+            setHeight(height);
+        }
+
+        if (!isShowing() || mContentView == null) {
+            return;
+        }
+
+        WindowManager.LayoutParams p = (WindowManager.LayoutParams) mPopupView.getLayoutParams();
+
+        boolean update = force;
+
+        final int finalWidth = mWidthMode < 0 ? mWidthMode : mLastWidth;
+        if (width != -1 && p.width != finalWidth) {
+            p.width = mLastWidth = finalWidth;
+            update = true;
+        }
+
+        final int finalHeight = mHeightMode < 0 ? mHeightMode : mLastHeight;
+        if (height != -1 && p.height != finalHeight) {
+            p.height = mLastHeight = finalHeight;
+            update = true;
+        }
+
+        if (p.x != x) {
+            p.x = x;
+            update = true;
+        }
+
+        if (p.y != y) {
+            p.y = y;
+            update = true;
+        }
+
+        final int newAnim = computeAnimationResource();
+        if (newAnim != p.windowAnimations) {
+            p.windowAnimations = newAnim;
+            update = true;
+        }
+
+        final int newFlags = computeFlags(p.flags);
+        if (newFlags != p.flags) {
+            p.flags = newFlags;
+            update = true;
+        }
+
+        if (update) {
+            setLayoutDirectionFromAnchor();
+            mWindowManager.updateViewLayout(mPopupView, p);
+        }
+!!!2031362.java!!!	update(inout anchor : View, in width : int, in height : int) : void
+        update(anchor, false, 0, 0, true, width, height, mAnchoredGravity);
+!!!2031490.java!!!	update(inout anchor : View, in xoff : int, in yoff : int, in width : int, in height : int) : void
+        update(anchor, true, xoff, yoff, true, width, height, mAnchoredGravity);
+!!!2031618.java!!!	update(inout anchor : View, inout updateLocation : boolean, in xoff : int, in yoff : int, inout updateDimension : boolean, in width : int, in height : int, in gravity : int) : void
+
+        if (!isShowing() || mContentView == null) {
+            return;
+        }
+
+        WeakReference<View> oldAnchor = mAnchor;
+        final boolean needsUpdate = updateLocation
+                && (mAnchorXoff != xoff || mAnchorYoff != yoff);
+        if (oldAnchor == null || oldAnchor.get() != anchor || (needsUpdate && !mIsDropdown)) {
+            registerForScrollChanged(anchor, xoff, yoff, gravity);
+        } else if (needsUpdate) {
+            // No need to register again if this is a DropDown, showAsDropDown already did.
+            mAnchorXoff = xoff;
+            mAnchorYoff = yoff;
+            mAnchoredGravity = gravity;
+        }
+
+        WindowManager.LayoutParams p = (WindowManager.LayoutParams) mPopupView.getLayoutParams();
+
+        if (updateDimension) {
+            if (width == -1) {
+                width = mPopupWidth;
+            } else {
+                mPopupWidth = width;
+            }
+            if (height == -1) {
+                height = mPopupHeight;
+            } else {
+                mPopupHeight = height;
+            }
+        }
+
+        int x = p.x;
+        int y = p.y;
+
+        if (updateLocation) {
+            updateAboveAnchor(findDropDownPosition(anchor, p, xoff, yoff, gravity));
+        } else {
+            updateAboveAnchor(findDropDownPosition(anchor, p, mAnchorXoff, mAnchorYoff,
+                    mAnchoredGravity));
+        }
+
+        update(p.x, p.y, width, height, x != p.x || y != p.y);
+!!!2031874.java!!!	unregisterForScrollChanged() : void
+        WeakReference<View> anchorRef = mAnchor;
+        View anchor = null;
+        if (anchorRef != null) {
+            anchor = anchorRef.get();
+        }
+        if (anchor != null) {
+            ViewTreeObserver vto = anchor.getViewTreeObserver();
+            vto.removeOnScrollChangedListener(mOnScrollChangedListener);
+        }
+        mAnchor = null;
+!!!2032002.java!!!	registerForScrollChanged(inout anchor : View, in xoff : int, in yoff : int, in gravity : int) : void
+        unregisterForScrollChanged();
+
+        mAnchor = new WeakReference<View>(anchor);
+        ViewTreeObserver vto = anchor.getViewTreeObserver();
+        if (vto != null) {
+            vto.addOnScrollChangedListener(mOnScrollChangedListener);
+        }
+
+        mAnchorXoff = xoff;
+        mAnchorYoff = yoff;
+        mAnchoredGravity = gravity;

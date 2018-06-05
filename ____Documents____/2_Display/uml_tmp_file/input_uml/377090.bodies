@@ -1,0 +1,40 @@
+class TextModifyOperation
+!!!2260226.java!!!	TextModifyOperation(inout owner : UndoOwner)
+            super(owner);
+!!!2260354.java!!!	TextModifyOperation(inout src : Parcel, inout loader : ClassLoader)
+            super(src, loader);
+            mRangeStart = src.readInt();
+            mRangeEnd = src.readInt();
+            mOldText = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(src);
+!!!2260610.java!!!	undo() : void
+            swapText();
+!!!2260738.java!!!	redo() : void
+            swapText();
+!!!2260866.java!!!	swapText() : void
+            // Both undo and redo involves swapping the contents of the range
+            // in the text view with our local text.
+            TextView tv = getOwnerData();
+            Editable editable = (Editable)tv.getText();
+            CharSequence curText;
+            if (mRangeStart >= mRangeEnd) {
+                curText = null;
+            } else {
+                curText = editable.subSequence(mRangeStart, mRangeEnd);
+            }
+            if (DEBUG_UNDO) {
+                Log.d(TAG, "Swap: range=(" + mRangeStart + "-" + mRangeEnd
+                        + "), oldText=" + mOldText);
+                Log.d(TAG, "Swap: curText=" + curText);
+            }
+            if (mOldText == null) {
+                editable.delete(mRangeStart, mRangeEnd);
+                mRangeEnd = mRangeStart;
+            } else {
+                editable.replace(mRangeStart, mRangeEnd, mOldText);
+                mRangeEnd = mRangeStart + mOldText.length();
+            }
+            mOldText = curText;
+!!!2260994.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            dest.writeInt(mRangeStart);
+            dest.writeInt(mRangeEnd);
+            TextUtils.writeToParcel(mOldText, dest, flags);

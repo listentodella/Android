@@ -1,0 +1,894 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Bouml (http://bouml.free.fr/) -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="3237" height="2855" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="1846,215 2038,215 2038,225 2048,225 2048,251 1846,251 1846,215" />
+	<line stroke="black" stroke-opacity="1" x1="2038" y1="215" x2="2048" y2="225" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1856" y="240">android_view_InputChannel.cpp</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="1978,155 2106,155 2106,165 2116,165 2116,191 1978,191 1978,155" />
+	<line stroke="black" stroke-opacity="1" x1="2106" y1="155" x2="2116" y2="165" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1988" y="180">InputTransport.cpp</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="2225,162 2384,162 2384,172 2394,172 2394,211 2225,211 2225,162" />
+	<line stroke="black" stroke-opacity="1" x1="2384" y1="162" x2="2394" y2="172" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2235" y="187">com_android_server_input</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2235" y="202">_InputManagerService.cpp</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="2365,228 2524,228 2524,238 2534,238 2534,277 2365,277 2365,228" />
+	<line stroke="black" stroke-opacity="1" x1="2524" y1="228" x2="2534" y2="238" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2375" y="253">com_android_server_input</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2375" y="268">_InputManagerService.cpp</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="2541,165 2669,165 2669,175 2679,175 2679,201 2541,201 2541,165" />
+	<line stroke="black" stroke-opacity="1" x1="2669" y1="165" x2="2679" y2="175" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2551" y="190">InputDispatcher.cpp</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="2684,212 2812,212 2812,222 2822,222 2822,248 2684,248 2684,212" />
+	<line stroke="black" stroke-opacity="1" x1="2812" y1="212" x2="2822" y2="222" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2694" y="237">InputDispatcher.cpp</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="2618,845 3088,845 3088,855 3098,855 3098,912 2618,912 2618,845" />
+	<line stroke="black" stroke-opacity="1" x1="3088" y1="845" x2="3098" y2="855" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2628" y="870">int fd = inputChannel-&gt;getFd();</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2628" y="885">mConnectionsByFd.add(fd, connection);</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2628" y="900">mLooper-&gt;addFd(fd, 0, ALOOPER_EVENT_INPUT, handleReceiveCallback, this);</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="1163,1031 1624,1031 1624,1041 1634,1041 1634,1136 1163,1136 1163,1031" />
+	<line stroke="black" stroke-opacity="1" x1="1624" y1="1031" x2="1634" y2="1041" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1173" y="1056">int rawFd = parcel-&gt;readFileDescriptor();</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1173" y="1071">int dupFd = dup(rawFd);</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1173" y="1086">InputChannel* inputChannel = new InputChannel(name, dupFd);</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1173" y="1101">NativeInputChannel* nativeInputChannel = new</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1173" y="1116">NativeInputChannel(inputChannel);</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1173" y="1131">android_view_InputChannel_setNativeInputChannel(env, obj, nativeInputChannel);</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="1749,282 1975,282 1975,292 1985,292 1985,318 1749,318 1749,282" />
+	<line stroke="black" stroke-opacity="1" x1="1975" y1="282" x2="1985" y2="292" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1759" y="307">android_view_InputEventReceiver.cpp</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="2125,300 2344,300 2344,310 2354,310 2354,333 2125,333 2125,300" />
+	<line stroke="black" stroke-opacity="1" x1="2344" y1="300" x2="2354" y2="310" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2135" y="325">android_view_InputEventReceiver.cpp</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="2498,61 2579,61 2579,71 2589,71 2589,94 2498,94 2498,61" />
+	<line stroke="black" stroke-opacity="1" x1="2579" y1="61" x2="2589" y2="71" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2508" y="86">Looper.cpp</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="2037,59 2165,59 2165,69 2175,69 2175,95 2037,95 2037,59" />
+	<line stroke="black" stroke-opacity="1" x1="2165" y1="59" x2="2175" y2="69" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2047" y="84">InputTransport.cpp</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="1638,2038 2024,2038 2024,2048 2034,2048 2034,2072 1638,2072 1638,2038" />
+	<line stroke="black" stroke-opacity="1" x1="2024" y1="2038" x2="2034" y2="2048" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1648" y="2063">nRead = ::recv(mFd, msg, sizeof(InputMessage), MSG_DONTWAIT)</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1343" y="134" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1291" y="152" width="55" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="1287" y="130" width="56" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="1315" y="147">:Session</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1647" y="131" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1567" y="149" width="83" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="1563" y="127" width="84" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="1605" y="144">:InputChannel</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1792" y="134" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1714" y="152" width="81" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="1710" y="130" width="82" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="1751" y="147">:WindowState</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1539" y="114" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1401" y="132" width="141" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="1397" y="110" width="142" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="1468" y="127">:WindowManagerService</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1961" y="114" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1920" y="132" width="44" height="3" />
+	<rect fill="#ff0000" stroke="black" stroke-width="1" stroke-opacity="1" x="1916" y="110" width="45" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="1939" y="127">:none</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2232" y="114" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2111" y="132" width="124" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="2107" y="110" width="125" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="2170" y="127">:InputManagerService</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2083" y="116" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2003" y="134" width="83" height="3" />
+	<rect fill="#ff0000" stroke="black" stroke-width="1" stroke-opacity="1" x="1999" y="112" width="84" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="2041" y="129">:InputChannel</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2323" y="118" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2282" y="136" width="44" height="3" />
+	<rect fill="#ff0000" stroke="black" stroke-width="1" stroke-opacity="1" x="2278" y="114" width="45" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="2301" y="131">:none2</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2517" y="118" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2402" y="136" width="118" height="3" />
+	<rect fill="#ff0000" stroke="black" stroke-width="1" stroke-opacity="1" x="2398" y="114" width="119" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="2458" y="131">:NativeInputManager</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2656" y="118" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2563" y="136" width="96" height="3" />
+	<rect fill="#ff0000" stroke="black" stroke-width="1" stroke-opacity="1" x="2559" y="114" width="97" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="2608" y="131">:InputDispatcher</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2837" y="121" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2675" y="139" width="165" height="3" />
+	<rect fill="#ff0000" stroke="black" stroke-width="1" stroke-opacity="1" x="2671" y="117" width="166" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="2754" y="134">:InputDispatcher::Connection</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1191" y="118" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="954" y="136" width="240" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="950" y="114" width="241" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="1071" y="131">:ViewRootImpl::WindowInputEventReceiver</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1739" y="104" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1628" y="122" width="114" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="1624" y="100" width="115" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="1682" y="117">:InputEventReceiver</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1881" y="104" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1840" y="122" width="44" height="3" />
+	<rect fill="#ff0000" stroke="black" stroke-width="1" stroke-opacity="1" x="1836" y="100" width="45" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="1859" y="117">:none3</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2312" y="57" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2167" y="75" width="148" height="3" />
+	<rect fill="#ff0000" stroke="black" stroke-width="1" stroke-opacity="1" x="2163" y="53" width="149" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="2238" y="70">:NativeInputEventReceiver</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2556" y="28" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2511" y="46" width="48" height="3" />
+	<rect fill="#ff0000" stroke="black" stroke-width="1" stroke-opacity="1" x="2507" y="24" width="49" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="2532" y="41">:Looper</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2157" y="25" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="2065" y="43" width="95" height="3" />
+	<rect fill="#ff0000" stroke="black" stroke-width="1" stroke-opacity="1" x="2061" y="21" width="96" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="2109" y="38">:InputConsumer</text>
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="247" y1="171" x2="247" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="543" y1="171" x2="543" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="690" y1="175" x2="690" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="860" y1="171" x2="860" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="990" y1="191" x2="990" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="1136" y1="199" x2="1136" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="1317" y1="171" x2="1317" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="1607" y1="168" x2="1607" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="1753" y1="171" x2="1753" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="1470" y1="151" x2="1470" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="1940" y1="151" x2="1940" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="2171" y1="151" x2="2171" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="2043" y1="153" x2="2043" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="2302" y1="155" x2="2302" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="2459" y1="155" x2="2459" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="2609" y1="155" x2="2609" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="2756" y1="158" x2="2756" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="1072" y1="155" x2="1072" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="1683" y1="141" x2="1683" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="1860" y1="141" x2="1860" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="2239" y1="94" x2="2239" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="2533" y1="65" x2="2533" y2="2855" />
+</g>
+<g>
+	<line stroke="black" stroke-dasharray="18,6"  stroke-opacity="1" x1="2111" y1="62" x2="2111" y2="2855" />
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="287" y="134" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="207" y="152" width="83" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="203" y="130" width="84" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="245" y="147">:ActivityThread</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="564" y="134" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="523" y="152" width="44" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="519" y="130" width="45" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="542" y="147">:Activity</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="751" y="138" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="629" y="156" width="125" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="625" y="134" width="126" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="688" y="151">:WindowManagerImpl</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="927" y="134" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="793" y="152" width="137" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="789" y="130" width="138" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="858" y="147">:WindowManagerGlobal</text>
+</g>
+<g>
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="1031" y="154" width="3" height="21" />
+	<rect fill="#808080" stroke="none" stroke-opacity="1" x="949" y="172" width="85" height="3" />
+	<rect fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" x="945" y="150" width="86" height="22" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-decoration="underline" text-anchor="middle" x="988" y="167">:ViewRootImpl</text>
+</g>
+<g>
+	<ellipse fill="#ffffc0" stroke="black" stroke-width="1" stroke-opacity="1" cx="1136" cy="168" rx="10" ry="10" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" text-anchor="middle" x="1137" y="193">:IWindowSession</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="2663,1301 3215,1301 3215,1311 3225,1311 3225,1526 2663,1526 2663,1301" />
+	<line stroke="black" stroke-opacity="1" x1="3215" y1="1301" x2="3225" y2="1311" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1326">Request request;</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1341">request.fd = fd;</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1356">request.ident = ident;</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1371">request.callback = callback;</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1386">request.data = data;</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1401"></text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1416">struct epoll_event eventItem;</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1431">memset(&amp; eventItem, 0, sizeof(epoll_event)); // zero out unused members of data field union</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1446">eventItem.events = epollEvents;</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1461">eventItem.data.fd = fd;</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1476"></text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1491">epoll_ctl(mEpollFd, EPOLL_CTL_ADD, fd, &amp; eventItem);</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2673" y="1506">mRequests.add(fd, request);</text>
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="1014,1568 1702,1568 1702,1578 1712,1578 1712,1770 1014,1770 1014,1568" />
+	<line stroke="black" stroke-opacity="1" x1="1702" y1="1568" x2="1712" y2="1578" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1593">// Set up the input pipeline.</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1608">CharSequence counterSuffix = attrs.getTitle();</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1623">mSyntheticInputStage = new SyntheticInputStage();</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1638">InputStage viewPostImeStage = new ViewPostImeInputStage(mSyntheticInputStage);</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1653">InputStage nativePostImeStage = new NativePostImeInputStage(viewPostImeStage, &quot;aq:native-post-ime:&quot; + counterSuffix);</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1668">InputStage earlyPostImeStage = new EarlyPostImeInputStage(nativePostImeStage);</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1683">InputStage imeStage = new ImeInputStage(earlyPostImeStage, &quot;aq:ime:&quot; + counterSuffix);</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1698">InputStage viewPreImeStage = new ViewPreImeInputStage(imeStage);</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1713">InputStage nativePreImeStage = new NativePreImeInputStage(viewPreImeStage, &quot;aq:native-pre-ime:&quot; + counterSuffix);</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1728"></text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1743">mFirstInputStage = nativePreImeStage;</text>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1024" y="1758">mFirstPostImeInputStage = earlyPostImeStage;</text>
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1855" y="1305" width="10" height="166" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2234" y="1320" width="10" height="152" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2528" y="1422" width="10" height="24" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2528" y="1651" width="10" height="460" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2234" y="1915" width="10" height="516" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2106" y="2011" width="10" height="192" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2038" y="2035" width="10" height="45" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1678" y="2314" width="10" height="228" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1067" y="2324" width="10" height="209" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="985" y="2353" width="10" height="490" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="538" y="231" width="10" height="39" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="685" y="312" width="10" height="96" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="855" y="326" width="10" height="116" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="985" y="350" width="10" height="29" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="985" y="411" width="10" height="1367" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1131" y="428" width="10" height="703" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1312" y="476" width="10" height="407" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1465" y="469" width="10" height="417" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1602" y="482" width="10" height="40" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1748" y="555" width="10" height="36" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1602" y="649" width="10" height="36" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1935" y="486" width="10" height="122" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2166" y="704" width="10" height="206" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2038" y="526" width="10" height="71" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2297" y="712" width="10" height="202" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2454" y="764" width="10" height="146" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2604" y="787" width="10" height="126" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2751" y="802" width="10" height="36" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2038" y="924" width="10" height="55" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1067" y="1286" width="10" height="180" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1678" y="1302" width="10" height="171" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="242" y="201" width="10" height="446" />
+</g>
+<ellipse fill="black" stroke="none" cx="2658.5" cy="1658.5" rx="4.5" ry="4.5" />
+<ellipse fill="black" stroke="none" cx="90.5" cy="221.5" rx="4.5" ry="4.5" />
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1476" y1="573" x2="1748" y2="573" />
+	<polygon fill="#000000" stroke="none" points="1748,573 1744,569 1744,577" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1476" y1="667" x2="1602" y2="667" />
+	<polygon fill="#000000" stroke="none" points="1602,667 1598,663 1598,671" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1613" y1="504" x2="1935" y2="504" />
+	<polygon fill="#000000" stroke="none" points="1935,504 1931,500 1931,508" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1476" y1="723" x2="2166" y2="723" />
+	<polygon fill="#000000" stroke="none" points="2166,723 2162,719 2162,727" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="2615" y1="820" x2="2751" y2="820" />
+	<polygon fill="#000000" stroke="none" points="2751,820 2747,816 2747,824" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="996" y1="1300" x2="1067" y2="1300" />
+	<polygon fill="#000000" stroke="none" points="1067,1300 1063,1296 1063,1304" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="2539" y1="1657" x2="2654" y2="1657" />
+	<polygon fill="#000000" stroke="none" points="2539,1657 2543,1653 2543,1661" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="2049" y1="2046" x2="2106" y2="2046" />
+	<polygon fill="#000000" stroke="none" points="2049,2046 2053,2042 2053,2050" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1078" y1="2333" x2="1678" y2="2333" />
+	<polygon fill="#000000" stroke="none" points="1078,2333 1082,2329 1082,2337" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="996" y1="2361" x2="1067" y2="2361" />
+	<polygon fill="#000000" stroke="none" points="996,2361 1000,2357 1000,2365" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="95" y1="220" x2="242" y2="220" />
+	<polygon fill="#000000" stroke="none" points="242,220 238,216 238,224" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="253" y1="250" x2="538" y2="250" />
+	<polygon fill="#000000" stroke="none" points="538,250 534,246 534,254" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="253" y1="330" x2="685" y2="330" />
+	<polygon fill="#000000" stroke="none" points="685,330 681,326 681,334" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="866" y1="428" x2="985" y2="428" />
+	<polygon fill="#000000" stroke="none" points="985,428 981,424 981,432" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1323" y1="493" x2="1465" y2="493" />
+	<polygon fill="#000000" stroke="none" points="1465,493 1461,489 1461,497" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2240" y="1342" width="10" height="116" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2534" y="1692" width="10" height="399" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2240" y="1972" width="10" height="454" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2112" y="2082" width="10" height="28" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2112" y="2125" width="10" height="24" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2112" y="2173" width="10" height="24" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="991" y="2405" width="10" height="24" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="991" y="2476" width="10" height="361" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1476" y1="491" x2="1602" y2="491" />
+	<polygon fill="#000000" stroke="none" points="1602,491 1598,487 1598,495" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="2177" y1="730" x2="2297" y2="730" />
+	<polygon fill="#000000" stroke="none" points="2297,730 2293,726 2293,734" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1078" y1="1332" x2="1678" y2="1332" />
+	<polygon fill="#000000" stroke="none" points="1678,1332 1674,1328 1674,1336" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="991" y="1558" width="10" height="215" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1137" y="445" width="10" height="525" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1137" y="1012" width="10" height="111" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1941" y="508" width="10" height="89" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2044" y="567" width="10" height="23" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2303" y="747" width="10" height="152" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="696" y1="343" x2="855" y2="343" />
+	<polygon fill="#000000" stroke="none" points="855,343 851,339 851,347" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="996" y1="452" x2="1131" y2="452" />
+	<polygon fill="#000000" stroke="none" points="1131,452 1127,448 1127,456" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1952" y1="543" x2="2038" y2="543" />
+	<polygon fill="#000000" stroke="none" points="2038,543 2034,539 2034,547" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="2314" y1="783" x2="2454" y2="783" />
+	<polygon fill="#000000" stroke="none" points="2454,783 2450,779 2450,787" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1689" y1="1324" x2="1855" y2="1324" />
+	<polygon fill="#000000" stroke="none" points="1855,1324 1851,1320 1851,1328" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="2245" y1="1924" x2="2534" y2="1924" />
+	<polygon fill="#000000" stroke="none" points="2245,1924 2249,1920 2249,1928" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="2117" y1="2023" x2="2240" y2="2023" />
+	<polygon fill="#000000" stroke="none" points="2117,2023 2121,2019 2121,2027" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1689" y1="2320" x2="2240" y2="2320" />
+	<polygon fill="#000000" stroke="none" points="1689,2320 1693,2316 1693,2324" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="866" y1="361" x2="985" y2="361" />
+	<polygon fill="#000000" stroke="none" points="985,361 981,357 981,365" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1149 446 L 1166 446 L 1166 453 L 1149 453" />
+	<polygon fill="#000000" stroke="none" points="1149,453 1153,457 1153,449" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1149 1013 L 1166 1013 L 1166 1020 L 1149 1020" />
+	<polygon fill="#000000" stroke="none" points="1149,1020 1153,1024 1153,1016" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1953 509 L 1970 509 L 1970 516 L 1953 516" />
+	<polygon fill="#000000" stroke="none" points="1953,516 1957,520 1957,512" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2056 568 L 2073 568 L 2073 575 L 2056 575" />
+	<polygon fill="#000000" stroke="none" points="2056,575 2060,579 2060,571" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2315 748 L 2332 748 L 2332 755 L 2315 755" />
+	<polygon fill="#000000" stroke="none" points="2315,755 2319,759 2319,751" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2252 1343 L 2269 1343 L 2269 1350 L 2252 1350" />
+	<polygon fill="#000000" stroke="none" points="2252,1350 2256,1354 2256,1346" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2546 1693 L 2563 1693 L 2563 1700 L 2546 1700" />
+	<polygon fill="#000000" stroke="none" points="2546,1700 2550,1704 2550,1696" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2252 1973 L 2269 1973 L 2269 1980 L 2252 1980" />
+	<polygon fill="#000000" stroke="none" points="2252,1980 2256,1984 2256,1976" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2124 2083 L 2141 2083 L 2141 2090 L 2124 2090" />
+	<polygon fill="#000000" stroke="none" points="2124,2090 2128,2094 2128,2086" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2124 2126 L 2141 2126 L 2141 2133 L 2124 2133" />
+	<polygon fill="#000000" stroke="none" points="2124,2133 2128,2137 2128,2129" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2124 2174 L 2141 2174 L 2141 2181 L 2124 2181" />
+	<polygon fill="#000000" stroke="none" points="2124,2181 2128,2185 2128,2177" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1003 2406 L 1020 2406 L 1020 2413 L 1003 2413" />
+	<polygon fill="#000000" stroke="none" points="1003,2413 1007,2417 1007,2409" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1003 2477 L 1020 2477 L 1020 2484 L 1003 2484" />
+	<polygon fill="#000000" stroke="none" points="1003,2484 1007,2488 1007,2480" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1003 1559 L 1020 1559 L 1020 1566 L 1003 1566" />
+	<polygon fill="#000000" stroke="none" points="1003,1566 1007,1570 1007,1562" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2246" y="1378" width="10" height="72" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2540" y="1725" width="10" height="24" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2540" y="1788" width="10" height="24" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2540" y="1852" width="10" height="24" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="2246" y="2245" width="10" height="24" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="997" y="2514" width="10" height="24" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="997" y="2562" width="10" height="24" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="997" y="2614" width="10" height="217" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="2465" y1="803" x2="2604" y2="803" />
+	<polygon fill="#000000" stroke="none" points="2604,803 2600,799 2600,807" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1866" y1="1329" x2="2234" y2="1329" />
+	<polygon fill="#000000" stroke="none" points="2234,1329 2230,1325 2230,1333" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1143" y="484" width="10" height="479" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1154" y1="527" x2="1312" y2="527" />
+	<polygon fill="#000000" stroke="none" points="1312,527 1308,523 1308,531" />
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="2257" y1="1428" x2="2528" y2="1428" />
+	<polygon fill="#000000" stroke="none" points="2528,1428 2524,1424 2524,1432" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1155 485 L 1172 485 L 1172 492 L 1155 492" />
+	<polygon fill="#000000" stroke="none" points="1155,492 1159,496 1159,488" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2258 1379 L 2275 1379 L 2275 1386 L 2258 1386" />
+	<polygon fill="#000000" stroke="none" points="2258,1386 2262,1390 2262,1382" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2552 1726 L 2569 1726 L 2569 1733 L 2552 1733" />
+	<polygon fill="#000000" stroke="none" points="2552,1733 2556,1737 2556,1729" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2552 1789 L 2569 1789 L 2569 1796 L 2552 1796" />
+	<polygon fill="#000000" stroke="none" points="2552,1796 2556,1800 2556,1792" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2552 1853 L 2569 1853 L 2569 1860 L 2552 1860" />
+	<polygon fill="#000000" stroke="none" points="2552,1860 2556,1864 2556,1856" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 2258 2246 L 2275 2246 L 2275 2253 L 2258 2253" />
+	<polygon fill="#000000" stroke="none" points="2258,2253 2262,2257 2262,2249" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1009 2515 L 1026 2515 L 1026 2522 L 1009 2522" />
+	<polygon fill="#000000" stroke="none" points="1009,2522 1013,2526 1013,2518" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1009 2563 L 1026 2563 L 1026 2570 L 1009 2570" />
+	<polygon fill="#000000" stroke="none" points="1009,2570 1013,2574 1013,2566" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1009 2615 L 1026 2615 L 1026 2622 L 1009 2622" />
+	<polygon fill="#000000" stroke="none" points="1009,2622 1013,2626 1013,2618" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1003" y="2651" width="10" height="24" />
+</g>
+<g>
+	<rect fill="none" stroke="black" stroke-width="1" stroke-opacity="1" x="1003" y="2695" width="10" height="130" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1015 2652 L 1032 2652 L 1032 2659 L 1015 2659" />
+	<polygon fill="#000000" stroke="none" points="1015,2659 1019,2663 1019,2655" />
+</g>
+<g>
+	<path fill="none" stroke="black" stroke-opacity="1" d="M 1015 2696 L 1032 2696 L 1032 2703 L 1015 2703" />
+	<polygon fill="#000000" stroke="none" points="1015,2703 1019,2707 1019,2699" />
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1166" y="443">E1. mRemote.transact(Stub.TRANSACTION_addToDisplay,...)</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1157" y="1008">E2. outInputChannel.readFromParcel(_reply);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1344" y="488">H1. addWindow</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1474" y="474">I1. InputChannel[] inputChannels = InputChannel.openInputChannelPair(name);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1483" y="565">I2. win.setInputChannel(inputChannels[0]);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1479" y="642">I3. inputChannels[1].transferTo(outInputChannel);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1641" y="496">J1. nativeOpenInputChannelPair</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1943" y="505">K1. android_view_InputChannel_nativeOpenInputChannelPair</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1487" y="718">I4. mInputManager.registerInputChannel</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1958" y="535">L1. openInputChannelPair</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2048" y="561">M1. socketpair</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2178" y="722">J1. nativeRegisterInputChannel</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2311" y="742">K1. nativeRegisterInputChannel</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2327" y="768">L1. im-&gt;registerInputChannel</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2469" y="795">M1. registerInputChannel</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2608" y="808">N1. connection = new Connection(inputChannel, inputWindowHandle, monitor)</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1159" y="482">F1. onTransact</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1169" y="518">G1. addToDisplay</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1172" y="942">G2. _arg6.writeToParcel</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="998" y="1279">D2. mInputEventReceiver = new WindowInputEventReceiver(mInputChannel,Looper.myLooper());</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1090" y="1324">E1. InputEventReceiver</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1709" y="1316">F1. nativeInit</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1879" y="1319">G1. receiver = new NativeInputEventReceiver</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2248" y="1334">H1. receiver-&gt;initialize()</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2260" y="1375">I1. setFdEvents</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2275" y="1415">L1. mMessageQueue-&gt;getLooper()-&gt;addFd(fd, 0, events, this, NULL);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2555" y="1646">pollOnce</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2550" y="1684">A3. pollInner</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2555" y="1717">B1. epoll_wait</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2550" y="1783">B2. pushResponse(events, mRequests.valueAt(requestIndex));</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2545" y="1845">B3. Response&amp; response = mResponses.editItemAt(i);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2255" y="1913">B4. int callbackResult = response.request.callback-&gt;handleEvent(fd, events, data);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2252" y="1964">C1. consumeEvents(env, false /*consumeBatches*/, -1, NULL);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2124" y="2015">D1. mInputConsumer.consume(..., &amp;seq, &amp;inputEvent)</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2058" y="2041">E1. mChannel-&gt;receiveMessage(&amp;mMsg)</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2127" y="2075">E2.initializeKeyEvent(keyEvent, &amp;mMsg);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2128" y="2121">E3. *outSeq = mMsg.body.key.seq;</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2126" y="2167">E4. *outEvent = keyEvent;</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2257" y="2239">D2. inputEventObj = android_view_KeyEvent_fromNative(env,static_cast&lt;KeyEvent*&gt;(inputEvent));</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1697" y="2311">D3. env-&gt;CallVoidMethod(receiverObj.get(),gInputEventReceiverClassInfo.dispatchInputEvent, seq, inputEventObj);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1097" y="2324">E1.onInputEvent(event);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1000" y="2354">F1. enqueueInputEvent(event, this, 0, true)</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1001" y="2401">G1. mPendingInputEventTail = q;</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1002" y="2470">G2. doProcessInputEvents</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1008" y="2510">H1. QueuedInputEvent q = mPendingInputEventHead;</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1008" y="2556">H2. mPendingInputEventHead = q.mNext;</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1006" y="2609">H3. deliverInputEvent(q);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1021" y="2645">I1. stage = q.shouldSkipIme() ? mFirstPostImeInputStage : mFirstInputStage;</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1021" y="2690">I2. stage.deliver(q);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1003" y="1552">D3. Set up the input pipeline.</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="1002" y="428">D1. mWindowSession.addToDisplay(...,mInputChannel);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="875" y="420">C2. root.setView(...)</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="880" y="348">C1. root = new ViewRootImpl(...)</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="710" y="335">B1. mGlobal.addView(...)</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="267" y="322">A2. wm.addView(decor, l);</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="268" y="242">A1. ViewManager wm = a.getWindowManager();</text>
+</g>
+<g>
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="107" y="212">handleResumeActivity</text>
+</g>
+<g>
+	<line stroke="black" stroke-opacity="1" x1="1154" y1="950" x2="2038" y2="950" />
+	<polygon fill="#000000" stroke="none" points="2038,950 2034,946 2034,954" />
+</g>
+<g>
+	<polygon fill="#c0ffff" stroke="black" stroke-opacity="1" points="2056,938 2379,938 2379,948 2389,948 2389,971 2056,971 2056,938" />
+	<line stroke="black" stroke-opacity="1" x1="2379" y1="938" x2="2389" y2="948" />
+	<text font-family="Helvetica" font-size="11" fill="#000000" xml:space="preserve" x="2066" y="963">parcel-&gt;writeDupFileDescriptor(inputChannel-&gt;getFd())</text>
+</g>
+</svg>

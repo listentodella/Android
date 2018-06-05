@@ -1,0 +1,745 @@
+format 76
+"utils" // utils
+  revision 1
+  modified_by 2 "thisway_diy"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  cpp_h_dir "L:/android_projects/uml_tmp_file/include/utils/"
+  cpp_src_dir "L:/android_projects/uml_tmp_file/include/utils/"
+  classview 142722 "utils"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 175490 "android_create_thread_fn"
+      visibility package stereotype "typedef" explicit_base_type "int"
+      cpp_decl "${comment}typedef ${type}(* ${name})(android_thread_func_t entryFunction,
+                                        void *userData,
+                                        const char* threadName,
+                                        int32_t threadPriority,
+                                        size_t threadStackSize,
+                                        android_thread_id_t *threadId);
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " Used by the Java Runtime to control how threads are created, so that
+ they can be proper and lovely Java threads."
+    end
+
+    class 177666 "off64_t"
+      visibility package stereotype "typedef" explicit_base_type "off_t"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 178306 "nsecs_t"
+      visibility package stereotype "typedef" explicit_base_type "int64_t"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 179074 "anonymous2"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 304002 "OK"
+	public type class_ref 179074 // anonymous2
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 304130 "NO_ERROR"
+	public type class_ref 179074 // anonymous2
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 304258 "UNKNOWN_ERROR"
+	public type class_ref 179074 // anonymous2
+	init_value " (-2147483647-1)"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 304386 "NO_MEMORY"
+	public type class_ref 179074 // anonymous2
+	init_value " -ENOMEM"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 304514 "INVALID_OPERATION"
+	public type class_ref 179074 // anonymous2
+	init_value " -ENOSYS"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 304642 "BAD_VALUE"
+	public type class_ref 179074 // anonymous2
+	init_value " -EINVAL"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 304770 "BAD_TYPE"
+	public type class_ref 179074 // anonymous2
+	init_value " (UNKNOWN_ERROR + 1)"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 304898 "NAME_NOT_FOUND"
+	public type class_ref 179074 // anonymous2
+	init_value " -ENOENT"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 305026 "PERMISSION_DENIED"
+	public type class_ref 179074 // anonymous2
+	init_value " -EPERM"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 305154 "NO_INIT"
+	public type class_ref 179074 // anonymous2
+	init_value " -ENODEV"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 305282 "ALREADY_EXISTS"
+	public type class_ref 179074 // anonymous2
+	init_value " -EEXIST"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 305410 "DEAD_OBJECT"
+	public type class_ref 179074 // anonymous2
+	init_value " -EPIPE"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 305538 "FAILED_TRANSACTION"
+	public type class_ref 179074 // anonymous2
+	init_value " (UNKNOWN_ERROR + 2)"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 305666 "JPARKS_BROKE_IT"
+	public type class_ref 179074 // anonymous2
+	init_value " -EPIPE"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 305794 "BAD_INDEX"
+	public type class_ref 179074 // anonymous2
+	init_value " -EOVERFLOW"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 305922 "NOT_ENOUGH_DATA"
+	public type class_ref 179074 // anonymous2
+	init_value " -ENODATA"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 306050 "WOULD_BLOCK"
+	public type class_ref 179074 // anonymous2
+	init_value " -EWOULDBLOCK"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 306178 "TIMED_OUT"
+	public type class_ref 179074 // anonymous2
+	init_value " -ETIMEDOUT"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 306306 "UNKNOWN_TRANSACTION"
+	public type class_ref 179074 // anonymous2
+	init_value " -EBADMSG"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 186370 "native_handle_t"
+      visibility package stereotype "typedef" explicit_base_type "native_handle"
+      cpp_decl "${comment}typedef struct ${type} ${name};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 188034 "char16_t"
+      visibility package stereotype "typedef" explicit_base_type "uint16_t"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 191362 "char32_t"
+      visibility package stereotype "typedef" explicit_base_type "uint32_t"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 191746 "android_thread_id_t"
+      visibility package stereotype "typedef" explicit_base_type "void"
+      cpp_decl "${comment}typedef ${type}*  ${name};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 191874 "android_thread_func_t"
+      visibility package stereotype "typedef" explicit_base_type "int"
+      cpp_decl "${comment}typedef ${type}(* ${name})(void*);
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 192130 "anonymous14"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 320770 "PRIORITY_LOWEST"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_LOWEST"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 320898 "PRIORITY_BACKGROUND"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_BACKGROUND"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 321026 "PRIORITY_NORMAL"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_NORMAL"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 321154 "PRIORITY_FOREGROUND"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_FOREGROUND"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 321282 "PRIORITY_DISPLAY"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_DISPLAY"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 321410 "PRIORITY_URGENT_DISPLAY"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_URGENT_DISPLAY"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 321538 "PRIORITY_AUDIO"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_AUDIO"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 321666 "PRIORITY_URGENT_AUDIO"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_URGENT_AUDIO"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 321794 "PRIORITY_HIGHEST"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_HIGHEST"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 321922 "PRIORITY_DEFAULT"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_DEFAULT"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 322050 "PRIORITY_MORE_FAVORABLE"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_MORE_FAVORABLE"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 322178 "PRIORITY_LESS_FAVORABLE"
+	public type class_ref 192130 // anonymous14
+	init_value " ANDROID_PRIORITY_LESS_FAVORABLE"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 192258 "anonymous15"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 322306 "SYSTEM_TIME_REALTIME"
+	public type class_ref 192258 // anonymous15
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 322434 "SYSTEM_TIME_MONOTONIC"
+	public type class_ref 192258 // anonymous15
+	init_value " 1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 322562 "SYSTEM_TIME_PROCESS"
+	public type class_ref 192258 // anonymous15
+	init_value " 2"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 322690 "SYSTEM_TIME_THREAD"
+	public type class_ref 192258 // anonymous15
+	init_value " 3"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 322818 "SYSTEM_TIME_BOOTTIME"
+	public type class_ref 192258 // anonymous15
+	init_value " 4   // same as SYSTEM_TIME_MONOTONIC, but including CPU suspend time
+"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+  end
+
+  deploymentview 142082 "utils"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 149250 "AndroidThreads"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 175490 // android_create_thread_fn
+      end
+    end
+
+    artifact 149890 "Compat"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 177666 // off64_t
+      end
+    end
+
+    artifact 151938 "NativeHandle"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 186370 // native_handle_t
+      end
+    end
+
+    artifact 153730 "ThreadDefs"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 191746 // android_thread_id_t
+	class_ref 191874 // android_thread_func_t
+	class_ref 192130 // anonymous14
+      end
+    end
+
+    artifact 153986 "Timers"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 178306 // nsecs_t
+	class_ref 192258 // anonymous15
+      end
+    end
+
+    artifact 154498 "Unicode"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 191362 // char32_t
+	class_ref 188034 // char16_t
+      end
+    end
+  end
+
+  package_ref 142722 // android
+end

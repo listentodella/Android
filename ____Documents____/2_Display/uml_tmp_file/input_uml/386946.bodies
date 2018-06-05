@@ -1,0 +1,97 @@
+class RadioGroup
+!!!2392706.java!!!	RadioGroup(inout context : Context)
+        super(context);
+        setOrientation(VERTICAL);
+        init();
+!!!2392834.java!!!	RadioGroup(inout context : Context, inout attrs : AttributeSet)
+        super(context, attrs);
+
+        // retrieve selected radio button as requested by the user in the
+        // XML layout file
+        TypedArray attributes = context.obtainStyledAttributes(
+                attrs, com.android.internal.R.styleable.RadioGroup, com.android.internal.R.attr.radioButtonStyle, 0);
+
+        int value = attributes.getResourceId(R.styleable.RadioGroup_checkedButton, View.NO_ID);
+        if (value != View.NO_ID) {
+            mCheckedId = value;
+        }
+
+        final int index = attributes.getInt(com.android.internal.R.styleable.RadioGroup_orientation, VERTICAL);
+        setOrientation(index);
+
+        attributes.recycle();
+        init();
+!!!2392962.java!!!	init() : void
+        mChildOnCheckedChangeListener = new CheckedStateTracker();
+        mPassThroughListener = new PassThroughHierarchyChangeListener();
+        super.setOnHierarchyChangeListener(mPassThroughListener);
+!!!2393090.java!!!	setOnHierarchyChangeListener(inout listener : ViewGroup::OnHierarchyChangeListener) : void
+        // the user listener is delegated to our pass-through listener
+        mPassThroughListener.mOnHierarchyChangeListener = listener;
+!!!2393218.java!!!	onFinishInflate() : void
+        super.onFinishInflate();
+
+        // checks the appropriate radio button as requested in the XML file
+        if (mCheckedId != -1) {
+            mProtectFromCheckedChange = true;
+            setCheckedStateForView(mCheckedId, true);
+            mProtectFromCheckedChange = false;
+            setCheckedId(mCheckedId);
+        }
+!!!2393346.java!!!	addView(inout child : View, in index : int, inout params : ViewGroup::LayoutParams) : void
+        if (child instanceof RadioButton) {
+            final RadioButton button = (RadioButton) child;
+            if (button.isChecked()) {
+                mProtectFromCheckedChange = true;
+                if (mCheckedId != -1) {
+                    setCheckedStateForView(mCheckedId, false);
+                }
+                mProtectFromCheckedChange = false;
+                setCheckedId(button.getId());
+            }
+        }
+
+        super.addView(child, index, params);
+!!!2393474.java!!!	check(in id : int) : void
+        // don't even bother
+        if (id != -1 && (id == mCheckedId)) {
+            return;
+        }
+
+        if (mCheckedId != -1) {
+            setCheckedStateForView(mCheckedId, false);
+        }
+
+        if (id != -1) {
+            setCheckedStateForView(id, true);
+        }
+
+        setCheckedId(id);
+!!!2393602.java!!!	setCheckedId(in id : int) : void
+        mCheckedId = id;
+        if (mOnCheckedChangeListener != null) {
+            mOnCheckedChangeListener.onCheckedChanged(this, mCheckedId);
+        }
+!!!2393730.java!!!	setCheckedStateForView(in viewId : int, inout checked : boolean) : void
+        View checkedView = findViewById(viewId);
+        if (checkedView != null && checkedView instanceof RadioButton) {
+            ((RadioButton) checkedView).setChecked(checked);
+        }
+!!!2393858.java!!!	getCheckedRadioButtonId() : int
+        return mCheckedId;
+!!!2393986.java!!!	clearCheck() : void
+        check(-1);
+!!!2394114.java!!!	setOnCheckedChangeListener(inout listener : RadioGroup::OnCheckedChangeListener) : void
+        mOnCheckedChangeListener = listener;
+!!!2394242.java!!!	generateLayoutParams(inout attrs : AttributeSet) : LinearLayout::LayoutParams
+        return new RadioGroup.LayoutParams(getContext(), attrs);
+!!!2394370.java!!!	checkLayoutParams(inout p : ViewGroup::LayoutParams) : boolean
+        return p instanceof RadioGroup.LayoutParams;
+!!!2394498.java!!!	generateDefaultLayoutParams() : LinearLayout::LayoutParams
+        return new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+!!!2394626.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(RadioGroup.class.getName());
+!!!2394754.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(RadioGroup.class.getName());

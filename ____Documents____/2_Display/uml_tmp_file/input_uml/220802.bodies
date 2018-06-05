@@ -1,0 +1,10 @@
+class CheckForLongPress
+!!!690946.java!!!	run() : void
+            if (isPressed() && (mParent != null)
+                    && mOriginalWindowAttachCount == mWindowAttachCount) {
+                if (performLongClick()) {
+                    mHasPerformedLongPress = true;
+                }
+            }
+!!!691074.java!!!	rememberWindowAttachCount() : void
+            mOriginalWindowAttachCount = mWindowAttachCount;

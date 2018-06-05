@@ -1,0 +1,86 @@
+class DisplayCommand
+!!!568578.java!!!	setMainDisplay(in mode : String) : int
+        int ret = 0;
+        Slog.d(TAG, "setMainDisplay: " + mode);
+        return ret;
+!!!568706.java!!!	enable(in mode : String, in rotation : int, in xoverScan : int, in yoverScan : int, in mirror : int, in colorDepth : int, in keepRate : int, in resolution : int, in rotAngle : int, in navBarVisible : int) : int
+        int ret = 0;
+
+        mCfgParam.mode = mode;
+        mCfgParam.rotation = rotation;
+        mCfgParam.xOverScan = xoverScan;
+        mCfgParam.yOverScan = yoverScan;
+        mCfgParam.mirror = mirror;
+        mCfgParam.colorDepth = colorDepth;
+        mCfgParam.keepRate = keepRate;
+        mCfgParam.resolution = resolution;
+        mCfgParam.rotAngle = rotAngle;
+        mCfgParam.navBarVisible = navBarVisible;
+        Slog.d(TAG, "enable: " + mode);
+
+        return ret;
+!!!568834.java!!!	disable() : int
+        int ret = 0;
+        Slog.d(TAG, "disable");
+        return ret;
+!!!568962.java!!!	setResolution(in mode : String) : int
+        int ret = 0;
+        mCfgParam.mode = mode;
+        Slog.d(TAG, "setResolution: " + mode);
+        return ret;
+!!!569090.java!!!	setOverScan(in Xratio : int, in Yratio : int) : int
+        int ret = 0;
+        mCfgParam.xOverScan = Xratio;
+        mCfgParam.yOverScan = Yratio;
+        Slog.d(TAG, "setOverScan: " + mCfgParam.xOverScan + " " + mCfgParam.yOverScan);
+        return ret;
+!!!569218.java!!!	getKeepRate() : int
+        return mCfgParam.keepRate;
+!!!569346.java!!!	getResolution() : int
+        return mCfgParam.resolution;
+!!!569474.java!!!	getRotAngle() : int
+        return mCfgParam.rotAngle;
+!!!569602.java!!!	getNavBarVisible() : int
+        return mCfgParam.navBarVisible;
+!!!569730.java!!!	getXOverScan() : int
+        return mCfgParam.xOverScan;
+!!!569858.java!!!	getYOverScan() : int
+        return mCfgParam.yOverScan;
+!!!569986.java!!!	setMirror(in mirror : int) : int
+        int ret = 0;
+        mCfgParam.mirror = mirror;
+        Slog.d(TAG, "setMirror: " + mirror);
+        return ret;
+!!!570114.java!!!	setColorDepth(in depth : int) : int
+        int ret = 0;
+        mCfgParam.colorDepth = depth;
+        Slog.d(TAG, "setColorDepth: " + depth);
+        return ret;
+!!!570242.java!!!	setRotation(in rotation : int) : int
+        int ret = 0;
+        mCfgParam.rotation = rotation;
+        Slog.d(TAG, "setRotation: " + rotation);
+        return ret;
+!!!570370.java!!!	setKeepRate(in keepRate : int) : int
+        int ret = 0;
+        mCfgParam.keepRate = keepRate;
+        Slog.d(TAG, "setKeepRate: " + keepRate);
+        return ret;
+!!!570498.java!!!	setHDMIResolution(in resolution : int) : int
+        int ret = 0;
+        mCfgParam.resolution = resolution;
+        Slog.d(TAG, "setHDMIResolution: " + resolution);
+        return ret;
+!!!570626.java!!!	setRotAngle(in rotAngle : int) : int
+        int ret = 0;
+        mCfgParam.rotAngle = rotAngle;
+        Slog.d(TAG, "setRotAngle: " + rotAngle);
+        return ret;
+!!!570754.java!!!	setNavBarVisible(in navBarVisible : int) : int
+        int ret = 0;
+        mCfgParam.navBarVisible = navBarVisible;
+        Slog.d(TAG, "setNavBarVisible: " + navBarVisible);
+        return ret;
+!!!570882.java!!!	broadcastEvent() : int
+        int ret = 0;
+        return ret;

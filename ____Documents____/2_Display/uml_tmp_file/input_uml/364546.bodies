@@ -1,0 +1,5 @@
+class PassThroughClickListener
+!!!2122626.java!!!	onClick(inout v : View) : void
+            onClickImpl();
+
+            if (mWrapped != null) mWrapped.onClick(v);

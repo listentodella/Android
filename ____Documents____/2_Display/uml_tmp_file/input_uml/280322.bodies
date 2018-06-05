@@ -1,0 +1,6 @@
+class ProviderRefCount
+!!!1455746.java!!!	ProviderRefCount(inout inHolder : IActivityManager::ContentProviderHolder, inout inClient : ActivityThread::ProviderClientRecord, in sCount : int, in uCount : int)
+            holder = inHolder;
+            client = inClient;
+            stableCount = sCount;
+            unstableCount = uCount;

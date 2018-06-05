@@ -1,0 +1,12 @@
+class ScreenLockTimeout
+!!!518274.java!!!	run() : void
+            synchronized (this) {
+                if (localLOGV) Log.v(TAG, "mScreenLockTimeout activating keyguard");
+                if (mKeyguardDelegate != null) {
+                    mKeyguardDelegate.doKeyguardTimeout(options);
+                }
+                mLockScreenTimerActive = false;
+                options = null;
+            }
+!!!518402.java!!!	setLockOptions(inout options : Bundle) : void
+            this.options = options;

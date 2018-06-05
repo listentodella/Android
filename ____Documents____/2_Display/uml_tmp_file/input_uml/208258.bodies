@@ -1,0 +1,19 @@
+class AbsSavedState
+!!!536706.java!!!	AbsSavedState()
+        mSuperState = null;
+!!!536834.java!!!	AbsSavedState(inout superState : Parcelable)
+        if (superState == null) {
+            throw new IllegalArgumentException("superState must not be null");
+        }
+        mSuperState = superState != EMPTY_STATE ? superState : null;
+!!!536962.java!!!	AbsSavedState(inout source : Parcel)
+        // FIXME need class loader
+        Parcelable superState = source.readParcelable(null);
+         
+        mSuperState = superState != null ? superState : EMPTY_STATE;
+!!!537090.java!!!	getSuperState() : Parcelable
+        return mSuperState;
+!!!537218.java!!!	describeContents() : int
+        return 0;
+!!!537346.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+         dest.writeParcelable(mSuperState, flags);

@@ -1,0 +1,18 @@
+class SyncRunnable
+!!!1634050.java!!!	SyncRunnable(inout target : Runnable)
+            mTarget = target;
+!!!1634178.java!!!	run() : void
+            mTarget.run();
+            synchronized (this) {
+                mComplete = true;
+                notifyAll();
+            }
+!!!1634306.java!!!	waitForComplete() : void
+            synchronized (this) {
+                while (!mComplete) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }

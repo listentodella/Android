@@ -1,0 +1,3 @@
+class AppBindData
+!!!1423106.java!!!	toString() : String
+            return "AppBindData{appInfo=" + appInfo + "}";

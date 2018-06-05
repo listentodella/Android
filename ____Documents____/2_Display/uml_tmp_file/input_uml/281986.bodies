@@ -1,0 +1,3 @@
+class ResultData
+!!!1423618.java!!!	toString() : String
+            return "ResultData{token=" + token + " results" + results + "}";

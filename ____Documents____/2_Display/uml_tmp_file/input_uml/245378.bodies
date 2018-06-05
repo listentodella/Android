@@ -1,0 +1,3 @@
+class FocusObserver
+!!!1023490.java!!!	FocusObserver()
+            mHandler = new H();

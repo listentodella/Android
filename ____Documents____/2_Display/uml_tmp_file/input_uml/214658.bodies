@@ -1,0 +1,3696 @@
+class ViewGroup
+!!!882306.java!!!	ViewGroup(inout context : Context)
+        this(context, null);
+!!!882434.java!!!	ViewGroup(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!882562.java!!!	ViewGroup(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!882690.java!!!	ViewGroup(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+        initViewGroup();
+        initFromAttributes(context, attrs, defStyleAttr, defStyleRes);
+!!!882818.java!!!	debugDraw() : boolean
+        return DEBUG_DRAW || mAttachInfo != null && mAttachInfo.mDebugLayout;
+!!!882946.java!!!	initViewGroup() : void
+        // ViewGroup doesn't draw by default
+        if (!debugDraw()) {
+            setFlags(WILL_NOT_DRAW, DRAW_MASK);
+        }
+        mGroupFlags |= FLAG_CLIP_CHILDREN;
+        mGroupFlags |= FLAG_CLIP_TO_PADDING;
+        mGroupFlags |= FLAG_ANIMATION_DONE;
+        mGroupFlags |= FLAG_ANIMATION_CACHE;
+        mGroupFlags |= FLAG_ALWAYS_DRAWN_WITH_CACHE;
+
+        if (mContext.getApplicationInfo().targetSdkVersion >= Build.VERSION_CODES.HONEYCOMB) {
+            mGroupFlags |= FLAG_SPLIT_MOTION_EVENTS;
+        }
+
+        setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
+
+        mChildren = new View[ARRAY_INITIAL_CAPACITY];
+        mChildrenCount = 0;
+
+        mPersistentDrawingCache = PERSISTENT_SCROLLING_CACHE;
+!!!883074.java!!!	initFromAttributes(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int) : void
+        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ViewGroup, defStyleAttr,
+                defStyleRes);
+
+        final int N = a.getIndexCount();
+        for (int i = 0; i < N; i++) {
+            int attr = a.getIndex(i);
+            switch (attr) {
+                case R.styleable.ViewGroup_clipChildren:
+                    setClipChildren(a.getBoolean(attr, true));
+                    break;
+                case R.styleable.ViewGroup_clipToPadding:
+                    setClipToPadding(a.getBoolean(attr, true));
+                    break;
+                case R.styleable.ViewGroup_animationCache:
+                    setAnimationCacheEnabled(a.getBoolean(attr, true));
+                    break;
+                case R.styleable.ViewGroup_persistentDrawingCache:
+                    setPersistentDrawingCache(a.getInt(attr, PERSISTENT_SCROLLING_CACHE));
+                    break;
+                case R.styleable.ViewGroup_addStatesFromChildren:
+                    setAddStatesFromChildren(a.getBoolean(attr, false));
+                    break;
+                case R.styleable.ViewGroup_alwaysDrawnWithCache:
+                    setAlwaysDrawnWithCacheEnabled(a.getBoolean(attr, true));
+                    break;
+                case R.styleable.ViewGroup_layoutAnimation:
+                    int id = a.getResourceId(attr, -1);
+                    if (id > 0) {
+                        setLayoutAnimation(AnimationUtils.loadLayoutAnimation(mContext, id));
+                    }
+                    break;
+                case R.styleable.ViewGroup_descendantFocusability:
+                    setDescendantFocusability(DESCENDANT_FOCUSABILITY_FLAGS[a.getInt(attr, 0)]);
+                    break;
+                case R.styleable.ViewGroup_splitMotionEvents:
+                    setMotionEventSplittingEnabled(a.getBoolean(attr, false));
+                    break;
+                case R.styleable.ViewGroup_animateLayoutChanges:
+                    boolean animateLayoutChanges = a.getBoolean(attr, false);
+                    if (animateLayoutChanges) {
+                        setLayoutTransition(new LayoutTransition());
+                    }
+                    break;
+                case R.styleable.ViewGroup_layoutMode:
+                    setLayoutMode(a.getInt(attr, LAYOUT_MODE_UNDEFINED));
+                    break;
+                case R.styleable.ViewGroup_transitionGroup:
+                    setTransitionGroup(a.getBoolean(attr, false));
+                    break;
+                case R.styleable.ViewGroup_touchscreenBlocksFocus:
+                    setTouchscreenBlocksFocus(a.getBoolean(attr, false));
+                    break;
+            }
+        }
+
+        a.recycle();
+!!!883202.java!!!	getDescendantFocusability() : int
+        return mGroupFlags & FLAG_MASK_FOCUSABILITY;
+!!!883330.java!!!	setDescendantFocusability(in focusability : int) : void
+        switch (focusability) {
+            case FOCUS_BEFORE_DESCENDANTS:
+            case FOCUS_AFTER_DESCENDANTS:
+            case FOCUS_BLOCK_DESCENDANTS:
+                break;
+            default:
+                throw new IllegalArgumentException("must be one of FOCUS_BEFORE_DESCENDANTS, "
+                        + "FOCUS_AFTER_DESCENDANTS, FOCUS_BLOCK_DESCENDANTS");
+        }
+        mGroupFlags &= ~FLAG_MASK_FOCUSABILITY;
+        mGroupFlags |= (focusability & FLAG_MASK_FOCUSABILITY);
+!!!883458.java!!!	handleFocusGainInternal(in direction : int, inout previouslyFocusedRect : Rect) : void
+        if (mFocused != null) {
+            mFocused.unFocus(this);
+            mFocused = null;
+        }
+        super.handleFocusGainInternal(direction, previouslyFocusedRect);
+!!!883586.java!!!	requestChildFocus(inout child : View, inout focused : View) : void
+        if (DBG) {
+            System.out.println(this + " requestChildFocus()");
+        }
+        if (getDescendantFocusability() == FOCUS_BLOCK_DESCENDANTS) {
+            return;
+        }
+
+        // Unfocus us, if necessary
+        super.unFocus(focused);
+
+        // We had a previous notion of who had focus. Clear it.
+        if (mFocused != child) {
+            if (mFocused != null) {
+                mFocused.unFocus(focused);
+            }
+
+            mFocused = child;
+        }
+        if (mParent != null) {
+            mParent.requestChildFocus(this, focused);
+        }
+!!!883714.java!!!	focusableViewAvailable(inout v : View) : void
+        if (mParent != null
+                // shortcut: don't report a new focusable view if we block our descendants from
+                // getting focus
+                && (getDescendantFocusability() != FOCUS_BLOCK_DESCENDANTS)
+                && (isFocusableInTouchMode() || !shouldBlockFocusForTouchscreen())
+                // shortcut: don't report a new focusable view if we already are focused
+                // (and we don't prefer our descendants)
+                //
+                // note: knowing that mFocused is non-null is not a good enough reason
+                // to break the traversal since in that case we'd actually have to find
+                // the focused view and make sure it wasn't FOCUS_AFTER_DESCENDANTS and
+                // an ancestor of v; this will get checked for at ViewAncestor
+                && !(isFocused() && getDescendantFocusability() != FOCUS_AFTER_DESCENDANTS)) {
+            mParent.focusableViewAvailable(v);
+        }
+!!!883842.java!!!	showContextMenuForChild(inout originalView : View) : boolean
+        return mParent != null && mParent.showContextMenuForChild(originalView);
+!!!883970.java!!!	startActionModeForChild(inout originalView : View, inout callback : ActionMode::Callback) : ActionMode
+        return mParent != null ? mParent.startActionModeForChild(originalView, callback) : null;
+!!!884098.java!!!	focusSearch(inout focused : View, in direction : int) : View
+        if (isRootNamespace()) {
+            // root namespace means we should consider ourselves the top of the
+            // tree for focus searching; otherwise we could be focus searching
+            // into other tabs.  see LocalActivityManager and TabHost for more info
+            return FocusFinder.getInstance().findNextFocus(this, focused, direction);
+        } else if (mParent != null) {
+            return mParent.focusSearch(focused, direction);
+        }
+        return null;
+!!!884226.java!!!	requestChildRectangleOnScreen(inout child : View, inout rectangle : Rect, inout immediate : boolean) : boolean
+        return false;
+!!!884354.java!!!	requestSendAccessibilityEvent(inout child : View, inout event : AccessibilityEvent) : boolean
+        ViewParent parent = mParent;
+        if (parent == null) {
+            return false;
+        }
+        final boolean propagate = onRequestSendAccessibilityEvent(child, event);
+        if (!propagate) {
+            return false;
+        }
+        return parent.requestSendAccessibilityEvent(this, event);
+!!!884482.java!!!	onRequestSendAccessibilityEvent(inout child : View, inout event : AccessibilityEvent) : boolean
+        if (mAccessibilityDelegate != null) {
+            return mAccessibilityDelegate.onRequestSendAccessibilityEvent(this, child, event);
+        } else {
+            return onRequestSendAccessibilityEventInternal(child, event);
+        }
+!!!884610.java!!!	onRequestSendAccessibilityEventInternal(inout child : View, inout event : AccessibilityEvent) : boolean
+        return true;
+!!!884738.java!!!	translateBoundsAndIntersectionsInWindowCoordinates(inout child : View, inout bounds : RectF, inout intersections : List<RectF>) : boolean
+        // Not attached, done.
+        if (mAttachInfo == null) {
+            return false;
+        }
+
+        if (getAlpha() <= 0 || getTransitionAlpha() <= 0 ||
+                getVisibility() != VISIBLE) {
+            // Cannot click on a view with an invisible predecessor.
+            return false;
+        }
+
+        // Compensate for the child transformation.
+        if (!child.hasIdentityMatrix()) {
+            Matrix matrix = child.getMatrix();
+            matrix.mapRect(bounds);
+            final int intersectionCount = intersections.size();
+            for (int i = 0; i < intersectionCount; i++) {
+                RectF intersection = intersections.get(i);
+                matrix.mapRect(intersection);
+            }
+        }
+
+        // Translate the bounds from child to parent coordinates.
+        final int dx = child.mLeft - mScrollX;
+        final int dy = child.mTop - mScrollY;
+        bounds.offset(dx, dy);
+        offsetRects(intersections, dx, dy);
+
+        // If the bounds do not intersect our bounds, done.
+        if (!bounds.intersects(0, 0, getWidth(), getHeight())) {
+            return false;
+        }
+
+        // Check whether any clickable siblings cover the child
+        // view and if so keep track of the intersections. Also
+        // respect Z ordering when iterating over children.
+        ArrayList<View> orderedList = buildOrderedChildList();
+        final boolean useCustomOrder = orderedList == null
+                && isChildrenDrawingOrderEnabled();
+
+        final int childCount = mChildrenCount;
+        for (int i = childCount - 1; i >= 0; i--) {
+            final int childIndex = useCustomOrder
+                    ? getChildDrawingOrder(childCount, i) : i;
+            final View sibling = (orderedList == null)
+                    ? mChildren[childIndex] : orderedList.get(childIndex);
+
+            // We care only about siblings over the child.
+            if (sibling == child) {
+                break;
+            }
+
+            // Ignore invisible views as they are not interactive.
+            if (sibling.getVisibility() != View.VISIBLE) {
+                continue;
+            }
+
+            // If sibling is not interactive we do not care.
+            if (!sibling.isClickable() && !sibling.isLongClickable()) {
+                continue;
+            }
+
+            // Compute the sibling bounds in its coordinates.
+            RectF siblingBounds = mAttachInfo.mTmpTransformRect1;
+            siblingBounds.set(0, 0, sibling.getWidth(), sibling.getHeight());
+
+            // Take into account the sibling transformation matrix.
+            if (!sibling.hasIdentityMatrix()) {
+                sibling.getMatrix().mapRect(siblingBounds);
+            }
+
+            // Offset the sibling to our coordinates.
+            final int siblingDx = sibling.mLeft - mScrollX;
+            final int siblingDy = sibling.mTop - mScrollY;
+            siblingBounds.offset(siblingDx, siblingDy);
+
+            // Compute the intersection between the child and the sibling.
+            if (siblingBounds.intersect(bounds)) {
+                // If an interactive sibling completely covers the child, done.
+                if (siblingBounds.equals(bounds)) {
+                    return false;
+                }
+                // Keep track of the intersection rectangle.
+                RectF intersection = new RectF(siblingBounds);
+                intersections.add(intersection);
+            }
+        }
+
+        if (mParent instanceof ViewGroup) {
+            ViewGroup parentGroup = (ViewGroup) mParent;
+            return parentGroup.translateBoundsAndIntersectionsInWindowCoordinates(
+                    this, bounds, intersections);
+        }
+
+        return true;
+!!!884866.java!!!	childHasTransientStateChanged(inout child : View, inout childHasTransientState : boolean) : void
+        final boolean oldHasTransientState = hasTransientState();
+        if (childHasTransientState) {
+            mChildCountWithTransientState++;
+        } else {
+            mChildCountWithTransientState--;
+        }
+
+        final boolean newHasTransientState = hasTransientState();
+        if (mParent != null && oldHasTransientState != newHasTransientState) {
+            try {
+                mParent.childHasTransientStateChanged(this, newHasTransientState);
+            } catch (AbstractMethodError e) {
+                Log.e(TAG, mParent.getClass().getSimpleName() +
+                        " does not fully implement ViewParent", e);
+            }
+        }
+!!!884994.java!!!	hasTransientState() : boolean
+        return mChildCountWithTransientState > 0 || super.hasTransientState();
+!!!885122.java!!!	dispatchUnhandledMove(inout focused : View, in direction : int) : boolean
+        return mFocused != null &&
+                mFocused.dispatchUnhandledMove(focused, direction);
+!!!885250.java!!!	clearChildFocus(inout child : View) : void
+        if (DBG) {
+            System.out.println(this + " clearChildFocus()");
+        }
+
+        mFocused = null;
+        if (mParent != null) {
+            mParent.clearChildFocus(this);
+        }
+!!!885378.java!!!	clearFocus() : void
+        if (DBG) {
+            System.out.println(this + " clearFocus()");
+        }
+        if (mFocused == null) {
+            super.clearFocus();
+        } else {
+            View focused = mFocused;
+            mFocused = null;
+            focused.clearFocus();
+        }
+!!!885506.java!!!	unFocus(inout focused : View) : void
+        if (DBG) {
+            System.out.println(this + " unFocus()");
+        }
+        if (mFocused == null) {
+            super.unFocus(focused);
+        } else {
+            mFocused.unFocus(focused);
+            mFocused = null;
+        }
+!!!885634.java!!!	getFocusedChild() : View
+        return mFocused;
+!!!885762.java!!!	getDeepestFocusedChild() : View
+        View v = this;
+        while (v != null) {
+            if (v.isFocused()) {
+                return v;
+            }
+            v = v instanceof ViewGroup ? ((ViewGroup) v).getFocusedChild() : null;
+        }
+        return null;
+!!!885890.java!!!	hasFocus() : boolean
+        return (mPrivateFlags & PFLAG_FOCUSED) != 0 || mFocused != null;
+!!!886018.java!!!	findFocus() : View
+        if (DBG) {
+            System.out.println("Find focus in " + this + ": flags="
+                    + isFocused() + ", child=" + mFocused);
+        }
+
+        if (isFocused()) {
+            return this;
+        }
+
+        if (mFocused != null) {
+            return mFocused.findFocus();
+        }
+        return null;
+!!!886146.java!!!	hasFocusable() : boolean
+        if ((mViewFlags & VISIBILITY_MASK) != VISIBLE) {
+            return false;
+        }
+
+        if (isFocusable()) {
+            return true;
+        }
+
+        final int descendantFocusability = getDescendantFocusability();
+        if (descendantFocusability != FOCUS_BLOCK_DESCENDANTS) {
+            final int count = mChildrenCount;
+            final View[] children = mChildren;
+
+            for (int i = 0; i < count; i++) {
+                final View child = children[i];
+                if (child.hasFocusable()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+!!!886274.java!!!	addFocusables(inout views : ArrayList<View>, in direction : int, in focusableMode : int) : void
+        final int focusableCount = views.size();
+
+        final int descendantFocusability = getDescendantFocusability();
+
+        if (descendantFocusability != FOCUS_BLOCK_DESCENDANTS) {
+            if (shouldBlockFocusForTouchscreen()) {
+                focusableMode |= FOCUSABLES_TOUCH_MODE;
+            }
+
+            final int count = mChildrenCount;
+            final View[] children = mChildren;
+
+            for (int i = 0; i < count; i++) {
+                final View child = children[i];
+                if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE) {
+                    child.addFocusables(views, direction, focusableMode);
+                }
+            }
+        }
+
+        // we add ourselves (if focusable) in all cases except for when we are
+        // FOCUS_AFTER_DESCENDANTS and there are some descendants focusable.  this is
+        // to avoid the focus search finding layouts when a more precise search
+        // among the focusable children would be more interesting.
+        if ((descendantFocusability != FOCUS_AFTER_DESCENDANTS
+                // No focusable descendants
+                || (focusableCount == views.size())) &&
+                (isFocusableInTouchMode() || !shouldBlockFocusForTouchscreen())) {
+            super.addFocusables(views, direction, focusableMode);
+        }
+!!!886402.java!!!	setTouchscreenBlocksFocus(inout touchscreenBlocksFocus : boolean) : void
+        if (touchscreenBlocksFocus) {
+            mGroupFlags |= FLAG_TOUCHSCREEN_BLOCKS_FOCUS;
+            if (hasFocus()) {
+                final View focusedChild = getDeepestFocusedChild();
+                if (!focusedChild.isFocusableInTouchMode()) {
+                    final View newFocus = focusSearch(FOCUS_FORWARD);
+                    if (newFocus != null) {
+                        newFocus.requestFocus();
+                    }
+                }
+            }
+        } else {
+            mGroupFlags &= ~FLAG_TOUCHSCREEN_BLOCKS_FOCUS;
+        }
+!!!886530.java!!!	getTouchscreenBlocksFocus() : boolean
+        return (mGroupFlags & FLAG_TOUCHSCREEN_BLOCKS_FOCUS) != 0;
+!!!886658.java!!!	shouldBlockFocusForTouchscreen() : boolean
+        return getTouchscreenBlocksFocus() &&
+                mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN);
+!!!886786.java!!!	findViewsWithText(inout outViews : ArrayList<View>, inout text : CharSequence, in flags : int) : void
+        super.findViewsWithText(outViews, text, flags);
+        final int childrenCount = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < childrenCount; i++) {
+            View child = children[i];
+            if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE
+                    && (child.mPrivateFlags & PFLAG_IS_ROOT_NAMESPACE) == 0) {
+                child.findViewsWithText(outViews, text, flags);
+            }
+        }
+!!!886914.java!!!	findViewByAccessibilityIdTraversal(in accessibilityId : int) : View
+        View foundView = super.findViewByAccessibilityIdTraversal(accessibilityId);
+        if (foundView != null) {
+            return foundView;
+        }
+        final int childrenCount = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < childrenCount; i++) {
+            View child = children[i];
+            foundView = child.findViewByAccessibilityIdTraversal(accessibilityId);
+            if (foundView != null) {
+                return foundView;
+            }
+        }
+        return null;
+!!!887042.java!!!	dispatchWindowFocusChanged(inout hasFocus : boolean) : void
+        super.dispatchWindowFocusChanged(hasFocus);
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            children[i].dispatchWindowFocusChanged(hasFocus);
+        }
+!!!887170.java!!!	addTouchables(inout views : ArrayList<View>) : void
+        super.addTouchables(views);
+
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+
+        for (int i = 0; i < count; i++) {
+            final View child = children[i];
+            if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE) {
+                child.addTouchables(views);
+            }
+        }
+!!!887298.java!!!	makeOptionalFitsSystemWindows() : void
+        super.makeOptionalFitsSystemWindows();
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            children[i].makeOptionalFitsSystemWindows();
+        }
+!!!887426.java!!!	dispatchDisplayHint(in hint : int) : void
+        super.dispatchDisplayHint(hint);
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            children[i].dispatchDisplayHint(hint);
+        }
+!!!887554.java!!!	onChildVisibilityChanged(inout child : View, in oldVisibility : int, in newVisibility : int) : void
+        if (mTransition != null) {
+            if (newVisibility == VISIBLE) {
+                mTransition.showChild(this, child, oldVisibility);
+            } else {
+                mTransition.hideChild(this, child, newVisibility);
+                if (mTransitioningViews != null && mTransitioningViews.contains(child)) {
+                    // Only track this on disappearing views - appearing views are already visible
+                    // and don't need special handling during drawChild()
+                    if (mVisibilityChangingChildren == null) {
+                        mVisibilityChangingChildren = new ArrayList<View>();
+                    }
+                    mVisibilityChangingChildren.add(child);
+                    addDisappearingView(child);
+                }
+            }
+        }
+
+        // in all cases, for drags
+        if (mCurrentDrag != null) {
+            if (newVisibility == VISIBLE) {
+                notifyChildOfDrag(child);
+            }
+        }
+!!!887682.java!!!	dispatchVisibilityChanged(inout changedView : View, in visibility : int) : void
+        super.dispatchVisibilityChanged(changedView, visibility);
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            children[i].dispatchVisibilityChanged(changedView, visibility);
+        }
+!!!887810.java!!!	dispatchWindowVisibilityChanged(in visibility : int) : void
+        super.dispatchWindowVisibilityChanged(visibility);
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            children[i].dispatchWindowVisibilityChanged(visibility);
+        }
+!!!887938.java!!!	dispatchConfigurationChanged(inout newConfig : Configuration) : void
+        super.dispatchConfigurationChanged(newConfig);
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            children[i].dispatchConfigurationChanged(newConfig);
+        }
+!!!888066.java!!!	recomputeViewAttributes(inout child : View) : void
+        if (mAttachInfo != null && !mAttachInfo.mRecomputeGlobalAttributes) {
+            ViewParent parent = mParent;
+            if (parent != null) parent.recomputeViewAttributes(this);
+        }
+!!!888194.java!!!	dispatchCollectViewAttributes(inout attachInfo : View::AttachInfo, in visibility : int) : void
+        if ((visibility & VISIBILITY_MASK) == VISIBLE) {
+            super.dispatchCollectViewAttributes(attachInfo, visibility);
+            final int count = mChildrenCount;
+            final View[] children = mChildren;
+            for (int i = 0; i < count; i++) {
+                final View child = children[i];
+                child.dispatchCollectViewAttributes(attachInfo,
+                        visibility | (child.mViewFlags&VISIBILITY_MASK));
+            }
+        }
+!!!888322.java!!!	bringChildToFront(inout child : View) : void
+        int index = indexOfChild(child);
+        if (index >= 0) {
+            removeFromArray(index);
+            addInArray(child, mChildrenCount);
+            child.mParent = this;
+            requestLayout();
+            invalidate();
+        }
+!!!888450.java!!!	getLocalPoint() : PointF
+        if (mLocalPoint == null) mLocalPoint = new PointF();
+        return mLocalPoint;
+!!!888578.java!!!	dispatchDragEvent(inout event : DragEvent) : boolean
+        boolean retval = false;
+        final float tx = event.mX;
+        final float ty = event.mY;
+
+        ViewRootImpl root = getViewRootImpl();
+
+        // Dispatch down the view hierarchy
+        final PointF localPoint = getLocalPoint();
+
+        switch (event.mAction) {
+        case DragEvent.ACTION_DRAG_STARTED: {
+            // clear state to recalculate which views we drag over
+            mCurrentDragView = null;
+
+            // Set up our tracking of drag-started notifications
+            mCurrentDrag = DragEvent.obtain(event);
+            if (mDragNotifiedChildren == null) {
+                mDragNotifiedChildren = new HashSet<View>();
+            } else {
+                mDragNotifiedChildren.clear();
+            }
+
+            // Now dispatch down to our children, caching the responses
+            mChildAcceptsDrag = false;
+            final int count = mChildrenCount;
+            final View[] children = mChildren;
+            for (int i = 0; i < count; i++) {
+                final View child = children[i];
+                child.mPrivateFlags2 &= ~View.DRAG_MASK;
+                if (child.getVisibility() == VISIBLE) {
+                    final boolean handled = notifyChildOfDrag(children[i]);
+                    if (handled) {
+                        mChildAcceptsDrag = true;
+                    }
+                }
+            }
+
+            // Return HANDLED if one of our children can accept the drag
+            if (mChildAcceptsDrag) {
+                retval = true;
+            }
+        } break;
+
+        case DragEvent.ACTION_DRAG_ENDED: {
+            // Release the bookkeeping now that the drag lifecycle has ended
+            if (mDragNotifiedChildren != null) {
+                for (View child : mDragNotifiedChildren) {
+                    // If a child was notified about an ongoing drag, it's told that it's over
+                    child.dispatchDragEvent(event);
+                    child.mPrivateFlags2 &= ~View.DRAG_MASK;
+                    child.refreshDrawableState();
+                }
+
+                mDragNotifiedChildren.clear();
+                if (mCurrentDrag != null) {
+                    mCurrentDrag.recycle();
+                    mCurrentDrag = null;
+                }
+            }
+
+            // We consider drag-ended to have been handled if one of our children
+            // had offered to handle the drag.
+            if (mChildAcceptsDrag) {
+                retval = true;
+            }
+        } break;
+
+        case DragEvent.ACTION_DRAG_LOCATION: {
+            // Find the [possibly new] drag target
+            final View target = findFrontmostDroppableChildAt(event.mX, event.mY, localPoint);
+
+            // If we've changed apparent drag target, tell the view root which view
+            // we're over now [for purposes of the eventual drag-recipient-changed
+            // notifications to the framework] and tell the new target that the drag
+            // has entered its bounds.  The root will see setDragFocus() calls all
+            // the way down to the final leaf view that is handling the LOCATION event
+            // before reporting the new potential recipient to the framework.
+            if (mCurrentDragView != target) {
+                root.setDragFocus(target);
+
+                final int action = event.mAction;
+                // If we've dragged off of a child view, send it the EXITED message
+                if (mCurrentDragView != null) {
+                    final View view = mCurrentDragView;
+                    event.mAction = DragEvent.ACTION_DRAG_EXITED;
+                    view.dispatchDragEvent(event);
+                    view.mPrivateFlags2 &= ~View.PFLAG2_DRAG_HOVERED;
+                    view.refreshDrawableState();
+                }
+                mCurrentDragView = target;
+
+                // If we've dragged over a new child view, send it the ENTERED message
+                if (target != null) {
+                    event.mAction = DragEvent.ACTION_DRAG_ENTERED;
+                    target.dispatchDragEvent(event);
+                    target.mPrivateFlags2 |= View.PFLAG2_DRAG_HOVERED;
+                    target.refreshDrawableState();
+                }
+                event.mAction = action;  // restore the event's original state
+            }
+
+            // Dispatch the actual drag location notice, localized into its coordinates
+            if (target != null) {
+                event.mX = localPoint.x;
+                event.mY = localPoint.y;
+
+                retval = target.dispatchDragEvent(event);
+
+                event.mX = tx;
+                event.mY = ty;
+            }
+        } break;
+
+        /* Entered / exited dispatch
+         *
+         * DRAG_ENTERED is not dispatched downwards from ViewGroup.  The reason for this is
+         * that we're about to get the corresponding LOCATION event, which we will use to
+         * determine which of our children is the new target; at that point we will
+         * push a DRAG_ENTERED down to the new target child [which may itself be a ViewGroup].
+         *
+         * DRAG_EXITED *is* dispatched all the way down immediately: once we know the
+         * drag has left this ViewGroup, we know by definition that every contained subview
+         * is also no longer under the drag point.
+         */
+
+        case DragEvent.ACTION_DRAG_EXITED: {
+            if (mCurrentDragView != null) {
+                final View view = mCurrentDragView;
+                view.dispatchDragEvent(event);
+                view.mPrivateFlags2 &= ~View.PFLAG2_DRAG_HOVERED;
+                view.refreshDrawableState();
+
+                mCurrentDragView = null;
+            }
+        } break;
+
+        case DragEvent.ACTION_DROP: {
+            if (ViewDebug.DEBUG_DRAG) Log.d(View.VIEW_LOG_TAG, "Drop event: " + event);
+            View target = findFrontmostDroppableChildAt(event.mX, event.mY, localPoint);
+            if (target != null) {
+                if (ViewDebug.DEBUG_DRAG) Log.d(View.VIEW_LOG_TAG, "   dispatch drop to " + target);
+                event.mX = localPoint.x;
+                event.mY = localPoint.y;
+                retval = target.dispatchDragEvent(event);
+                event.mX = tx;
+                event.mY = ty;
+            } else {
+                if (ViewDebug.DEBUG_DRAG) {
+                    Log.d(View.VIEW_LOG_TAG, "   not dropped on an accepting view");
+                }
+            }
+        } break;
+        }
+
+        // If none of our children could handle the event, try here
+        if (!retval) {
+            // Call up to the View implementation that dispatches to installed listeners
+            retval = super.dispatchDragEvent(event);
+        }
+        return retval;
+!!!888706.java!!!	findFrontmostDroppableChildAt(in x : float, in y : float, inout outLocalPoint : PointF) : View
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = count - 1; i >= 0; i--) {
+            final View child = children[i];
+            if (!child.canAcceptDrag()) {
+                continue;
+            }
+
+            if (isTransformedTouchPointInView(x, y, child, outLocalPoint)) {
+                return child;
+            }
+        }
+        return null;
+!!!888834.java!!!	notifyChildOfDrag(inout child : View) : boolean
+        if (ViewDebug.DEBUG_DRAG) {
+            Log.d(View.VIEW_LOG_TAG, "Sending drag-started to view: " + child);
+        }
+
+        boolean canAccept = false;
+        if (! mDragNotifiedChildren.contains(child)) {
+            mDragNotifiedChildren.add(child);
+            canAccept = child.dispatchDragEvent(mCurrentDrag);
+            if (canAccept && !child.canAcceptDrag()) {
+                child.mPrivateFlags2 |= View.PFLAG2_DRAG_CAN_ACCEPT;
+                child.refreshDrawableState();
+            }
+        }
+        return canAccept;
+!!!888962.java!!!	dispatchWindowSystemUiVisiblityChanged(in visible : int) : void
+        super.dispatchWindowSystemUiVisiblityChanged(visible);
+
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i=0; i <count; i++) {
+            final View child = children[i];
+            child.dispatchWindowSystemUiVisiblityChanged(visible);
+        }
+!!!889090.java!!!	dispatchSystemUiVisibilityChanged(in visible : int) : void
+        super.dispatchSystemUiVisibilityChanged(visible);
+
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i=0; i <count; i++) {
+            final View child = children[i];
+            child.dispatchSystemUiVisibilityChanged(visible);
+        }
+!!!889218.java!!!	updateLocalSystemUiVisibility(in localValue : int, in localChanges : int) : boolean
+        boolean changed = super.updateLocalSystemUiVisibility(localValue, localChanges);
+
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i=0; i <count; i++) {
+            final View child = children[i];
+            changed |= child.updateLocalSystemUiVisibility(localValue, localChanges);
+        }
+        return changed;
+!!!889346.java!!!	dispatchKeyEventPreIme(inout event : KeyEvent) : boolean
+        if ((mPrivateFlags & (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS))
+                == (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS)) {
+            return super.dispatchKeyEventPreIme(event);
+        } else if (mFocused != null && (mFocused.mPrivateFlags & PFLAG_HAS_BOUNDS)
+                == PFLAG_HAS_BOUNDS) {
+            return mFocused.dispatchKeyEventPreIme(event);
+        }
+        return false;
+!!!889474.java!!!	dispatchKeyEvent(inout event : KeyEvent) : boolean
+        if (mInputEventConsistencyVerifier != null) {
+            mInputEventConsistencyVerifier.onKeyEvent(event, 1);
+        }
+
+        if ((mPrivateFlags & (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS))
+                == (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS)) {
+            if (super.dispatchKeyEvent(event)) {
+                return true;
+            }
+        } else if (mFocused != null && (mFocused.mPrivateFlags & PFLAG_HAS_BOUNDS)
+                == PFLAG_HAS_BOUNDS) {
+            if (mFocused.dispatchKeyEvent(event)) {
+                return true;
+            }
+        }
+
+        if (mInputEventConsistencyVerifier != null) {
+            mInputEventConsistencyVerifier.onUnhandledEvent(event, 1);
+        }
+        return false;
+!!!889602.java!!!	dispatchKeyShortcutEvent(inout event : KeyEvent) : boolean
+        if ((mPrivateFlags & (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS))
+                == (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS)) {
+            return super.dispatchKeyShortcutEvent(event);
+        } else if (mFocused != null && (mFocused.mPrivateFlags & PFLAG_HAS_BOUNDS)
+                == PFLAG_HAS_BOUNDS) {
+            return mFocused.dispatchKeyShortcutEvent(event);
+        }
+        return false;
+!!!889730.java!!!	dispatchTrackballEvent(inout event : MotionEvent) : boolean
+        if (mInputEventConsistencyVerifier != null) {
+            mInputEventConsistencyVerifier.onTrackballEvent(event, 1);
+        }
+
+        if ((mPrivateFlags & (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS))
+                == (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS)) {
+            if (super.dispatchTrackballEvent(event)) {
+                return true;
+            }
+        } else if (mFocused != null && (mFocused.mPrivateFlags & PFLAG_HAS_BOUNDS)
+                == PFLAG_HAS_BOUNDS) {
+            if (mFocused.dispatchTrackballEvent(event)) {
+                return true;
+            }
+        }
+
+        if (mInputEventConsistencyVerifier != null) {
+            mInputEventConsistencyVerifier.onUnhandledEvent(event, 1);
+        }
+        return false;
+!!!889858.java!!!	dispatchHoverEvent(inout event : MotionEvent) : boolean
+        final int action = event.getAction();
+
+        // First check whether the view group wants to intercept the hover event.
+        final boolean interceptHover = onInterceptHoverEvent(event);
+        event.setAction(action); // restore action in case it was changed
+
+        MotionEvent eventNoHistory = event;
+        boolean handled = false;
+
+        // Send events to the hovered children and build a new list of hover targets until
+        // one is found that handles the event.
+        HoverTarget firstOldHoverTarget = mFirstHoverTarget;
+        mFirstHoverTarget = null;
+        if (!interceptHover && action != MotionEvent.ACTION_HOVER_EXIT) {
+            final float x = event.getX();
+            final float y = event.getY();
+            final int childrenCount = mChildrenCount;
+            if (childrenCount != 0) {
+                final ArrayList<View> preorderedList = buildOrderedChildList();
+                final boolean customOrder = preorderedList == null
+                        && isChildrenDrawingOrderEnabled();
+                final View[] children = mChildren;
+                HoverTarget lastHoverTarget = null;
+                for (int i = childrenCount - 1; i >= 0; i--) {
+                    int childIndex = customOrder ? getChildDrawingOrder(childrenCount, i) : i;
+                    final View child = (preorderedList == null)
+                            ? children[childIndex] : preorderedList.get(childIndex);
+                    if (!canViewReceivePointerEvents(child)
+                            || !isTransformedTouchPointInView(x, y, child, null)) {
+                        continue;
+                    }
+
+                    // Obtain a hover target for this child.  Dequeue it from the
+                    // old hover target list if the child was previously hovered.
+                    HoverTarget hoverTarget = firstOldHoverTarget;
+                    final boolean wasHovered;
+                    for (HoverTarget predecessor = null; ;) {
+                        if (hoverTarget == null) {
+                            hoverTarget = HoverTarget.obtain(child);
+                            wasHovered = false;
+                            break;
+                        }
+
+                        if (hoverTarget.child == child) {
+                            if (predecessor != null) {
+                                predecessor.next = hoverTarget.next;
+                            } else {
+                                firstOldHoverTarget = hoverTarget.next;
+                            }
+                            hoverTarget.next = null;
+                            wasHovered = true;
+                            break;
+                        }
+
+                        predecessor = hoverTarget;
+                        hoverTarget = hoverTarget.next;
+                    }
+
+                    // Enqueue the hover target onto the new hover target list.
+                    if (lastHoverTarget != null) {
+                        lastHoverTarget.next = hoverTarget;
+                    } else {
+                        mFirstHoverTarget = hoverTarget;
+                    }
+                    lastHoverTarget = hoverTarget;
+
+                    // Dispatch the event to the child.
+                    if (action == MotionEvent.ACTION_HOVER_ENTER) {
+                        if (!wasHovered) {
+                            // Send the enter as is.
+                            handled |= dispatchTransformedGenericPointerEvent(
+                                    event, child); // enter
+                        }
+                    } else if (action == MotionEvent.ACTION_HOVER_MOVE) {
+                        if (!wasHovered) {
+                            // Synthesize an enter from a move.
+                            eventNoHistory = obtainMotionEventNoHistoryOrSelf(eventNoHistory);
+                            eventNoHistory.setAction(MotionEvent.ACTION_HOVER_ENTER);
+                            handled |= dispatchTransformedGenericPointerEvent(
+                                    eventNoHistory, child); // enter
+                            eventNoHistory.setAction(action);
+
+                            handled |= dispatchTransformedGenericPointerEvent(
+                                    eventNoHistory, child); // move
+                        } else {
+                            // Send the move as is.
+                            handled |= dispatchTransformedGenericPointerEvent(event, child);
+                        }
+                    }
+                    if (handled) {
+                        break;
+                    }
+                }
+                if (preorderedList != null) preorderedList.clear();
+            }
+        }
+
+        // Send exit events to all previously hovered children that are no longer hovered.
+        while (firstOldHoverTarget != null) {
+            final View child = firstOldHoverTarget.child;
+
+            // Exit the old hovered child.
+            if (action == MotionEvent.ACTION_HOVER_EXIT) {
+                // Send the exit as is.
+                handled |= dispatchTransformedGenericPointerEvent(
+                        event, child); // exit
+            } else {
+                // Synthesize an exit from a move or enter.
+                // Ignore the result because hover focus has moved to a different view.
+                if (action == MotionEvent.ACTION_HOVER_MOVE) {
+                    dispatchTransformedGenericPointerEvent(
+                            event, child); // move
+                }
+                eventNoHistory = obtainMotionEventNoHistoryOrSelf(eventNoHistory);
+                eventNoHistory.setAction(MotionEvent.ACTION_HOVER_EXIT);
+                dispatchTransformedGenericPointerEvent(
+                        eventNoHistory, child); // exit
+                eventNoHistory.setAction(action);
+            }
+
+            final HoverTarget nextOldHoverTarget = firstOldHoverTarget.next;
+            firstOldHoverTarget.recycle();
+            firstOldHoverTarget = nextOldHoverTarget;
+        }
+
+        // Send events to the view group itself if no children have handled it.
+        boolean newHoveredSelf = !handled;
+        if (newHoveredSelf == mHoveredSelf) {
+            if (newHoveredSelf) {
+                // Send event to the view group as before.
+                handled |= super.dispatchHoverEvent(event);
+            }
+        } else {
+            if (mHoveredSelf) {
+                // Exit the view group.
+                if (action == MotionEvent.ACTION_HOVER_EXIT) {
+                    // Send the exit as is.
+                    handled |= super.dispatchHoverEvent(event); // exit
+                } else {
+                    // Synthesize an exit from a move or enter.
+                    // Ignore the result because hover focus is moving to a different view.
+                    if (action == MotionEvent.ACTION_HOVER_MOVE) {
+                        super.dispatchHoverEvent(event); // move
+                    }
+                    eventNoHistory = obtainMotionEventNoHistoryOrSelf(eventNoHistory);
+                    eventNoHistory.setAction(MotionEvent.ACTION_HOVER_EXIT);
+                    super.dispatchHoverEvent(eventNoHistory); // exit
+                    eventNoHistory.setAction(action);
+                }
+                mHoveredSelf = false;
+            }
+
+            if (newHoveredSelf) {
+                // Enter the view group.
+                if (action == MotionEvent.ACTION_HOVER_ENTER) {
+                    // Send the enter as is.
+                    handled |= super.dispatchHoverEvent(event); // enter
+                    mHoveredSelf = true;
+                } else if (action == MotionEvent.ACTION_HOVER_MOVE) {
+                    // Synthesize an enter from a move.
+                    eventNoHistory = obtainMotionEventNoHistoryOrSelf(eventNoHistory);
+                    eventNoHistory.setAction(MotionEvent.ACTION_HOVER_ENTER);
+                    handled |= super.dispatchHoverEvent(eventNoHistory); // enter
+                    eventNoHistory.setAction(action);
+
+                    handled |= super.dispatchHoverEvent(eventNoHistory); // move
+                    mHoveredSelf = true;
+                }
+            }
+        }
+
+        // Recycle the copy of the event that we made.
+        if (eventNoHistory != event) {
+            eventNoHistory.recycle();
+        }
+
+        // Done.
+        return handled;
+!!!889986.java!!!	exitHoverTargets() : void
+        if (mHoveredSelf || mFirstHoverTarget != null) {
+            final long now = SystemClock.uptimeMillis();
+            MotionEvent event = MotionEvent.obtain(now, now,
+                    MotionEvent.ACTION_HOVER_EXIT, 0.0f, 0.0f, 0);
+            event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+            dispatchHoverEvent(event);
+            event.recycle();
+        }
+!!!890114.java!!!	cancelHoverTarget(inout view : View) : void
+        HoverTarget predecessor = null;
+        HoverTarget target = mFirstHoverTarget;
+        while (target != null) {
+            final HoverTarget next = target.next;
+            if (target.child == view) {
+                if (predecessor == null) {
+                    mFirstHoverTarget = next;
+                } else {
+                    predecessor.next = next;
+                }
+                target.recycle();
+
+                final long now = SystemClock.uptimeMillis();
+                MotionEvent event = MotionEvent.obtain(now, now,
+                        MotionEvent.ACTION_HOVER_EXIT, 0.0f, 0.0f, 0);
+                event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+                view.dispatchHoverEvent(event);
+                event.recycle();
+                return;
+            }
+            predecessor = target;
+            target = next;
+        }
+!!!890242.java!!!	hasHoveredChild() : boolean
+        return mFirstHoverTarget != null;
+!!!890370.java!!!	addChildrenForAccessibility(inout childrenForAccessibility : ArrayList<View>) : void
+        ChildListForAccessibility children = ChildListForAccessibility.obtain(this, true);
+        try {
+            final int childrenCount = children.getChildCount();
+            for (int i = 0; i < childrenCount; i++) {
+                View child = children.getChildAt(i);
+                if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE) {
+                    if (child.includeForAccessibility()) {
+                        childrenForAccessibility.add(child);
+                    } else {
+                        child.addChildrenForAccessibility(childrenForAccessibility);
+                    }
+                }
+            }
+        } finally {
+            children.recycle();
+        }
+!!!890498.java!!!	onInterceptHoverEvent(inout event : MotionEvent) : boolean
+        return false;
+!!!890626.java!!!	obtainMotionEventNoHistoryOrSelf(inout event : MotionEvent) : MotionEvent
+        if (event.getHistorySize() == 0) {
+            return event;
+        }
+        return MotionEvent.obtainNoHistory(event);
+!!!890754.java!!!	dispatchGenericPointerEvent(inout event : MotionEvent) : boolean
+        // Send the event to the child under the pointer.
+        final int childrenCount = mChildrenCount;
+        if (childrenCount != 0) {
+            final float x = event.getX();
+            final float y = event.getY();
+
+            final ArrayList<View> preorderedList = buildOrderedChildList();
+            final boolean customOrder = preorderedList == null
+                    && isChildrenDrawingOrderEnabled();
+            final View[] children = mChildren;
+            for (int i = childrenCount - 1; i >= 0; i--) {
+                int childIndex = customOrder ? getChildDrawingOrder(childrenCount, i) : i;
+                final View child = (preorderedList == null)
+                        ? children[childIndex] : preorderedList.get(childIndex);
+                if (!canViewReceivePointerEvents(child)
+                        || !isTransformedTouchPointInView(x, y, child, null)) {
+                    continue;
+                }
+
+                if (dispatchTransformedGenericPointerEvent(event, child)) {
+                    if (preorderedList != null) preorderedList.clear();
+                    return true;
+                }
+            }
+            if (preorderedList != null) preorderedList.clear();
+        }
+
+        // No child handled the event.  Send it to this view group.
+        return super.dispatchGenericPointerEvent(event);
+!!!890882.java!!!	dispatchGenericFocusedEvent(inout event : MotionEvent) : boolean
+        // Send the event to the focused child or to this view group if it has focus.
+        if ((mPrivateFlags & (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS))
+                == (PFLAG_FOCUSED | PFLAG_HAS_BOUNDS)) {
+            return super.dispatchGenericFocusedEvent(event);
+        } else if (mFocused != null && (mFocused.mPrivateFlags & PFLAG_HAS_BOUNDS)
+                == PFLAG_HAS_BOUNDS) {
+            return mFocused.dispatchGenericMotionEvent(event);
+        }
+        return false;
+!!!891010.java!!!	dispatchTransformedGenericPointerEvent(inout event : MotionEvent, inout child : View) : boolean
+        final float offsetX = mScrollX - child.mLeft;
+        final float offsetY = mScrollY - child.mTop;
+
+        boolean handled;
+        if (!child.hasIdentityMatrix()) {
+            MotionEvent transformedEvent = MotionEvent.obtain(event);
+            transformedEvent.offsetLocation(offsetX, offsetY);
+            transformedEvent.transform(child.getInverseMatrix());
+            handled = child.dispatchGenericMotionEvent(transformedEvent);
+            transformedEvent.recycle();
+        } else {
+            event.offsetLocation(offsetX, offsetY);
+            handled = child.dispatchGenericMotionEvent(event);
+            event.offsetLocation(-offsetX, -offsetY);
+        }
+        return handled;
+!!!891138.java!!!	dispatchTouchEvent(inout ev : MotionEvent) : boolean
+        if (mInputEventConsistencyVerifier != null) {
+            mInputEventConsistencyVerifier.onTouchEvent(ev, 1);
+        }
+
+        boolean handled = false;
+        if (onFilterTouchEventForSecurity(ev)) {
+            final int action = ev.getAction();
+            final int actionMasked = action & MotionEvent.ACTION_MASK;
+
+            // Handle an initial down.
+            if (actionMasked == MotionEvent.ACTION_DOWN) {
+                // Throw away all previous state when starting a new touch gesture.
+                // The framework may have dropped the up or cancel event for the previous gesture
+                // due to an app switch, ANR, or some other state change.
+                cancelAndClearTouchTargets(ev);
+                resetTouchState();
+            }
+
+            // Check for interception.
+            final boolean intercepted;
+            if (actionMasked == MotionEvent.ACTION_DOWN
+                    || mFirstTouchTarget != null) {
+                final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
+                if (!disallowIntercept) {
+                    intercepted = onInterceptTouchEvent(ev);
+                    ev.setAction(action); // restore action in case it was changed
+                } else {
+                    intercepted = false;
+                }
+            } else {
+                // There are no touch targets and this action is not an initial down
+                // so this view group continues to intercept touches.
+                intercepted = true;
+            }
+
+            // Check for cancelation.
+            final boolean canceled = resetCancelNextUpFlag(this)
+                    || actionMasked == MotionEvent.ACTION_CANCEL;
+
+            // Update list of touch targets for pointer down, if needed.
+            final boolean split = (mGroupFlags & FLAG_SPLIT_MOTION_EVENTS) != 0;
+            TouchTarget newTouchTarget = null;
+            boolean alreadyDispatchedToNewTouchTarget = false;
+            if (!canceled && !intercepted) {
+                if (actionMasked == MotionEvent.ACTION_DOWN
+                        || (split && actionMasked == MotionEvent.ACTION_POINTER_DOWN)
+                        || actionMasked == MotionEvent.ACTION_HOVER_MOVE) {
+                    final int actionIndex = ev.getActionIndex(); // always 0 for down
+                    final int idBitsToAssign = split ? 1 << ev.getPointerId(actionIndex)
+                            : TouchTarget.ALL_POINTER_IDS;
+
+                    // Clean up earlier touch targets for this pointer id in case they
+                    // have become out of sync.
+                    removePointersFromTouchTargets(idBitsToAssign);
+
+                    final int childrenCount = mChildrenCount;
+                    if (newTouchTarget == null && childrenCount != 0) {
+                        final float x = ev.getX(actionIndex);
+                        final float y = ev.getY(actionIndex);
+                        // Find a child that can receive the event.
+                        // Scan children from front to back.
+                        final ArrayList<View> preorderedList = buildOrderedChildList();
+                        final boolean customOrder = preorderedList == null
+                                && isChildrenDrawingOrderEnabled();
+                        final View[] children = mChildren;
+                        for (int i = childrenCount - 1; i >= 0; i--) {
+                            final int childIndex = customOrder
+                                    ? getChildDrawingOrder(childrenCount, i) : i;
+                            final View child = (preorderedList == null)
+                                    ? children[childIndex] : preorderedList.get(childIndex);
+                            if (!canViewReceivePointerEvents(child)
+                                    || !isTransformedTouchPointInView(x, y, child, null)) {
+                                continue;
+                            }
+
+                            newTouchTarget = getTouchTarget(child);
+                            if (newTouchTarget != null) {
+                                // Child is already receiving touch within its bounds.
+                                // Give it the new pointer in addition to the ones it is handling.
+                                newTouchTarget.pointerIdBits |= idBitsToAssign;
+                                break;
+                            }
+
+                            resetCancelNextUpFlag(child);
+                            if (dispatchTransformedTouchEvent(ev, false, child, idBitsToAssign)) {
+                                // Child wants to receive touch within its bounds.
+                                mLastTouchDownTime = ev.getDownTime();
+                                if (preorderedList != null) {
+                                    // childIndex points into presorted list, find original index
+                                    for (int j = 0; j < childrenCount; j++) {
+                                        if (children[childIndex] == mChildren[j]) {
+                                            mLastTouchDownIndex = j;
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    mLastTouchDownIndex = childIndex;
+                                }
+                                mLastTouchDownX = ev.getX();
+                                mLastTouchDownY = ev.getY();
+                                newTouchTarget = addTouchTarget(child, idBitsToAssign);
+                                alreadyDispatchedToNewTouchTarget = true;
+                                break;
+                            }
+                        }
+                        if (preorderedList != null) preorderedList.clear();
+                    }
+
+                    if (newTouchTarget == null && mFirstTouchTarget != null) {
+                        // Did not find a child to receive the event.
+                        // Assign the pointer to the least recently added target.
+                        newTouchTarget = mFirstTouchTarget;
+                        while (newTouchTarget.next != null) {
+                            newTouchTarget = newTouchTarget.next;
+                        }
+                        newTouchTarget.pointerIdBits |= idBitsToAssign;
+                    }
+                }
+            }
+
+            // Dispatch to touch targets.
+            if (mFirstTouchTarget == null) {
+                // No touch targets so treat this as an ordinary view.
+                handled = dispatchTransformedTouchEvent(ev, canceled, null,
+                        TouchTarget.ALL_POINTER_IDS);
+            } else {
+                // Dispatch to touch targets, excluding the new touch target if we already
+                // dispatched to it.  Cancel touch targets if necessary.
+                TouchTarget predecessor = null;
+                TouchTarget target = mFirstTouchTarget;
+                while (target != null) {
+                    final TouchTarget next = target.next;
+                    if (alreadyDispatchedToNewTouchTarget && target == newTouchTarget) {
+                        handled = true;
+                    } else {
+                        final boolean cancelChild = resetCancelNextUpFlag(target.child)
+                                || intercepted;
+                        if (dispatchTransformedTouchEvent(ev, cancelChild,
+                                target.child, target.pointerIdBits)) {
+                            handled = true;
+                        }
+                        if (cancelChild) {
+                            if (predecessor == null) {
+                                mFirstTouchTarget = next;
+                            } else {
+                                predecessor.next = next;
+                            }
+                            target.recycle();
+                            target = next;
+                            continue;
+                        }
+                    }
+                    predecessor = target;
+                    target = next;
+                }
+            }
+
+            // Update list of touch targets for pointer up or cancel, if needed.
+            if (canceled
+                    || actionMasked == MotionEvent.ACTION_UP
+                    || actionMasked == MotionEvent.ACTION_HOVER_MOVE) {
+                resetTouchState();
+            } else if (split && actionMasked == MotionEvent.ACTION_POINTER_UP) {
+                final int actionIndex = ev.getActionIndex();
+                final int idBitsToRemove = 1 << ev.getPointerId(actionIndex);
+                removePointersFromTouchTargets(idBitsToRemove);
+            }
+        }
+
+        if (!handled && mInputEventConsistencyVerifier != null) {
+            mInputEventConsistencyVerifier.onUnhandledEvent(ev, 1);
+        }
+        return handled;
+!!!891266.java!!!	resetTouchState() : void
+        clearTouchTargets();
+        resetCancelNextUpFlag(this);
+        mGroupFlags &= ~FLAG_DISALLOW_INTERCEPT;
+        mNestedScrollAxes = SCROLL_AXIS_NONE;
+!!!891394.java!!!	resetCancelNextUpFlag(inout view : View) : boolean
+        if ((view.mPrivateFlags & PFLAG_CANCEL_NEXT_UP_EVENT) != 0) {
+            view.mPrivateFlags &= ~PFLAG_CANCEL_NEXT_UP_EVENT;
+            return true;
+        }
+        return false;
+!!!891522.java!!!	clearTouchTargets() : void
+        TouchTarget target = mFirstTouchTarget;
+        if (target != null) {
+            do {
+                TouchTarget next = target.next;
+                target.recycle();
+                target = next;
+            } while (target != null);
+            mFirstTouchTarget = null;
+        }
+!!!891650.java!!!	cancelAndClearTouchTargets(inout event : MotionEvent) : void
+        if (mFirstTouchTarget != null) {
+            boolean syntheticEvent = false;
+            if (event == null) {
+                final long now = SystemClock.uptimeMillis();
+                event = MotionEvent.obtain(now, now,
+                        MotionEvent.ACTION_CANCEL, 0.0f, 0.0f, 0);
+                event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+                syntheticEvent = true;
+            }
+
+            for (TouchTarget target = mFirstTouchTarget; target != null; target = target.next) {
+                resetCancelNextUpFlag(target.child);
+                dispatchTransformedTouchEvent(event, true, target.child, target.pointerIdBits);
+            }
+            clearTouchTargets();
+
+            if (syntheticEvent) {
+                event.recycle();
+            }
+        }
+!!!891778.java!!!	getTouchTarget(inout child : View) : ViewGroup::TouchTarget
+        for (TouchTarget target = mFirstTouchTarget; target != null; target = target.next) {
+            if (target.child == child) {
+                return target;
+            }
+        }
+        return null;
+!!!891906.java!!!	addTouchTarget(inout child : View, in pointerIdBits : int) : ViewGroup::TouchTarget
+        TouchTarget target = TouchTarget.obtain(child, pointerIdBits);
+        target.next = mFirstTouchTarget;
+        mFirstTouchTarget = target;
+        return target;
+!!!892034.java!!!	removePointersFromTouchTargets(in pointerIdBits : int) : void
+        TouchTarget predecessor = null;
+        TouchTarget target = mFirstTouchTarget;
+        while (target != null) {
+            final TouchTarget next = target.next;
+            if ((target.pointerIdBits & pointerIdBits) != 0) {
+                target.pointerIdBits &= ~pointerIdBits;
+                if (target.pointerIdBits == 0) {
+                    if (predecessor == null) {
+                        mFirstTouchTarget = next;
+                    } else {
+                        predecessor.next = next;
+                    }
+                    target.recycle();
+                    target = next;
+                    continue;
+                }
+            }
+            predecessor = target;
+            target = next;
+        }
+!!!892162.java!!!	cancelTouchTarget(inout view : View) : void
+        TouchTarget predecessor = null;
+        TouchTarget target = mFirstTouchTarget;
+        while (target != null) {
+            final TouchTarget next = target.next;
+            if (target.child == view) {
+                if (predecessor == null) {
+                    mFirstTouchTarget = next;
+                } else {
+                    predecessor.next = next;
+                }
+                target.recycle();
+
+                final long now = SystemClock.uptimeMillis();
+                MotionEvent event = MotionEvent.obtain(now, now,
+                        MotionEvent.ACTION_CANCEL, 0.0f, 0.0f, 0);
+                event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+                view.dispatchTouchEvent(event);
+                event.recycle();
+                return;
+            }
+            predecessor = target;
+            target = next;
+        }
+!!!892290.java!!!	canViewReceivePointerEvents(inout child : View) : boolean
+        return (child.mViewFlags & VISIBILITY_MASK) == VISIBLE
+                || child.getAnimation() != null;
+!!!892418.java!!!	isTransformedTouchPointInView(in x : float, in y : float, inout child : View, inout outLocalPoint : PointF) : boolean
+        float localX = x + mScrollX - child.mLeft;
+        float localY = y + mScrollY - child.mTop;
+        if (! child.hasIdentityMatrix() && mAttachInfo != null) {
+            final float[] localXY = mAttachInfo.mTmpTransformLocation;
+            localXY[0] = localX;
+            localXY[1] = localY;
+            child.getInverseMatrix().mapPoints(localXY);
+            localX = localXY[0];
+            localY = localXY[1];
+        }
+        final boolean isInView = child.pointInView(localX, localY);
+        if (isInView && outLocalPoint != null) {
+            outLocalPoint.set(localX, localY);
+        }
+        return isInView;
+!!!892546.java!!!	dispatchTransformedTouchEvent(inout event : MotionEvent, inout cancel : boolean, inout child : View, in desiredPointerIdBits : int) : boolean
+        final boolean handled;
+
+        // Canceling motions is a special case.  We don't need to perform any transformations
+        // or filtering.  The important part is the action, not the contents.
+        final int oldAction = event.getAction();
+        if (cancel || oldAction == MotionEvent.ACTION_CANCEL) {
+            event.setAction(MotionEvent.ACTION_CANCEL);
+            if (child == null) {
+                handled = super.dispatchTouchEvent(event);
+            } else {
+                handled = child.dispatchTouchEvent(event);
+            }
+            event.setAction(oldAction);
+            return handled;
+        }
+
+        // Calculate the number of pointers to deliver.
+        final int oldPointerIdBits = event.getPointerIdBits();
+        final int newPointerIdBits = oldPointerIdBits & desiredPointerIdBits;
+
+        // If for some reason we ended up in an inconsistent state where it looks like we
+        // might produce a motion event with no pointers in it, then drop the event.
+        if (newPointerIdBits == 0) {
+            return false;
+        }
+
+        // If the number of pointers is the same and we don't need to perform any fancy
+        // irreversible transformations, then we can reuse the motion event for this
+        // dispatch as long as we are careful to revert any changes we make.
+        // Otherwise we need to make a copy.
+        final MotionEvent transformedEvent;
+        if (newPointerIdBits == oldPointerIdBits) {
+            if (child == null || child.hasIdentityMatrix()) {
+                if (child == null) {
+                    handled = super.dispatchTouchEvent(event);
+                } else {
+                    final float offsetX = mScrollX - child.mLeft;
+                    final float offsetY = mScrollY - child.mTop;
+                    event.offsetLocation(offsetX, offsetY);
+
+                    handled = child.dispatchTouchEvent(event);
+
+                    event.offsetLocation(-offsetX, -offsetY);
+                }
+                return handled;
+            }
+            transformedEvent = MotionEvent.obtain(event);
+        } else {
+            transformedEvent = event.split(newPointerIdBits);
+        }
+
+        // Perform any necessary transformations and dispatch.
+        if (child == null) {
+            handled = super.dispatchTouchEvent(transformedEvent);
+        } else {
+            final float offsetX = mScrollX - child.mLeft;
+            final float offsetY = mScrollY - child.mTop;
+            transformedEvent.offsetLocation(offsetX, offsetY);
+            if (! child.hasIdentityMatrix()) {
+                transformedEvent.transform(child.getInverseMatrix());
+            }
+
+            handled = child.dispatchTouchEvent(transformedEvent);
+        }
+
+        // Done.
+        transformedEvent.recycle();
+        return handled;
+!!!892674.java!!!	setMotionEventSplittingEnabled(inout split : boolean) : void
+        // TODO Applications really shouldn't change this setting mid-touch event,
+        // but perhaps this should handle that case and send ACTION_CANCELs to any child views
+        // with gestures in progress when this is changed.
+        if (split) {
+            mGroupFlags |= FLAG_SPLIT_MOTION_EVENTS;
+        } else {
+            mGroupFlags &= ~FLAG_SPLIT_MOTION_EVENTS;
+        }
+!!!892802.java!!!	isMotionEventSplittingEnabled() : boolean
+        return (mGroupFlags & FLAG_SPLIT_MOTION_EVENTS) == FLAG_SPLIT_MOTION_EVENTS;
+!!!892930.java!!!	isTransitionGroup() : boolean
+        if ((mGroupFlags & FLAG_IS_TRANSITION_GROUP_SET) != 0) {
+            return ((mGroupFlags & FLAG_IS_TRANSITION_GROUP) != 0);
+        } else {
+            return getBackground() != null || getTransitionName() != null;
+        }
+!!!893058.java!!!	setTransitionGroup(inout isTransitionGroup : boolean) : void
+        mGroupFlags |= FLAG_IS_TRANSITION_GROUP_SET;
+        if (isTransitionGroup) {
+            mGroupFlags |= FLAG_IS_TRANSITION_GROUP;
+        } else {
+            mGroupFlags &= ~FLAG_IS_TRANSITION_GROUP;
+        }
+!!!893186.java!!!	requestDisallowInterceptTouchEvent(inout disallowIntercept : boolean) : void
+
+        if (disallowIntercept == ((mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0)) {
+            // We're already in this state, assume our ancestors are too
+            return;
+        }
+
+        if (disallowIntercept) {
+            mGroupFlags |= FLAG_DISALLOW_INTERCEPT;
+        } else {
+            mGroupFlags &= ~FLAG_DISALLOW_INTERCEPT;
+        }
+
+        // Pass it up to our parent
+        if (mParent != null) {
+            mParent.requestDisallowInterceptTouchEvent(disallowIntercept);
+        }
+!!!893314.java!!!	onInterceptTouchEvent(inout ev : MotionEvent) : boolean
+        return false;
+!!!893442.java!!!	requestFocus(in direction : int, inout previouslyFocusedRect : Rect) : boolean
+        if (DBG) {
+            System.out.println(this + " ViewGroup.requestFocus direction="
+                    + direction);
+        }
+        int descendantFocusability = getDescendantFocusability();
+
+        switch (descendantFocusability) {
+            case FOCUS_BLOCK_DESCENDANTS:
+                return super.requestFocus(direction, previouslyFocusedRect);
+            case FOCUS_BEFORE_DESCENDANTS: {
+                final boolean took = super.requestFocus(direction, previouslyFocusedRect);
+                return took ? took : onRequestFocusInDescendants(direction, previouslyFocusedRect);
+            }
+            case FOCUS_AFTER_DESCENDANTS: {
+                final boolean took = onRequestFocusInDescendants(direction, previouslyFocusedRect);
+                return took ? took : super.requestFocus(direction, previouslyFocusedRect);
+            }
+            default:
+                throw new IllegalStateException("descendant focusability must be "
+                        + "one of FOCUS_BEFORE_DESCENDANTS, FOCUS_AFTER_DESCENDANTS, FOCUS_BLOCK_DESCENDANTS "
+                        + "but is " + descendantFocusability);
+        }
+!!!893570.java!!!	onRequestFocusInDescendants(in direction : int, inout previouslyFocusedRect : Rect) : boolean
+        int index;
+        int increment;
+        int end;
+        int count = mChildrenCount;
+        if ((direction & FOCUS_FORWARD) != 0) {
+            index = 0;
+            increment = 1;
+            end = count;
+        } else {
+            index = count - 1;
+            increment = -1;
+            end = -1;
+        }
+        final View[] children = mChildren;
+        for (int i = index; i != end; i += increment) {
+            View child = children[i];
+            if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE) {
+                if (child.requestFocus(direction, previouslyFocusedRect)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+!!!893698.java!!!	dispatchStartTemporaryDetach() : void
+        super.dispatchStartTemporaryDetach();
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            children[i].dispatchStartTemporaryDetach();
+        }
+!!!893826.java!!!	dispatchFinishTemporaryDetach() : void
+        super.dispatchFinishTemporaryDetach();
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            children[i].dispatchFinishTemporaryDetach();
+        }
+!!!893954.java!!!	dispatchAttachedToWindow(inout info : View::AttachInfo, in visibility : int) : void
+        mGroupFlags |= FLAG_PREVENT_DISPATCH_ATTACHED_TO_WINDOW;
+        super.dispatchAttachedToWindow(info, visibility);
+        mGroupFlags &= ~FLAG_PREVENT_DISPATCH_ATTACHED_TO_WINDOW;
+
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            final View child = children[i];
+            child.dispatchAttachedToWindow(info,
+                    visibility | (child.mViewFlags & VISIBILITY_MASK));
+        }
+!!!894082.java!!!	dispatchScreenStateChanged(in screenState : int) : void
+        super.dispatchScreenStateChanged(screenState);
+
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            children[i].dispatchScreenStateChanged(screenState);
+        }
+!!!894210.java!!!	dispatchPopulateAccessibilityEventInternal(inout event : AccessibilityEvent) : boolean
+        boolean handled = false;
+        if (includeForAccessibility()) {
+            handled = super.dispatchPopulateAccessibilityEventInternal(event);
+            if (handled) {
+                return handled;
+            }
+        }
+        // Let our children have a shot in populating the event.
+        ChildListForAccessibility children = ChildListForAccessibility.obtain(this, true);
+        try {
+            final int childCount = children.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                View child = children.getChildAt(i);
+                if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE) {
+                    handled = child.dispatchPopulateAccessibilityEvent(event);
+                    if (handled) {
+                        return handled;
+                    }
+                }
+            }
+        } finally {
+            children.recycle();
+        }
+        return false;
+!!!894338.java!!!	onInitializeAccessibilityNodeInfoInternal(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfoInternal(info);
+        if (mAttachInfo != null) {
+            final ArrayList<View> childrenForAccessibility = mAttachInfo.mTempArrayList;
+            childrenForAccessibility.clear();
+            addChildrenForAccessibility(childrenForAccessibility);
+            final int childrenForAccessibilityCount = childrenForAccessibility.size();
+            for (int i = 0; i < childrenForAccessibilityCount; i++) {
+                final View child = childrenForAccessibility.get(i);
+                info.addChildUnchecked(child);
+            }
+            childrenForAccessibility.clear();
+        }
+!!!894466.java!!!	onInitializeAccessibilityEventInternal(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEventInternal(event);
+        event.setClassName(ViewGroup.class.getName());
+!!!894594.java!!!	notifySubtreeAccessibilityStateChanged(inout child : View, inout source : View, in changeType : int) : void
+        // If this is a live region, we should send a subtree change event
+        // from this view. Otherwise, we can let it propagate up.
+        if (getAccessibilityLiveRegion() != ACCESSIBILITY_LIVE_REGION_NONE) {
+            notifyViewAccessibilityStateChangedIfNeeded(changeType);
+        } else if (mParent != null) {
+            try {
+                mParent.notifySubtreeAccessibilityStateChanged(this, source, changeType);
+            } catch (AbstractMethodError e) {
+                Log.e(VIEW_LOG_TAG, mParent.getClass().getSimpleName() +
+                        " does not fully implement ViewParent", e);
+            }
+        }
+!!!894722.java!!!	resetSubtreeAccessibilityStateChanged() : void
+        super.resetSubtreeAccessibilityStateChanged();
+        View[] children = mChildren;
+        final int childCount = mChildrenCount;
+        for (int i = 0; i < childCount; i++) {
+            children[i].resetSubtreeAccessibilityStateChanged();
+        }
+!!!894850.java!!!	dispatchDetachedFromWindow() : void
+        // If we still have a touch target, we are still in the process of
+        // dispatching motion events to a child; we need to get rid of that
+        // child to avoid dispatching events to it after the window is torn
+        // down. To make sure we keep the child in a consistent state, we
+        // first send it an ACTION_CANCEL motion event.
+        cancelAndClearTouchTargets(null);
+
+        // Similarly, set ACTION_EXIT to all hover targets and clear them.
+        exitHoverTargets();
+
+        // In case view is detached while transition is running
+        mLayoutCalledWhileSuppressed = false;
+
+        // Tear down our drag tracking
+        mDragNotifiedChildren = null;
+        if (mCurrentDrag != null) {
+            mCurrentDrag.recycle();
+            mCurrentDrag = null;
+        }
+
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            children[i].dispatchDetachedFromWindow();
+        }
+        clearDisappearingChildren();
+        super.dispatchDetachedFromWindow();
+!!!894978.java!!!	internalSetPadding(in left : int, in top : int, in right : int, in bottom : int) : void
+        super.internalSetPadding(left, top, right, bottom);
+
+        if ((mPaddingLeft | mPaddingTop | mPaddingRight | mPaddingBottom) != 0) {
+            mGroupFlags |= FLAG_PADDING_NOT_NULL;
+        } else {
+            mGroupFlags &= ~FLAG_PADDING_NOT_NULL;
+        }
+!!!895106.java!!!	dispatchSaveInstanceState(inout container : SparseArray<Parcelable>) : void
+        super.dispatchSaveInstanceState(container);
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            View c = children[i];
+            if ((c.mViewFlags & PARENT_SAVE_DISABLED_MASK) != PARENT_SAVE_DISABLED) {
+                c.dispatchSaveInstanceState(container);
+            }
+        }
+!!!895234.java!!!	dispatchFreezeSelfOnly(inout container : SparseArray<Parcelable>) : void
+        super.dispatchSaveInstanceState(container);
+!!!895362.java!!!	dispatchRestoreInstanceState(inout container : SparseArray<Parcelable>) : void
+        super.dispatchRestoreInstanceState(container);
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            View c = children[i];
+            if ((c.mViewFlags & PARENT_SAVE_DISABLED_MASK) != PARENT_SAVE_DISABLED) {
+                c.dispatchRestoreInstanceState(container);
+            }
+        }
+!!!895490.java!!!	dispatchThawSelfOnly(inout container : SparseArray<Parcelable>) : void
+        super.dispatchRestoreInstanceState(container);
+!!!895618.java!!!	setChildrenDrawingCacheEnabled(inout enabled : boolean) : void
+        if (enabled || (mPersistentDrawingCache & PERSISTENT_ALL_CACHES) != PERSISTENT_ALL_CACHES) {
+            final View[] children = mChildren;
+            final int count = mChildrenCount;
+            for (int i = 0; i < count; i++) {
+                children[i].setDrawingCacheEnabled(enabled);
+            }
+        }
+!!!895746.java!!!	onAnimationStart() : void
+        super.onAnimationStart();
+
+        // When this ViewGroup's animation starts, build the cache for the children
+        if ((mGroupFlags & FLAG_ANIMATION_CACHE) == FLAG_ANIMATION_CACHE) {
+            final int count = mChildrenCount;
+            final View[] children = mChildren;
+            final boolean buildCache = !isHardwareAccelerated();
+
+            for (int i = 0; i < count; i++) {
+                final View child = children[i];
+                if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE) {
+                    child.setDrawingCacheEnabled(true);
+                    if (buildCache) {
+                        child.buildDrawingCache(true);
+                    }
+                }
+            }
+
+            mGroupFlags |= FLAG_CHILDREN_DRAWN_WITH_CACHE;
+        }
+!!!895874.java!!!	onAnimationEnd() : void
+        super.onAnimationEnd();
+
+        // When this ViewGroup's animation ends, destroy the cache of the children
+        if ((mGroupFlags & FLAG_ANIMATION_CACHE) == FLAG_ANIMATION_CACHE) {
+            mGroupFlags &= ~FLAG_CHILDREN_DRAWN_WITH_CACHE;
+
+            if ((mPersistentDrawingCache & PERSISTENT_ANIMATION_CACHE) == 0) {
+                setChildrenDrawingCacheEnabled(false);
+            }
+        }
+!!!896002.java!!!	createSnapshot(inout quality : Bitmap.Config, in backgroundColor : int, inout skipChildren : boolean) : Bitmap
+        int count = mChildrenCount;
+        int[] visibilities = null;
+
+        if (skipChildren) {
+            visibilities = new int[count];
+            for (int i = 0; i < count; i++) {
+                View child = getChildAt(i);
+                visibilities[i] = child.getVisibility();
+                if (visibilities[i] == View.VISIBLE) {
+                    child.setVisibility(INVISIBLE);
+                }
+            }
+        }
+
+        Bitmap b = super.createSnapshot(quality, backgroundColor, skipChildren);
+
+        if (skipChildren) {
+            for (int i = 0; i < count; i++) {
+                getChildAt(i).setVisibility(visibilities[i]);
+            }
+        }
+
+        return b;
+!!!896130.java!!!	isLayoutModeOptical() : boolean
+        return mLayoutMode == LAYOUT_MODE_OPTICAL_BOUNDS;
+!!!896258.java!!!	computeOpticalInsets() : Insets
+        if (isLayoutModeOptical()) {
+            int left = 0;
+            int top = 0;
+            int right = 0;
+            int bottom = 0;
+            for (int i = 0; i < mChildrenCount; i++) {
+                View child = getChildAt(i);
+                if (child.getVisibility() == VISIBLE) {
+                    Insets insets = child.getOpticalInsets();
+                    left =   Math.max(left,   insets.left);
+                    top =    Math.max(top,    insets.top);
+                    right =  Math.max(right,  insets.right);
+                    bottom = Math.max(bottom, insets.bottom);
+                }
+            }
+            return Insets.of(left, top, right, bottom);
+        } else {
+            return Insets.NONE;
+        }
+!!!896386.java!!!	fillRect(inout canvas : Canvas, inout paint : Paint, in x1 : int, in y1 : int, in x2 : int, in y2 : int) : void
+        if (x1 != x2 && y1 != y2) {
+            if (x1 > x2) {
+                int tmp = x1; x1 = x2; x2 = tmp;
+            }
+            if (y1 > y2) {
+                int tmp = y1; y1 = y2; y2 = tmp;
+            }
+            canvas.drawRect(x1, y1, x2, y2, paint);
+        }
+!!!896514.java!!!	sign(in x : int) : int
+        return (x >= 0) ? 1 : -1;
+!!!896642.java!!!	drawCorner(inout c : Canvas, inout paint : Paint, in x1 : int, in y1 : int, in dx : int, in dy : int, in lw : int) : void
+        fillRect(c, paint, x1, y1, x1 + dx, y1 + lw * sign(dy));
+        fillRect(c, paint, x1, y1, x1 + lw * sign(dx), y1 + dy);
+!!!896770.java!!!	dipsToPixels(in dips : int) : int
+        float scale = getContext().getResources().getDisplayMetrics().density;
+        return (int) (dips * scale + 0.5f);
+!!!896898.java!!!	drawRectCorners(inout canvas : Canvas, in x1 : int, in y1 : int, in x2 : int, in y2 : int, inout paint : Paint, in lineLength : int, in lineWidth : int) : void
+        drawCorner(canvas, paint, x1, y1, lineLength, lineLength, lineWidth);
+        drawCorner(canvas, paint, x1, y2, lineLength, -lineLength, lineWidth);
+        drawCorner(canvas, paint, x2, y1, -lineLength, lineLength, lineWidth);
+        drawCorner(canvas, paint, x2, y2, -lineLength, -lineLength, lineWidth);
+!!!897026.java!!!	fillDifference(inout canvas : Canvas, in x2 : int, in y2 : int, in x3 : int, in y3 : int, in dx1 : int, in dy1 : int, in dx2 : int, in dy2 : int, inout paint : Paint) : void
+        int x1 = x2 - dx1;
+        int y1 = y2 - dy1;
+
+        int x4 = x3 + dx2;
+        int y4 = y3 + dy2;
+
+        fillRect(canvas, paint, x1, y1, x4, y2);
+        fillRect(canvas, paint, x1, y2, x2, y3);
+        fillRect(canvas, paint, x3, y2, x4, y3);
+        fillRect(canvas, paint, x1, y3, x4, y4);
+!!!897154.java!!!	onDebugDrawMargins(inout canvas : Canvas, inout paint : Paint) : void
+        for (int i = 0; i < getChildCount(); i++) {
+            View c = getChildAt(i);
+            c.getLayoutParams().onDebugDraw(c, canvas, paint);
+        }
+!!!897282.java!!!	onDebugDraw(inout canvas : Canvas) : void
+        Paint paint = getDebugPaint();
+
+        // Draw optical bounds
+        {
+            paint.setColor(Color.RED);
+            paint.setStyle(Paint.Style.STROKE);
+
+            for (int i = 0; i < getChildCount(); i++) {
+                View c = getChildAt(i);
+                Insets insets = c.getOpticalInsets();
+
+                drawRect(canvas, paint,
+                        c.getLeft()   + insets.left,
+                        c.getTop()    + insets.top,
+                        c.getRight()  - insets.right  - 1,
+                        c.getBottom() - insets.bottom - 1);
+            }
+        }
+
+        // Draw margins
+        {
+            paint.setColor(Color.argb(63, 255, 0, 255));
+            paint.setStyle(Paint.Style.FILL);
+
+            onDebugDrawMargins(canvas, paint);
+        }
+
+        // Draw clip bounds
+        {
+            paint.setColor(Color.rgb(63, 127, 255));
+            paint.setStyle(Paint.Style.FILL);
+
+            int lineLength = dipsToPixels(8);
+            int lineWidth = dipsToPixels(1);
+            for (int i = 0; i < getChildCount(); i++) {
+                View c = getChildAt(i);
+                drawRectCorners(canvas, c.getLeft(), c.getTop(), c.getRight(), c.getBottom(),
+                        paint, lineLength, lineWidth);
+            }
+        }
+!!!897410.java!!!	dispatchDraw(inout canvas : Canvas) : void
+        boolean usingRenderNodeProperties = canvas.isRecordingFor(mRenderNode);
+        final int childrenCount = mChildrenCount;
+        final View[] children = mChildren;
+        int flags = mGroupFlags;
+
+        if ((flags & FLAG_RUN_ANIMATION) != 0 && canAnimate()) {
+            final boolean cache = (mGroupFlags & FLAG_ANIMATION_CACHE) == FLAG_ANIMATION_CACHE;
+
+            final boolean buildCache = !isHardwareAccelerated();
+            for (int i = 0; i < childrenCount; i++) {
+                final View child = children[i];
+                if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE) {
+                    final LayoutParams params = child.getLayoutParams();
+                    attachLayoutAnimationParameters(child, params, i, childrenCount);
+                    bindLayoutAnimation(child);
+                    if (cache) {
+                        child.setDrawingCacheEnabled(true);
+                        if (buildCache) {
+                            child.buildDrawingCache(true);
+                        }
+                    }
+                }
+            }
+
+            final LayoutAnimationController controller = mLayoutAnimationController;
+            if (controller.willOverlap()) {
+                mGroupFlags |= FLAG_OPTIMIZE_INVALIDATE;
+            }
+
+            controller.start();
+
+            mGroupFlags &= ~FLAG_RUN_ANIMATION;
+            mGroupFlags &= ~FLAG_ANIMATION_DONE;
+
+            if (cache) {
+                mGroupFlags |= FLAG_CHILDREN_DRAWN_WITH_CACHE;
+            }
+
+            if (mAnimationListener != null) {
+                mAnimationListener.onAnimationStart(controller.getAnimation());
+            }
+        }
+
+        int clipSaveCount = 0;
+        final boolean clipToPadding = (flags & CLIP_TO_PADDING_MASK) == CLIP_TO_PADDING_MASK;
+        if (clipToPadding) {
+            clipSaveCount = canvas.save();
+            canvas.clipRect(mScrollX + mPaddingLeft, mScrollY + mPaddingTop,
+                    mScrollX + mRight - mLeft - mPaddingRight,
+                    mScrollY + mBottom - mTop - mPaddingBottom);
+        }
+
+        // We will draw our child's animation, let's reset the flag
+        mPrivateFlags &= ~PFLAG_DRAW_ANIMATION;
+        mGroupFlags &= ~FLAG_INVALIDATE_REQUIRED;
+
+        boolean more = false;
+        final long drawingTime = getDrawingTime();
+
+        if (usingRenderNodeProperties) canvas.insertReorderBarrier();
+        // Only use the preordered list if not HW accelerated, since the HW pipeline will do the
+        // draw reordering internally
+        final ArrayList<View> preorderedList = usingRenderNodeProperties
+                ? null : buildOrderedChildList();
+        final boolean customOrder = preorderedList == null
+                && isChildrenDrawingOrderEnabled();
+        for (int i = 0; i < childrenCount; i++) {
+            int childIndex = customOrder ? getChildDrawingOrder(childrenCount, i) : i;
+            final View child = (preorderedList == null)
+                    ? children[childIndex] : preorderedList.get(childIndex);
+            if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE || child.getAnimation() != null) {
+                more |= drawChild(canvas, child, drawingTime);
+            }
+        }
+        if (preorderedList != null) preorderedList.clear();
+
+        // Draw any disappearing views that have animations
+        if (mDisappearingChildren != null) {
+            final ArrayList<View> disappearingChildren = mDisappearingChildren;
+            final int disappearingCount = disappearingChildren.size() - 1;
+            // Go backwards -- we may delete as animations finish
+            for (int i = disappearingCount; i >= 0; i--) {
+                final View child = disappearingChildren.get(i);
+                more |= drawChild(canvas, child, drawingTime);
+            }
+        }
+        if (usingRenderNodeProperties) canvas.insertInorderBarrier();
+
+        if (debugDraw()) {
+            onDebugDraw(canvas);
+        }
+
+        if (clipToPadding) {
+            canvas.restoreToCount(clipSaveCount);
+        }
+
+        // mGroupFlags might have been updated by drawChild()
+        flags = mGroupFlags;
+
+        if ((flags & FLAG_INVALIDATE_REQUIRED) == FLAG_INVALIDATE_REQUIRED) {
+            invalidate(true);
+        }
+
+        if ((flags & FLAG_ANIMATION_DONE) == 0 && (flags & FLAG_NOTIFY_ANIMATION_LISTENER) == 0 &&
+                mLayoutAnimationController.isDone() && !more) {
+            // We want to erase the drawing cache and notify the listener after the
+            // next frame is drawn because one extra invalidate() is caused by
+            // drawChild() after the animation is over
+            mGroupFlags |= FLAG_NOTIFY_ANIMATION_LISTENER;
+            final Runnable end = new Runnable() {
+               public void run() {
+                   notifyAnimationListener();
+               }
+            };
+            post(end);
+        }
+!!!897538.java!!!	getOverlay() : ViewGroupOverlay
+        if (mOverlay == null) {
+            mOverlay = new ViewGroupOverlay(mContext, this);
+        }
+        return (ViewGroupOverlay) mOverlay;
+!!!897666.java!!!	getChildDrawingOrder(in childCount : int, in i : int) : int
+        return i;
+!!!897794.java!!!	hasChildWithZ() : boolean
+        for (int i = 0; i < mChildrenCount; i++) {
+            if (mChildren[i].getZ() != 0) return true;
+        }
+        return false;
+!!!897922.java!!!	buildOrderedChildList() : View
+        final int count = mChildrenCount;
+        if (count <= 1 || !hasChildWithZ()) return null;
+
+        if (mPreSortedChildren == null) {
+            mPreSortedChildren = new ArrayList<View>(count);
+        } else {
+            mPreSortedChildren.ensureCapacity(count);
+        }
+
+        final boolean useCustomOrder = isChildrenDrawingOrderEnabled();
+        for (int i = 0; i < mChildrenCount; i++) {
+            // add next child (in child order) to end of list
+            int childIndex = useCustomOrder ? getChildDrawingOrder(mChildrenCount, i) : i;
+            View nextChild = mChildren[childIndex];
+            float currentZ = nextChild.getZ();
+
+            // insert ahead of any Views with greater Z
+            int insertIndex = i;
+            while (insertIndex > 0 && mPreSortedChildren.get(insertIndex - 1).getZ() > currentZ) {
+                insertIndex--;
+            }
+            mPreSortedChildren.add(insertIndex, nextChild);
+        }
+        return mPreSortedChildren;
+!!!898050.java!!!	notifyAnimationListener() : void
+        mGroupFlags &= ~FLAG_NOTIFY_ANIMATION_LISTENER;
+        mGroupFlags |= FLAG_ANIMATION_DONE;
+
+        if (mAnimationListener != null) {
+           final Runnable end = new Runnable() {
+               public void run() {
+                   mAnimationListener.onAnimationEnd(mLayoutAnimationController.getAnimation());
+               }
+           };
+           post(end);
+        }
+
+        if ((mGroupFlags & FLAG_ANIMATION_CACHE) == FLAG_ANIMATION_CACHE) {
+            mGroupFlags &= ~FLAG_CHILDREN_DRAWN_WITH_CACHE;
+            if ((mPersistentDrawingCache & PERSISTENT_ANIMATION_CACHE) == 0) {
+                setChildrenDrawingCacheEnabled(false);
+            }
+        }
+
+        invalidate(true);
+!!!898178.java!!!	dispatchGetDisplayList() : void
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            final View child = children[i];
+            if (((child.mViewFlags & VISIBILITY_MASK) == VISIBLE || child.getAnimation() != null) &&
+                    child.hasStaticLayer()) {
+                recreateChildDisplayList(child);
+            }
+        }
+        if (mOverlay != null) {
+            View overlayView = mOverlay.getOverlayView();
+            recreateChildDisplayList(overlayView);
+        }
+        if (mDisappearingChildren != null) {
+            final ArrayList<View> disappearingChildren = mDisappearingChildren;
+            final int disappearingCount = disappearingChildren.size();
+            for (int i = 0; i < disappearingCount; ++i) {
+                final View child = disappearingChildren.get(i);
+                recreateChildDisplayList(child);
+            }
+        }
+!!!898306.java!!!	recreateChildDisplayList(inout child : View) : void
+        child.mRecreateDisplayList = (child.mPrivateFlags & PFLAG_INVALIDATED)
+                == PFLAG_INVALIDATED;
+        child.mPrivateFlags &= ~PFLAG_INVALIDATED;
+        child.getDisplayList();
+        child.mRecreateDisplayList = false;
+!!!898434.java!!!	drawChild(inout canvas : Canvas, inout child : View, in drawingTime : long) : boolean
+        return child.draw(canvas, this, drawingTime);
+!!!898562.java!!!	getClipChildren() : boolean
+        return ((mGroupFlags & FLAG_CLIP_CHILDREN) != 0);
+!!!898690.java!!!	setClipChildren(inout clipChildren : boolean) : void
+        boolean previousValue = (mGroupFlags & FLAG_CLIP_CHILDREN) == FLAG_CLIP_CHILDREN;
+        if (clipChildren != previousValue) {
+            setBooleanFlag(FLAG_CLIP_CHILDREN, clipChildren);
+            for (int i = 0; i < mChildrenCount; ++i) {
+                View child = getChildAt(i);
+                if (child.mRenderNode != null) {
+                    child.mRenderNode.setClipToBounds(clipChildren);
+                }
+            }
+            invalidate(true);
+        }
+!!!898818.java!!!	setClipToPadding(inout clipToPadding : boolean) : void
+        if (hasBooleanFlag(FLAG_CLIP_TO_PADDING) != clipToPadding) {
+            setBooleanFlag(FLAG_CLIP_TO_PADDING, clipToPadding);
+            invalidate(true);
+        }
+!!!898946.java!!!	getClipToPadding() : boolean
+        return hasBooleanFlag(FLAG_CLIP_TO_PADDING);
+!!!899074.java!!!	dispatchSetSelected(inout selected : boolean) : void
+        final View[] children = mChildren;
+        final int count = mChildrenCount;
+        for (int i = 0; i < count; i++) {
+            children[i].setSelected(selected);
+        }
+!!!899202.java!!!	dispatchSetActivated(inout activated : boolean) : void
+        final View[] children = mChildren;
+        final int count = mChildrenCount;
+        for (int i = 0; i < count; i++) {
+            children[i].setActivated(activated);
+        }
+!!!899330.java!!!	dispatchSetPressed(inout pressed : boolean) : void
+        final View[] children = mChildren;
+        final int count = mChildrenCount;
+        for (int i = 0; i < count; i++) {
+            final View child = children[i];
+            // Children that are clickable on their own should not
+            // show a pressed state when their parent view does.
+            // Clearing a pressed state always propagates.
+            if (!pressed || (!child.isClickable() && !child.isLongClickable())) {
+                child.setPressed(pressed);
+            }
+        }
+!!!899458.java!!!	dispatchCancelPendingInputEvents() : void
+        super.dispatchCancelPendingInputEvents();
+
+        final View[] children = mChildren;
+        final int count = mChildrenCount;
+        for (int i = 0; i < count; i++) {
+            children[i].dispatchCancelPendingInputEvents();
+        }
+!!!899586.java!!!	setStaticTransformationsEnabled(inout enabled : boolean) : void
+        setBooleanFlag(FLAG_SUPPORT_STATIC_TRANSFORMATIONS, enabled);
+!!!899714.java!!!	getChildStaticTransformation(inout child : View, inout t : Transformation) : boolean
+        return false;
+!!!899842.java!!!	getChildTransformation() : Transformation
+        if (mChildTransformation == null) {
+            mChildTransformation = new Transformation();
+        }
+        return mChildTransformation;
+!!!899970.java!!!	findViewTraversal(in id : int) : View
+        if (id == mID) {
+            return this;
+        }
+
+        final View[] where = mChildren;
+        final int len = mChildrenCount;
+
+        for (int i = 0; i < len; i++) {
+            View v = where[i];
+
+            if ((v.mPrivateFlags & PFLAG_IS_ROOT_NAMESPACE) == 0) {
+                v = v.findViewById(id);
+
+                if (v != null) {
+                    return v;
+                }
+            }
+        }
+
+        return null;
+!!!900098.java!!!	findViewWithTagTraversal(inout tag : Object) : View
+        if (tag != null && tag.equals(mTag)) {
+            return this;
+        }
+
+        final View[] where = mChildren;
+        final int len = mChildrenCount;
+
+        for (int i = 0; i < len; i++) {
+            View v = where[i];
+
+            if ((v.mPrivateFlags & PFLAG_IS_ROOT_NAMESPACE) == 0) {
+                v = v.findViewWithTag(tag);
+
+                if (v != null) {
+                    return v;
+                }
+            }
+        }
+
+        return null;
+!!!900226.java!!!	findViewByPredicateTraversal(inout predicate : Predicate<View>, inout childToSkip : View) : View
+        if (predicate.apply(this)) {
+            return this;
+        }
+
+        final View[] where = mChildren;
+        final int len = mChildrenCount;
+
+        for (int i = 0; i < len; i++) {
+            View v = where[i];
+
+            if (v != childToSkip && (v.mPrivateFlags & PFLAG_IS_ROOT_NAMESPACE) == 0) {
+                v = v.findViewByPredicate(predicate);
+
+                if (v != null) {
+                    return v;
+                }
+            }
+        }
+
+        return null;
+!!!900354.java!!!	addView(inout child : View) : void
+        addView(child, -1);
+!!!900482.java!!!	addView(inout child : View, in index : int) : void
+        LayoutParams params = child.getLayoutParams();
+        if (params == null) {
+            params = generateDefaultLayoutParams();
+            if (params == null) {
+                throw new IllegalArgumentException("generateDefaultLayoutParams() cannot return null");
+            }
+        }
+        addView(child, index, params);
+!!!900610.java!!!	addView(inout child : View, in width : int, in height : int) : void
+        final LayoutParams params = generateDefaultLayoutParams();
+        params.width = width;
+        params.height = height;
+        addView(child, -1, params);
+!!!900738.java!!!	addView(inout child : View, inout params : ViewGroup::LayoutParams) : void
+        addView(child, -1, params);
+!!!900866.java!!!	addView(inout child : View, in index : int, inout params : ViewGroup::LayoutParams) : void
+        if (DBG) {
+            System.out.println(this + " addView");
+        }
+
+        // addViewInner() will call child.requestLayout() when setting the new LayoutParams
+        // therefore, we call requestLayout() on ourselves before, so that the child's request
+        // will be blocked at our level
+        requestLayout();
+        invalidate(true);
+        addViewInner(child, index, params, false);
+!!!900994.java!!!	updateViewLayout(inout view : View, inout params : ViewGroup::LayoutParams) : void
+        if (!checkLayoutParams(params)) {
+            throw new IllegalArgumentException("Invalid LayoutParams supplied to " + this);
+        }
+        if (view.mParent != this) {
+            throw new IllegalArgumentException("Given view not a child of " + this);
+        }
+        view.setLayoutParams(params);
+!!!901122.java!!!	checkLayoutParams(inout p : ViewGroup::LayoutParams) : boolean
+        return  p != null;
+!!!901506.java!!!	setOnHierarchyChangeListener(inout listener : ViewGroup::OnHierarchyChangeListener) : void
+        mOnHierarchyChangeListener = listener;
+!!!901634.java!!!	onViewAdded(inout child : View) : void
+        if (mOnHierarchyChangeListener != null) {
+            mOnHierarchyChangeListener.onChildViewAdded(this, child);
+        }
+!!!901762.java!!!	onViewRemoved(inout child : View) : void
+        if (mOnHierarchyChangeListener != null) {
+            mOnHierarchyChangeListener.onChildViewRemoved(this, child);
+        }
+!!!901890.java!!!	clearCachedLayoutMode() : void
+        if (!hasBooleanFlag(FLAG_LAYOUT_MODE_WAS_EXPLICITLY_SET)) {
+           mLayoutMode = LAYOUT_MODE_UNDEFINED;
+        }
+!!!902018.java!!!	onAttachedToWindow() : void
+        super.onAttachedToWindow();
+        clearCachedLayoutMode();
+!!!902146.java!!!	onDetachedFromWindow() : void
+        super.onDetachedFromWindow();
+        clearCachedLayoutMode();
+!!!902274.java!!!	addViewInLayout(inout child : View, in index : int, inout params : ViewGroup::LayoutParams) : boolean
+        return addViewInLayout(child, index, params, false);
+!!!902402.java!!!	addViewInLayout(inout child : View, in index : int, inout params : ViewGroup::LayoutParams, inout preventRequestLayout : boolean) : boolean
+        child.mParent = null;
+        addViewInner(child, index, params, preventRequestLayout);
+        child.mPrivateFlags = (child.mPrivateFlags & ~PFLAG_DIRTY_MASK) | PFLAG_DRAWN;
+        return true;
+!!!902530.java!!!	cleanupLayoutState(inout child : View) : void
+        child.mPrivateFlags &= ~View.PFLAG_FORCE_LAYOUT;
+!!!902658.java!!!	addViewInner(inout child : View, in index : int, inout params : ViewGroup::LayoutParams, inout preventRequestLayout : boolean) : void
+
+        if (mTransition != null) {
+            // Don't prevent other add transitions from completing, but cancel remove
+            // transitions to let them complete the process before we add to the container
+            mTransition.cancel(LayoutTransition.DISAPPEARING);
+        }
+
+        if (child.getParent() != null) {
+            throw new IllegalStateException("The specified child already has a parent. " +
+                    "You must call removeView() on the child's parent first.");
+        }
+
+        if (mTransition != null) {
+            mTransition.addChild(this, child);
+        }
+
+        if (!checkLayoutParams(params)) {
+            params = generateLayoutParams(params);
+        }
+
+        if (preventRequestLayout) {
+            child.mLayoutParams = params;
+        } else {
+            child.setLayoutParams(params);
+        }
+
+        if (index < 0) {
+            index = mChildrenCount;
+        }
+
+        addInArray(child, index);
+
+        // tell our children
+        if (preventRequestLayout) {
+            child.assignParent(this);
+        } else {
+            child.mParent = this;
+        }
+
+        if (child.hasFocus()) {
+            requestChildFocus(child, child.findFocus());
+        }
+
+        AttachInfo ai = mAttachInfo;
+        if (ai != null && (mGroupFlags & FLAG_PREVENT_DISPATCH_ATTACHED_TO_WINDOW) == 0) {
+            boolean lastKeepOn = ai.mKeepScreenOn;
+            ai.mKeepScreenOn = false;
+            child.dispatchAttachedToWindow(mAttachInfo, (mViewFlags&VISIBILITY_MASK));
+            if (ai.mKeepScreenOn) {
+                needGlobalAttributesUpdate(true);
+            }
+            ai.mKeepScreenOn = lastKeepOn;
+        }
+
+        if (child.isLayoutDirectionInherited()) {
+            child.resetRtlProperties();
+        }
+
+        onViewAdded(child);
+
+        if ((child.mViewFlags & DUPLICATE_PARENT_STATE) == DUPLICATE_PARENT_STATE) {
+            mGroupFlags |= FLAG_NOTIFY_CHILDREN_ON_DRAWABLE_STATE_CHANGE;
+        }
+
+        if (child.hasTransientState()) {
+            childHasTransientStateChanged(child, true);
+        }
+
+        if (child.getVisibility() != View.GONE) {
+            notifySubtreeAccessibilityStateChangedIfNeeded();
+        }
+!!!902786.java!!!	addInArray(inout child : View, in index : int) : void
+        View[] children = mChildren;
+        final int count = mChildrenCount;
+        final int size = children.length;
+        if (index == count) {
+            if (size == count) {
+                mChildren = new View[size + ARRAY_CAPACITY_INCREMENT];
+                System.arraycopy(children, 0, mChildren, 0, size);
+                children = mChildren;
+            }
+            children[mChildrenCount++] = child;
+        } else if (index < count) {
+            if (size == count) {
+                mChildren = new View[size + ARRAY_CAPACITY_INCREMENT];
+                System.arraycopy(children, 0, mChildren, 0, index);
+                System.arraycopy(children, index, mChildren, index + 1, count - index);
+                children = mChildren;
+            } else {
+                System.arraycopy(children, index, children, index + 1, count - index);
+            }
+            children[index] = child;
+            mChildrenCount++;
+            if (mLastTouchDownIndex >= index) {
+                mLastTouchDownIndex++;
+            }
+        } else {
+            throw new IndexOutOfBoundsException("index=" + index + " count=" + count);
+        }
+!!!902914.java!!!	removeFromArray(in index : int) : void
+        final View[] children = mChildren;
+        if (!(mTransitioningViews != null && mTransitioningViews.contains(children[index]))) {
+            children[index].mParent = null;
+        }
+        final int count = mChildrenCount;
+        if (index == count - 1) {
+            children[--mChildrenCount] = null;
+        } else if (index >= 0 && index < count) {
+            System.arraycopy(children, index + 1, children, index, count - index - 1);
+            children[--mChildrenCount] = null;
+        } else {
+            throw new IndexOutOfBoundsException();
+        }
+        if (mLastTouchDownIndex == index) {
+            mLastTouchDownTime = 0;
+            mLastTouchDownIndex = -1;
+        } else if (mLastTouchDownIndex > index) {
+            mLastTouchDownIndex--;
+        }
+!!!903042.java!!!	removeFromArray(in start : int, in count : int) : void
+        final View[] children = mChildren;
+        final int childrenCount = mChildrenCount;
+
+        start = Math.max(0, start);
+        final int end = Math.min(childrenCount, start + count);
+
+        if (start == end) {
+            return;
+        }
+
+        if (end == childrenCount) {
+            for (int i = start; i < end; i++) {
+                children[i].mParent = null;
+                children[i] = null;
+            }
+        } else {
+            for (int i = start; i < end; i++) {
+                children[i].mParent = null;
+            }
+
+            // Since we're looping above, we might as well do the copy, but is arraycopy()
+            // faster than the extra 2 bounds checks we would do in the loop?
+            System.arraycopy(children, end, children, start, childrenCount - end);
+
+            for (int i = childrenCount - (end - start); i < childrenCount; i++) {
+                children[i] = null;
+            }
+        }
+
+        mChildrenCount -= (end - start);
+!!!903170.java!!!	bindLayoutAnimation(inout child : View) : void
+        Animation a = mLayoutAnimationController.getAnimationForView(child);
+        child.setAnimation(a);
+!!!903298.java!!!	attachLayoutAnimationParameters(inout child : View, inout params : ViewGroup::LayoutParams, in index : int, in count : int) : void
+        LayoutAnimationController.AnimationParameters animationParams =
+                    params.layoutAnimationParameters;
+        if (animationParams == null) {
+            animationParams = new LayoutAnimationController.AnimationParameters();
+            params.layoutAnimationParameters = animationParams;
+        }
+
+        animationParams.count = count;
+        animationParams.index = index;
+!!!903426.java!!!	removeView(inout view : View) : void
+        removeViewInternal(view);
+        requestLayout();
+        invalidate(true);
+!!!903554.java!!!	removeViewInLayout(inout view : View) : void
+        removeViewInternal(view);
+!!!903682.java!!!	removeViewsInLayout(in start : int, in count : int) : void
+        removeViewsInternal(start, count);
+!!!903810.java!!!	removeViewAt(in index : int) : void
+        removeViewInternal(index, getChildAt(index));
+        requestLayout();
+        invalidate(true);
+!!!903938.java!!!	removeViews(in start : int, in count : int) : void
+        removeViewsInternal(start, count);
+        requestLayout();
+        invalidate(true);
+!!!904066.java!!!	removeViewInternal(inout view : View) : void
+        final int index = indexOfChild(view);
+        if (index >= 0) {
+            removeViewInternal(index, view);
+        }
+!!!904194.java!!!	removeViewInternal(in index : int, inout view : View) : void
+
+        if (mTransition != null) {
+            mTransition.removeChild(this, view);
+        }
+
+        boolean clearChildFocus = false;
+        if (view == mFocused) {
+            view.unFocus(null);
+            clearChildFocus = true;
+        }
+
+        if (view.isAccessibilityFocused()) {
+            view.clearAccessibilityFocus();
+        }
+
+        cancelTouchTarget(view);
+        cancelHoverTarget(view);
+
+        if (view.getAnimation() != null ||
+                (mTransitioningViews != null && mTransitioningViews.contains(view))) {
+            addDisappearingView(view);
+        } else if (view.mAttachInfo != null) {
+           view.dispatchDetachedFromWindow();
+        }
+
+        if (view.hasTransientState()) {
+            childHasTransientStateChanged(view, false);
+        }
+
+        needGlobalAttributesUpdate(false);
+
+        removeFromArray(index);
+
+        if (clearChildFocus) {
+            clearChildFocus(view);
+            if (!rootViewRequestFocus()) {
+                notifyGlobalFocusCleared(this);
+            }
+        }
+
+        onViewRemoved(view);
+
+        if (view.getVisibility() != View.GONE) {
+            notifySubtreeAccessibilityStateChangedIfNeeded();
+        }
+!!!904322.java!!!	setLayoutTransition(inout transition : LayoutTransition) : void
+        if (mTransition != null) {
+            LayoutTransition previousTransition = mTransition;
+            previousTransition.cancel();
+            previousTransition.removeTransitionListener(mLayoutTransitionListener);
+        }
+        mTransition = transition;
+        if (mTransition != null) {
+            mTransition.addTransitionListener(mLayoutTransitionListener);
+        }
+!!!904450.java!!!	getLayoutTransition() : LayoutTransition
+        return mTransition;
+!!!904578.java!!!	removeViewsInternal(in start : int, in count : int) : void
+        final View focused = mFocused;
+        final boolean detach = mAttachInfo != null;
+        boolean clearChildFocus = false;
+
+        final View[] children = mChildren;
+        final int end = start + count;
+
+        for (int i = start; i < end; i++) {
+            final View view = children[i];
+
+            if (mTransition != null) {
+                mTransition.removeChild(this, view);
+            }
+
+            if (view == focused) {
+                view.unFocus(null);
+                clearChildFocus = true;
+            }
+
+            if (view.isAccessibilityFocused()) {
+                view.clearAccessibilityFocus();
+            }
+
+            cancelTouchTarget(view);
+            cancelHoverTarget(view);
+
+            if (view.getAnimation() != null ||
+                (mTransitioningViews != null && mTransitioningViews.contains(view))) {
+                addDisappearingView(view);
+            } else if (detach) {
+               view.dispatchDetachedFromWindow();
+            }
+
+            if (view.hasTransientState()) {
+                childHasTransientStateChanged(view, false);
+            }
+
+            needGlobalAttributesUpdate(false);
+
+            onViewRemoved(view);
+        }
+
+        removeFromArray(start, count);
+
+        if (clearChildFocus) {
+            clearChildFocus(focused);
+            if (!rootViewRequestFocus()) {
+                notifyGlobalFocusCleared(focused);
+            }
+        }
+!!!904706.java!!!	removeAllViews() : void
+        removeAllViewsInLayout();
+        requestLayout();
+        invalidate(true);
+!!!904834.java!!!	removeAllViewsInLayout() : void
+        final int count = mChildrenCount;
+        if (count <= 0) {
+            return;
+        }
+
+        final View[] children = mChildren;
+        mChildrenCount = 0;
+
+        final View focused = mFocused;
+        final boolean detach = mAttachInfo != null;
+        boolean clearChildFocus = false;
+
+        needGlobalAttributesUpdate(false);
+
+        for (int i = count - 1; i >= 0; i--) {
+            final View view = children[i];
+
+            if (mTransition != null) {
+                mTransition.removeChild(this, view);
+            }
+
+            if (view == focused) {
+                view.unFocus(null);
+                clearChildFocus = true;
+            }
+
+            if (view.isAccessibilityFocused()) {
+                view.clearAccessibilityFocus();
+            }
+
+            cancelTouchTarget(view);
+            cancelHoverTarget(view);
+
+            if (view.getAnimation() != null ||
+                    (mTransitioningViews != null && mTransitioningViews.contains(view))) {
+                addDisappearingView(view);
+            } else if (detach) {
+               view.dispatchDetachedFromWindow();
+            }
+
+            if (view.hasTransientState()) {
+                childHasTransientStateChanged(view, false);
+            }
+
+            onViewRemoved(view);
+
+            view.mParent = null;
+            children[i] = null;
+        }
+
+        if (clearChildFocus) {
+            clearChildFocus(focused);
+            if (!rootViewRequestFocus()) {
+                notifyGlobalFocusCleared(focused);
+            }
+        }
+!!!904962.java!!!	removeDetachedView(inout child : View, inout animate : boolean) : void
+        if (mTransition != null) {
+            mTransition.removeChild(this, child);
+        }
+
+        if (child == mFocused) {
+            child.clearFocus();
+        }
+
+        child.clearAccessibilityFocus();
+
+        cancelTouchTarget(child);
+        cancelHoverTarget(child);
+
+        if ((animate && child.getAnimation() != null) ||
+                (mTransitioningViews != null && mTransitioningViews.contains(child))) {
+            addDisappearingView(child);
+        } else if (child.mAttachInfo != null) {
+            child.dispatchDetachedFromWindow();
+        }
+
+        if (child.hasTransientState()) {
+            childHasTransientStateChanged(child, false);
+        }
+
+        onViewRemoved(child);
+!!!905090.java!!!	attachViewToParent(inout child : View, in index : int, inout params : ViewGroup::LayoutParams) : void
+        child.mLayoutParams = params;
+
+        if (index < 0) {
+            index = mChildrenCount;
+        }
+
+        addInArray(child, index);
+
+        child.mParent = this;
+        child.mPrivateFlags = (child.mPrivateFlags & ~PFLAG_DIRTY_MASK
+                        & ~PFLAG_DRAWING_CACHE_VALID)
+                | PFLAG_DRAWN | PFLAG_INVALIDATED;
+        this.mPrivateFlags |= PFLAG_INVALIDATED;
+
+        if (child.hasFocus()) {
+            requestChildFocus(child, child.findFocus());
+        }
+!!!905218.java!!!	detachViewFromParent(inout child : View) : void
+        removeFromArray(indexOfChild(child));
+!!!905346.java!!!	detachViewFromParent(in index : int) : void
+        removeFromArray(index);
+!!!905474.java!!!	detachViewsFromParent(in start : int, in count : int) : void
+        removeFromArray(start, count);
+!!!905602.java!!!	detachAllViewsFromParent() : void
+        final int count = mChildrenCount;
+        if (count <= 0) {
+            return;
+        }
+
+        final View[] children = mChildren;
+        mChildrenCount = 0;
+
+        for (int i = count - 1; i >= 0; i--) {
+            children[i].mParent = null;
+            children[i] = null;
+        }
+!!!905730.java!!!	invalidateChild(inout child : View, in dirty : Rect) : void
+        ViewParent parent = this;
+
+        final AttachInfo attachInfo = mAttachInfo;
+        if (attachInfo != null) {
+            // If the child is drawing an animation, we want to copy this flag onto
+            // ourselves and the parent to make sure the invalidate request goes
+            // through
+            final boolean drawAnimation = (child.mPrivateFlags & PFLAG_DRAW_ANIMATION)
+                    == PFLAG_DRAW_ANIMATION;
+
+            // Check whether the child that requests the invalidate is fully opaque
+            // Views being animated or transformed are not considered opaque because we may
+            // be invalidating their old position and need the parent to paint behind them.
+            Matrix childMatrix = child.getMatrix();
+            final boolean isOpaque = child.isOpaque() && !drawAnimation &&
+                    child.getAnimation() == null && childMatrix.isIdentity();
+            // Mark the child as dirty, using the appropriate flag
+            // Make sure we do not set both flags at the same time
+            int opaqueFlag = isOpaque ? PFLAG_DIRTY_OPAQUE : PFLAG_DIRTY;
+
+            if (child.mLayerType != LAYER_TYPE_NONE) {
+                mPrivateFlags |= PFLAG_INVALIDATED;
+                mPrivateFlags &= ~PFLAG_DRAWING_CACHE_VALID;
+            }
+
+            final int[] location = attachInfo.mInvalidateChildLocation;
+            location[CHILD_LEFT_INDEX] = child.mLeft;
+            location[CHILD_TOP_INDEX] = child.mTop;
+            if (!childMatrix.isIdentity() ||
+                    (mGroupFlags & ViewGroup.FLAG_SUPPORT_STATIC_TRANSFORMATIONS) != 0) {
+                RectF boundingRect = attachInfo.mTmpTransformRect;
+                boundingRect.set(dirty);
+                Matrix transformMatrix;
+                if ((mGroupFlags & ViewGroup.FLAG_SUPPORT_STATIC_TRANSFORMATIONS) != 0) {
+                    Transformation t = attachInfo.mTmpTransformation;
+                    boolean transformed = getChildStaticTransformation(child, t);
+                    if (transformed) {
+                        transformMatrix = attachInfo.mTmpMatrix;
+                        transformMatrix.set(t.getMatrix());
+                        if (!childMatrix.isIdentity()) {
+                            transformMatrix.preConcat(childMatrix);
+                        }
+                    } else {
+                        transformMatrix = childMatrix;
+                    }
+                } else {
+                    transformMatrix = childMatrix;
+                }
+                transformMatrix.mapRect(boundingRect);
+                dirty.set((int) (boundingRect.left - 0.5f),
+                        (int) (boundingRect.top - 0.5f),
+                        (int) (boundingRect.right + 0.5f),
+                        (int) (boundingRect.bottom + 0.5f));
+            }
+
+            do {
+                View view = null;
+                if (parent instanceof View) {
+                    view = (View) parent;
+                }
+
+                if (drawAnimation) {
+                    if (view != null) {
+                        view.mPrivateFlags |= PFLAG_DRAW_ANIMATION;
+                    } else if (parent instanceof ViewRootImpl) {
+                        ((ViewRootImpl) parent).mIsAnimating = true;
+                    }
+                }
+
+                // If the parent is dirty opaque or not dirty, mark it dirty with the opaque
+                // flag coming from the child that initiated the invalidate
+                if (view != null) {
+                    if ((view.mViewFlags & FADING_EDGE_MASK) != 0 &&
+                            view.getSolidColor() == 0) {
+                        opaqueFlag = PFLAG_DIRTY;
+                    }
+                    if ((view.mPrivateFlags & PFLAG_DIRTY_MASK) != PFLAG_DIRTY) {
+                        view.mPrivateFlags = (view.mPrivateFlags & ~PFLAG_DIRTY_MASK) | opaqueFlag;
+                    }
+                }
+
+                parent = parent.invalidateChildInParent(location, dirty);
+                if (view != null) {
+                    // Account for transform on current parent
+                    Matrix m = view.getMatrix();
+                    if (!m.isIdentity()) {
+                        RectF boundingRect = attachInfo.mTmpTransformRect;
+                        boundingRect.set(dirty);
+                        m.mapRect(boundingRect);
+                        dirty.set((int) (boundingRect.left - 0.5f),
+                                (int) (boundingRect.top - 0.5f),
+                                (int) (boundingRect.right + 0.5f),
+                                (int) (boundingRect.bottom + 0.5f));
+                    }
+                }
+            } while (parent != null);
+        }
+!!!905858.java!!!	invalidateChildInParent(in location : int, in dirty : Rect) : ViewParent
+        if ((mPrivateFlags & PFLAG_DRAWN) == PFLAG_DRAWN ||
+                (mPrivateFlags & PFLAG_DRAWING_CACHE_VALID) == PFLAG_DRAWING_CACHE_VALID) {
+            if ((mGroupFlags & (FLAG_OPTIMIZE_INVALIDATE | FLAG_ANIMATION_DONE)) !=
+                        FLAG_OPTIMIZE_INVALIDATE) {
+                dirty.offset(location[CHILD_LEFT_INDEX] - mScrollX,
+                        location[CHILD_TOP_INDEX] - mScrollY);
+                if ((mGroupFlags & FLAG_CLIP_CHILDREN) == 0) {
+                    dirty.union(0, 0, mRight - mLeft, mBottom - mTop);
+                }
+
+                final int left = mLeft;
+                final int top = mTop;
+
+                if ((mGroupFlags & FLAG_CLIP_CHILDREN) == FLAG_CLIP_CHILDREN) {
+                    if (!dirty.intersect(0, 0, mRight - left, mBottom - top)) {
+                        dirty.setEmpty();
+                    }
+                }
+                mPrivateFlags &= ~PFLAG_DRAWING_CACHE_VALID;
+
+                location[CHILD_LEFT_INDEX] = left;
+                location[CHILD_TOP_INDEX] = top;
+
+                if (mLayerType != LAYER_TYPE_NONE) {
+                    mPrivateFlags |= PFLAG_INVALIDATED;
+                }
+
+                return mParent;
+
+            } else {
+                mPrivateFlags &= ~PFLAG_DRAWN & ~PFLAG_DRAWING_CACHE_VALID;
+
+                location[CHILD_LEFT_INDEX] = mLeft;
+                location[CHILD_TOP_INDEX] = mTop;
+                if ((mGroupFlags & FLAG_CLIP_CHILDREN) == FLAG_CLIP_CHILDREN) {
+                    dirty.set(0, 0, mRight - mLeft, mBottom - mTop);
+                } else {
+                    // in case the dirty rect extends outside the bounds of this container
+                    dirty.union(0, 0, mRight - mLeft, mBottom - mTop);
+                }
+
+                if (mLayerType != LAYER_TYPE_NONE) {
+                    mPrivateFlags |= PFLAG_INVALIDATED;
+                }
+
+                return mParent;
+            }
+        }
+
+        return null;
+!!!905986.java!!!	damageChildDeferred(inout child : View) : boolean
+        ViewParent parent = getParent();
+        while (parent != null) {
+            if (parent instanceof ViewGroup) {
+                parent = parent.getParent();
+            } else if (parent instanceof ViewRootImpl) {
+                ((ViewRootImpl) parent).invalidate();
+                return true;
+            } else {
+                parent = null;
+            }
+        }
+        return false;
+!!!906114.java!!!	damageChild(inout child : View, in dirty : Rect) : void
+        if (damageChildDeferred(child)) {
+            return;
+        }
+
+        ViewParent parent = this;
+
+        final AttachInfo attachInfo = mAttachInfo;
+        if (attachInfo != null) {
+            int left = child.mLeft;
+            int top = child.mTop;
+            if (!child.getMatrix().isIdentity()) {
+                child.transformRect(dirty);
+            }
+
+            do {
+                if (parent instanceof ViewGroup) {
+                    ViewGroup parentVG = (ViewGroup) parent;
+                    if (parentVG.mLayerType != LAYER_TYPE_NONE) {
+                        // Layered parents should be recreated, not just re-issued
+                        parentVG.invalidate();
+                        parent = null;
+                    } else {
+                        parent = parentVG.damageChildInParent(left, top, dirty);
+                        left = parentVG.mLeft;
+                        top = parentVG.mTop;
+                    }
+                } else {
+                    // Reached the top; this calls into the usual invalidate method in
+                    // ViewRootImpl, which schedules a traversal
+                    final int[] location = attachInfo.mInvalidateChildLocation;
+                    location[0] = left;
+                    location[1] = top;
+                    parent = parent.invalidateChildInParent(location, dirty);
+                }
+            } while (parent != null);
+        }
+!!!906242.java!!!	damageChildInParent(in left : int, in top : int, in dirty : Rect) : ViewParent
+        if ((mPrivateFlags & PFLAG_DRAWN) != 0
+                || (mPrivateFlags & PFLAG_DRAWING_CACHE_VALID) != 0) {
+            dirty.offset(left - mScrollX, top - mScrollY);
+            if ((mGroupFlags & FLAG_CLIP_CHILDREN) == 0) {
+                dirty.union(0, 0, mRight - mLeft, mBottom - mTop);
+            }
+
+            if ((mGroupFlags & FLAG_CLIP_CHILDREN) == 0 ||
+                    dirty.intersect(0, 0, mRight - mLeft, mBottom - mTop)) {
+
+                if (!getMatrix().isIdentity()) {
+                    transformRect(dirty);
+                }
+
+                return mParent;
+            }
+        }
+
+        return null;
+!!!906370.java!!!	offsetDescendantRectToMyCoords(inout descendant : View, inout rect : Rect) : void
+        offsetRectBetweenParentAndChild(descendant, rect, true, false);
+!!!906498.java!!!	offsetRectIntoDescendantCoords(inout descendant : View, inout rect : Rect) : void
+        offsetRectBetweenParentAndChild(descendant, rect, false, false);
+!!!906626.java!!!	offsetRectBetweenParentAndChild(inout descendant : View, inout rect : Rect, inout offsetFromChildToParent : boolean, inout clipToBounds : boolean) : void
+
+        // already in the same coord system :)
+        if (descendant == this) {
+            return;
+        }
+
+        ViewParent theParent = descendant.mParent;
+
+        // search and offset up to the parent
+        while ((theParent != null)
+                && (theParent instanceof View)
+                && (theParent != this)) {
+
+            if (offsetFromChildToParent) {
+                rect.offset(descendant.mLeft - descendant.mScrollX,
+                        descendant.mTop - descendant.mScrollY);
+                if (clipToBounds) {
+                    View p = (View) theParent;
+                    rect.intersect(0, 0, p.mRight - p.mLeft, p.mBottom - p.mTop);
+                }
+            } else {
+                if (clipToBounds) {
+                    View p = (View) theParent;
+                    rect.intersect(0, 0, p.mRight - p.mLeft, p.mBottom - p.mTop);
+                }
+                rect.offset(descendant.mScrollX - descendant.mLeft,
+                        descendant.mScrollY - descendant.mTop);
+            }
+
+            descendant = (View) theParent;
+            theParent = descendant.mParent;
+        }
+
+        // now that we are up to this view, need to offset one more time
+        // to get into our coordinate space
+        if (theParent == this) {
+            if (offsetFromChildToParent) {
+                rect.offset(descendant.mLeft - descendant.mScrollX,
+                        descendant.mTop - descendant.mScrollY);
+            } else {
+                rect.offset(descendant.mScrollX - descendant.mLeft,
+                        descendant.mScrollY - descendant.mTop);
+            }
+        } else {
+            throw new IllegalArgumentException("parameter must be a descendant of this view");
+        }
+!!!906754.java!!!	offsetChildrenTopAndBottom(in offset : int) : void
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        boolean invalidate = false;
+
+        for (int i = 0; i < count; i++) {
+            final View v = children[i];
+            v.mTop += offset;
+            v.mBottom += offset;
+            if (v.mRenderNode != null) {
+                invalidate = true;
+                v.mRenderNode.offsetTopAndBottom(offset);
+            }
+        }
+
+        if (invalidate) {
+            invalidateViewProperty(false, false);
+        }
+        notifySubtreeAccessibilityStateChangedIfNeeded();
+!!!906882.java!!!	getChildVisibleRect(inout child : View, inout r : Rect, inout offset : android.graphics.Point) : boolean
+        // It doesn't make a whole lot of sense to call this on a view that isn't attached,
+        // but for some simple tests it can be useful. If we don't have attach info this
+        // will allocate memory.
+        final RectF rect = mAttachInfo != null ? mAttachInfo.mTmpTransformRect : new RectF();
+        rect.set(r);
+
+        if (!child.hasIdentityMatrix()) {
+           child.getMatrix().mapRect(rect);
+        }
+
+        int dx = child.mLeft - mScrollX;
+        int dy = child.mTop - mScrollY;
+
+        rect.offset(dx, dy);
+
+        if (offset != null) {
+            if (!child.hasIdentityMatrix()) {
+                float[] position = mAttachInfo != null ? mAttachInfo.mTmpTransformLocation
+                        : new float[2];
+                position[0] = offset.x;
+                position[1] = offset.y;
+                child.getMatrix().mapPoints(position);
+                offset.x = (int) (position[0] + 0.5f);
+                offset.y = (int) (position[1] + 0.5f);
+            }
+            offset.x += dx;
+            offset.y += dy;
+        }
+
+        if (rect.intersect(0, 0, mRight - mLeft, mBottom - mTop)) {
+            if (mParent == null) return true;
+            r.set((int) (rect.left + 0.5f), (int) (rect.top + 0.5f),
+                    (int) (rect.right + 0.5f), (int) (rect.bottom + 0.5f));
+            return mParent.getChildVisibleRect(this, r, offset);
+        }
+
+        return false;
+!!!907010.java!!!	layout(in l : int, in t : int, in r : int, in b : int) : void
+        if (!mSuppressLayout && (mTransition == null || !mTransition.isChangingLayout())) {
+            if (mTransition != null) {
+                mTransition.layoutChange(this);
+            }
+            super.layout(l, t, r, b);
+        } else {
+            // record the fact that we noop'd it; request layout when transition finishes
+            mLayoutCalledWhileSuppressed = true;
+        }
+!!!907266.java!!!	canAnimate() : boolean
+        return mLayoutAnimationController != null;
+!!!907394.java!!!	startLayoutAnimation() : void
+        if (mLayoutAnimationController != null) {
+            mGroupFlags |= FLAG_RUN_ANIMATION;
+            requestLayout();
+        }
+!!!907522.java!!!	scheduleLayoutAnimation() : void
+        mGroupFlags |= FLAG_RUN_ANIMATION;
+!!!907650.java!!!	setLayoutAnimation(inout controller : LayoutAnimationController) : void
+        mLayoutAnimationController = controller;
+        if (mLayoutAnimationController != null) {
+            mGroupFlags |= FLAG_RUN_ANIMATION;
+        }
+!!!907778.java!!!	getLayoutAnimation() : LayoutAnimationController
+        return mLayoutAnimationController;
+!!!907906.java!!!	isAnimationCacheEnabled() : boolean
+        return (mGroupFlags & FLAG_ANIMATION_CACHE) == FLAG_ANIMATION_CACHE;
+!!!908034.java!!!	setAnimationCacheEnabled(inout enabled : boolean) : void
+        setBooleanFlag(FLAG_ANIMATION_CACHE, enabled);
+!!!908162.java!!!	isAlwaysDrawnWithCacheEnabled() : boolean
+        return (mGroupFlags & FLAG_ALWAYS_DRAWN_WITH_CACHE) == FLAG_ALWAYS_DRAWN_WITH_CACHE;
+!!!908290.java!!!	setAlwaysDrawnWithCacheEnabled(inout always : boolean) : void
+        setBooleanFlag(FLAG_ALWAYS_DRAWN_WITH_CACHE, always);
+!!!908418.java!!!	isChildrenDrawnWithCacheEnabled() : boolean
+        return (mGroupFlags & FLAG_CHILDREN_DRAWN_WITH_CACHE) == FLAG_CHILDREN_DRAWN_WITH_CACHE;
+!!!908546.java!!!	setChildrenDrawnWithCacheEnabled(inout enabled : boolean) : void
+        setBooleanFlag(FLAG_CHILDREN_DRAWN_WITH_CACHE, enabled);
+!!!908674.java!!!	isChildrenDrawingOrderEnabled() : boolean
+        return (mGroupFlags & FLAG_USE_CHILD_DRAWING_ORDER) == FLAG_USE_CHILD_DRAWING_ORDER;
+!!!908802.java!!!	setChildrenDrawingOrderEnabled(inout enabled : boolean) : void
+        setBooleanFlag(FLAG_USE_CHILD_DRAWING_ORDER, enabled);
+!!!908930.java!!!	hasBooleanFlag(in flag : int) : boolean
+        return (mGroupFlags & flag) == flag;
+!!!909058.java!!!	setBooleanFlag(in flag : int, inout value : boolean) : void
+        if (value) {
+            mGroupFlags |= flag;
+        } else {
+            mGroupFlags &= ~flag;
+        }
+!!!909186.java!!!	getPersistentDrawingCache() : int
+        return mPersistentDrawingCache;
+!!!909314.java!!!	setPersistentDrawingCache(in drawingCacheToKeep : int) : void
+        mPersistentDrawingCache = drawingCacheToKeep & PERSISTENT_ALL_CACHES;
+!!!909442.java!!!	setLayoutMode(in layoutMode : int, inout explicitly : boolean) : void
+        mLayoutMode = layoutMode;
+        setBooleanFlag(FLAG_LAYOUT_MODE_WAS_EXPLICITLY_SET, explicitly);
+!!!909570.java!!!	invalidateInheritedLayoutMode(in layoutModeOfRoot : int) : void
+        if (mLayoutMode == LAYOUT_MODE_UNDEFINED ||
+            mLayoutMode == layoutModeOfRoot ||
+            hasBooleanFlag(FLAG_LAYOUT_MODE_WAS_EXPLICITLY_SET)) {
+            return;
+        }
+        setLayoutMode(LAYOUT_MODE_UNDEFINED, false);
+
+        // apply recursively
+        for (int i = 0, N = getChildCount(); i < N; i++) {
+            getChildAt(i).invalidateInheritedLayoutMode(layoutModeOfRoot);
+        }
+!!!909698.java!!!	getLayoutMode() : int
+        if (mLayoutMode == LAYOUT_MODE_UNDEFINED) {
+            int inheritedLayoutMode = (mParent instanceof ViewGroup) ?
+                    ((ViewGroup) mParent).getLayoutMode() : LAYOUT_MODE_DEFAULT;
+            setLayoutMode(inheritedLayoutMode, false);
+        }
+        return mLayoutMode;
+!!!909826.java!!!	setLayoutMode(in layoutMode : int) : void
+        if (mLayoutMode != layoutMode) {
+            invalidateInheritedLayoutMode(layoutMode);
+            setLayoutMode(layoutMode, layoutMode != LAYOUT_MODE_UNDEFINED);
+            requestLayout();
+        }
+!!!909954.java!!!	generateLayoutParams(inout attrs : AttributeSet) : ViewGroup::LayoutParams
+        return new LayoutParams(getContext(), attrs);
+!!!910082.java!!!	generateLayoutParams(inout p : ViewGroup::LayoutParams) : ViewGroup::LayoutParams
+        return p;
+!!!910210.java!!!	generateDefaultLayoutParams() : ViewGroup::LayoutParams
+        return new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+!!!910338.java!!!	debug(in depth : int) : void
+        super.debug(depth);
+        String output;
+
+        if (mFocused != null) {
+            output = debugIndent(depth);
+            output += "mFocused";
+            Log.d(VIEW_LOG_TAG, output);
+        }
+        if (mChildrenCount != 0) {
+            output = debugIndent(depth);
+            output += "{";
+            Log.d(VIEW_LOG_TAG, output);
+        }
+        int count = mChildrenCount;
+        for (int i = 0; i < count; i++) {
+            View child = mChildren[i];
+            child.debug(depth + 1);
+        }
+
+        if (mChildrenCount != 0) {
+            output = debugIndent(depth);
+            output += "}";
+            Log.d(VIEW_LOG_TAG, output);
+        }
+!!!910466.java!!!	indexOfChild(inout child : View) : int
+        final int count = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < count; i++) {
+            if (children[i] == child) {
+                return i;
+            }
+        }
+        return -1;
+!!!910594.java!!!	getChildCount() : int
+        return mChildrenCount;
+!!!910722.java!!!	getChildAt(in index : int) : View
+        if (index < 0 || index >= mChildrenCount) {
+            return null;
+        }
+        return mChildren[index];
+!!!910850.java!!!	measureChildren(in widthMeasureSpec : int, in heightMeasureSpec : int) : void
+        final int size = mChildrenCount;
+        final View[] children = mChildren;
+        for (int i = 0; i < size; ++i) {
+            final View child = children[i];
+            if ((child.mViewFlags & VISIBILITY_MASK) != GONE) {
+                measureChild(child, widthMeasureSpec, heightMeasureSpec);
+            }
+        }
+!!!910978.java!!!	measureChild(inout child : View, in parentWidthMeasureSpec : int, in parentHeightMeasureSpec : int) : void
+        final LayoutParams lp = child.getLayoutParams();
+
+        final int childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,
+                mPaddingLeft + mPaddingRight, lp.width);
+        final int childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,
+                mPaddingTop + mPaddingBottom, lp.height);
+
+        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+!!!911106.java!!!	measureChildWithMargins(inout child : View, in parentWidthMeasureSpec : int, in widthUsed : int, in parentHeightMeasureSpec : int, in heightUsed : int) : void
+        final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+
+        final int childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,
+                mPaddingLeft + mPaddingRight + lp.leftMargin + lp.rightMargin
+                        + widthUsed, lp.width);
+        final int childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,
+                mPaddingTop + mPaddingBottom + lp.topMargin + lp.bottomMargin
+                        + heightUsed, lp.height);
+
+        child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+!!!911234.java!!!	getChildMeasureSpec(in spec : int, in padding : int, in childDimension : int) : int
+        int specMode = MeasureSpec.getMode(spec);
+        int specSize = MeasureSpec.getSize(spec);
+
+        int size = Math.max(0, specSize - padding);
+
+        int resultSize = 0;
+        int resultMode = 0;
+
+        switch (specMode) {
+        // Parent has imposed an exact size on us
+        case MeasureSpec.EXACTLY:
+            if (childDimension >= 0) {
+                resultSize = childDimension;
+                resultMode = MeasureSpec.EXACTLY;
+            } else if (childDimension == LayoutParams.MATCH_PARENT) {
+                // Child wants to be our size. So be it.
+                resultSize = size;
+                resultMode = MeasureSpec.EXACTLY;
+            } else if (childDimension == LayoutParams.WRAP_CONTENT) {
+                // Child wants to determine its own size. It can't be
+                // bigger than us.
+                resultSize = size;
+                resultMode = MeasureSpec.AT_MOST;
+            }
+            break;
+
+        // Parent has imposed a maximum size on us
+        case MeasureSpec.AT_MOST:
+            if (childDimension >= 0) {
+                // Child wants a specific size... so be it
+                resultSize = childDimension;
+                resultMode = MeasureSpec.EXACTLY;
+            } else if (childDimension == LayoutParams.MATCH_PARENT) {
+                // Child wants to be our size, but our size is not fixed.
+                // Constrain child to not be bigger than us.
+                resultSize = size;
+                resultMode = MeasureSpec.AT_MOST;
+            } else if (childDimension == LayoutParams.WRAP_CONTENT) {
+                // Child wants to determine its own size. It can't be
+                // bigger than us.
+                resultSize = size;
+                resultMode = MeasureSpec.AT_MOST;
+            }
+            break;
+
+        // Parent asked to see how big we want to be
+        case MeasureSpec.UNSPECIFIED:
+            if (childDimension >= 0) {
+                // Child wants a specific size... let him have it
+                resultSize = childDimension;
+                resultMode = MeasureSpec.EXACTLY;
+            } else if (childDimension == LayoutParams.MATCH_PARENT) {
+                // Child wants to be our size... find out how big it should
+                // be
+                resultSize = 0;
+                resultMode = MeasureSpec.UNSPECIFIED;
+            } else if (childDimension == LayoutParams.WRAP_CONTENT) {
+                // Child wants to determine its own size.... find out how
+                // big it should be
+                resultSize = 0;
+                resultMode = MeasureSpec.UNSPECIFIED;
+            }
+            break;
+        }
+        return MeasureSpec.makeMeasureSpec(resultSize, resultMode);
+!!!911362.java!!!	clearDisappearingChildren() : void
+        final ArrayList<View> disappearingChildren = mDisappearingChildren;
+        if (disappearingChildren != null) {
+            final int count = disappearingChildren.size();
+            for (int i = 0; i < count; i++) {
+                final View view = disappearingChildren.get(i);
+                if (view.mAttachInfo != null) {
+                    view.dispatchDetachedFromWindow();
+                }
+                view.clearAnimation();
+            }
+            disappearingChildren.clear();
+            invalidate();
+        }
+!!!911490.java!!!	addDisappearingView(inout v : View) : void
+        ArrayList<View> disappearingChildren = mDisappearingChildren;
+
+        if (disappearingChildren == null) {
+            disappearingChildren = mDisappearingChildren = new ArrayList<View>();
+        }
+
+        disappearingChildren.add(v);
+!!!911618.java!!!	finishAnimatingView(in view : View, inout animation : Animation) : void
+        final ArrayList<View> disappearingChildren = mDisappearingChildren;
+        if (disappearingChildren != null) {
+            if (disappearingChildren.contains(view)) {
+                disappearingChildren.remove(view);
+
+                if (view.mAttachInfo != null) {
+                    view.dispatchDetachedFromWindow();
+                }
+
+                view.clearAnimation();
+                mGroupFlags |= FLAG_INVALIDATE_REQUIRED;
+            }
+        }
+
+        if (animation != null && !animation.getFillAfter()) {
+            view.clearAnimation();
+        }
+
+        if ((view.mPrivateFlags & PFLAG_ANIMATION_STARTED) == PFLAG_ANIMATION_STARTED) {
+            view.onAnimationEnd();
+            // Should be performed by onAnimationEnd() but this avoid an infinite loop,
+            // so we'd rather be safe than sorry
+            view.mPrivateFlags &= ~PFLAG_ANIMATION_STARTED;
+            // Draw one more frame after the animation is done
+            mGroupFlags |= FLAG_INVALIDATE_REQUIRED;
+        }
+!!!911746.java!!!	isViewTransitioning(inout view : View) : boolean
+        return (mTransitioningViews != null && mTransitioningViews.contains(view));
+!!!911874.java!!!	startViewTransition(inout view : View) : void
+        if (view.mParent == this) {
+            if (mTransitioningViews == null) {
+                mTransitioningViews = new ArrayList<View>();
+            }
+            mTransitioningViews.add(view);
+        }
+!!!912002.java!!!	endViewTransition(inout view : View) : void
+        if (mTransitioningViews != null) {
+            mTransitioningViews.remove(view);
+            final ArrayList<View> disappearingChildren = mDisappearingChildren;
+            if (disappearingChildren != null && disappearingChildren.contains(view)) {
+                disappearingChildren.remove(view);
+                if (mVisibilityChangingChildren != null &&
+                        mVisibilityChangingChildren.contains(view)) {
+                    mVisibilityChangingChildren.remove(view);
+                } else {
+                    if (view.mAttachInfo != null) {
+                        view.dispatchDetachedFromWindow();
+                    }
+                    if (view.mParent != null) {
+                        view.mParent = null;
+                    }
+                }
+                invalidate();
+            }
+        }
+!!!912130.java!!!	suppressLayout(inout suppress : boolean) : void
+        mSuppressLayout = suppress;
+        if (!suppress) {
+            if (mLayoutCalledWhileSuppressed) {
+                requestLayout();
+                mLayoutCalledWhileSuppressed = false;
+            }
+        }
+!!!912258.java!!!	isLayoutSuppressed() : boolean
+        return mSuppressLayout;
+!!!912386.java!!!	gatherTransparentRegion(inout region : Region) : boolean
+        // If no transparent regions requested, we are always opaque.
+        final boolean meOpaque = (mPrivateFlags & View.PFLAG_REQUEST_TRANSPARENT_REGIONS) == 0;
+        if (meOpaque && region == null) {
+            // The caller doesn't care about the region, so stop now.
+            return true;
+        }
+        super.gatherTransparentRegion(region);
+        final View[] children = mChildren;
+        final int count = mChildrenCount;
+        boolean noneOfTheChildrenAreTransparent = true;
+        for (int i = 0; i < count; i++) {
+            final View child = children[i];
+            if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE || child.getAnimation() != null) {
+                if (!child.gatherTransparentRegion(region)) {
+                    noneOfTheChildrenAreTransparent = false;
+                }
+            }
+        }
+        return meOpaque || noneOfTheChildrenAreTransparent;
+!!!912514.java!!!	requestTransparentRegion(inout child : View) : void
+        if (child != null) {
+            child.mPrivateFlags |= View.PFLAG_REQUEST_TRANSPARENT_REGIONS;
+            if (mParent != null) {
+                mParent.requestTransparentRegion(this);
+            }
+        }
+!!!912642.java!!!	dispatchApplyWindowInsets(inout insets : WindowInsets) : WindowInsets
+        insets = super.dispatchApplyWindowInsets(insets);
+        if (!insets.isConsumed()) {
+            final int count = getChildCount();
+            for (int i = 0; i < count; i++) {
+                insets = getChildAt(i).dispatchApplyWindowInsets(insets);
+                if (insets.isConsumed()) {
+                    break;
+                }
+            }
+        }
+        return insets;
+!!!912770.java!!!	getLayoutAnimationListener() : Animation::AnimationListener
+        return mAnimationListener;
+!!!912898.java!!!	drawableStateChanged() : void
+        super.drawableStateChanged();
+
+        if ((mGroupFlags & FLAG_NOTIFY_CHILDREN_ON_DRAWABLE_STATE_CHANGE) != 0) {
+            if ((mGroupFlags & FLAG_ADD_STATES_FROM_CHILDREN) != 0) {
+                throw new IllegalStateException("addStateFromChildren cannot be enabled if a"
+                        + " child has duplicateParentState set to true");
+            }
+
+            final View[] children = mChildren;
+            final int count = mChildrenCount;
+
+            for (int i = 0; i < count; i++) {
+                final View child = children[i];
+                if ((child.mViewFlags & DUPLICATE_PARENT_STATE) != 0) {
+                    child.refreshDrawableState();
+                }
+            }
+        }
+!!!913026.java!!!	jumpDrawablesToCurrentState() : void
+        super.jumpDrawablesToCurrentState();
+        final View[] children = mChildren;
+        final int count = mChildrenCount;
+        for (int i = 0; i < count; i++) {
+            children[i].jumpDrawablesToCurrentState();
+        }
+!!!913154.java!!!	drawableHotspotChanged(in x : float, in y : float) : void
+        super.drawableHotspotChanged(x, y);
+
+        if ((mGroupFlags & FLAG_NOTIFY_CHILDREN_ON_DRAWABLE_STATE_CHANGE) != 0) {
+            if ((mGroupFlags & FLAG_ADD_STATES_FROM_CHILDREN) != 0) {
+                throw new IllegalStateException("addStateFromChildren cannot be enabled if a"
+                        + " child has duplicateParentState set to true");
+            }
+
+            final View[] children = mChildren;
+            final int count = mChildrenCount;
+
+            for (int i = 0; i < count; i++) {
+                final View child = children[i];
+                if ((child.mViewFlags & DUPLICATE_PARENT_STATE) != 0) {
+                    child.drawableHotspotChanged(x, y);
+                }
+            }
+        }
+!!!913282.java!!!	onCreateDrawableState(in extraSpace : int) : int
+        if ((mGroupFlags & FLAG_ADD_STATES_FROM_CHILDREN) == 0) {
+            return super.onCreateDrawableState(extraSpace);
+        }
+
+        int need = 0;
+        int n = getChildCount();
+        for (int i = 0; i < n; i++) {
+            int[] childState = getChildAt(i).getDrawableState();
+
+            if (childState != null) {
+                need += childState.length;
+            }
+        }
+
+        int[] state = super.onCreateDrawableState(extraSpace + need);
+
+        for (int i = 0; i < n; i++) {
+            int[] childState = getChildAt(i).getDrawableState();
+
+            if (childState != null) {
+                state = mergeDrawableStates(state, childState);
+            }
+        }
+
+        return state;
+!!!913410.java!!!	setAddStatesFromChildren(inout addsStates : boolean) : void
+        if (addsStates) {
+            mGroupFlags |= FLAG_ADD_STATES_FROM_CHILDREN;
+        } else {
+            mGroupFlags &= ~FLAG_ADD_STATES_FROM_CHILDREN;
+        }
+
+        refreshDrawableState();
+!!!913538.java!!!	addStatesFromChildren() : boolean
+        return (mGroupFlags & FLAG_ADD_STATES_FROM_CHILDREN) != 0;
+!!!913666.java!!!	childDrawableStateChanged(inout child : View) : void
+        if ((mGroupFlags & FLAG_ADD_STATES_FROM_CHILDREN) != 0) {
+            refreshDrawableState();
+        }
+!!!913794.java!!!	setLayoutAnimationListener(inout animationListener : Animation::AnimationListener) : void
+        mAnimationListener = animationListener;
+!!!913922.java!!!	requestTransitionStart(inout transition : LayoutTransition) : void
+        ViewRootImpl viewAncestor = getViewRootImpl();
+        if (viewAncestor != null) {
+            viewAncestor.requestTransitionStart(transition);
+        }
+!!!914050.java!!!	resolveRtlPropertiesIfNeeded() : boolean
+        final boolean result = super.resolveRtlPropertiesIfNeeded();
+        // We dont need to resolve the children RTL properties if nothing has changed for the parent
+        if (result) {
+            int count = getChildCount();
+            for (int i = 0; i < count; i++) {
+                final View child = getChildAt(i);
+                if (child.isLayoutDirectionInherited()) {
+                    child.resolveRtlPropertiesIfNeeded();
+                }
+            }
+        }
+        return result;
+!!!914178.java!!!	resolveLayoutDirection() : boolean
+        final boolean result = super.resolveLayoutDirection();
+        if (result) {
+            int count = getChildCount();
+            for (int i = 0; i < count; i++) {
+                final View child = getChildAt(i);
+                if (child.isLayoutDirectionInherited()) {
+                    child.resolveLayoutDirection();
+                }
+            }
+        }
+        return result;
+!!!914306.java!!!	resolveTextDirection() : boolean
+        final boolean result = super.resolveTextDirection();
+        if (result) {
+            int count = getChildCount();
+            for (int i = 0; i < count; i++) {
+                final View child = getChildAt(i);
+                if (child.isTextDirectionInherited()) {
+                    child.resolveTextDirection();
+                }
+            }
+        }
+        return result;
+!!!914434.java!!!	resolveTextAlignment() : boolean
+        final boolean result = super.resolveTextAlignment();
+        if (result) {
+            int count = getChildCount();
+            for (int i = 0; i < count; i++) {
+                final View child = getChildAt(i);
+                if (child.isTextAlignmentInherited()) {
+                    child.resolveTextAlignment();
+                }
+            }
+        }
+        return result;
+!!!914562.java!!!	resolvePadding() : void
+        super.resolvePadding();
+        int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.isLayoutDirectionInherited()) {
+                child.resolvePadding();
+            }
+        }
+!!!914690.java!!!	resolveDrawables() : void
+        super.resolveDrawables();
+        int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.isLayoutDirectionInherited()) {
+                child.resolveDrawables();
+            }
+        }
+!!!914818.java!!!	resolveLayoutParams() : void
+        super.resolveLayoutParams();
+        int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            child.resolveLayoutParams();
+        }
+!!!914946.java!!!	resetResolvedLayoutDirection() : void
+        super.resetResolvedLayoutDirection();
+
+        int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.isLayoutDirectionInherited()) {
+                child.resetResolvedLayoutDirection();
+            }
+        }
+!!!915074.java!!!	resetResolvedTextDirection() : void
+        super.resetResolvedTextDirection();
+
+        int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.isTextDirectionInherited()) {
+                child.resetResolvedTextDirection();
+            }
+        }
+!!!915202.java!!!	resetResolvedTextAlignment() : void
+        super.resetResolvedTextAlignment();
+
+        int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.isTextAlignmentInherited()) {
+                child.resetResolvedTextAlignment();
+            }
+        }
+!!!915330.java!!!	resetResolvedPadding() : void
+        super.resetResolvedPadding();
+
+        int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.isLayoutDirectionInherited()) {
+                child.resetResolvedPadding();
+            }
+        }
+!!!915458.java!!!	resetResolvedDrawables() : void
+        super.resetResolvedDrawables();
+
+        int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.isLayoutDirectionInherited()) {
+                child.resetResolvedDrawables();
+            }
+        }
+!!!915586.java!!!	shouldDelayChildPressedState() : boolean
+        return true;
+!!!915714.java!!!	onStartNestedScroll(inout child : View, inout target : View, in nestedScrollAxes : int) : boolean
+        return false;
+!!!915842.java!!!	onNestedScrollAccepted(inout child : View, inout target : View, in axes : int) : void
+        mNestedScrollAxes = axes;
+!!!915970.java!!!	onStopNestedScroll(inout child : View) : void
+        // Stop any recursive nested scrolling.
+        stopNestedScroll();
+!!!916098.java!!!	onNestedScroll(inout target : View, in dxConsumed : int, in dyConsumed : int, in dxUnconsumed : int, in dyUnconsumed : int) : void
+        // Do nothing
+!!!916226.java!!!	onNestedPreScroll(inout target : View, in dx : int, in dy : int, inout consumed : int) : void
+        // Do nothing
+!!!916354.java!!!	onNestedFling(inout target : View, in velocityX : float, in velocityY : float, inout consumed : boolean) : boolean
+        return false;
+!!!916482.java!!!	onNestedPreFling(inout target : View, in velocityX : float, in velocityY : float) : boolean
+        return false;
+!!!916610.java!!!	getNestedScrollAxes() : int
+        return mNestedScrollAxes;
+!!!916866.java!!!	captureTransitioningViews(inout transitioningViews : List<View>) : void
+        if (getVisibility() != View.VISIBLE) {
+            return;
+        }
+        if (isTransitionGroup()) {
+            transitioningViews.add(this);
+        } else {
+            int count = getChildCount();
+            for (int i = 0; i < count; i++) {
+                View child = getChildAt(i);
+                child.captureTransitioningViews(transitioningViews);
+            }
+        }
+!!!916994.java!!!	findNamedViews(inout namedElements : Map<String, View>) : void
+        if (getVisibility() != VISIBLE && mGhostView == null) {
+            return;
+        }
+        super.findNamedViews(namedElements);
+        int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = getChildAt(i);
+            child.findNamedViews(namedElements);
+        }
+!!!923138.java!!!	getDebugPaint() : Paint
+        if (sDebugPaint == null) {
+            sDebugPaint = new Paint();
+            sDebugPaint.setAntiAlias(false);
+        }
+        return sDebugPaint;
+!!!923266.java!!!	drawRect(inout canvas : Canvas, inout paint : Paint, in x1 : int, in y1 : int, in x2 : int, in y2 : int) : void
+        if (sDebugLines== null) {
+            // TODO: This won't work with multiple UI threads in a single process
+            sDebugLines = new float[16];
+        }
+
+        sDebugLines[0] = x1;
+        sDebugLines[1] = y1;
+        sDebugLines[2] = x2;
+        sDebugLines[3] = y1;
+
+        sDebugLines[4] = x2;
+        sDebugLines[5] = y1;
+        sDebugLines[6] = x2;
+        sDebugLines[7] = y2;
+
+        sDebugLines[8] = x2;
+        sDebugLines[9] = y2;
+        sDebugLines[10] = x1;
+        sDebugLines[11] = y2;
+
+        sDebugLines[12] = x1;
+        sDebugLines[13] = y2;
+        sDebugLines[14] = x1;
+        sDebugLines[15] = y1;
+
+        canvas.drawLines(sDebugLines, paint);

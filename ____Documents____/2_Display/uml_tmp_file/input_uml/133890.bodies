@@ -1,0 +1,7 @@
+class LocalService
+!!!157058.java!!!	setDisplayViewports(inout defaultViewport : DisplayViewport, inout externalTouchViewport : DisplayViewport) : void
+            setDisplayViewportsInternal(defaultViewport, externalTouchViewport);
+!!!157186.java!!!	injectInputEvent(inout event : InputEvent, in displayId : int, in mode : int) : boolean
+            return injectInputEventInternal(event, displayId, mode);
+!!!157314.java!!!	setInteractive(inout interactive : boolean) : void
+            nativeSetInteractive(mPtr, interactive);

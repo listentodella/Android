@@ -1,0 +1,37 @@
+class Spec
+!!!2311042.java!!!	Spec(inout startDefined : boolean, inout span : GridLayout::Interval, inout alignment : GridLayout::Alignment, in weight : float)
+            this.startDefined = startDefined;
+            this.span = span;
+            this.alignment = alignment;
+            this.weight = weight;
+!!!2311170.java!!!	Spec(inout startDefined : boolean, in start : int, in size : int, inout alignment : GridLayout::Alignment, in weight : float)
+            this(startDefined, new Interval(start, start + size), alignment, weight);
+!!!2311298.java!!!	copyWriteSpan(inout span : GridLayout::Interval) : GridLayout::Spec
+            return new Spec(startDefined, span, alignment, weight);
+!!!2311426.java!!!	copyWriteAlignment(inout alignment : GridLayout::Alignment) : GridLayout::Spec
+            return new Spec(startDefined, span, alignment, weight);
+!!!2311554.java!!!	getFlexibility() : int
+            return (alignment == UNDEFINED_ALIGNMENT && weight == 0) ? INFLEXIBLE : CAN_STRETCH;
+!!!2311682.java!!!	equals(inout that : Object) : boolean
+            if (this == that) {
+                return true;
+            }
+            if (that == null || getClass() != that.getClass()) {
+                return false;
+            }
+
+            Spec spec = (Spec) that;
+
+            if (!alignment.equals(spec.alignment)) {
+                return false;
+            }
+            //noinspection RedundantIfStatement
+            if (!span.equals(spec.span)) {
+                return false;
+            }
+
+            return true;
+!!!2311810.java!!!	hashCode() : int
+            int result = span.hashCode();
+            result = 31 * result + alignment.hashCode();
+            return result;

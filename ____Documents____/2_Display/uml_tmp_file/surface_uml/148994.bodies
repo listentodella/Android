@@ -1,0 +1,16 @@
+class PowerHAL
+!!!215810.cpp!!!	vsyncHint(in enabled : bool) : status_t
+    Mutex::Autolock _l(mlock);
+    if (mPowerManager == NULL) {
+        const String16 serviceName("power");
+        sp<IBinder> bs = defaultServiceManager()->checkService(serviceName);
+        if (bs == NULL) {
+            return NAME_NOT_FOUND;
+        }
+        mPowerManager = interface_cast<IPowerManager>(bs);
+    }
+    status_t status = mPowerManager->powerHint(POWER_HINT_VSYNC, enabled ? 1 : 0);
+    if(status == DEAD_OBJECT) {
+        mPowerManager = NULL;
+    }
+    return status;

@@ -1,0 +1,12 @@
+class ProviderKey
+!!!1421186.java!!!	ProviderKey(in authority : String, in userId : int)
+            this.authority = authority;
+            this.userId = userId;
+!!!1421314.java!!!	equals(inout o : Object) : boolean
+            if (o instanceof ProviderKey) {
+                final ProviderKey other = (ProviderKey) o;
+                return Objects.equals(authority, other.authority) && userId == other.userId;
+            }
+            return false;
+!!!1421442.java!!!	hashCode() : int
+            return ((authority != null) ? authority.hashCode() : 0) ^ userId;

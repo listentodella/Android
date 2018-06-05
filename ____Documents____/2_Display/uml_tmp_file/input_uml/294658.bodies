@@ -1,0 +1,25 @@
+class JobSchedulerImpl
+!!!1639810.java!!!	JobSchedulerImpl(inout binder : IJobScheduler)
+        mBinder = binder;
+!!!1639938.java!!!	schedule(inout job : JobInfo) : int
+        try {
+            return mBinder.schedule(job);
+        } catch (RemoteException e) {
+            return JobScheduler.RESULT_FAILURE;
+        }
+!!!1640066.java!!!	cancel(in jobId : int) : void
+        try {
+            mBinder.cancel(jobId);
+        } catch (RemoteException e) {}
+
+!!!1640194.java!!!	cancelAll() : void
+        try {
+            mBinder.cancelAll();
+        } catch (RemoteException e) {}
+
+!!!1640322.java!!!	getAllPendingJobs() : JobInfo
+        try {
+            return mBinder.getAllPendingJobs();
+        } catch (RemoteException e) {
+            return null;
+        }

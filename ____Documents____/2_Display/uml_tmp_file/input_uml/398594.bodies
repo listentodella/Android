@@ -1,0 +1,88 @@
+class Toast
+!!!2529922.java!!!	Toast(inout context : Context)
+        mContext = context;
+        mTN = new TN();
+        mTN.mY = context.getResources().getDimensionPixelSize(
+                com.android.internal.R.dimen.toast_y_offset);
+        mTN.mGravity = context.getResources().getInteger(
+                com.android.internal.R.integer.config_toastDefaultGravity);
+!!!2530050.java!!!	show() : void
+        if (mNextView == null) {
+            throw new RuntimeException("setView must have been called");
+        }
+
+        INotificationManager service = getService();
+        String pkg = mContext.getOpPackageName();
+        TN tn = mTN;
+        tn.mNextView = mNextView;
+
+        try {
+            service.enqueueToast(pkg, tn, mDuration);
+        } catch (RemoteException e) {
+            // Empty
+        }
+!!!2530178.java!!!	cancel() : void
+        mTN.hide();
+
+        try {
+            getService().cancelToast(mContext.getPackageName(), mTN);
+        } catch (RemoteException e) {
+            // Empty
+        }
+!!!2530306.java!!!	setView(inout view : View) : void
+        mNextView = view;
+!!!2530434.java!!!	getView() : View
+        return mNextView;
+!!!2530562.java!!!	setDuration(in duration : int) : void
+        mDuration = duration;
+!!!2530690.java!!!	getDuration() : int
+        return mDuration;
+!!!2530818.java!!!	setMargin(in horizontalMargin : float, in verticalMargin : float) : void
+        mTN.mHorizontalMargin = horizontalMargin;
+        mTN.mVerticalMargin = verticalMargin;
+!!!2530946.java!!!	getHorizontalMargin() : float
+        return mTN.mHorizontalMargin;
+!!!2531074.java!!!	getVerticalMargin() : float
+        return mTN.mVerticalMargin;
+!!!2531202.java!!!	setGravity(in gravity : int, in xOffset : int, in yOffset : int) : void
+        mTN.mGravity = gravity;
+        mTN.mX = xOffset;
+        mTN.mY = yOffset;
+!!!2531330.java!!!	getGravity() : int
+        return mTN.mGravity;
+!!!2531458.java!!!	getXOffset() : int
+        return mTN.mX;
+!!!2531586.java!!!	getYOffset() : int
+        return mTN.mY;
+!!!2531714.java!!!	makeText(inout context : Context, inout text : CharSequence, in duration : int) : Toast
+        Toast result = new Toast(context);
+
+        LayoutInflater inflate = (LayoutInflater)
+                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View v = inflate.inflate(com.android.internal.R.layout.transient_notification, null);
+        TextView tv = (TextView)v.findViewById(com.android.internal.R.id.message);
+        tv.setText(text);
+        
+        result.mNextView = v;
+        result.mDuration = duration;
+
+        return result;
+!!!2531842.java!!!	makeText(inout context : Context, in resId : int, in duration : int) : Toast
+        return makeText(context, context.getResources().getText(resId), duration);
+!!!2531970.java!!!	setText(in resId : int) : void
+        setText(mContext.getText(resId));
+!!!2532098.java!!!	setText(inout s : CharSequence) : void
+        if (mNextView == null) {
+            throw new RuntimeException("This Toast was not created with Toast.makeText()");
+        }
+        TextView tv = (TextView) mNextView.findViewById(com.android.internal.R.id.message);
+        if (tv == null) {
+            throw new RuntimeException("This Toast was not created with Toast.makeText()");
+        }
+        tv.setText(s);
+!!!2532226.java!!!	getService() : INotificationManager
+        if (sService != null) {
+            return sService;
+        }
+        sService = INotificationManager.Stub.asInterface(ServiceManager.getService("notification"));
+        return sService;

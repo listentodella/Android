@@ -1,0 +1,27 @@
+class LayoutParams
+!!!917122.java!!!	LayoutParams(inout c : Context, inout attrs : AttributeSet)
+            TypedArray a = c.obtainStyledAttributes(attrs, R.styleable.ViewGroup_Layout);
+            setBaseAttributes(a,
+                    R.styleable.ViewGroup_Layout_layout_width,
+                    R.styleable.ViewGroup_Layout_layout_height);
+            a.recycle();
+!!!917250.java!!!	LayoutParams(in width : int, in height : int)
+            this.width = width;
+            this.height = height;
+!!!917378.java!!!	LayoutParams(inout source : ViewGroup::LayoutParams)
+            this.width = source.width;
+            this.height = source.height;
+!!!917634.java!!!	setBaseAttributes(inout a : TypedArray, in widthAttr : int, in heightAttr : int) : void
+            width = a.getLayoutDimension(widthAttr, "layout_width");
+            height = a.getLayoutDimension(heightAttr, "layout_height");
+!!!917890.java!!!	debug(in output : String) : String
+            return output + "ViewGroup.LayoutParams={ width="
+                    + sizeToString(width) + ", height=" + sizeToString(height) + " }";
+!!!918146.java!!!	sizeToString(in size : int) : String
+            if (size == WRAP_CONTENT) {
+                return "wrap-content";
+            }
+            if (size == MATCH_PARENT) {
+                return "match-parent";
+            }
+            return String.valueOf(size);

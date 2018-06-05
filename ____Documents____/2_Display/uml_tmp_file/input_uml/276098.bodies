@@ -1,0 +1,32 @@
+class AppTask
+!!!1359746.java!!!	AppTask(inout task : IAppTask)
+            mAppTaskImpl = task;
+!!!1359874.java!!!	finishAndRemoveTask() : void
+            try {
+                mAppTaskImpl.finishAndRemoveTask();
+            } catch (RemoteException e) {
+                Slog.e(TAG, "Invalid AppTask", e);
+            }
+!!!1360002.java!!!	getTaskInfo() : ActivityManager::RecentTaskInfo
+            try {
+                return mAppTaskImpl.getTaskInfo();
+            } catch (RemoteException e) {
+                Slog.e(TAG, "Invalid AppTask", e);
+                return null;
+            }
+!!!1360130.java!!!	moveToFront() : void
+            try {
+                mAppTaskImpl.moveToFront();
+            } catch (RemoteException e) {
+                Slog.e(TAG, "Invalid AppTask", e);
+            }
+!!!1360258.java!!!	startActivity(inout context : Context, inout intent : Intent, inout options : Bundle) : void
+            ActivityThread thread = ActivityThread.currentActivityThread();
+            thread.getInstrumentation().execStartActivityFromAppTask(context,
+                    thread.getApplicationThread(), mAppTaskImpl, intent, options);
+!!!1360386.java!!!	setExcludeFromRecents(inout exclude : boolean) : void
+            try {
+                mAppTaskImpl.setExcludeFromRecents(exclude);
+            } catch (RemoteException e) {
+                Slog.e(TAG, "Invalid AppTask", e);
+            }

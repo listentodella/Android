@@ -1,0 +1,108 @@
+class tmat44
+!!!340482.cpp!!!	tmat44()
+    mValue[0] = col_type(1,0,0,0);
+    mValue[1] = col_type(0,1,0,0);
+    mValue[2] = col_type(0,0,1,0);
+    mValue[3] = col_type(0,0,0,1);
+!!!340610.cpp!!!	tmat44(in v : U)
+    mValue[0] = col_type(v,0,0,0);
+    mValue[1] = col_type(0,v,0,0);
+    mValue[2] = col_type(0,0,v,0);
+    mValue[3] = col_type(0,0,0,v);
+!!!340738.cpp!!!	tmat44(in v : tvec4<U>)
+    mValue[0] = col_type(v.x,0,0,0);
+    mValue[1] = col_type(0,v.y,0,0);
+    mValue[2] = col_type(0,0,v.z,0);
+    mValue[3] = col_type(0,0,0,v.w);
+!!!340866.cpp!!!	tmat44(in rhs : tmat44<U>)
+    for (size_t r=0 ; r<row_size() ; r++)
+        mValue[r] = rhs[r];
+!!!340994.cpp!!!	tmat44(in v0 : tvec4<A>, in v1 : tvec4<B>, in v2 : tvec4<C>, in v3 : tvec4<D>)
+    mValue[0] = v0;
+    mValue[1] = v1;
+    mValue[2] = v2;
+    mValue[3] = v3;
+!!!341122.cpp!!!	tmat44(in m00 : A, in m01 : B, in m02 : C, in m03 : D, in m10 : E, in m11 : F, in m12 : G, in m13 : H, in m20 : I, in m21 : J, in m22 : K, in m23 : L, in m30 : M, in m31 : N, in m32 : O, in m33 : P)
+    mValue[0] = col_type(m00, m01, m02, m03);
+    mValue[1] = col_type(m10, m11, m12, m13);
+    mValue[2] = col_type(m20, m21, m22, m23);
+    mValue[3] = col_type(m30, m31, m32, m33);
+!!!341250.cpp!!!	tmat44(in rawArray : U)
+    for (size_t r=0 ; r<row_size() ; r++)
+        for (size_t c=0 ; c<col_size() ; c++)
+            mValue[r][c] = *rawArray++;
+!!!341378.cpp!!!	ortho(in left : T, in right : T, in bottom : T, in top : T, in near : T, in far : T) : tmat44
+    tmat44<T> m;
+    m[0][0] =  2 / (right - left);
+    m[1][1] =  2 / (top   - bottom);
+    m[2][2] = -2 / (far   - near);
+    m[3][0] = -(right + left)   / (right - left);
+    m[3][1] = -(top   + bottom) / (top   - bottom);
+    m[3][2] = -(far   + near)   / (far   - near);
+    return m;
+!!!341506.cpp!!!	frustum(in left : T, in right : T, in bottom : T, in top : T, in near : T, in far : T) : tmat44
+    tmat44<T> m;
+    T A = (right + left)   / (right - left);
+    T B = (top   + bottom) / (top   - bottom);
+    T C = (far   + near)   / (far   - near);
+    T D = (2 * far * near) / (far   - near);
+    m[0][0] = (2 * near) / (right - left);
+    m[1][1] = (2 * near) / (top   - bottom);
+    m[2][0] = A;
+    m[2][1] = B;
+    m[2][2] = C;
+    m[2][3] =-1;
+    m[3][2] = D;
+    m[3][3] = 0;
+    return m;
+!!!341634.cpp!!!	lookAt(in eye : tvec3<A>, in center : tvec3<B>, in up : tvec3<C>) : tmat44
+    tvec3<T> L(normalize(center - eye));
+    tvec3<T> S(normalize( cross(L, up) ));
+    tvec3<T> U(cross(S, L));
+    return tmat44<T>(
+            tvec4<T>( S, 0),
+            tvec4<T>( U, 0),
+            tvec4<T>(-L, 0),
+            tvec4<T>(-eye, 1));
+!!!341762.cpp!!!	translate(in t : tvec4<A>) : tmat44
+    tmat44<T> r;
+    r[3] = t;
+    return r;
+!!!341890.cpp!!!	scale(in s : tvec4<A>) : tmat44
+    tmat44<T> r;
+    r[0][0] = s[0];
+    r[1][1] = s[1];
+    r[2][2] = s[2];
+    r[3][3] = s[3];
+    return r;
+!!!342018.cpp!!!	rotate(in radian : A, in about : tvec3<B>) : tmat44
+    tmat44<T> rotation;
+    T* r = const_cast<T*>(rotation.asArray());
+    T c = cos(radian);
+    T s = sin(radian);
+    if (about.x==1 && about.y==0 && about.z==0) {
+        r[5] = c;   r[10]= c;
+        r[6] = s;   r[9] = -s;
+    } else if (about.x==0 && about.y==1 && about.z==0) {
+        r[0] = c;   r[10]= c;
+        r[8] = s;   r[2] = -s;
+    } else if (about.x==0 && about.y==0 && about.z==1) {
+        r[0] = c;   r[5] = c;
+        r[1] = s;   r[4] = -s;
+    } else {
+        tvec3<B> nabout = normalize(about);
+        B x = nabout.x;
+        B y = nabout.y;
+        B z = nabout.z;
+        T nc = 1 - c;
+        T xy = x * y;
+        T yz = y * z;
+        T zx = z * x;
+        T xs = x * s;
+        T ys = y * s;
+        T zs = z * s;
+        r[ 0] = x*x*nc +  c;    r[ 4] =  xy*nc - zs;    r[ 8] =  zx*nc + ys;
+        r[ 1] =  xy*nc + zs;    r[ 5] = y*y*nc +  c;    r[ 9] =  yz*nc - xs;
+        r[ 2] =  zx*nc - ys;    r[ 6] =  yz*nc + xs;    r[10] = z*z*nc +  c;
+    }
+    return rotation;

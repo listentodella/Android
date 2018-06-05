@@ -1,0 +1,95 @@
+class InsertionHandleView
+!!!2252162.java!!!	InsertionHandleView(inout drawable : Drawable)
+            super(drawable, drawable);
+!!!2252290.java!!!	show() : void
+            super.show();
+
+            final long durationSinceCutOrCopy =
+                    SystemClock.uptimeMillis() - TextView.LAST_CUT_OR_COPY_TIME;
+            if (durationSinceCutOrCopy < RECENT_CUT_COPY_DURATION) {
+                showActionPopupWindow(0);
+            }
+
+            hideAfterDelay();
+!!!2252418.java!!!	showWithActionPopup() : void
+            show();
+            showActionPopupWindow(0);
+!!!2252546.java!!!	hideAfterDelay() : void
+            if (mHider == null) {
+                mHider = new Runnable() {
+                    public void run() {
+                        hide();
+                    }
+                };
+            } else {
+                removeHiderCallback();
+            }
+            mTextView.postDelayed(mHider, DELAY_BEFORE_HANDLE_FADES_OUT);
+!!!2252674.java!!!	removeHiderCallback() : void
+            if (mHider != null) {
+                mTextView.removeCallbacks(mHider);
+            }
+!!!2252802.java!!!	getHotspotX(inout drawable : Drawable, inout isRtlRun : boolean) : int
+            return drawable.getIntrinsicWidth() / 2;
+!!!2252930.java!!!	getHorizontalGravity(inout isRtlRun : boolean) : int
+            return Gravity.CENTER_HORIZONTAL;
+!!!2253058.java!!!	getCursorOffset() : int
+            int offset = super.getCursorOffset();
+            final Drawable cursor = mCursorCount > 0 ? mCursorDrawable[0] : null;
+            if (cursor != null) {
+                cursor.getPadding(mTempRect);
+                offset += (cursor.getIntrinsicWidth() - mTempRect.left - mTempRect.right) / 2;
+            }
+            return offset;
+!!!2253186.java!!!	onTouchEvent(inout ev : MotionEvent) : boolean
+            final boolean result = super.onTouchEvent(ev);
+
+            switch (ev.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    mDownPositionX = ev.getRawX();
+                    mDownPositionY = ev.getRawY();
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                    if (!offsetHasBeenChanged()) {
+                        final float deltaX = mDownPositionX - ev.getRawX();
+                        final float deltaY = mDownPositionY - ev.getRawY();
+                        final float distanceSquared = deltaX * deltaX + deltaY * deltaY;
+
+                        final ViewConfiguration viewConfiguration = ViewConfiguration.get(
+                                mTextView.getContext());
+                        final int touchSlop = viewConfiguration.getScaledTouchSlop();
+
+                        if (distanceSquared < touchSlop * touchSlop) {
+                            if (mActionPopupWindow != null && mActionPopupWindow.isShowing()) {
+                                // Tapping on the handle dismisses the displayed action popup
+                                mActionPopupWindow.hide();
+                            } else {
+                                showWithActionPopup();
+                            }
+                        }
+                    }
+                    hideAfterDelay();
+                    break;
+
+                case MotionEvent.ACTION_CANCEL:
+                    hideAfterDelay();
+                    break;
+
+                default:
+                    break;
+            }
+
+            return result;
+!!!2253314.java!!!	getCurrentCursorOffset() : int
+            return mTextView.getSelectionStart();
+!!!2253442.java!!!	updateSelection(in offset : int) : void
+            Selection.setSelection((Spannable) mTextView.getText(), offset);
+!!!2253570.java!!!	updatePosition(in x : float, in y : float) : void
+            positionAtCursorOffset(mTextView.getOffsetForPosition(x, y), false);
+!!!2253698.java!!!	onHandleMoved() : void
+            super.onHandleMoved();
+            removeHiderCallback();
+!!!2253826.java!!!	onDetached() : void
+            super.onDetached();
+            removeHiderCallback();

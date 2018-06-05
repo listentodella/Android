@@ -1,0 +1,9 @@
+class KeyguardShowDelegate
+!!!529666.java!!!	KeyguardShowDelegate(inout showListener : KeyguardServiceDelegate::ShowListener)
+            mShowListener = showListener;
+!!!529794.java!!!	onShown(inout windowToken : IBinder) : void
+            if (DEBUG) Log.v(TAG, "**** SHOWN CALLED ****");
+            if (mShowListener != null) {
+                mShowListener.onShown(windowToken);
+            }
+            hideScrim();

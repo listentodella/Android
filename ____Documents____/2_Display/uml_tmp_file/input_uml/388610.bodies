@@ -1,0 +1,41 @@
+class RtlSpacingHelper
+!!!2404482.java!!!	getLeft() : int
+        return mLeft;
+!!!2404610.java!!!	getRight() : int
+        return mRight;
+!!!2404738.java!!!	getStart() : int
+        return mIsRtl ? mRight : mLeft;
+!!!2404866.java!!!	getEnd() : int
+        return mIsRtl ? mLeft : mRight;
+!!!2404994.java!!!	setRelative(in start : int, in end : int) : void
+        mStart = start;
+        mEnd = end;
+        mIsRelative = true;
+        if (mIsRtl) {
+            if (end != UNDEFINED) mLeft = end;
+            if (start != UNDEFINED) mRight = start;
+        } else {
+            if (start != UNDEFINED) mLeft = start;
+            if (end != UNDEFINED) mRight = end;
+        }
+!!!2405122.java!!!	setAbsolute(in left : int, in right : int) : void
+        mIsRelative = false;
+        if (left != UNDEFINED) mLeft = mExplicitLeft = left;
+        if (right != UNDEFINED) mRight = mExplicitRight = right;
+!!!2405250.java!!!	setDirection(inout isRtl : boolean) : void
+        if (isRtl == mIsRtl) {
+            return;
+        }
+        mIsRtl = isRtl;
+        if (mIsRelative) {
+            if (isRtl) {
+                mLeft = mEnd != UNDEFINED ? mEnd : mExplicitLeft;
+                mRight = mStart != UNDEFINED ? mStart : mExplicitRight;
+            } else {
+                mLeft = mStart != UNDEFINED ? mStart : mExplicitLeft;
+                mRight = mEnd != UNDEFINED ? mEnd : mExplicitRight;
+            }
+        } else {
+            mLeft = mExplicitLeft;
+            mRight = mExplicitRight;
+        }

@@ -1,0 +1,13 @@
+class EventLog
+!!!220674.cpp!!!	logFrameDurations(in window : String8, in durations : int32_t, in numDurations : size_t) : void
+    EventLog::getInstance().doLogFrameDurations(window, durations,
+            numDurations);
+!!!222082.cpp!!!	doLogFrameDurations(in window : String8, in durations : int32_t, in numDurations : size_t) : void
+    EventLog::TagBuffer buffer(LOGTAG_SF_FRAME_DUR);
+    buffer.startList(1 + numDurations);
+    buffer.writeString8(window);
+    for (size_t i = 0; i < numDurations; i++) {
+        buffer.writeInt32(durations[i]);
+    }
+    buffer.endList();
+    buffer.log();

@@ -1,0 +1,57 @@
+class UsageStatsManager
+!!!1828482.java!!!	UsageStatsManager(inout context : Context, inout service : IUsageStatsManager)
+        mContext = context;
+        mService = service;
+!!!1828610.java!!!	queryUsageStats(in intervalType : int, in beginTime : long, in endTime : long) : UsageStats
+        try {
+            @SuppressWarnings("unchecked")
+            ParceledListSlice<UsageStats> slice = mService.queryUsageStats(intervalType, beginTime,
+                    endTime, mContext.getOpPackageName());
+            if (slice != null) {
+                return slice.getList();
+            }
+        } catch (RemoteException e) {
+            // fallthrough and return null.
+        }
+        return Collections.emptyList();
+!!!1828738.java!!!	queryConfigurations(in intervalType : int, in beginTime : long, in endTime : long) : ConfigurationStats
+        try {
+            @SuppressWarnings("unchecked")
+            ParceledListSlice<ConfigurationStats> slice = mService.queryConfigurationStats(
+                    intervalType, beginTime, endTime, mContext.getOpPackageName());
+            if (slice != null) {
+                return slice.getList();
+            }
+        } catch (RemoteException e) {
+            // fallthrough and return the empty list.
+        }
+        return Collections.emptyList();
+!!!1828866.java!!!	queryEvents(in beginTime : long, in endTime : long) : UsageEvents
+        try {
+            UsageEvents iter = mService.queryEvents(beginTime, endTime,
+                    mContext.getOpPackageName());
+            if (iter != null) {
+                return iter;
+            }
+        } catch (RemoteException e) {
+            // fallthrough and return null
+        }
+        return sEmptyResults;
+!!!1828994.java!!!	queryAndAggregateUsageStats(in beginTime : long, in endTime : long) : UsageStats
+        List<UsageStats> stats = queryUsageStats(INTERVAL_BEST, beginTime, endTime);
+        if (stats.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        ArrayMap<String, UsageStats> aggregatedStats = new ArrayMap<>();
+        final int statCount = stats.size();
+        for (int i = 0; i < statCount; i++) {
+            UsageStats newStat = stats.get(i);
+            UsageStats existingStat = aggregatedStats.get(newStat.getPackageName());
+            if (existingStat == null) {
+                aggregatedStats.put(newStat.mPackageName, newStat);
+            } else {
+                existingStat.add(newStat);
+            }
+        }
+        return aggregatedStats;

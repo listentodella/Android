@@ -1,0 +1,45 @@
+class String16
+!!!408322.cpp!!!	string() : char16_t
+    return mString;
+!!!408450.cpp!!!	size() : size_t
+    return SharedBuffer::sizeFromData(mString)/sizeof(char16_t)-1;
+!!!408578.cpp!!!	sharedBuffer() : SharedBuffer
+    return SharedBuffer::bufferFromData(mString);
+!!!409474.cpp!!!	operator =(in other : String16) : String16
+    setTo(other);
+    return *this;
+!!!409602.cpp!!!	operator +=(in other : String16) : String16
+    append(other);
+    return *this;
+!!!409730.cpp!!!	operator +(in other : String16) : String16
+    String16 tmp(*this);
+    tmp += other;
+    return tmp;
+!!!411010.cpp!!!	compare(in other : String16) : int
+    return strzcmp16(mString, size(), other.mString, other.size());
+!!!411138.cpp!!!	operator <(in other : String16) : bool
+    return strzcmp16(mString, size(), other.mString, other.size()) < 0;
+!!!411266.cpp!!!	operator <=(in other : String16) : bool
+    return strzcmp16(mString, size(), other.mString, other.size()) <= 0;
+!!!411394.cpp!!!	operator ==(in other : String16) : bool
+    return strzcmp16(mString, size(), other.mString, other.size()) == 0;
+!!!411522.cpp!!!	operator !=(in other : String16) : bool
+    return strzcmp16(mString, size(), other.mString, other.size()) != 0;
+!!!411650.cpp!!!	operator >=(in other : String16) : bool
+    return strzcmp16(mString, size(), other.mString, other.size()) >= 0;
+!!!411778.cpp!!!	operator >(in other : String16) : bool
+    return strzcmp16(mString, size(), other.mString, other.size()) > 0;
+!!!411906.cpp!!!	operator <(in other : char16_t) : bool
+    return strcmp16(mString, other) < 0;
+!!!412034.cpp!!!	operator <=(in other : char16_t) : bool
+    return strcmp16(mString, other) <= 0;
+!!!412162.cpp!!!	operator ==(in other : char16_t) : bool
+    return strcmp16(mString, other) == 0;
+!!!412290.cpp!!!	operator !=(in other : char16_t) : bool
+    return strcmp16(mString, other) != 0;
+!!!412418.cpp!!!	operator >=(in other : char16_t) : bool
+    return strcmp16(mString, other) >= 0;
+!!!412546.cpp!!!	operator >(in other : char16_t) : bool
+    return strcmp16(mString, other) > 0;
+!!!412674.cpp!!!	operator constchar16_t*()
+    return mString;

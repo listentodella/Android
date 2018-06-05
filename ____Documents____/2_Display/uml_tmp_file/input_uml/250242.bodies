@@ -1,0 +1,24 @@
+class AnticipateInterpolator
+!!!1119618.java!!!	AnticipateInterpolator()
+        mTension = 2.0f;
+!!!1119746.java!!!	AnticipateInterpolator(in tension : float)
+        mTension = tension;
+!!!1119874.java!!!	AnticipateInterpolator(inout context : Context, inout attrs : AttributeSet)
+        this(context.getResources(), context.getTheme(), attrs);
+!!!1120002.java!!!	AnticipateInterpolator(inout res : Resources, inout theme : Theme, inout attrs : AttributeSet)
+        TypedArray a;
+        if (theme != null) {
+            a = theme.obtainStyledAttributes(attrs, R.styleable.AnticipateInterpolator, 0, 0);
+        } else {
+            a = res.obtainAttributes(attrs, R.styleable.AnticipateInterpolator);
+        }
+
+        mTension =
+                a.getFloat(R.styleable.AnticipateInterpolator_tension, 2.0f);
+
+        a.recycle();
+!!!1120130.java!!!	getInterpolation(in t : float) : float
+        // a(t) = t * t * ((tension + 1) * t - tension)
+        return t * t * ((mTension + 1) * t - mTension);
+!!!1120258.java!!!	createNativeInterpolator() : long
+        return NativeInterpolatorFactoryHelper.createAnticipateInterpolator(mTension);

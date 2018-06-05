@@ -1,0 +1,217 @@
+class InputDeviceState
+!!!160386.java!!!	getTouchCalibration(in surfaceRotation : int) : TouchCalibration
+            try {
+                return mTouchCalibration[surfaceRotation];
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                Slog.w(InputManagerService.TAG, "Cannot get touch calibration.", ex);
+                return null;
+            }
+!!!160514.java!!!	setTouchCalibration(in surfaceRotation : int, inout calibration : TouchCalibration) : boolean
+            try {
+                if (!calibration.equals(mTouchCalibration[surfaceRotation])) {
+                    mTouchCalibration[surfaceRotation] = calibration;
+                    return true;
+                }
+                return false;
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                Slog.w(InputManagerService.TAG, "Cannot set touch calibration.", ex);
+                return false;
+            }
+!!!160642.java!!!	getCurrentKeyboardLayout() : String
+            return mCurrentKeyboardLayout;
+!!!160770.java!!!	setCurrentKeyboardLayout(in keyboardLayout : String) : boolean
+            if (Objects.equal(mCurrentKeyboardLayout, keyboardLayout)) {
+                return false;
+            }
+            addKeyboardLayout(keyboardLayout);
+            mCurrentKeyboardLayout = keyboardLayout;
+            return true;
+!!!160898.java!!!	getKeyboardLayouts() : String
+            if (mKeyboardLayouts.isEmpty()) {
+                return (String[])ArrayUtils.emptyArray(String.class);
+            }
+            return mKeyboardLayouts.toArray(new String[mKeyboardLayouts.size()]);
+!!!161026.java!!!	addKeyboardLayout(in keyboardLayout : String) : boolean
+            int index = Collections.binarySearch(mKeyboardLayouts, keyboardLayout);
+            if (index >= 0) {
+                return false;
+            }
+            mKeyboardLayouts.add(-index - 1, keyboardLayout);
+            if (mCurrentKeyboardLayout == null) {
+                mCurrentKeyboardLayout = keyboardLayout;
+            }
+            return true;
+!!!161154.java!!!	removeKeyboardLayout(in keyboardLayout : String) : boolean
+            int index = Collections.binarySearch(mKeyboardLayouts, keyboardLayout);
+            if (index < 0) {
+                return false;
+            }
+            mKeyboardLayouts.remove(index);
+            updateCurrentKeyboardLayoutIfRemoved(keyboardLayout, index);
+            return true;
+!!!161282.java!!!	updateCurrentKeyboardLayoutIfRemoved(in removedKeyboardLayout : String, in removedIndex : int) : void
+            if (Objects.equal(mCurrentKeyboardLayout, removedKeyboardLayout)) {
+                if (!mKeyboardLayouts.isEmpty()) {
+                    int index = removedIndex;
+                    if (index == mKeyboardLayouts.size()) {
+                        index = 0;
+                    }
+                    mCurrentKeyboardLayout = mKeyboardLayouts.get(index);
+                } else {
+                    mCurrentKeyboardLayout = null;
+                }
+            }
+!!!161410.java!!!	switchKeyboardLayout(in direction : int) : boolean
+            final int size = mKeyboardLayouts.size();
+            if (size < 2) {
+                return false;
+            }
+            int index = Collections.binarySearch(mKeyboardLayouts, mCurrentKeyboardLayout);
+            assert index >= 0;
+            if (direction > 0) {
+                index = (index + 1) % size;
+            } else {
+                index = (index + size - 1) % size;
+            }
+            mCurrentKeyboardLayout = mKeyboardLayouts.get(index);
+            return true;
+!!!161538.java!!!	removeUninstalledKeyboardLayouts(inout availableKeyboardLayouts : Set<String>) : boolean
+            boolean changed = false;
+            for (int i = mKeyboardLayouts.size(); i-- > 0; ) {
+                String keyboardLayout = mKeyboardLayouts.get(i);
+                if (!availableKeyboardLayouts.contains(keyboardLayout)) {
+                    Slog.i(TAG, "Removing uninstalled keyboard layout " + keyboardLayout);
+                    mKeyboardLayouts.remove(i);
+                    updateCurrentKeyboardLayoutIfRemoved(keyboardLayout, i);
+                    changed = true;
+                }
+            }
+            return changed;
+!!!161666.java!!!	loadFromXml(inout parser : XmlPullParser) : void
+            final int outerDepth = parser.getDepth();
+            while (XmlUtils.nextElementWithin(parser, outerDepth)) {
+                if (parser.getName().equals("keyboard-layout")) {
+                    String descriptor = parser.getAttributeValue(null, "descriptor");
+                    if (descriptor == null) {
+                        throw new XmlPullParserException(
+                                "Missing descriptor attribute on keyboard-layout.");
+                    }
+                    String current = parser.getAttributeValue(null, "current");
+                    if (mKeyboardLayouts.contains(descriptor)) {
+                        throw new XmlPullParserException(
+                                "Found duplicate keyboard layout.");
+                    }
+
+                    mKeyboardLayouts.add(descriptor);
+                    if (current != null && current.equals("true")) {
+                        if (mCurrentKeyboardLayout != null) {
+                            throw new XmlPullParserException(
+                                    "Found multiple current keyboard layouts.");
+                        }
+                        mCurrentKeyboardLayout = descriptor;
+                    }
+                } else if (parser.getName().equals("calibration")) {
+                    String format = parser.getAttributeValue(null, "format");
+                    String rotation = parser.getAttributeValue(null, "rotation");
+                    int r = -1;
+
+                    if (format == null) {
+                        throw new XmlPullParserException(
+                                "Missing format attribute on calibration.");
+                    }
+                    if (!format.equals("affine")) {
+                        throw new XmlPullParserException(
+                                "Unsupported format for calibration.");
+                    }
+                    if (rotation != null) {
+                        try {
+                            r = stringToSurfaceRotation(rotation);
+                        } catch (IllegalArgumentException e) {
+                            throw new XmlPullParserException(
+                                    "Unsupported rotation for calibration.");
+                        }
+                    }
+
+                    float[] matrix = TouchCalibration.IDENTITY.getAffineTransform();
+                    int depth = parser.getDepth();
+                    while (XmlUtils.nextElementWithin(parser, depth)) {
+                        String tag = parser.getName().toLowerCase();
+                        String value = parser.nextText();
+
+                        for (int i = 0; i < matrix.length && i < CALIBRATION_NAME.length; i++) {
+                            if (tag.equals(CALIBRATION_NAME[i])) {
+                                matrix[i] = Float.parseFloat(value);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (r == -1) {
+                        // Assume calibration applies to all rotations
+                        for (r = 0; r < mTouchCalibration.length; r++) {
+                            mTouchCalibration[r] = new TouchCalibration(matrix[0],
+                                matrix[1], matrix[2], matrix[3], matrix[4], matrix[5]);
+                        }
+                    } else {
+                        mTouchCalibration[r] = new TouchCalibration(matrix[0],
+                            matrix[1], matrix[2], matrix[3], matrix[4], matrix[5]);
+                    }
+                }
+            }
+
+            // Maintain invariant that layouts are sorted.
+            Collections.sort(mKeyboardLayouts);
+
+            // Maintain invariant that there is always a current keyboard layout unless
+            // there are none installed.
+            if (mCurrentKeyboardLayout == null && !mKeyboardLayouts.isEmpty()) {
+                mCurrentKeyboardLayout = mKeyboardLayouts.get(0);
+            }
+!!!161794.java!!!	saveToXml(inout serializer : XmlSerializer) : void
+            for (String layout : mKeyboardLayouts) {
+                serializer.startTag(null, "keyboard-layout");
+                serializer.attribute(null, "descriptor", layout);
+                if (layout.equals(mCurrentKeyboardLayout)) {
+                    serializer.attribute(null, "current", "true");
+                }
+                serializer.endTag(null, "keyboard-layout");
+            }
+
+            for (int i = 0; i < mTouchCalibration.length; i++) {
+                if (mTouchCalibration[i] != null) {
+                    String rotation = surfaceRotationToString(i);
+                    float[] transform = mTouchCalibration[i].getAffineTransform();
+
+                    serializer.startTag(null, "calibration");
+                    serializer.attribute(null, "format", "affine");
+                    serializer.attribute(null, "rotation", rotation);
+                    for (int j = 0; j < transform.length && j < CALIBRATION_NAME.length; j++) {
+                        serializer.startTag(null, CALIBRATION_NAME[j]);
+                        serializer.text(Float.toString(transform[j]));
+                        serializer.endTag(null, CALIBRATION_NAME[j]);
+                    }
+                    serializer.endTag(null, "calibration");
+                }
+            }
+!!!161922.java!!!	surfaceRotationToString(in surfaceRotation : int) : String
+            switch (surfaceRotation) {
+                case Surface.ROTATION_0:   return "0";
+                case Surface.ROTATION_90:  return "90";
+                case Surface.ROTATION_180: return "180";
+                case Surface.ROTATION_270: return "270";
+            }
+            throw new IllegalArgumentException("Unsupported surface rotation value" + surfaceRotation);
+!!!162050.java!!!	stringToSurfaceRotation(in s : String) : int
+            if ("0".equals(s)) {
+                return Surface.ROTATION_0;
+            }
+            if ("90".equals(s)) {
+                return Surface.ROTATION_90;
+            }
+            if ("180".equals(s)) {
+                return Surface.ROTATION_180;
+            }
+            if ("270".equals(s)) {
+                return Surface.ROTATION_270;
+            }
+            throw new IllegalArgumentException("Unsupported surface rotation string '" + s + "'");

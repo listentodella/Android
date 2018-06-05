@@ -1,0 +1,347 @@
+class ExitTransitionCoordinator
+!!!1614850.java!!!	ExitTransitionCoordinator(inout activity : Activity, inout names : ArrayList<String>, inout accepted : ArrayList<String>, inout mapped : ArrayList<View>, inout isReturning : boolean)
+        super(activity.getWindow(), names, getListener(activity, isReturning), isReturning);
+        viewsReady(mapSharedElements(accepted, mapped));
+        stripOffscreenViews();
+        mIsBackgroundReady = !isReturning;
+        mActivity = activity;
+!!!1614978.java!!!	getListener(inout activity : Activity, inout isReturning : boolean) : SharedElementCallback
+        return isReturning ? activity.mEnterTransitionListener : activity.mExitTransitionListener;
+!!!1615106.java!!!	onReceiveResult(in resultCode : int, inout resultData : Bundle) : void
+        switch (resultCode) {
+            case MSG_SET_REMOTE_RECEIVER:
+                stopCancel();
+                mResultReceiver = resultData.getParcelable(KEY_REMOTE_RECEIVER);
+                if (mIsCanceled) {
+                    mResultReceiver.send(MSG_CANCEL, null);
+                    mResultReceiver = null;
+                } else {
+                    notifyComplete();
+                }
+                break;
+            case MSG_HIDE_SHARED_ELEMENTS:
+                stopCancel();
+                if (!mIsCanceled) {
+                    hideSharedElements();
+                }
+                break;
+            case MSG_START_EXIT_TRANSITION:
+                mHandler.removeMessages(MSG_CANCEL);
+                startExit();
+                break;
+            case MSG_SHARED_ELEMENT_DESTINATION:
+                mExitSharedElementBundle = resultData;
+                sharedElementExitBack();
+                break;
+        }
+!!!1615234.java!!!	stopCancel() : void
+        if (mHandler != null) {
+            mHandler.removeMessages(MSG_CANCEL);
+        }
+!!!1615362.java!!!	delayCancel() : void
+        if (mHandler != null) {
+            mHandler.sendEmptyMessageDelayed(MSG_CANCEL, MAX_WAIT_MS);
+        }
+!!!1615490.java!!!	resetViews() : void
+        if (mTransitioningViews != null) {
+            showViews(mTransitioningViews, true);
+        }
+        showViews(mSharedElements, true);
+        mIsHidden = true;
+        ViewGroup decorView = getDecor();
+        if (!mIsReturning && decorView != null) {
+            decorView.suppressLayout(false);
+        }
+        moveSharedElementsFromOverlay();
+        clearState();
+!!!1615618.java!!!	sharedElementExitBack() : void
+        final ViewGroup decorView = getDecor();
+        if (decorView != null) {
+            decorView.suppressLayout(true);
+        }
+        if (decorView != null && mExitSharedElementBundle != null &&
+                !mExitSharedElementBundle.isEmpty() &&
+                !mSharedElements.isEmpty() && getSharedElementTransition() != null) {
+            startTransition(new Runnable() {
+                public void run() {
+                    startSharedElementExit(decorView);
+                }
+            });
+        } else {
+            sharedElementTransitionComplete();
+        }
+!!!1615746.java!!!	startSharedElementExit(in decorView : ViewGroup) : void
+        Transition transition = getSharedElementExitTransition();
+        transition.addListener(new Transition.TransitionListenerAdapter() {
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                transition.removeListener(this);
+                if (mExitComplete) {
+                    delayCancel();
+                }
+            }
+        });
+        final ArrayList<View> sharedElementSnapshots = createSnapshots(mExitSharedElementBundle,
+                mSharedElementNames);
+        decorView.getViewTreeObserver()
+                .addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        decorView.getViewTreeObserver().removeOnPreDrawListener(this);
+                        setSharedElementState(mExitSharedElementBundle, sharedElementSnapshots);
+                        return true;
+                    }
+                });
+        setGhostVisibility(View.INVISIBLE);
+        scheduleGhostVisibilityChange(View.INVISIBLE);
+        if (mListener != null) {
+            mListener.onSharedElementEnd(mSharedElementNames, mSharedElements,
+                    sharedElementSnapshots);
+        }
+        TransitionManager.beginDelayedTransition(decorView, transition);
+        scheduleGhostVisibilityChange(View.VISIBLE);
+        setGhostVisibility(View.VISIBLE);
+        decorView.invalidate();
+!!!1615874.java!!!	hideSharedElements() : void
+        moveSharedElementsFromOverlay();
+        if (!mIsHidden) {
+            hideViews(mSharedElements);
+        }
+        mSharedElementsHidden = true;
+        finishIfNecessary();
+!!!1616002.java!!!	startExit() : void
+        if (!mIsExitStarted) {
+            mIsExitStarted = true;
+            ViewGroup decorView = getDecor();
+            if (decorView != null) {
+                decorView.suppressLayout(true);
+            }
+            moveSharedElementsToOverlay();
+            startTransition(new Runnable() {
+                @Override
+                public void run() {
+                    beginTransitions();
+                }
+            });
+        }
+!!!1616130.java!!!	startExit(in resultCode : int, inout data : Intent) : void
+        if (!mIsExitStarted) {
+            mIsExitStarted = true;
+            ViewGroup decorView = getDecor();
+            if (decorView != null) {
+                decorView.suppressLayout(true);
+            }
+            mHandler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    mIsCanceled = true;
+                    finish();
+                }
+            };
+            delayCancel();
+            moveSharedElementsToOverlay();
+            if (decorView != null && decorView.getBackground() == null) {
+                getWindow().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
+            }
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(mActivity, this,
+                    mAllSharedElementNames, resultCode, data);
+            mActivity.convertToTranslucent(new Activity.TranslucentConversionListener() {
+                @Override
+                public void onTranslucentConversionComplete(boolean drawComplete) {
+                    if (!mIsCanceled) {
+                        fadeOutBackground();
+                    }
+                }
+            }, options);
+            startTransition(new Runnable() {
+                @Override
+                public void run() {
+                    startExitTransition();
+                }
+            });
+        }
+!!!1616258.java!!!	stop() : void
+        if (mIsReturning && mActivity != null) {
+            // Override the previous ActivityOptions. We don't want the
+            // activity to have options since we're essentially canceling the
+            // transition and finishing right now.
+            mActivity.convertToTranslucent(null, null);
+            finish();
+        }
+!!!1616386.java!!!	startExitTransition() : void
+        Transition transition = getExitTransition();
+        ViewGroup decorView = getDecor();
+        if (transition != null && decorView != null && mTransitioningViews != null) {
+            TransitionManager.beginDelayedTransition(decorView, transition);
+            mTransitioningViews.get(0).invalidate();
+        } else {
+            transitionStarted();
+        }
+!!!1616514.java!!!	fadeOutBackground() : void
+        if (mBackgroundAnimator == null) {
+            ViewGroup decor = getDecor();
+            Drawable background;
+            if (decor != null && (background = decor.getBackground()) != null) {
+                background = background.mutate();
+                getWindow().setBackgroundDrawable(background);
+                mBackgroundAnimator = ObjectAnimator.ofInt(background, "alpha", 0);
+                mBackgroundAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        mBackgroundAnimator = null;
+                        if (!mIsCanceled) {
+                            mIsBackgroundReady = true;
+                            notifyComplete();
+                        }
+                    }
+                });
+                mBackgroundAnimator.setDuration(getFadeDuration());
+                mBackgroundAnimator.start();
+            } else {
+                mIsBackgroundReady = true;
+            }
+        }
+!!!1616642.java!!!	getExitTransition() : Transition
+        Transition viewsTransition = null;
+        if (mTransitioningViews != null && !mTransitioningViews.isEmpty()) {
+            viewsTransition = configureTransition(getViewsTransition(), true);
+        }
+        if (viewsTransition == null) {
+            exitTransitionComplete();
+        } else {
+            final ArrayList<View> transitioningViews = mTransitioningViews;
+            viewsTransition.addListener(new ContinueTransitionListener() {
+                @Override
+                public void onTransitionEnd(Transition transition) {
+                    transition.removeListener(this);
+                    exitTransitionComplete();
+                    if (mIsHidden && transitioningViews != null) {
+                        showViews(transitioningViews, true);
+                    }
+                    if (mSharedElementBundle != null) {
+                        delayCancel();
+                    }
+                    super.onTransitionEnd(transition);
+                }
+            });
+            viewsTransition.forceVisibility(View.INVISIBLE, false);
+        }
+        return viewsTransition;
+!!!1616770.java!!!	getSharedElementExitTransition() : Transition
+        Transition sharedElementTransition = null;
+        if (!mSharedElements.isEmpty()) {
+            sharedElementTransition = configureTransition(getSharedElementTransition(), false);
+        }
+        if (sharedElementTransition == null) {
+            sharedElementTransitionComplete();
+        } else {
+            sharedElementTransition.addListener(new ContinueTransitionListener() {
+                @Override
+                public void onTransitionEnd(Transition transition) {
+                    transition.removeListener(this);
+                    sharedElementTransitionComplete();
+                    if (mIsHidden) {
+                        showViews(mSharedElements, true);
+                    }
+                }
+            });
+            mSharedElements.get(0).invalidate();
+        }
+        return sharedElementTransition;
+!!!1616898.java!!!	beginTransitions() : void
+        Transition sharedElementTransition = getSharedElementExitTransition();
+        Transition viewsTransition = getExitTransition();
+
+        Transition transition = mergeTransitions(sharedElementTransition, viewsTransition);
+        ViewGroup decorView = getDecor();
+        if (transition != null && decorView != null) {
+            setGhostVisibility(View.INVISIBLE);
+            scheduleGhostVisibilityChange(View.INVISIBLE);
+            TransitionManager.beginDelayedTransition(decorView, transition);
+            scheduleGhostVisibilityChange(View.VISIBLE);
+            setGhostVisibility(View.VISIBLE);
+            decorView.invalidate();
+        } else {
+            transitionStarted();
+        }
+!!!1617026.java!!!	exitTransitionComplete() : void
+        mExitComplete = true;
+        notifyComplete();
+!!!1617154.java!!!	isReadyToNotify() : boolean
+        return mSharedElementBundle != null && mResultReceiver != null && mIsBackgroundReady;
+!!!1617282.java!!!	sharedElementTransitionComplete() : void
+        mSharedElementBundle = mExitSharedElementBundle == null
+                ? captureSharedElementState() : captureExitSharedElementsState();
+        notifyComplete();
+!!!1617410.java!!!	captureExitSharedElementsState() : Bundle
+        Bundle bundle = new Bundle();
+        RectF bounds = new RectF();
+        Matrix matrix = new Matrix();
+        for (int i = 0; i < mSharedElements.size(); i++) {
+            String name = mSharedElementNames.get(i);
+            Bundle sharedElementState = mExitSharedElementBundle.getBundle(name);
+            if (sharedElementState != null) {
+                bundle.putBundle(name, sharedElementState);
+            } else {
+                View view = mSharedElements.get(i);
+                captureSharedElementState(view, name, bundle, matrix, bounds);
+            }
+        }
+        return bundle;
+!!!1617538.java!!!	notifyComplete() : void
+        if (isReadyToNotify()) {
+            if (!mSharedElementNotified) {
+                mSharedElementNotified = true;
+                delayCancel();
+                mResultReceiver.send(MSG_TAKE_SHARED_ELEMENTS, mSharedElementBundle);
+            }
+            if (!mExitNotified && mExitComplete) {
+                mExitNotified = true;
+                mResultReceiver.send(MSG_EXIT_TRANSITION_COMPLETE, null);
+                mResultReceiver = null; // done talking
+                ViewGroup decorView = getDecor();
+                if (!mIsReturning && decorView != null) {
+                    decorView.suppressLayout(false);
+                }
+                finishIfNecessary();
+            }
+        }
+!!!1617666.java!!!	finishIfNecessary() : void
+        if (mIsReturning && mExitNotified && mActivity != null && (mSharedElements.isEmpty() ||
+                mSharedElementsHidden)) {
+            finish();
+        }
+        if (!mIsReturning && mExitNotified) {
+            mActivity = null; // don't need it anymore
+        }
+!!!1617794.java!!!	finish() : void
+        stopCancel();
+        if (mActivity != null) {
+            mActivity.mActivityTransitionState.clear();
+            mActivity.finish();
+            mActivity.overridePendingTransition(0, 0);
+            mActivity = null;
+        }
+        // Clear the state so that we can't hold any references accidentally and leak memory.
+        mHandler = null;
+        mSharedElementBundle = null;
+        if (mBackgroundAnimator != null) {
+            mBackgroundAnimator.cancel();
+            mBackgroundAnimator = null;
+        }
+        mExitSharedElementBundle = null;
+        clearState();
+!!!1617922.java!!!	moveSharedElementWithParent() : boolean
+        return !mIsReturning;
+!!!1618050.java!!!	getViewsTransition() : Transition
+        if (mIsReturning) {
+            return getWindow().getReturnTransition();
+        } else {
+            return getWindow().getExitTransition();
+        }
+!!!1618178.java!!!	getSharedElementTransition() : Transition
+        if (mIsReturning) {
+            return getWindow().getSharedElementReturnTransition();
+        } else {
+            return getWindow().getSharedElementExitTransition();
+        }

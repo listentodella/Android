@@ -1,0 +1,22 @@
+class Blink
+!!!2238466.java!!!	run() : void
+            if (mCancelled) {
+                return;
+            }
+
+            removeCallbacks(Blink.this);
+
+            if (shouldBlink()) {
+                if (mTextView.getLayout() != null) {
+                    mTextView.invalidateCursorPath();
+                }
+
+                postAtTime(this, SystemClock.uptimeMillis() + BLINK);
+            }
+!!!2238594.java!!!	cancel() : void
+            if (!mCancelled) {
+                removeCallbacks(Blink.this);
+                mCancelled = true;
+            }
+!!!2238722.java!!!	uncancel() : void
+            mCancelled = false;

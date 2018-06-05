@@ -1,0 +1,9 @@
+class PolicyManager
+!!!1892098.java!!!	makeNewWindow(inout context : Context) : Window
+        return sPolicy.makeNewWindow(context);
+!!!1892226.java!!!	makeNewLayoutInflater(inout context : Context) : LayoutInflater
+        return sPolicy.makeNewLayoutInflater(context);
+!!!1892354.java!!!	makeNewWindowManager() : WindowManagerPolicy
+        return sPolicy.makeNewWindowManager();
+!!!1892482.java!!!	makeNewFallbackEventHandler(inout context : Context) : FallbackEventHandler
+        return sPolicy.makeNewFallbackEventHandler(context);

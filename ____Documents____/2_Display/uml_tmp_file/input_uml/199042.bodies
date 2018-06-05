@@ -1,0 +1,17 @@
+class SilentModeToggleAction
+!!!455810.java!!!	SilentModeToggleAction()
+            super(R.drawable.ic_audio_vol_mute,
+                    R.drawable.ic_audio_vol,
+                    R.string.global_action_toggle_silent_mode,
+                    R.string.global_action_silent_mode_on_status,
+                    R.string.global_action_silent_mode_off_status);
+!!!455938.java!!!	onToggle(inout on : boolean) : void
+            if (on) {
+                mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+            } else {
+                mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+            }
+!!!456066.java!!!	showDuringKeyguard() : boolean
+            return true;
+!!!456194.java!!!	showBeforeProvisioning() : boolean
+            return false;

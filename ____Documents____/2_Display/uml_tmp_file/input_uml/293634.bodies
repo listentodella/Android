@@ -1,0 +1,14 @@
+class InstrumentationThread
+!!!1633666.java!!!	InstrumentationThread(in name : String)
+            super(name);
+!!!1633794.java!!!	run() : void
+            try {
+                Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY);
+            } catch (RuntimeException e) {
+                Log.w(TAG, "Exception setting priority of instrumentation thread "                                            
+                        + Process.myTid(), e);                                                                             
+            }
+            if (mAutomaticPerformanceSnapshots) {
+                startPerformanceSnapshot();
+            }
+            onStart();

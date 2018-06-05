@@ -1,0 +1,5 @@
+class CanceledException
+!!!1709954.java!!!	CanceledException(in name : String)
+            super(name);
+!!!1710082.java!!!	CanceledException(inout cause : Exception)
+            super(cause);

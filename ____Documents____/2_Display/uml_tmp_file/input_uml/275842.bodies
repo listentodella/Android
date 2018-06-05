@@ -1,0 +1,43 @@
+class RecentTaskInfo
+!!!1348610.java!!!	describeContents() : int
+            return 0;
+!!!1348738.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            dest.writeInt(id);
+            dest.writeInt(persistentId);
+            if (baseIntent != null) {
+                dest.writeInt(1);
+                baseIntent.writeToParcel(dest, 0);
+            } else {
+                dest.writeInt(0);
+            }
+            ComponentName.writeToParcel(origActivity, dest);
+            TextUtils.writeToParcel(description, dest,
+                    Parcelable.PARCELABLE_WRITE_RETURN_VALUE);
+            if (taskDescription != null) {
+                dest.writeInt(1);
+                taskDescription.writeToParcel(dest, 0);
+            } else {
+                dest.writeInt(0);
+            }
+            dest.writeInt(stackId);
+            dest.writeInt(userId);
+            dest.writeLong(firstActiveTime);
+            dest.writeLong(lastActiveTime);
+            dest.writeInt(affiliatedTaskId);
+            dest.writeInt(affiliatedTaskColor);
+!!!1348866.java!!!	readFromParcel(inout source : Parcel) : void
+            id = source.readInt();
+            persistentId = source.readInt();
+            baseIntent = source.readInt() > 0 ? Intent.CREATOR.createFromParcel(source) : null;
+            origActivity = ComponentName.readFromParcel(source);
+            description = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(source);
+            taskDescription = source.readInt() > 0 ?
+                    TaskDescription.CREATOR.createFromParcel(source) : null;
+            stackId = source.readInt();
+            userId = source.readInt();
+            firstActiveTime = source.readLong();
+            lastActiveTime = source.readLong();
+            affiliatedTaskId = source.readInt();
+            affiliatedTaskColor = source.readInt();
+!!!1348994.java!!!	RecentTaskInfo(inout source : Parcel)
+            readFromParcel(source);

@@ -1,0 +1,254 @@
+class DayPickerView
+!!!2210946.java!!!	DayPickerView(inout context : Context, inout controller : DatePickerController)
+        super(context);
+        init();
+        setController(controller);
+!!!2211074.java!!!	setController(inout controller : DatePickerController) : void
+        if (mController != null) {
+            mController.unregisterOnDateChangedListener(this);
+        }
+        mController = controller;
+        mController.registerOnDateChangedListener(this);
+        setUpAdapter();
+        setAdapter(mAdapter);
+        onDateChanged();
+!!!2211202.java!!!	init() : void
+        setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        setDrawSelectorOnTop(false);
+
+        setUpListView();
+!!!2211330.java!!!	onChange() : void
+        setUpAdapter();
+        setAdapter(mAdapter);
+!!!2211458.java!!!	setUpAdapter() : void
+        if (mAdapter == null) {
+            mAdapter = new SimpleMonthAdapter(getContext(), mController);
+        } else {
+            mAdapter.setSelectedDay(mSelectedDay);
+            mAdapter.notifyDataSetChanged();
+        }
+        // refresh the view with the new parameters
+        mAdapter.notifyDataSetChanged();
+!!!2211586.java!!!	setUpListView() : void
+        // Transparent background on scroll
+        setCacheColorHint(0);
+        // No dividers
+        setDivider(null);
+        // Items are clickable
+        setItemsCanFocus(true);
+        // The thumb gets in the way, so disable it
+        setFastScrollEnabled(false);
+        setVerticalScrollBarEnabled(false);
+        setOnScrollListener(this);
+        setFadingEdgeLength(0);
+        // Make the scrolling behavior nicer
+        setFriction(ViewConfiguration.getScrollFriction() * mFriction);
+!!!2211714.java!!!	getDiffMonths(inout start : Calendar, inout end : Calendar) : int
+        final int diffYears = end.get(Calendar.YEAR) - start.get(Calendar.YEAR);
+        final int diffMonths = end.get(Calendar.MONTH) - start.get(Calendar.MONTH) + 12 * diffYears;
+        return diffMonths;
+!!!2211842.java!!!	getPositionFromDay(inout day : Calendar) : int
+        final int diffMonthMax = getDiffMonths(mController.getMinDate(), mController.getMaxDate());
+        int diffMonth = getDiffMonths(mController.getMinDate(), day);
+
+        if (diffMonth < 0 ) {
+            diffMonth = 0;
+        } else if (diffMonth > diffMonthMax) {
+            diffMonth = diffMonthMax;
+        }
+
+        return diffMonth;
+!!!2211970.java!!!	goTo(inout day : Calendar, inout animate : boolean, inout setSelected : boolean, inout forceScroll : boolean) : boolean
+
+        // Set the selected day
+        if (setSelected) {
+            mSelectedDay.setTimeInMillis(day.getTimeInMillis());
+        }
+
+        mTempDay.setTimeInMillis(day.getTimeInMillis());
+        final int position = getPositionFromDay(day);
+
+        View child;
+        int i = 0;
+        int top = 0;
+        // Find a child that's completely in the view
+        do {
+            child = getChildAt(i++);
+            if (child == null) {
+                break;
+            }
+            top = child.getTop();
+        } while (top < 0);
+
+        // Compute the first and last position visible
+        int selectedPosition;
+        if (child != null) {
+            selectedPosition = getPositionForView(child);
+        } else {
+            selectedPosition = 0;
+        }
+
+        if (setSelected) {
+            mAdapter.setSelectedDay(mSelectedDay);
+        }
+
+        // Check if the selected day is now outside of our visible range
+        // and if so scroll to the month that contains it
+        if (position != selectedPosition || forceScroll) {
+            setMonthDisplayed(mTempDay);
+            mPreviousScrollState = OnScrollListener.SCROLL_STATE_FLING;
+            if (animate) {
+                smoothScrollToPositionFromTop(
+                        position, LIST_TOP_OFFSET, GOTO_SCROLL_DURATION);
+                return true;
+            } else {
+                postSetSelection(position);
+            }
+        } else if (setSelected) {
+            setMonthDisplayed(mSelectedDay);
+        }
+        return false;
+!!!2212098.java!!!	postSetSelection(in position : int) : void
+        clearFocus();
+        post(new Runnable() {
+
+            @Override
+            public void run() {
+                setSelection(position);
+            }
+        });
+        onScrollStateChanged(this, OnScrollListener.SCROLL_STATE_IDLE);
+!!!2212226.java!!!	onScroll(inout view : AbsListView, in firstVisibleItem : int, in visibleItemCount : int, in totalItemCount : int) : void
+        SimpleMonthView child = (SimpleMonthView) view.getChildAt(0);
+        if (child == null) {
+            return;
+        }
+
+        mPreviousScrollState = mCurrentScrollState;
+!!!2212354.java!!!	setMonthDisplayed(inout date : Calendar) : void
+        if (mCurrentMonthDisplayed != date.get(Calendar.MONTH)) {
+            mCurrentMonthDisplayed = date.get(Calendar.MONTH);
+            invalidateViews();
+        }
+!!!2212482.java!!!	onScrollStateChanged(inout view : AbsListView, in scrollState : int) : void
+        // use a post to prevent re-entering onScrollStateChanged before it
+        // exits
+        mScrollStateChangedRunnable.doScrollStateChange(view, scrollState);
+!!!2212610.java!!!	setCalendarTextColor(inout colors : ColorStateList) : void
+        mAdapter.setCalendarTextColor(colors);
+!!!2213122.java!!!	getMostVisiblePosition() : int
+        final int firstPosition = getFirstVisiblePosition();
+        final int height = getHeight();
+
+        int maxDisplayedHeight = 0;
+        int mostVisibleIndex = 0;
+        int i=0;
+        int bottom = 0;
+        while (bottom < height) {
+            View child = getChildAt(i);
+            if (child == null) {
+                break;
+            }
+            bottom = child.getBottom();
+            int displayedHeight = Math.min(bottom, height) - Math.max(0, child.getTop());
+            if (displayedHeight > maxDisplayedHeight) {
+                mostVisibleIndex = i;
+                maxDisplayedHeight = displayedHeight;
+            }
+            i++;
+        }
+        return firstPosition + mostVisibleIndex;
+!!!2213250.java!!!	onDateChanged() : void
+        goTo(mController.getSelectedDay(), false, true, true);
+!!!2213378.java!!!	findAccessibilityFocus() : Calendar
+        final int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            final View child = getChildAt(i);
+            if (child instanceof SimpleMonthView) {
+                final Calendar focus = ((SimpleMonthView) child).getAccessibilityFocus();
+                if (focus != null) {
+                    return focus;
+                }
+            }
+        }
+
+        return null;
+!!!2213506.java!!!	restoreAccessibilityFocus(inout day : Calendar) : boolean
+        if (day == null) {
+            return false;
+        }
+
+        final int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            final View child = getChildAt(i);
+            if (child instanceof SimpleMonthView) {
+                if (((SimpleMonthView) child).restoreAccessibilityFocus(day)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+!!!2213634.java!!!	layoutChildren() : void
+        final Calendar focusedDay = findAccessibilityFocus();
+        super.layoutChildren();
+        if (mPerformingScroll) {
+            mPerformingScroll = false;
+        } else {
+            restoreAccessibilityFocus(focusedDay);
+        }
+!!!2213762.java!!!	onConfigurationChanged(inout newConfig : Configuration) : void
+        mYearFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
+!!!2213890.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setItemCount(-1);
+!!!2214018.java!!!	getMonthAndYearString(inout day : Calendar) : String
+        StringBuffer sbuf = new StringBuffer();
+        sbuf.append(day.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
+        sbuf.append(" ");
+        sbuf.append(mYearFormat.format(day.getTime()));
+        return sbuf.toString();
+!!!2214146.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.addAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+        info.addAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+!!!2214274.java!!!	performAccessibilityAction(in action : int, inout arguments : Bundle) : boolean
+        if (action != AccessibilityNodeInfo.ACTION_SCROLL_FORWARD &&
+                action != AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD) {
+            return super.performAccessibilityAction(action, arguments);
+        }
+
+        // Figure out what month is showing.
+        int firstVisiblePosition = getFirstVisiblePosition();
+        int month = firstVisiblePosition % 12;
+        int year = firstVisiblePosition / 12 + mController.getMinYear();
+        Calendar day = Calendar.getInstance();
+        day.set(year, month, 1);
+
+        // Scroll either forward or backward one month.
+        if (action == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD) {
+            day.add(Calendar.MONTH, 1);
+            if (day.get(Calendar.MONTH) == 12) {
+                day.set(Calendar.MONTH, 0);
+                day.add(Calendar.YEAR, 1);
+            }
+        } else if (action == AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD) {
+            View firstVisibleView = getChildAt(0);
+            // If the view is fully visible, jump one month back. Otherwise, we'll just jump
+            // to the first day of first visible month.
+            if (firstVisibleView != null && firstVisibleView.getTop() >= -1) {
+                // There's an off-by-one somewhere, so the top of the first visible item will
+                // actually be -1 when it's at the exact top.
+                day.add(Calendar.MONTH, -1);
+                if (day.get(Calendar.MONTH) == -1) {
+                    day.set(Calendar.MONTH, 11);
+                    day.add(Calendar.YEAR, -1);
+                }
+            }
+        }
+
+        // Go to that month.
+        announceForAccessibility(getMonthAndYearString(day));
+        goTo(day, true, false, true);
+        mPerformingScroll = true;
+        return true;

@@ -1,0 +1,212 @@
+class ThreadedRenderer
+!!!851970.java!!!	ThreadedRenderer(inout context : Context, inout translucent : boolean)
+        final TypedArray a = context.obtainStyledAttributes(null, R.styleable.Lighting, 0, 0);
+        mLightY = a.getDimension(R.styleable.Lighting_lightY, 0);
+        mLightZ = a.getDimension(R.styleable.Lighting_lightZ, 0);
+        mLightRadius = a.getDimension(R.styleable.Lighting_lightRadius, 0);
+        mAmbientShadowAlpha =
+                (int) (255 * a.getFloat(R.styleable.Lighting_ambientShadowAlpha, 0) + 0.5f);
+        mSpotShadowAlpha = (int) (255 * a.getFloat(R.styleable.Lighting_spotShadowAlpha, 0) + 0.5f);
+        a.recycle();
+
+        long rootNodePtr = nCreateRootRenderNode();
+        mRootNode = RenderNode.adopt(rootNodePtr);
+        mRootNode.setClipToBounds(false);
+        mNativeProxy = nCreateProxy(translucent, rootNodePtr);
+
+        AtlasInitializer.sInstance.init(context, mNativeProxy);
+
+        // Setup timing
+        mChoreographer = Choreographer.getInstance();
+        nSetFrameInterval(mNativeProxy, mChoreographer.getFrameIntervalNanos());
+
+        loadSystemProperties();
+!!!852098.java!!!	destroy() : void
+        mInitialized = false;
+        updateEnabledState(null);
+        nDestroy(mNativeProxy);
+!!!852226.java!!!	updateEnabledState(inout surface : Surface) : void
+        if (surface == null || !surface.isValid()) {
+            setEnabled(false);
+        } else {
+            setEnabled(mInitialized);
+        }
+!!!852354.java!!!	initialize(inout surface : Surface) : boolean
+        mInitialized = true;
+        updateEnabledState(surface);
+        boolean status = nInitialize(mNativeProxy, surface);
+        surface.allocateBuffers();
+        return status;
+!!!852482.java!!!	updateSurface(inout surface : Surface) : void
+        updateEnabledState(surface);
+        nUpdateSurface(mNativeProxy, surface);
+!!!852610.java!!!	pauseSurface(inout surface : Surface) : void
+        nPauseSurface(mNativeProxy, surface);
+!!!852738.java!!!	destroyHardwareResources(inout view : View) : void
+        destroyResources(view);
+        nDestroyHardwareResources(mNativeProxy);
+!!!852866.java!!!	destroyResources(inout view : View) : void
+        view.destroyHardwareResources();
+
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+
+            int count = group.getChildCount();
+            for (int i = 0; i < count; i++) {
+                destroyResources(group.getChildAt(i));
+            }
+        }
+!!!852994.java!!!	invalidate(inout surface : Surface) : void
+        updateSurface(surface);
+!!!853122.java!!!	detachSurfaceTexture(in hardwareLayer : long) : void
+        nDetachSurfaceTexture(mNativeProxy, hardwareLayer);
+!!!853250.java!!!	setup(in width : int, in height : int, inout surfaceInsets : Rect) : void
+        final float lightX = width / 2.0f;
+        mWidth = width;
+        mHeight = height;
+        if (surfaceInsets != null && !surfaceInsets.isEmpty()) {
+            mHasInsets = true;
+            mInsetLeft = surfaceInsets.left;
+            mInsetTop = surfaceInsets.top;
+            mSurfaceWidth = width + mInsetLeft + surfaceInsets.right;
+            mSurfaceHeight = height + mInsetTop + surfaceInsets.bottom;
+
+            // If the surface has insets, it can't be opaque.
+            setOpaque(false);
+        } else {
+            mHasInsets = false;
+            mInsetLeft = 0;
+            mInsetTop = 0;
+            mSurfaceWidth = width;
+            mSurfaceHeight = height;
+        }
+        mRootNode.setLeftTopRightBottom(-mInsetLeft, -mInsetTop, mSurfaceWidth, mSurfaceHeight);
+        nSetup(mNativeProxy, mSurfaceWidth, mSurfaceHeight,
+                lightX, mLightY, mLightZ, mLightRadius,
+                mAmbientShadowAlpha, mSpotShadowAlpha);
+!!!853378.java!!!	setOpaque(inout opaque : boolean) : void
+        nSetOpaque(mNativeProxy, opaque && !mHasInsets);
+!!!853506.java!!!	getWidth() : int
+        return mWidth;
+!!!853634.java!!!	getHeight() : int
+        return mHeight;
+!!!853762.java!!!	dumpGfxInfo(inout pw : PrintWriter, inout fd : FileDescriptor) : void
+        pw.flush();
+        nDumpProfileInfo(mNativeProxy, fd);
+!!!853890.java!!!	search(inout values : String, in value : String) : int
+        for (int i = 0; i < values.length; i++) {
+            if (values[i].equals(value)) return i;
+        }
+        return -1;
+!!!854018.java!!!	checkIfProfilingRequested() : boolean
+        String profiling = SystemProperties.get(HardwareRenderer.PROFILE_PROPERTY);
+        int graphType = search(VISUALIZERS, profiling);
+        return (graphType >= 0) || Boolean.parseBoolean(profiling);
+!!!854146.java!!!	loadSystemProperties() : boolean
+        boolean changed = nLoadSystemProperties(mNativeProxy);
+        boolean wantProfiling = checkIfProfilingRequested();
+        if (wantProfiling != mProfilingEnabled) {
+            mProfilingEnabled = wantProfiling;
+            changed = true;
+        }
+        return changed;
+!!!854274.java!!!	updateViewTreeDisplayList(inout view : View) : void
+        view.mPrivateFlags |= View.PFLAG_DRAWN;
+        view.mRecreateDisplayList = (view.mPrivateFlags & View.PFLAG_INVALIDATED)
+                == View.PFLAG_INVALIDATED;
+        view.mPrivateFlags &= ~View.PFLAG_INVALIDATED;
+        view.getDisplayList();
+        view.mRecreateDisplayList = false;
+!!!854402.java!!!	updateRootDisplayList(inout view : View, inout callbacks : HardwareRenderer::HardwareDrawCallbacks) : void
+        Trace.traceBegin(Trace.TRACE_TAG_VIEW, "getDisplayList");
+        updateViewTreeDisplayList(view);
+
+        if (mRootNodeNeedsUpdate || !mRootNode.isValid()) {
+            HardwareCanvas canvas = mRootNode.start(mSurfaceWidth, mSurfaceHeight);
+            try {
+                final int saveCount = canvas.save();
+                canvas.translate(mInsetLeft, mInsetTop);
+                callbacks.onHardwarePreDraw(canvas);
+
+                canvas.insertReorderBarrier();
+                canvas.drawRenderNode(view.getDisplayList());
+                canvas.insertInorderBarrier();
+
+                callbacks.onHardwarePostDraw(canvas);
+                canvas.restoreToCount(saveCount);
+                mRootNodeNeedsUpdate = false;
+            } finally {
+                mRootNode.end(canvas);
+            }
+        }
+        Trace.traceEnd(Trace.TRACE_TAG_VIEW);
+!!!854530.java!!!	invalidateRoot() : void
+        mRootNodeNeedsUpdate = true;
+!!!854658.java!!!	draw(inout view : View, inout attachInfo : View::AttachInfo, inout callbacks : HardwareRenderer::HardwareDrawCallbacks) : void
+        attachInfo.mIgnoreDirtyState = true;
+        long frameTimeNanos = mChoreographer.getFrameTimeNanos();
+        attachInfo.mDrawingTime = frameTimeNanos / TimeUtils.NANOS_PER_MS;
+
+        long recordDuration = 0;
+        if (mProfilingEnabled) {
+            recordDuration = System.nanoTime();
+        }
+
+        updateRootDisplayList(view, callbacks);
+
+        if (mProfilingEnabled) {
+            recordDuration = System.nanoTime() - recordDuration;
+        }
+
+        attachInfo.mIgnoreDirtyState = false;
+
+        // register animating rendernodes which started animating prior to renderer
+        // creation, which is typical for animators started prior to first draw
+        if (attachInfo.mPendingAnimatingRenderNodes != null) {
+            final int count = attachInfo.mPendingAnimatingRenderNodes.size();
+            for (int i = 0; i < count; i++) {
+                registerAnimatingRenderNode(
+                        attachInfo.mPendingAnimatingRenderNodes.get(i));
+            }
+            attachInfo.mPendingAnimatingRenderNodes.clear();
+            // We don't need this anymore as subsequent calls to
+            // ViewRootImpl#attachRenderNodeAnimator will go directly to us.
+            attachInfo.mPendingAnimatingRenderNodes = null;
+        }
+
+        int syncResult = nSyncAndDrawFrame(mNativeProxy, frameTimeNanos,
+                recordDuration, view.getResources().getDisplayMetrics().density);
+        if ((syncResult & SYNC_INVALIDATE_REQUIRED) != 0) {
+            attachInfo.mViewRootImpl.invalidate();
+        }
+!!!854786.java!!!	invokeFunctor(in functor : long, inout waitForCompletion : boolean) : void
+        nInvokeFunctor(functor, waitForCompletion);
+!!!854914.java!!!	createTextureLayer() : HardwareLayer
+        long layer = nCreateTextureLayer(mNativeProxy);
+        return HardwareLayer.adoptTextureLayer(this, layer);
+!!!855042.java!!!	buildLayer(inout node : RenderNode) : void
+        nBuildLayer(mNativeProxy, node.getNativeDisplayList());
+!!!855170.java!!!	copyLayerInto(in layer : HardwareLayer, in bitmap : Bitmap) : boolean
+        return nCopyLayerInto(mNativeProxy,
+                layer.getDeferredLayerUpdater(), bitmap.mNativeBitmap);
+!!!855298.java!!!	pushLayerUpdate(inout layer : HardwareLayer) : void
+        nPushLayerUpdate(mNativeProxy, layer.getDeferredLayerUpdater());
+!!!855426.java!!!	onLayerDestroyed(inout layer : HardwareLayer) : void
+        nCancelLayerUpdate(mNativeProxy, layer.getDeferredLayerUpdater());
+!!!855682.java!!!	fence() : void
+        nFence(mNativeProxy);
+!!!855810.java!!!	stopDrawing() : void
+        nStopDrawing(mNativeProxy);
+!!!855938.java!!!	notifyFramePending() : void
+        nNotifyFramePending(mNativeProxy);
+!!!856066.java!!!	registerAnimatingRenderNode(inout animator : RenderNode) : void
+        nRegisterAnimatingRenderNode(mRootNode.mNativeRenderNode, animator.mNativeRenderNode);
+!!!856194.java!!!	finalize() : void
+        try {
+            nDeleteProxy(mNativeProxy);
+            mNativeProxy = 0;
+        } finally {
+            super.finalize();
+        }
+!!!856322.java!!!	trimMemory(in level : int) : void
+        nTrimMemory(level);

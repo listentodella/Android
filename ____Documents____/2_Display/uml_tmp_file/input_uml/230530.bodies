@@ -1,0 +1,7 @@
+class SimpleOnScaleGestureListener
+!!!819842.java!!!	onScale(inout detector : ScaleGestureDetector) : boolean
+            return false;
+!!!819970.java!!!	onScaleBegin(inout detector : ScaleGestureDetector) : boolean
+            return true;
+!!!820098.java!!!	onScaleEnd(inout detector : ScaleGestureDetector) : void
+            // Intentionally empty

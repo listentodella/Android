@@ -1,0 +1,4 @@
+class MessageBase
+!!!191490.cpp!!!	handleMessage(in message : Message) : void
+    this->handler();
+    barrier.open();

@@ -1,0 +1,24 @@
+class LayoutParams
+!!!2546434.java!!!	LayoutParams(inout c : Context, inout attrs : AttributeSet)
+            super(c, attrs);
+!!!2546562.java!!!	LayoutParams(in width : int, in height : int)
+            super(width, height);
+            this.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
+!!!2546690.java!!!	LayoutParams(in width : int, in height : int, in gravity : int)
+            super(width, height);
+            this.gravity = gravity;
+!!!2546818.java!!!	LayoutParams(in gravity : int)
+            this(WRAP_CONTENT, MATCH_PARENT, gravity);
+!!!2546946.java!!!	LayoutParams(inout source : Toolbar::LayoutParams)
+            super(source);
+
+            mViewType = source.mViewType;
+!!!2547074.java!!!	LayoutParams(inout source : ActionBar::LayoutParams)
+            super(source);
+!!!2547202.java!!!	LayoutParams(inout source : ViewGroup::MarginLayoutParams)
+            super(source);
+            // ActionBar.LayoutParams doesn't have a MarginLayoutParams constructor.
+            // Fake it here and copy over the relevant data.
+            copyMarginsFrom(source);
+!!!2547330.java!!!	LayoutParams(inout source : ViewGroup::LayoutParams)
+            super(source);

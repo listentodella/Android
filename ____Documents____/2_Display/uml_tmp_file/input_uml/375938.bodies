@@ -1,0 +1,97 @@
+class SelectionActionModeCallback
+!!!2246786.java!!!	onCreateActionMode(inout mode : ActionMode, inout menu : Menu) : boolean
+            final boolean legacy = mTextView.getContext().getApplicationInfo().targetSdkVersion <
+                    Build.VERSION_CODES.LOLLIPOP;
+            final Context context = !legacy && menu instanceof MenuBuilder ?
+                    ((MenuBuilder) menu).getContext() :
+                    mTextView.getContext();
+            final TypedArray styledAttributes = context.obtainStyledAttributes(
+                    com.android.internal.R.styleable.SelectionModeDrawables);
+
+            mode.setTitle(mTextView.getContext().getString(
+                    com.android.internal.R.string.textSelectionCABTitle));
+            mode.setSubtitle(null);
+            mode.setTitleOptionalHint(true);
+
+            menu.add(0, TextView.ID_SELECT_ALL, 0, com.android.internal.R.string.selectAll).
+                    setIcon(styledAttributes.getResourceId(
+                            R.styleable.SelectionModeDrawables_actionModeSelectAllDrawable, 0)).
+                    setAlphabeticShortcut('a').
+                    setShowAsAction(
+                            MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+            if (mTextView.canCut()) {
+                menu.add(0, TextView.ID_CUT, 0, com.android.internal.R.string.cut).
+                    setIcon(styledAttributes.getResourceId(
+                            R.styleable.SelectionModeDrawables_actionModeCutDrawable, 0)).
+                    setAlphabeticShortcut('x').
+                    setShowAsAction(
+                            MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            }
+
+            if (mTextView.canCopy()) {
+                menu.add(0, TextView.ID_COPY, 0, com.android.internal.R.string.copy).
+                    setIcon(styledAttributes.getResourceId(
+                            R.styleable.SelectionModeDrawables_actionModeCopyDrawable, 0)).
+                    setAlphabeticShortcut('c').
+                    setShowAsAction(
+                            MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            }
+
+            if (mTextView.canPaste()) {
+                menu.add(0, TextView.ID_PASTE, 0, com.android.internal.R.string.paste).
+                        setIcon(styledAttributes.getResourceId(
+                                R.styleable.SelectionModeDrawables_actionModePasteDrawable, 0)).
+                        setAlphabeticShortcut('v').
+                        setShowAsAction(
+                                MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            }
+
+            styledAttributes.recycle();
+
+            if (mCustomSelectionActionModeCallback != null) {
+                if (!mCustomSelectionActionModeCallback.onCreateActionMode(mode, menu)) {
+                    // The custom mode can choose to cancel the action mode
+                    return false;
+                }
+            }
+
+            if (menu.hasVisibleItems() || mode.getCustomView() != null) {
+                getSelectionController().show();
+                mTextView.setHasTransientState(true);
+                return true;
+            } else {
+                return false;
+            }
+!!!2246914.java!!!	onPrepareActionMode(inout mode : ActionMode, inout menu : Menu) : boolean
+            if (mCustomSelectionActionModeCallback != null) {
+                return mCustomSelectionActionModeCallback.onPrepareActionMode(mode, menu);
+            }
+            return true;
+!!!2247042.java!!!	onActionItemClicked(inout mode : ActionMode, inout item : MenuItem) : boolean
+            if (mCustomSelectionActionModeCallback != null &&
+                 mCustomSelectionActionModeCallback.onActionItemClicked(mode, item)) {
+                return true;
+            }
+            return mTextView.onTextContextMenuItem(item.getItemId());
+!!!2247170.java!!!	onDestroyActionMode(inout mode : ActionMode) : void
+            if (mCustomSelectionActionModeCallback != null) {
+                mCustomSelectionActionModeCallback.onDestroyActionMode(mode);
+            }
+
+            /*
+             * If we're ending this mode because we're detaching from a window,
+             * we still have selection state to preserve. Don't clear it, we'll
+             * bring back the selection mode when (if) we get reattached.
+             */
+            if (!mPreserveDetachedSelection) {
+                Selection.setSelection((Spannable) mTextView.getText(),
+                        mTextView.getSelectionEnd());
+                mTextView.setHasTransientState(false);
+            }
+
+            if (mSelectionModifierCursorController != null) {
+                mSelectionModifierCursorController.hide();
+            }
+
+            mSelectionActionMode = null;

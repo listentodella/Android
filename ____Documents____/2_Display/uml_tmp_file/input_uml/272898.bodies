@@ -1,0 +1,691 @@
+class Instrumentation
+!!!1622530.java!!!	start() : void
+        if (mRunner != null) {
+            throw new RuntimeException("Instrumentation already started");
+        }
+        mRunner = new InstrumentationThread("Instr: " + getClass().getName());
+        mRunner.start();
+!!!1622786.java!!!	onException(inout obj : Object, inout e : Throwable) : boolean
+        return false;
+!!!1622914.java!!!	sendStatus(in resultCode : int, inout results : Bundle) : void
+        if (mWatcher != null) {
+            try {
+                mWatcher.instrumentationStatus(mComponent, resultCode, results);
+            }
+            catch (RemoteException e) {
+                mWatcher = null;
+            }
+        }
+!!!1623042.java!!!	finish(in resultCode : int, inout results : Bundle) : void
+        if (mAutomaticPerformanceSnapshots) {
+            endPerformanceSnapshot();
+        }
+        if (mPerfMetrics != null) {
+            if (results == null) {
+                results = new Bundle();
+            }
+            results.putAll(mPerfMetrics);
+        }
+        if (mUiAutomation != null) {
+            mUiAutomation.disconnect();
+            mUiAutomation = null;
+        }
+        mThread.finishInstrumentation(resultCode, results);
+!!!1623170.java!!!	setAutomaticPerformanceSnapshots() : void
+        mAutomaticPerformanceSnapshots = true;
+        mPerformanceCollector = new PerformanceCollector();
+!!!1623298.java!!!	startPerformanceSnapshot() : void
+        if (!isProfiling()) {
+            mPerformanceCollector.beginSnapshot(null);
+        }
+!!!1623426.java!!!	endPerformanceSnapshot() : void
+        if (!isProfiling()) {
+            mPerfMetrics = mPerformanceCollector.endSnapshot();
+        }
+!!!1623682.java!!!	getContext() : Context
+        return mInstrContext;
+!!!1623810.java!!!	getComponentName() : ComponentName
+        return mComponent;
+!!!1623938.java!!!	getTargetContext() : Context
+        return mAppContext;
+!!!1624066.java!!!	isProfiling() : boolean
+        return mThread.isProfiling();
+!!!1624194.java!!!	startProfiling() : void
+        if (mThread.isProfiling()) {
+            File file = new File(mThread.getProfileFilePath());
+            file.getParentFile().mkdirs();
+            Debug.startMethodTracing(file.toString(), 8 * 1024 * 1024);
+        }
+!!!1624322.java!!!	stopProfiling() : void
+        if (mThread.isProfiling()) {
+            Debug.stopMethodTracing();
+        }
+!!!1624450.java!!!	setInTouchMode(inout inTouch : boolean) : void
+        try {
+            IWindowManager.Stub.asInterface(
+                    ServiceManager.getService("window")).setInTouchMode(inTouch);
+        } catch (RemoteException e) {
+            // Shouldn't happen!
+        }
+!!!1624578.java!!!	waitForIdle(inout recipient : Runnable) : void
+        mMessageQueue.addIdleHandler(new Idler(recipient));
+        mThread.getHandler().post(new EmptyRunnable());
+!!!1624706.java!!!	waitForIdleSync() : void
+        validateNotAppThread();
+        Idler idler = new Idler(null);
+        mMessageQueue.addIdleHandler(idler);
+        mThread.getHandler().post(new EmptyRunnable());
+        idler.waitForIdle();
+!!!1624834.java!!!	runOnMainSync(inout runner : Runnable) : void
+        validateNotAppThread();
+        SyncRunnable sr = new SyncRunnable(runner);
+        mThread.getHandler().post(sr);
+        sr.waitForComplete();
+!!!1624962.java!!!	startActivitySync(inout intent : Intent) : Activity
+        validateNotAppThread();
+
+        synchronized (mSync) {
+            intent = new Intent(intent);
+    
+            ActivityInfo ai = intent.resolveActivityInfo(
+                getTargetContext().getPackageManager(), 0);
+            if (ai == null) {
+                throw new RuntimeException("Unable to resolve activity for: " + intent);
+            }
+            String myProc = mThread.getProcessName();
+            if (!ai.processName.equals(myProc)) {
+                // todo: if this intent is ambiguous, look here to see if
+                // there is a single match that is in our package.
+                throw new RuntimeException("Intent in process "
+                        + myProc + " resolved to different process "
+                        + ai.processName + ": " + intent);
+            }
+    
+            intent.setComponent(new ComponentName(
+                    ai.applicationInfo.packageName, ai.name));
+            final ActivityWaiter aw = new ActivityWaiter(intent);
+
+            if (mWaitingActivities == null) {
+                mWaitingActivities = new ArrayList();
+            }
+            mWaitingActivities.add(aw);
+
+            getTargetContext().startActivity(intent);
+
+            do {
+                try {
+                    mSync.wait();
+                } catch (InterruptedException e) {
+                }
+            } while (mWaitingActivities.contains(aw));
+         
+            return aw.activity;
+        }
+!!!1626370.java!!!	addMonitor(inout monitor : Instrumentation::ActivityMonitor) : void
+        synchronized (mSync) {
+            if (mActivityMonitors == null) {
+                mActivityMonitors = new ArrayList();
+            }
+            mActivityMonitors.add(monitor);
+        }
+!!!1626498.java!!!	addMonitor(inout filter : IntentFilter, inout result : Instrumentation::ActivityResult, inout block : boolean) : Instrumentation::ActivityMonitor
+        ActivityMonitor am = new ActivityMonitor(filter, result, block);
+        addMonitor(am);
+        return am;
+!!!1626626.java!!!	addMonitor(in cls : String, inout result : Instrumentation::ActivityResult, inout block : boolean) : Instrumentation::ActivityMonitor
+        ActivityMonitor am = new ActivityMonitor(cls, result, block);
+        addMonitor(am);
+        return am;
+!!!1626754.java!!!	checkMonitorHit(inout monitor : Instrumentation::ActivityMonitor, in minHits : int) : boolean
+        waitForIdleSync();
+        synchronized (mSync) {
+            if (monitor.getHits() < minHits) {
+                return false;
+            }
+            mActivityMonitors.remove(monitor);
+        }
+        return true;
+!!!1626882.java!!!	waitForMonitor(inout monitor : Instrumentation::ActivityMonitor) : Activity
+        Activity activity = monitor.waitForActivity();
+        synchronized (mSync) {
+            mActivityMonitors.remove(monitor);
+        }
+        return activity;
+!!!1627010.java!!!	waitForMonitorWithTimeout(inout monitor : Instrumentation::ActivityMonitor, in timeOut : long) : Activity
+        Activity activity = monitor.waitForActivityWithTimeout(timeOut);
+        synchronized (mSync) {
+            mActivityMonitors.remove(monitor);
+        }
+        return activity;
+!!!1627138.java!!!	removeMonitor(inout monitor : Instrumentation::ActivityMonitor) : void
+        synchronized (mSync) {
+            mActivityMonitors.remove(monitor);
+        }
+!!!1627266.java!!!	invokeMenuActionSync(inout targetActivity : Activity, in id : int, in flag : int) : boolean
+        class MenuRunnable implements Runnable {
+            private final Activity activity;
+            private final int identifier;
+            private final int flags;
+            boolean returnValue;
+            
+            public MenuRunnable(Activity _activity, int _identifier,
+                                    int _flags) {
+                activity = _activity;
+                identifier = _identifier;
+                flags = _flags;
+            }
+            
+            public void run() {
+                Window win = activity.getWindow();
+                
+                returnValue = win.performPanelIdentifierAction(
+                            Window.FEATURE_OPTIONS_PANEL,
+                            identifier, 
+                            flags);                
+            }
+            
+        }        
+        MenuRunnable mr = new MenuRunnable(targetActivity, id, flag);
+        runOnMainSync(mr);
+        return mr.returnValue;
+!!!1627394.java!!!	invokeContextMenuAction(inout targetActivity : Activity, in id : int, in flag : int) : boolean
+        validateNotAppThread();
+        
+        // Bring up context menu for current focus.
+        // It'd be nice to do this through code, but currently ListView depends on
+        //   long press to set metadata for its selected child
+        
+        final KeyEvent downEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_CENTER); 
+        sendKeySync(downEvent);
+
+        // Need to wait for long press
+        waitForIdleSync();
+        try {
+            Thread.sleep(ViewConfiguration.getLongPressTimeout());
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Could not sleep for long press timeout", e);
+            return false;
+        }
+
+        final KeyEvent upEvent = new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_CENTER); 
+        sendKeySync(upEvent);
+
+        // Wait for context menu to appear
+        waitForIdleSync();
+        
+        class ContextMenuRunnable implements Runnable {
+            private final Activity activity;
+            private final int identifier;
+            private final int flags;
+            boolean returnValue;
+            
+            public ContextMenuRunnable(Activity _activity, int _identifier,
+                                    int _flags) {
+                activity = _activity;
+                identifier = _identifier;
+                flags = _flags;
+            }
+            
+            public void run() {
+                Window win = activity.getWindow();
+                returnValue = win.performContextMenuIdentifierAction(
+                            identifier, 
+                            flags);                
+            }
+            
+        }        
+        
+        ContextMenuRunnable cmr = new ContextMenuRunnable(targetActivity, id, flag);
+        runOnMainSync(cmr);
+        return cmr.returnValue;
+!!!1627522.java!!!	sendStringSync(in text : String) : void
+        if (text == null) {
+            return;
+        }
+        KeyCharacterMap keyCharacterMap = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
+
+        KeyEvent[] events = keyCharacterMap.getEvents(text.toCharArray());
+
+        if (events != null) {
+            for (int i = 0; i < events.length; i++) {
+                // We have to change the time of an event before injecting it because
+                // all KeyEvents returned by KeyCharacterMap.getEvents() have the same
+                // time stamp and the system rejects too old events. Hence, it is
+                // possible for an event to become stale before it is injected if it
+                // takes too long to inject the preceding ones.
+                sendKeySync(KeyEvent.changeTimeRepeat(events[i], SystemClock.uptimeMillis(), 0));
+            }
+        }
+!!!1627650.java!!!	sendKeySync(inout event : KeyEvent) : void
+        validateNotAppThread();
+
+        long downTime = event.getDownTime();
+        long eventTime = event.getEventTime();
+        int action = event.getAction();
+        int code = event.getKeyCode();
+        int repeatCount = event.getRepeatCount();
+        int metaState = event.getMetaState();
+        int deviceId = event.getDeviceId();
+        int scancode = event.getScanCode();
+        int source = event.getSource();
+        int flags = event.getFlags();
+        if (source == InputDevice.SOURCE_UNKNOWN) {
+            source = InputDevice.SOURCE_KEYBOARD;
+        }
+        if (eventTime == 0) {
+            eventTime = SystemClock.uptimeMillis();
+        }
+        if (downTime == 0) {
+            downTime = eventTime;
+        }
+        KeyEvent newEvent = new KeyEvent(downTime, eventTime, action, code, repeatCount, metaState,
+                deviceId, scancode, flags | KeyEvent.FLAG_FROM_SYSTEM, source);
+        InputManager.getInstance().injectInputEvent(newEvent,
+                InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH);
+!!!1627778.java!!!	sendKeyDownUpSync(in key : int) : void
+        
+        sendKeySync(new KeyEvent(KeyEvent.ACTION_DOWN, key));
+        sendKeySync(new KeyEvent(KeyEvent.ACTION_UP, key));
+!!!1627906.java!!!	sendCharacterSync(in keyCode : int) : void
+        sendKeySync(new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
+        sendKeySync(new KeyEvent(KeyEvent.ACTION_UP, keyCode));
+!!!1628034.java!!!	sendPointerSync(inout event : MotionEvent) : void
+        validateNotAppThread();
+        if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) == 0) {
+            event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+        }
+        InputManager.getInstance().injectInputEvent(event,
+                InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH);
+!!!1628162.java!!!	sendTrackballEventSync(inout event : MotionEvent) : void
+        validateNotAppThread();
+        if ((event.getSource() & InputDevice.SOURCE_CLASS_TRACKBALL) == 0) {
+            event.setSource(InputDevice.SOURCE_TRACKBALL);
+        }
+        InputManager.getInstance().injectInputEvent(event,
+                InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH);
+!!!1628290.java!!!	newApplication(inout cl : ClassLoader, in className : String, inout context : Context) : Application
+        return newApplication(cl.loadClass(className), context);
+!!!1628418.java!!!	newApplication(inout clazz : Class<?>, inout context : Context) : Application
+        Application app = (Application)clazz.newInstance();
+        app.attach(context);
+        return app;
+!!!1628546.java!!!	callApplicationOnCreate(inout app : Application) : void
+        app.onCreate();
+!!!1628674.java!!!	newActivity(inout clazz : Class<?>, inout context : Context, inout token : IBinder, inout application : Application, inout intent : Intent, inout info : ActivityInfo, inout title : CharSequence, inout parent : Activity, in id : String, inout lastNonConfigurationInstance : Object) : Activity
+        Activity activity = (Activity)clazz.newInstance();
+        ActivityThread aThread = null;
+        activity.attach(context, aThread, this, token, 0, application, intent,
+                info, title, parent, id,
+                (Activity.NonConfigurationInstances)lastNonConfigurationInstance,
+                new Configuration(), null);
+        return activity;
+!!!1628802.java!!!	newActivity(inout cl : ClassLoader, in className : String, inout intent : Intent) : Activity
+        return (Activity)cl.loadClass(className).newInstance();
+!!!1628930.java!!!	prePerformCreate(inout activity : Activity) : void
+        if (mWaitingActivities != null) {
+            synchronized (mSync) {
+                final int N = mWaitingActivities.size();
+                for (int i=0; i<N; i++) {
+                    final ActivityWaiter aw = mWaitingActivities.get(i);
+                    final Intent intent = aw.intent;
+                    if (intent.filterEquals(activity.getIntent())) {
+                        aw.activity = activity;
+                        mMessageQueue.addIdleHandler(new ActivityGoing(aw));
+                    }
+                }
+            }
+        }
+!!!1629058.java!!!	postPerformCreate(inout activity : Activity) : void
+        if (mActivityMonitors != null) {
+            synchronized (mSync) {
+                final int N = mActivityMonitors.size();
+                for (int i=0; i<N; i++) {
+                    final ActivityMonitor am = mActivityMonitors.get(i);
+                    am.match(activity, activity, activity.getIntent());
+                }
+            }
+        }
+!!!1629186.java!!!	callActivityOnCreate(inout activity : Activity, inout icicle : Bundle) : void
+        prePerformCreate(activity);
+        activity.performCreate(icicle);
+        postPerformCreate(activity);
+!!!1629314.java!!!	callActivityOnCreate(inout activity : Activity, inout icicle : Bundle, inout persistentState : PersistableBundle) : void
+        prePerformCreate(activity);
+        activity.performCreate(icicle, persistentState);
+        postPerformCreate(activity);
+!!!1629442.java!!!	callActivityOnDestroy(inout activity : Activity) : void
+      // TODO: the following block causes intermittent hangs when using startActivity
+      // temporarily comment out until root cause is fixed (bug 2630683)
+//      if (mWaitingActivities != null) {
+//          synchronized (mSync) {
+//              final int N = mWaitingActivities.size();
+//              for (int i=0; i<N; i++) {
+//                  final ActivityWaiter aw = mWaitingActivities.get(i);
+//                  final Intent intent = aw.intent;
+//                  if (intent.filterEquals(activity.getIntent())) {
+//                      aw.activity = activity;
+//                      mMessageQueue.addIdleHandler(new ActivityGoing(aw));
+//                  }
+//              }
+//          }
+//      }
+      
+      activity.performDestroy();
+      
+      if (mActivityMonitors != null) {
+          synchronized (mSync) {
+              final int N = mActivityMonitors.size();
+              for (int i=0; i<N; i++) {
+                  final ActivityMonitor am = mActivityMonitors.get(i);
+                  am.match(activity, activity, activity.getIntent());
+              }
+          }
+      }
+!!!1629570.java!!!	callActivityOnRestoreInstanceState(inout activity : Activity, inout savedInstanceState : Bundle) : void
+        activity.performRestoreInstanceState(savedInstanceState);
+!!!1629698.java!!!	callActivityOnRestoreInstanceState(inout activity : Activity, inout savedInstanceState : Bundle, inout persistentState : PersistableBundle) : void
+        activity.performRestoreInstanceState(savedInstanceState, persistentState);
+!!!1629826.java!!!	callActivityOnPostCreate(inout activity : Activity, inout icicle : Bundle) : void
+        activity.onPostCreate(icicle);
+!!!1629954.java!!!	callActivityOnPostCreate(inout activity : Activity, inout icicle : Bundle, inout persistentState : PersistableBundle) : void
+        activity.onPostCreate(icicle, persistentState);
+!!!1630082.java!!!	callActivityOnNewIntent(inout activity : Activity, inout intent : Intent) : void
+        activity.onNewIntent(intent);
+!!!1630210.java!!!	callActivityOnStart(inout activity : Activity) : void
+        activity.onStart();
+!!!1630338.java!!!	callActivityOnRestart(inout activity : Activity) : void
+        activity.onRestart();
+!!!1630466.java!!!	callActivityOnResume(inout activity : Activity) : void
+        activity.mResumed = true;
+        activity.onResume();
+        
+        if (mActivityMonitors != null) {
+            synchronized (mSync) {
+                final int N = mActivityMonitors.size();
+                for (int i=0; i<N; i++) {
+                    final ActivityMonitor am = mActivityMonitors.get(i);
+                    am.match(activity, activity, activity.getIntent());
+                }
+            }
+        }
+!!!1630594.java!!!	callActivityOnStop(inout activity : Activity) : void
+        activity.onStop();
+!!!1630722.java!!!	callActivityOnSaveInstanceState(inout activity : Activity, inout outState : Bundle) : void
+        activity.performSaveInstanceState(outState);
+!!!1630850.java!!!	callActivityOnSaveInstanceState(inout activity : Activity, inout outState : Bundle, inout outPersistentState : PersistableBundle) : void
+        activity.performSaveInstanceState(outState, outPersistentState);
+!!!1630978.java!!!	callActivityOnPause(inout activity : Activity) : void
+        activity.performPause();
+!!!1631106.java!!!	callActivityOnUserLeaving(inout activity : Activity) : void
+        activity.performUserLeaving();
+!!!1631234.java!!!	startAllocCounting() : void
+        // Before we start trigger a GC and reset the debug counts. Run the 
+        // finalizers and another GC before starting and stopping the alloc
+        // counts. This will free up any objects that were just sitting around 
+        // waiting for their finalizers to be run.
+        Runtime.getRuntime().gc();
+        Runtime.getRuntime().runFinalization();
+        Runtime.getRuntime().gc();
+
+        Debug.resetAllCounts();
+        
+        // start the counts
+        Debug.startAllocCounting();
+!!!1631362.java!!!	stopAllocCounting() : void
+        Runtime.getRuntime().gc();
+        Runtime.getRuntime().runFinalization();
+        Runtime.getRuntime().gc();
+        Debug.stopAllocCounting();
+!!!1631490.java!!!	addValue(in key : String, in value : int, inout results : Bundle) : void
+        if (results.containsKey(key)) {
+            List<Integer> list = results.getIntegerArrayList(key);
+            if (list != null) {
+                list.add(value);
+            }
+        } else {
+            ArrayList<Integer> list = new ArrayList<Integer>();
+            list.add(value);
+            results.putIntegerArrayList(key, list);
+        }
+!!!1631618.java!!!	getAllocCounts() : Bundle
+        Bundle results = new Bundle();
+        results.putLong("global_alloc_count", Debug.getGlobalAllocCount());
+        results.putLong("global_alloc_size", Debug.getGlobalAllocSize());
+        results.putLong("global_freed_count", Debug.getGlobalFreedCount());
+        results.putLong("global_freed_size", Debug.getGlobalFreedSize());
+        results.putLong("gc_invocation_count", Debug.getGlobalGcInvocationCount());    
+        return results;
+!!!1631746.java!!!	getBinderCounts() : Bundle
+        Bundle results = new Bundle();
+        results.putLong("sent_transactions", Debug.getBinderSentTransactions());
+        results.putLong("received_transactions", Debug.getBinderReceivedTransactions());
+        return results;
+!!!1632258.java!!!	execStartActivity(inout who : Context, inout contextThread : IBinder, inout token : IBinder, inout target : Activity, inout intent : Intent, in requestCode : int, inout options : Bundle) : Instrumentation::ActivityResult
+        IApplicationThread whoThread = (IApplicationThread) contextThread;
+        if (mActivityMonitors != null) {
+            synchronized (mSync) {
+                final int N = mActivityMonitors.size();
+                for (int i=0; i<N; i++) {
+                    final ActivityMonitor am = mActivityMonitors.get(i);
+                    if (am.match(who, null, intent)) {
+                        am.mHits++;
+                        if (am.isBlocking()) {
+                            return requestCode >= 0 ? am.getResult() : null;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        try {
+            intent.migrateExtraStreamToClipData();
+            intent.prepareToLeaveProcess();
+            int result = ActivityManagerNative.getDefault()
+                .startActivity(whoThread, who.getBasePackageName(), intent,
+                        intent.resolveTypeIfNeeded(who.getContentResolver()),
+                        token, target != null ? target.mEmbeddedID : null,
+                        requestCode, 0, null, options);
+            checkStartActivityResult(result, intent);
+        } catch (RemoteException e) {
+        }
+        return null;
+!!!1632386.java!!!	execStartActivities(inout who : Context, inout contextThread : IBinder, inout token : IBinder, inout target : Activity, inout intents : Intent, inout options : Bundle) : void
+        execStartActivitiesAsUser(who, contextThread, token, target, intents, options,
+                UserHandle.myUserId());
+!!!1632514.java!!!	execStartActivitiesAsUser(inout who : Context, inout contextThread : IBinder, inout token : IBinder, inout target : Activity, inout intents : Intent, inout options : Bundle, in userId : int) : void
+        IApplicationThread whoThread = (IApplicationThread) contextThread;
+        if (mActivityMonitors != null) {
+            synchronized (mSync) {
+                final int N = mActivityMonitors.size();
+                for (int i=0; i<N; i++) {
+                    final ActivityMonitor am = mActivityMonitors.get(i);
+                    if (am.match(who, null, intents[0])) {
+                        am.mHits++;
+                        if (am.isBlocking()) {
+                            return;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        try {
+            String[] resolvedTypes = new String[intents.length];
+            for (int i=0; i<intents.length; i++) {
+                intents[i].migrateExtraStreamToClipData();
+                intents[i].prepareToLeaveProcess();
+                resolvedTypes[i] = intents[i].resolveTypeIfNeeded(who.getContentResolver());
+            }
+            int result = ActivityManagerNative.getDefault()
+                .startActivities(whoThread, who.getBasePackageName(), intents, resolvedTypes,
+                        token, options, userId);
+            checkStartActivityResult(result, intents[0]);
+        } catch (RemoteException e) {
+        }
+!!!1632642.java!!!	execStartActivity(inout who : Context, inout contextThread : IBinder, inout token : IBinder, inout target : Fragment, inout intent : Intent, in requestCode : int, inout options : Bundle) : Instrumentation::ActivityResult
+        IApplicationThread whoThread = (IApplicationThread) contextThread;
+        if (mActivityMonitors != null) {
+            synchronized (mSync) {
+                final int N = mActivityMonitors.size();
+                for (int i=0; i<N; i++) {
+                    final ActivityMonitor am = mActivityMonitors.get(i);
+                    if (am.match(who, null, intent)) {
+                        am.mHits++;
+                        if (am.isBlocking()) {
+                            return requestCode >= 0 ? am.getResult() : null;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        try {
+            intent.migrateExtraStreamToClipData();
+            intent.prepareToLeaveProcess();
+            int result = ActivityManagerNative.getDefault()
+                .startActivity(whoThread, who.getBasePackageName(), intent,
+                        intent.resolveTypeIfNeeded(who.getContentResolver()),
+                        token, target != null ? target.mWho : null,
+                        requestCode, 0, null, options);
+            checkStartActivityResult(result, intent);
+        } catch (RemoteException e) {
+        }
+        return null;
+!!!1632770.java!!!	execStartActivity(inout who : Context, inout contextThread : IBinder, inout token : IBinder, inout target : Activity, inout intent : Intent, in requestCode : int, inout options : Bundle, inout user : UserHandle) : Instrumentation::ActivityResult
+        IApplicationThread whoThread = (IApplicationThread) contextThread;
+        if (mActivityMonitors != null) {
+            synchronized (mSync) {
+                final int N = mActivityMonitors.size();
+                for (int i=0; i<N; i++) {
+                    final ActivityMonitor am = mActivityMonitors.get(i);
+                    if (am.match(who, null, intent)) {
+                        am.mHits++;
+                        if (am.isBlocking()) {
+                            return requestCode >= 0 ? am.getResult() : null;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        try {
+            intent.migrateExtraStreamToClipData();
+            intent.prepareToLeaveProcess();
+            int result = ActivityManagerNative.getDefault()
+                .startActivityAsUser(whoThread, who.getBasePackageName(), intent,
+                        intent.resolveTypeIfNeeded(who.getContentResolver()),
+                        token, target != null ? target.mEmbeddedID : null,
+                        requestCode, 0, null, options, user.getIdentifier());
+            checkStartActivityResult(result, intent);
+        } catch (RemoteException e) {
+        }
+        return null;
+!!!1632898.java!!!	execStartActivityAsCaller(inout who : Context, inout contextThread : IBinder, inout token : IBinder, inout target : Activity, inout intent : Intent, in requestCode : int, inout options : Bundle, in userId : int) : Instrumentation::ActivityResult
+        IApplicationThread whoThread = (IApplicationThread) contextThread;
+        if (mActivityMonitors != null) {
+            synchronized (mSync) {
+                final int N = mActivityMonitors.size();
+                for (int i=0; i<N; i++) {
+                    final ActivityMonitor am = mActivityMonitors.get(i);
+                    if (am.match(who, null, intent)) {
+                        am.mHits++;
+                        if (am.isBlocking()) {
+                            return requestCode >= 0 ? am.getResult() : null;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        try {
+            intent.migrateExtraStreamToClipData();
+            intent.prepareToLeaveProcess();
+            int result = ActivityManagerNative.getDefault()
+                .startActivityAsCaller(whoThread, who.getBasePackageName(), intent,
+                        intent.resolveTypeIfNeeded(who.getContentResolver()),
+                        token, target != null ? target.mEmbeddedID : null,
+                        requestCode, 0, null, options, userId);
+            checkStartActivityResult(result, intent);
+        } catch (RemoteException e) {
+        }
+        return null;
+!!!1633026.java!!!	execStartActivityFromAppTask(inout who : Context, inout contextThread : IBinder, inout appTask : IAppTask, inout intent : Intent, inout options : Bundle) : void
+        IApplicationThread whoThread = (IApplicationThread) contextThread;
+        if (mActivityMonitors != null) {
+            synchronized (mSync) {
+                final int N = mActivityMonitors.size();
+                for (int i=0; i<N; i++) {
+                    final ActivityMonitor am = mActivityMonitors.get(i);
+                    if (am.match(who, null, intent)) {
+                        am.mHits++;
+                        if (am.isBlocking()) {
+                            return;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        try {
+            intent.migrateExtraStreamToClipData();
+            intent.prepareToLeaveProcess();
+            int result = appTask.startActivity(whoThread.asBinder(), who.getBasePackageName(),
+                    intent, intent.resolveTypeIfNeeded(who.getContentResolver()), options);
+            checkStartActivityResult(result, intent);
+        } catch (RemoteException e) {
+        }
+        return;
+!!!1633154.java!!!	init(inout thread : ActivityThread, inout instrContext : Context, inout appContext : Context, inout component : ComponentName, inout watcher : IInstrumentationWatcher, inout uiAutomationConnection : IUiAutomationConnection) : void
+        mThread = thread;
+        mMessageQueue = mThread.getLooper().myQueue();
+        mInstrContext = instrContext;
+        mAppContext = appContext;
+        mComponent = component;
+        mWatcher = watcher;
+        mUiAutomationConnection = uiAutomationConnection;
+!!!1633282.java!!!	checkStartActivityResult(in res : int, inout intent : Object) : void
+        if (res >= ActivityManager.START_SUCCESS) {
+            return;
+        }
+        
+        switch (res) {
+            case ActivityManager.START_INTENT_NOT_RESOLVED:
+            case ActivityManager.START_CLASS_NOT_FOUND:
+                if (intent instanceof Intent && ((Intent)intent).getComponent() != null)
+                    throw new ActivityNotFoundException(
+                            "Unable to find explicit activity class "
+                            + ((Intent)intent).getComponent().toShortString()
+                            + "; have you declared this activity in your AndroidManifest.xml?");
+                throw new ActivityNotFoundException(
+                        "No Activity found to handle " + intent);
+            case ActivityManager.START_PERMISSION_DENIED:
+                throw new SecurityException("Not allowed to start activity "
+                        + intent);
+            case ActivityManager.START_FORWARD_AND_REQUEST_CONFLICT:
+                throw new AndroidRuntimeException(
+                        "FORWARD_RESULT_FLAG used while also requesting a result");
+            case ActivityManager.START_NOT_ACTIVITY:
+                throw new IllegalArgumentException(
+                        "PendingIntent is not an activity");
+            case ActivityManager.START_NOT_VOICE_COMPATIBLE:
+                throw new SecurityException(
+                        "Starting under voice control not allowed for: " + intent);
+            default:
+                throw new AndroidRuntimeException("Unknown error code "
+                        + res + " when starting " + intent);
+        }
+!!!1633410.java!!!	validateNotAppThread() : void
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            throw new RuntimeException(
+                "This method can not be called from the main application thread");
+        }
+!!!1633538.java!!!	getUiAutomation() : UiAutomation
+        if (mUiAutomationConnection != null) {
+            if (mUiAutomation == null) {
+                mUiAutomation = new UiAutomation(getTargetContext().getMainLooper(),
+                        mUiAutomationConnection);
+                mUiAutomation.connect();
+            }
+            return mUiAutomation;
+        }
+        return null;

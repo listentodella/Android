@@ -1,0 +1,126 @@
+class DropDownListView
+!!!2349186.java!!!	DropDownListView(inout context : Context, inout hijackFocus : boolean)
+            super(context, null, com.android.internal.R.attr.dropDownListViewStyle);
+            mHijackFocus = hijackFocus;
+            // TODO: Add an API to control this
+            setCacheColorHint(0); // Transparent, since the background drawable could be anything.
+!!!2349314.java!!!	onForwardedEvent(inout event : MotionEvent, in activePointerId : int) : boolean
+            boolean handledEvent = true;
+            boolean clearPressedItem = false;
+
+            final int actionMasked = event.getActionMasked();
+            switch (actionMasked) {
+                case MotionEvent.ACTION_CANCEL:
+                    handledEvent = false;
+                    break;
+                case MotionEvent.ACTION_UP:
+                    handledEvent = false;
+                    // $FALL-THROUGH$
+                case MotionEvent.ACTION_MOVE:
+                    final int activeIndex = event.findPointerIndex(activePointerId);
+                    if (activeIndex < 0) {
+                        handledEvent = false;
+                        break;
+                    }
+
+                    final int x = (int) event.getX(activeIndex);
+                    final int y = (int) event.getY(activeIndex);
+                    final int position = pointToPosition(x, y);
+                    if (position == INVALID_POSITION) {
+                        clearPressedItem = true;
+                        break;
+                    }
+
+                    final View child = getChildAt(position - getFirstVisiblePosition());
+                    setPressedItem(child, position, x, y);
+                    handledEvent = true;
+
+                    if (actionMasked == MotionEvent.ACTION_UP) {
+                        clickPressedItem(child, position);
+                    }
+                    break;
+            }
+
+            // Failure to handle the event cancels forwarding.
+            if (!handledEvent || clearPressedItem) {
+                clearPressedItem();
+            }
+
+            // Manage automatic scrolling.
+            if (handledEvent) {
+                if (mScrollHelper == null) {
+                    mScrollHelper = new AbsListViewAutoScroller(this);
+                }
+                mScrollHelper.setEnabled(true);
+                mScrollHelper.onTouch(this, event);
+            } else if (mScrollHelper != null) {
+                mScrollHelper.setEnabled(false);
+            }
+
+            return handledEvent;
+!!!2349442.java!!!	clickPressedItem(in child : View, in position : int) : void
+            final long id = getItemIdAtPosition(position);
+            final Animator anim = ObjectAnimator.ofInt(
+                    mSelector, DRAWABLE_ALPHA, 0xFF, CLICK_ANIM_ALPHA, 0xFF);
+            anim.setDuration(CLICK_ANIM_DURATION);
+            anim.setInterpolator(new AccelerateDecelerateInterpolator());
+            anim.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                public void onAnimationEnd(Animator animation) {
+                    performItemClick(child, position, id);
+                }
+            });
+            anim.start();
+
+            if (mClickAnimation != null) {
+                mClickAnimation.cancel();
+            }
+            mClickAnimation = anim;
+!!!2349570.java!!!	clearPressedItem() : void
+            mDrawsInPressedState = false;
+            setPressed(false);
+            updateSelectorState();
+
+            if (mClickAnimation != null) {
+                mClickAnimation.cancel();
+                mClickAnimation = null;
+            }
+!!!2349698.java!!!	setPressedItem(inout child : View, in position : int, in x : float, in y : float) : void
+            mDrawsInPressedState = true;
+
+            // Ordering is essential. First update the pressed state and layout
+            // the children. This will ensure the selector actually gets drawn.
+            setPressed(true);
+            layoutChildren();
+
+            // Ensure that keyboard focus starts from the last touched position.
+            setSelectedPositionInt(position);
+            positionSelectorLikeTouch(position, child, x, y);
+
+            // Refresh the drawable state to reflect the new pressed state,
+            // which will also update the selector state.
+            refreshDrawableState();
+
+            if (mClickAnimation != null) {
+                mClickAnimation.cancel();
+                mClickAnimation = null;
+            }
+!!!2349826.java!!!	touchModeDrawsInPressedState() : boolean
+            return mDrawsInPressedState || super.touchModeDrawsInPressedState();
+!!!2349954.java!!!	obtainView(in position : int, inout isScrap : boolean) : View
+            View view = super.obtainView(position, isScrap);
+
+            if (view instanceof TextView) {
+                ((TextView) view).setHorizontallyScrolling(true);
+            }
+
+            return view;
+!!!2350082.java!!!	isInTouchMode() : boolean
+            // WARNING: Please read the comment where mListSelectionHidden is declared
+            return (mHijackFocus && mListSelectionHidden) || super.isInTouchMode();
+!!!2350210.java!!!	hasWindowFocus() : boolean
+            return mHijackFocus || super.hasWindowFocus();
+!!!2350338.java!!!	isFocused() : boolean
+            return mHijackFocus || super.isFocused();
+!!!2350466.java!!!	hasFocus() : boolean
+            return mHijackFocus || super.hasFocus();

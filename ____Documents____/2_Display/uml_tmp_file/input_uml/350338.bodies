@@ -1,0 +1,20 @@
+class CheckForLongPress
+!!!1942914.java!!!	run() : void
+            final int motionPosition = mMotionPosition;
+            final View child = getChildAt(motionPosition - mFirstPosition);
+            if (child != null) {
+                final int longPressPosition = mMotionPosition;
+                final long longPressId = mAdapter.getItemId(mMotionPosition);
+
+                boolean handled = false;
+                if (sameWindow() && !mDataChanged) {
+                    handled = performLongPress(child, longPressPosition, longPressId);
+                }
+                if (handled) {
+                    mTouchMode = TOUCH_MODE_REST;
+                    setPressed(false);
+                    child.setPressed(false);
+                } else {
+                    mTouchMode = TOUCH_MODE_DONE_WAITING;
+                }
+            }

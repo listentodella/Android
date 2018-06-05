@@ -1,0 +1,264 @@
+class TaskStack
+!!!1223170.java!!!	TaskStack(inout service : WindowManagerService, in stackId : int)
+        mService = service;
+        mStackId = stackId;
+        // TODO: remove bounds from log, they are always 0.
+        EventLog.writeEvent(EventLogTags.WM_STACK_CREATED, stackId, mBounds.left, mBounds.top,
+                mBounds.right, mBounds.bottom);
+!!!1223298.java!!!	getDisplayContent() : DisplayContent
+        return mDisplayContent;
+!!!1223426.java!!!	getTasks() : Task
+        return mTasks;
+!!!1223554.java!!!	resizeWindows() : void
+        final boolean underStatusBar = mBounds.top == 0;
+
+        final ArrayList<WindowState> resizingWindows = mService.mResizingWindows;
+        for (int taskNdx = mTasks.size() - 1; taskNdx >= 0; --taskNdx) {
+            final ArrayList<AppWindowToken> activities = mTasks.get(taskNdx).mAppTokens;
+            for (int activityNdx = activities.size() - 1; activityNdx >= 0; --activityNdx) {
+                final ArrayList<WindowState> windows = activities.get(activityNdx).allAppWindows;
+                for (int winNdx = windows.size() - 1; winNdx >= 0; --winNdx) {
+                    final WindowState win = windows.get(winNdx);
+                    if (!resizingWindows.contains(win)) {
+                        if (WindowManagerService.DEBUG_RESIZE) Slog.d(TAG,
+                                "setBounds: Resizing " + win);
+                        resizingWindows.add(win);
+                    }
+                    win.mUnderStatusBar = underStatusBar;
+                }
+            }
+        }
+!!!1223682.java!!!	setBounds(inout bounds : Rect) : boolean
+        boolean oldFullscreen = mFullscreen;
+        if (mDisplayContent != null) {
+            mDisplayContent.getLogicalDisplayRect(mTmpRect);
+            mFullscreen = mTmpRect.equals(bounds);
+        }
+
+        if (mBounds.equals(bounds) && oldFullscreen == mFullscreen) {
+            return false;
+        }
+
+        mDimLayer.setBounds(bounds);
+        mAnimationBackgroundSurface.setBounds(bounds);
+        mBounds.set(bounds);
+
+        return true;
+!!!1223810.java!!!	getBounds(inout out : Rect) : void
+        out.set(mBounds);
+!!!1223938.java!!!	updateDisplayInfo() : void
+        if (mFullscreen && mDisplayContent != null) {
+            mDisplayContent.getLogicalDisplayRect(mTmpRect);
+            setBounds(mTmpRect);
+        }
+!!!1224066.java!!!	isFullscreen() : boolean
+        return mFullscreen;
+!!!1224194.java!!!	isAnimating() : boolean
+        for (int taskNdx = mTasks.size() - 1; taskNdx >= 0; --taskNdx) {
+            final ArrayList<AppWindowToken> activities = mTasks.get(taskNdx).mAppTokens;
+            for (int activityNdx = activities.size() - 1; activityNdx >= 0; --activityNdx) {
+                final ArrayList<WindowState> windows = activities.get(activityNdx).allAppWindows;
+                for (int winNdx = windows.size() - 1; winNdx >= 0; --winNdx) {
+                    final WindowStateAnimator winAnimator = windows.get(winNdx).mWinAnimator;
+                    if (winAnimator.isAnimating() || winAnimator.mWin.mExiting) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+!!!1224322.java!!!	addTask(inout task : Task, inout toTop : boolean) : void
+        int stackNdx;
+        if (!toTop) {
+            stackNdx = 0;
+        } else {
+            stackNdx = mTasks.size();
+            if (!mService.isCurrentProfileLocked(task.mUserId)) {
+                // Place the task below all current user tasks.
+                while (--stackNdx >= 0) {
+                    if (!mService.isCurrentProfileLocked(mTasks.get(stackNdx).mUserId)) {
+                        break;
+                    }
+                }
+                // Put it above first non-current user task.
+                ++stackNdx;
+            }
+        }
+        if (DEBUG_TASK_MOVEMENT) Slog.d(TAG, "addTask: task=" + task + " toTop=" + toTop
+                + " pos=" + stackNdx);
+        mTasks.add(stackNdx, task);
+
+        task.mStack = this;
+        mDisplayContent.moveStack(this, true);
+        EventLog.writeEvent(EventLogTags.WM_TASK_MOVED, task.taskId, toTop ? 1 : 0, stackNdx);
+!!!1224450.java!!!	moveTaskToTop(inout task : Task) : void
+        if (DEBUG_TASK_MOVEMENT) Slog.d(TAG, "moveTaskToTop: task=" + task + " Callers="
+                + Debug.getCallers(6));
+        mTasks.remove(task);
+        addTask(task, true);
+!!!1224578.java!!!	moveTaskToBottom(inout task : Task) : void
+        if (DEBUG_TASK_MOVEMENT) Slog.d(TAG, "moveTaskToBottom: task=" + task);
+        mTasks.remove(task);
+        addTask(task, false);
+!!!1224706.java!!!	removeTask(inout task : Task) : void
+        if (DEBUG_TASK_MOVEMENT) Slog.d(TAG, "removeTask: task=" + task);
+        mTasks.remove(task);
+        if (mDisplayContent != null) {
+            if (mTasks.isEmpty()) {
+                mDisplayContent.moveStack(this, false);
+            }
+            mDisplayContent.layoutNeeded = true;
+        }
+!!!1224834.java!!!	attachDisplayContent(inout displayContent : DisplayContent) : void
+        if (mDisplayContent != null) {
+            throw new IllegalStateException("attachDisplayContent: Already attached");
+        }
+
+        mDisplayContent = displayContent;
+        mDimLayer = new DimLayer(mService, this, displayContent);
+        mAnimationBackgroundSurface = new DimLayer(mService, this, displayContent);
+        updateDisplayInfo();
+!!!1224962.java!!!	detachDisplay() : void
+        EventLog.writeEvent(EventLogTags.WM_STACK_REMOVED, mStackId);
+
+        boolean doAnotherLayoutPass = false;
+        for (int taskNdx = mTasks.size() - 1; taskNdx >= 0; --taskNdx) {
+            final AppTokenList appWindowTokens = mTasks.get(taskNdx).mAppTokens;
+            for (int appNdx = appWindowTokens.size() - 1; appNdx >= 0; --appNdx) {
+                final WindowList appWindows = appWindowTokens.get(appNdx).allAppWindows;
+                for (int winNdx = appWindows.size() - 1; winNdx >= 0; --winNdx) {
+                    mService.removeWindowInnerLocked(null, appWindows.get(winNdx));
+                    doAnotherLayoutPass = true;
+                }
+            }
+        }
+        if (doAnotherLayoutPass) {
+            mService.requestTraversalLocked();
+        }
+
+        mAnimationBackgroundSurface.destroySurface();
+        mAnimationBackgroundSurface = null;
+        mDimLayer.destroySurface();
+        mDimLayer = null;
+        mDisplayContent = null;
+!!!1225090.java!!!	resetAnimationBackgroundAnimator() : void
+        mAnimationBackgroundAnimator = null;
+        mAnimationBackgroundSurface.hide();
+!!!1225218.java!!!	getDimBehindFadeDuration(in duration : long) : long
+        TypedValue tv = new TypedValue();
+        mService.mContext.getResources().getValue(
+                com.android.internal.R.fraction.config_dimBehindFadeDuration, tv, true);
+        if (tv.type == TypedValue.TYPE_FRACTION) {
+            duration = (long)tv.getFraction(duration, duration);
+        } else if (tv.type >= TypedValue.TYPE_FIRST_INT && tv.type <= TypedValue.TYPE_LAST_INT) {
+            duration = tv.data;
+        }
+        return duration;
+!!!1225346.java!!!	animateDimLayers() : boolean
+        final int dimLayer;
+        final float dimAmount;
+        if (mDimWinAnimator == null) {
+            dimLayer = mDimLayer.getLayer();
+            dimAmount = 0;
+        } else {
+            dimLayer = mDimWinAnimator.mAnimLayer - WindowManagerService.LAYER_OFFSET_DIM;
+            dimAmount = mDimWinAnimator.mWin.mAttrs.dimAmount;
+        }
+        final float targetAlpha = mDimLayer.getTargetAlpha();
+        if (targetAlpha != dimAmount) {
+            if (mDimWinAnimator == null) {
+                mDimLayer.hide(DEFAULT_DIM_DURATION);
+            } else {
+                long duration = (mDimWinAnimator.mAnimating && mDimWinAnimator.mAnimation != null)
+                        ? mDimWinAnimator.mAnimation.computeDurationHint()
+                        : DEFAULT_DIM_DURATION;
+                if (targetAlpha > dimAmount) {
+                    duration = getDimBehindFadeDuration(duration);
+                }
+                mDimLayer.show(dimLayer, dimAmount, duration);
+            }
+        } else if (mDimLayer.getLayer() != dimLayer) {
+            mDimLayer.setLayer(dimLayer);
+        }
+        if (mDimLayer.isAnimating()) {
+            if (!mService.okToDisplay()) {
+                // Jump to the end of the animation.
+                mDimLayer.show();
+            } else {
+                return mDimLayer.stepAnimation();
+            }
+        }
+        return false;
+!!!1225474.java!!!	resetDimmingTag() : void
+        mDimmingTag = false;
+!!!1225602.java!!!	setDimmingTag() : void
+        mDimmingTag = true;
+!!!1225730.java!!!	testDimmingTag() : boolean
+        return mDimmingTag;
+!!!1225858.java!!!	isDimming() : boolean
+        return mDimLayer.isDimming();
+!!!1225986.java!!!	isDimming(inout winAnimator : WindowStateAnimator) : boolean
+        return mDimWinAnimator == winAnimator && mDimLayer.isDimming();
+!!!1226114.java!!!	startDimmingIfNeeded(inout newWinAnimator : WindowStateAnimator) : void
+        // Only set dim params on the highest dimmed layer.
+        final WindowStateAnimator existingDimWinAnimator = mDimWinAnimator;
+        // Don't turn on for an unshown surface, or for any layer but the highest dimmed layer.
+        if (newWinAnimator.mSurfaceShown && (existingDimWinAnimator == null
+                || !existingDimWinAnimator.mSurfaceShown
+                || existingDimWinAnimator.mAnimLayer < newWinAnimator.mAnimLayer)) {
+            mDimWinAnimator = newWinAnimator;
+        }
+!!!1226242.java!!!	stopDimmingIfNeeded() : void
+        if (!mDimmingTag && isDimming()) {
+            mDimWinAnimator = null;
+        }
+!!!1226370.java!!!	setAnimationBackground(inout winAnimator : WindowStateAnimator, in color : int) : void
+        int animLayer = winAnimator.mAnimLayer;
+        if (mAnimationBackgroundAnimator == null
+                || animLayer < mAnimationBackgroundAnimator.mAnimLayer) {
+            mAnimationBackgroundAnimator = winAnimator;
+            animLayer = mService.adjustAnimationBackground(winAnimator);
+            mAnimationBackgroundSurface.show(animLayer - WindowManagerService.LAYER_OFFSET_DIM,
+                    ((color >> 24) & 0xff) / 255f, 0);
+        }
+!!!1226498.java!!!	switchUser(in userId : int) : void
+        int top = mTasks.size();
+        for (int taskNdx = 0; taskNdx < top; ++taskNdx) {
+            Task task = mTasks.get(taskNdx);
+            if (mService.isCurrentProfileLocked(task.mUserId)) {
+                mTasks.remove(taskNdx);
+                mTasks.add(task);
+                --top;
+            }
+        }
+!!!1226626.java!!!	close() : void
+        mDimLayer.mDimSurface.destroy();
+        mAnimationBackgroundSurface.mDimSurface.destroy();
+!!!1226754.java!!!	dump(in prefix : String, inout pw : PrintWriter) : void
+        pw.print(prefix); pw.print("mStackId="); pw.println(mStackId);
+        pw.print(prefix); pw.print("mDeferDetach="); pw.println(mDeferDetach);
+        for (int taskNdx = 0; taskNdx < mTasks.size(); ++taskNdx) {
+            pw.print(prefix); pw.println(mTasks.get(taskNdx));
+        }
+        if (mAnimationBackgroundSurface.isDimming()) {
+            pw.print(prefix); pw.println("mWindowAnimationBackgroundSurface:");
+            mAnimationBackgroundSurface.printTo(prefix + "  ", pw);
+        }
+        if (mDimLayer.isDimming()) {
+            pw.print(prefix); pw.println("mDimLayer:");
+            mDimLayer.printTo(prefix, pw);
+            pw.print(prefix); pw.print("mDimWinAnimator="); pw.println(mDimWinAnimator);
+        }
+        if (!mExitingAppTokens.isEmpty()) {
+            pw.println();
+            pw.println("  Exiting application tokens:");
+            for (int i=mExitingAppTokens.size()-1; i>=0; i--) {
+                WindowToken token = mExitingAppTokens.get(i);
+                pw.print("  Exiting App #"); pw.print(i);
+                pw.print(' '); pw.print(token);
+                pw.println(':');
+                token.dump(pw, "    ");
+            }
+        }
+!!!1226882.java!!!	toString() : String
+        return "{stackId=" + mStackId + " tasks=" + mTasks + "}";

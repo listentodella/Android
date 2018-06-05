@@ -1,0 +1,233 @@
+class ActivityChooserView
+!!!2019586.java!!!	ActivityChooserView(inout context : Context)
+        this(context, null);
+!!!2019714.java!!!	ActivityChooserView(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!2019842.java!!!	ActivityChooserView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2019970.java!!!	ActivityChooserView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        TypedArray attributesArray = context.obtainStyledAttributes(attrs,
+                R.styleable.ActivityChooserView, defStyleAttr, defStyleRes);
+
+        mInitialActivityCount = attributesArray.getInt(
+                R.styleable.ActivityChooserView_initialActivityCount,
+                ActivityChooserViewAdapter.MAX_ACTIVITY_COUNT_DEFAULT);
+
+        Drawable expandActivityOverflowButtonDrawable = attributesArray.getDrawable(
+                R.styleable.ActivityChooserView_expandActivityOverflowButtonDrawable);
+
+        attributesArray.recycle();
+
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        inflater.inflate(R.layout.activity_chooser_view, this, true);
+
+        mCallbacks = new Callbacks();
+
+        mActivityChooserContent = (LinearLayout) findViewById(R.id.activity_chooser_view_content);
+        mActivityChooserContentBackground = mActivityChooserContent.getBackground();
+
+        mDefaultActivityButton = (FrameLayout) findViewById(R.id.default_activity_button);
+        mDefaultActivityButton.setOnClickListener(mCallbacks);
+        mDefaultActivityButton.setOnLongClickListener(mCallbacks);
+        mDefaultActivityButtonImage = (ImageView) mDefaultActivityButton.findViewById(R.id.image);
+
+        final FrameLayout expandButton = (FrameLayout) findViewById(R.id.expand_activities_button);
+        expandButton.setOnClickListener(mCallbacks);
+        expandButton.setAccessibilityDelegate(new AccessibilityDelegate() {
+            @Override
+            public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfo info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                info.setCanOpenPopup(true);
+            }
+        });
+        expandButton.setOnTouchListener(new ForwardingListener(expandButton) {
+            @Override
+            public ListPopupWindow getPopup() {
+                return getListPopupWindow();
+            }
+
+            @Override
+            protected boolean onForwardingStarted() {
+                showPopup();
+                return true;
+            }
+
+            @Override
+            protected boolean onForwardingStopped() {
+                dismissPopup();
+                return true;
+            }
+        });
+        mExpandActivityOverflowButton = expandButton;
+
+        mExpandActivityOverflowButtonImage =
+            (ImageView) expandButton.findViewById(R.id.image);
+        mExpandActivityOverflowButtonImage.setImageDrawable(expandActivityOverflowButtonDrawable);
+
+        mAdapter = new ActivityChooserViewAdapter();
+        mAdapter.registerDataSetObserver(new DataSetObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                updateAppearance();
+            }
+        });
+
+        Resources resources = context.getResources();
+        mListPopupMaxWidth = Math.max(resources.getDisplayMetrics().widthPixels / 2,
+              resources.getDimensionPixelSize(com.android.internal.R.dimen.config_prefDialogWidth));
+!!!2020098.java!!!	setActivityChooserModel(inout dataModel : ActivityChooserModel) : void
+        mAdapter.setDataModel(dataModel);
+        if (isShowingPopup()) {
+            dismissPopup();
+            showPopup();
+        }
+!!!2020226.java!!!	setExpandActivityOverflowButtonDrawable(inout drawable : Drawable) : void
+        mExpandActivityOverflowButtonImage.setImageDrawable(drawable);
+!!!2020354.java!!!	setExpandActivityOverflowButtonContentDescription(in resourceId : int) : void
+        CharSequence contentDescription = mContext.getString(resourceId);
+        mExpandActivityOverflowButtonImage.setContentDescription(contentDescription);
+!!!2020482.java!!!	setProvider(inout provider : ActionProvider) : void
+        mProvider = provider;
+!!!2020610.java!!!	showPopup() : boolean
+        if (isShowingPopup() || !mIsAttachedToWindow) {
+            return false;
+        }
+        mIsSelectingDefaultActivity = false;
+        showPopupUnchecked(mInitialActivityCount);
+        return true;
+!!!2020738.java!!!	showPopupUnchecked(in maxActivityCount : int) : void
+        if (mAdapter.getDataModel() == null) {
+            throw new IllegalStateException("No data model. Did you call #setDataModel?");
+        }
+
+        getViewTreeObserver().addOnGlobalLayoutListener(mOnGlobalLayoutListener);
+
+        final boolean defaultActivityButtonShown =
+            mDefaultActivityButton.getVisibility() == VISIBLE;
+
+        final int activityCount = mAdapter.getActivityCount();
+        final int maxActivityCountOffset = defaultActivityButtonShown ? 1 : 0;
+        if (maxActivityCount != ActivityChooserViewAdapter.MAX_ACTIVITY_COUNT_UNLIMITED
+                && activityCount > maxActivityCount + maxActivityCountOffset) {
+            mAdapter.setShowFooterView(true);
+            mAdapter.setMaxActivityCount(maxActivityCount - 1);
+        } else {
+            mAdapter.setShowFooterView(false);
+            mAdapter.setMaxActivityCount(maxActivityCount);
+        }
+
+        ListPopupWindow popupWindow = getListPopupWindow();
+        if (!popupWindow.isShowing()) {
+            if (mIsSelectingDefaultActivity || !defaultActivityButtonShown) {
+                mAdapter.setShowDefaultActivity(true, defaultActivityButtonShown);
+            } else {
+                mAdapter.setShowDefaultActivity(false, false);
+            }
+            final int contentWidth = Math.min(mAdapter.measureContentWidth(), mListPopupMaxWidth);
+            popupWindow.setContentWidth(contentWidth);
+            popupWindow.show();
+            if (mProvider != null) {
+                mProvider.subUiVisibilityChanged(true);
+            }
+            popupWindow.getListView().setContentDescription(mContext.getString(
+                    R.string.activitychooserview_choose_application));
+        }
+!!!2020866.java!!!	dismissPopup() : boolean
+        if (isShowingPopup()) {
+            getListPopupWindow().dismiss();
+            ViewTreeObserver viewTreeObserver = getViewTreeObserver();
+            if (viewTreeObserver.isAlive()) {
+                viewTreeObserver.removeOnGlobalLayoutListener(mOnGlobalLayoutListener);
+            }
+        }
+        return true;
+!!!2020994.java!!!	isShowingPopup() : boolean
+        return getListPopupWindow().isShowing();
+!!!2021122.java!!!	onAttachedToWindow() : void
+        super.onAttachedToWindow();
+        ActivityChooserModel dataModel = mAdapter.getDataModel();
+        if (dataModel != null) {
+            dataModel.registerObserver(mModelDataSetOberver);
+        }
+        mIsAttachedToWindow = true;
+!!!2021250.java!!!	onDetachedFromWindow() : void
+        super.onDetachedFromWindow();
+        ActivityChooserModel dataModel = mAdapter.getDataModel();
+        if (dataModel != null) {
+            dataModel.unregisterObserver(mModelDataSetOberver);
+        }
+        ViewTreeObserver viewTreeObserver = getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.removeOnGlobalLayoutListener(mOnGlobalLayoutListener);
+        }
+        if (isShowingPopup()) {
+            dismissPopup();
+        }
+        mIsAttachedToWindow = false;
+!!!2021378.java!!!	onMeasure(in widthMeasureSpec : int, in heightMeasureSpec : int) : void
+        View child = mActivityChooserContent;
+        // If the default action is not visible we want to be as tall as the
+        // ActionBar so if this widget is used in the latter it will look as
+        // a normal action button.
+        if (mDefaultActivityButton.getVisibility() != VISIBLE) {
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec),
+                    MeasureSpec.EXACTLY);
+        }
+        measureChild(child, widthMeasureSpec, heightMeasureSpec);
+        setMeasuredDimension(child.getMeasuredWidth(), child.getMeasuredHeight());
+!!!2021506.java!!!	onLayout(inout changed : boolean, in left : int, in top : int, in right : int, in bottom : int) : void
+        mActivityChooserContent.layout(0, 0, right - left, bottom - top);
+        if (!isShowingPopup()) {
+            dismissPopup();
+        }
+!!!2021634.java!!!	getDataModel() : ActivityChooserModel
+        return mAdapter.getDataModel();
+!!!2021762.java!!!	setOnDismissListener(inout listener : PopupWindow::OnDismissListener) : void
+        mOnDismissListener = listener;
+!!!2021890.java!!!	setInitialActivityCount(in itemCount : int) : void
+        mInitialActivityCount = itemCount;
+!!!2022018.java!!!	setDefaultActionButtonContentDescription(in resourceId : int) : void
+        mDefaultActionButtonContentDescription = resourceId;
+!!!2022146.java!!!	getListPopupWindow() : ListPopupWindow
+        if (mListPopupWindow == null) {
+            mListPopupWindow = new ListPopupWindow(getContext());
+            mListPopupWindow.setAdapter(mAdapter);
+            mListPopupWindow.setAnchorView(ActivityChooserView.this);
+            mListPopupWindow.setModal(true);
+            mListPopupWindow.setOnItemClickListener(mCallbacks);
+            mListPopupWindow.setOnDismissListener(mCallbacks);
+        }
+        return mListPopupWindow;
+!!!2022274.java!!!	updateAppearance() : void
+        // Expand overflow button.
+        if (mAdapter.getCount() > 0) {
+            mExpandActivityOverflowButton.setEnabled(true);
+        } else {
+            mExpandActivityOverflowButton.setEnabled(false);
+        }
+        // Default activity button.
+        final int activityCount = mAdapter.getActivityCount();
+        final int historySize = mAdapter.getHistorySize();
+        if (activityCount==1 || activityCount > 1 && historySize > 0) {
+            mDefaultActivityButton.setVisibility(VISIBLE);
+            ResolveInfo activity = mAdapter.getDefaultActivity();
+            PackageManager packageManager = mContext.getPackageManager();
+            mDefaultActivityButtonImage.setImageDrawable(activity.loadIcon(packageManager));
+            if (mDefaultActionButtonContentDescription != 0) {
+                CharSequence label = activity.loadLabel(packageManager);
+                String contentDescription = mContext.getString(
+                        mDefaultActionButtonContentDescription, label);
+                mDefaultActivityButton.setContentDescription(contentDescription);
+            }
+        } else {
+            mDefaultActivityButton.setVisibility(View.GONE);
+        }
+        // Activity chooser content.
+        if (mDefaultActivityButton.getVisibility() == VISIBLE) {
+            mActivityChooserContent.setBackground(mActivityChooserContentBackground);
+        } else {
+            mActivityChooserContent.setBackground(null);
+        }

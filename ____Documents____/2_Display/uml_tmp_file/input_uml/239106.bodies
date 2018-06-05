@@ -1,0 +1,9 @@
+class ControlledInputConnectionWrapper
+!!!948610.java!!!	ControlledInputConnectionWrapper(in mainLooper : Looper, in conn : InputConnection, in inputMethodManager : InputMethodManager)
+            super(mainLooper, conn);
+            mParentInputMethodManager = inputMethodManager;
+            mActive = true;
+!!!948738.java!!!	isActive() : boolean
+            return mParentInputMethodManager.mActive && mActive;
+!!!948866.java!!!	deactivate() : void
+            mActive = false;

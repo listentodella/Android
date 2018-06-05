@@ -1,0 +1,16 @@
+class ShareMenuItemOnMenuItemClickListener
+!!!2437250.java!!!	onMenuItemClick(inout item : MenuItem) : boolean
+            ActivityChooserModel dataModel = ActivityChooserModel.get(mContext,
+                    mShareHistoryFileName);
+            final int itemId = item.getItemId();
+            Intent launchIntent = dataModel.chooseActivity(itemId);
+            if (launchIntent != null) {
+                final String action = launchIntent.getAction();
+                if (Intent.ACTION_SEND.equals(action) ||
+                        Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                            Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                }
+                mContext.startActivity(launchIntent);
+            }
+            return true;

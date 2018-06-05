@@ -1,0 +1,55 @@
+class RunningAppProcessInfo
+!!!1355522.java!!!	procStateToImportance(in procState : int) : int
+            if (procState >= ActivityManager.PROCESS_STATE_HOME) {
+                return ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND;
+            } else if (procState >= ActivityManager.PROCESS_STATE_SERVICE) {
+                return ActivityManager.RunningAppProcessInfo.IMPORTANCE_SERVICE;
+            } else if (procState > ActivityManager.PROCESS_STATE_HEAVY_WEIGHT) {
+                return ActivityManager.RunningAppProcessInfo.IMPORTANCE_CANT_SAVE_STATE;
+            } else if (procState >= ActivityManager.PROCESS_STATE_IMPORTANT_BACKGROUND) {
+                return ActivityManager.RunningAppProcessInfo.IMPORTANCE_PERCEPTIBLE;
+            } else if (procState >= ActivityManager.PROCESS_STATE_IMPORTANT_FOREGROUND) {
+                return ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
+            } else {
+                return ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+            }
+!!!1355650.java!!!	RunningAppProcessInfo()
+            importance = IMPORTANCE_FOREGROUND;
+            importanceReasonCode = REASON_UNKNOWN;
+            processState = PROCESS_STATE_IMPORTANT_FOREGROUND;
+!!!1355778.java!!!	RunningAppProcessInfo(in pProcessName : String, in pPid : int, inout pArr : String)
+            processName = pProcessName;
+            pid = pPid;
+            pkgList = pArr;
+!!!1355906.java!!!	describeContents() : int
+            return 0;
+!!!1356034.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            dest.writeString(processName);
+            dest.writeInt(pid);
+            dest.writeInt(uid);
+            dest.writeStringArray(pkgList);
+            dest.writeInt(this.flags);
+            dest.writeInt(lastTrimLevel);
+            dest.writeInt(importance);
+            dest.writeInt(lru);
+            dest.writeInt(importanceReasonCode);
+            dest.writeInt(importanceReasonPid);
+            ComponentName.writeToParcel(importanceReasonComponent, dest);
+            dest.writeInt(importanceReasonImportance);
+            dest.writeInt(processState);
+!!!1356162.java!!!	readFromParcel(inout source : Parcel) : void
+            processName = source.readString();
+            pid = source.readInt();
+            uid = source.readInt();
+            pkgList = source.readStringArray();
+            flags = source.readInt();
+            lastTrimLevel = source.readInt();
+            importance = source.readInt();
+            lru = source.readInt();
+            importanceReasonCode = source.readInt();
+            importanceReasonPid = source.readInt();
+            importanceReasonComponent = ComponentName.readFromParcel(source);
+            importanceReasonImportance = source.readInt();
+            processState = source.readInt();
+!!!1356290.java!!!	RunningAppProcessInfo(inout source : Parcel)
+            readFromParcel(source);

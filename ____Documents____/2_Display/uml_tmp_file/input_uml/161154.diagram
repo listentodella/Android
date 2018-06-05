@@ -1,0 +1,449 @@
+format 76
+
+classinstance 128002 class_ref 273154 // ActivityThread
+  name ""   xyz 203.4 130.9 2000 life_line_z 2000
+classinstance 128514 class_ref 272386 // Activity
+  name ""   xyz 519.2 130.4 2000 life_line_z 2000
+classinstance 128898 class_ref 246146 // WindowManagerImpl
+  name ""   xyz 625.3 134.7 2000 life_line_z 2000
+classinstance 129282 class_ref 246018 // WindowManagerGlobal
+  name ""   xyz 789.9 130.1 2000 life_line_z 2000
+classinstance 129666 class_ref 208642 // ViewRootImpl
+  name ""   xyz 945.8 150.6 2000 life_line_z 2000
+classinstance 130562 class_ref 314626 // IWindowSession
+  name ""   xyz 1087.8 158.3 2000 life_line_z 2000
+classinstance 131458 class_ref 261378 // Session
+  name ""   xyz 1287.5 130.4 2000 life_line_z 2000
+classinstance 131842 class_ref 225538 // InputChannel
+  name ""   xyz 1563.4 127.2 2000 life_line_z 2000
+classinstance 132226 class_ref 256386 // WindowState
+  name ""   xyz 1710.9 130.8 2000 life_line_z 2000
+classinstance 132866 class_ref 255874 // WindowManagerService
+  name ""   xyz 1397 110.1 2000 life_line_z 2000
+classinstance 134274 class_ref 315010 // none
+ color red  name ""   xyz 1916.3 110.1 2000 life_line_z 2000
+note 134402 "android_view_InputChannel.cpp
+"
+  xyzwh 1846.5 215.7 2000 203 37
+classinstance 135298 class_ref 131842 // InputManagerService
+  name ""   xyz 2106.8 110 2000 life_line_z 2000
+note 135810 "InputTransport.cpp
+"
+  xyzwh 1978.5 155.3 2000 139 37
+classinstance 135938 class_ref 163842 // InputChannel
+ color red  name ""   xyz 1999.1 112.7 2000 life_line_z 2000
+classinstance 136578 class_ref 315138 // none2
+ color red  name ""   xyz 2278.7 114.5 2000 life_line_z 2000
+note 136962 "com_android_server_input_InputManagerService.cpp
+"
+  xyzwh 2225.7 162.6 2000 170 50
+classinstancecanvas 137346 classinstance_ref 128002 // 
+ color red  xyz 2398.4 114 2000 life_line_z 2000
+end
+note 137474 "com_android_server_input_InputManagerService.cpp
+"
+  xyzwh 2365.6 228.8 2000 170 50
+classinstance 137858 class_ref 136962 // InputDispatcher
+ color red  name ""   xyz 2558.6 114.9 2000 life_line_z 2000
+note 138242 "InputDispatcher.cpp"
+  xyzwh 2541.2 165.8 2000 139 37
+classinstance 138370 class_ref 315266 // InputDispatcher::Connection
+ color red  name ""   xyz 2671.9 117.3 2000 life_line_z 2000
+note 138498 "InputDispatcher.cpp"
+  xyzwh 2684.7 212.8 2000 139 37
+note 138882 "int fd = inputChannel->getFd();
+mConnectionsByFd.add(fd, connection);
+mLooper->addFd(fd, 0, ALOOPER_EVENT_INPUT, handleReceiveCallback, this);"
+  xyzwh 2618.4 845.9 2000 481 68
+note 139778 "parcel->writeDupFileDescriptor(inputChannel->getFd())"
+  xyzwh 2055.6 937.8 3010 334 34
+note 139906 "int rawFd = parcel->readFileDescriptor();
+int dupFd = dup(rawFd);
+InputChannel* inputChannel = new InputChannel(name, dupFd);
+NativeInputChannel* nativeInputChannel = new NativeInputChannel(inputChannel);
+android_view_InputChannel_setNativeInputChannel(env, obj, nativeInputChannel);"
+  xyzwh 1163 1031.2 2000 472 106
+classinstance 140290 class_ref 315394 // ViewRootImpl::WindowInputEventReceiver
+  name ""   xyz 950.4 114 2000 life_line_z 2000
+classinstance 140674 class_ref 225922 // InputEventReceiver
+  name ""   xyz 1625.3 100.3 2000 life_line_z 2000
+classinstance 141058 class_ref 315522 // none3
+ color red  name ""   xyz 1836 100.4 2000 life_line_z 2000
+note 141186 "android_view_InputEventReceiver.cpp
+"
+  xyzwh 1749.9 282.8 2000 237 37
+classinstance 141570 class_ref 316418 // NativeInputEventReceiver
+ color red  name ""   xyz 2163.7 53 2000 life_line_z 2000
+note 141698 "android_view_InputEventReceiver.cpp
+"
+  xyzwh 2125.9 299.5 2000 230 34
+note 142594 "Request request;
+request.fd = fd;
+request.ident = ident;
+request.callback = callback;
+request.data = data;
+
+struct epoll_event eventItem;
+memset(& eventItem, 0, sizeof(epoll_event)); // zero out unused members of data field union
+eventItem.events = epollEvents;
+eventItem.data.fd = fd;
+
+epoll_ctl(mEpollFd, EPOLL_CTL_ADD, fd, & eventItem);
+mRequests.add(fd, request);
+"
+  xyzwh 2657 1315.2 2005 563 226
+classinstance 142722 class_ref 184322 // Looper
+ color red  name ""   xyz 2508.4 24.6 2000 life_line_z 2000
+note 142850 "Looper.cpp"
+  xyzwh 2498.2 61.3 2000 92 34
+durationcanvas 128130 classinstance_ref 128002 // :ActivityThread
+  xyzwh 242 200.4 2010 11 447
+end
+durationcanvas 128642 classinstance_ref 128514 // :Activity
+  xyzwh 538 231 2010 11 40
+end
+durationcanvas 129026 classinstance_ref 128898 // :WindowManagerImpl
+  xyzwh 685 312 2010 11 97
+end
+durationcanvas 129410 classinstance_ref 129282 // :WindowManagerGlobal
+  xyzwh 855 325.4 2010 11 117
+end
+durationcanvas 129794 classinstance_ref 129666 // :ViewRootImpl
+  xyzwh 985 349.4 2010 11 30
+end
+durationcanvas 130050 classinstance_ref 129666 // :ViewRootImpl
+  xyzwh 985 406.6 2010 11 1062
+end
+durationcanvas 130690 classinstance_ref 130562 // :IWindowSession
+  xyzwh 1131 428.2 2010 11 704
+  overlappingdurationcanvas 130946
+    xyzwh 1137 444.6 2020 11 526
+    overlappingdurationcanvas 139010
+      xyzwh 1143 482.6 2030 11 480
+    end
+  end
+  overlappingdurationcanvas 131202
+    xyzwh 1137 1011.6 2020 11 112
+  end
+end
+durationcanvas 131586 classinstance_ref 131458 // :Session
+  xyzwh 1312 476.2 2010 11 408
+end
+durationcanvas 132994 classinstance_ref 132866 // :WindowManagerService
+  xyzwh 1465 468.6 2010 11 418
+end
+durationcanvas 133378 classinstance_ref 131842 // :InputChannel
+  xyzwh 1602 482.6 2010 11 41
+end
+durationcanvas 133634 classinstance_ref 132226 // :WindowState
+  xyzwh 1748 555.4 2010 11 37
+end
+durationcanvas 133890 classinstance_ref 131842 // :InputChannel
+  xyzwh 1602 649.6 2010 11 37
+end
+durationcanvas 134530 classinstance_ref 134274 // :none
+  xyzwh 1935 486.6 2010 11 123
+  overlappingdurationcanvas 134786
+    xyzwh 1941 506.8 2020 11 90
+  end
+end
+durationcanvas 135426 classinstance_ref 135298 // :InputManagerService
+  xyzwh 2165 704.6 2010 11 207
+end
+durationcanvas 136066 classinstance_ref 135938 // :InputChannel
+  xyzwh 2038 525 2010 11 72
+  overlappingdurationcanvas 136322
+    xyzwh 2044 567.4 2020 11 24
+  end
+end
+durationcanvas 136706 classinstance_ref 136578 // :none2
+  xyzwh 2297 712.4 2010 11 203
+  overlappingdurationcanvas 137090
+    xyzwh 2303 747.4 2020 11 153
+  end
+end
+durationcanvas 137602 classinstance_ref 137346 // :NativeInputManager
+  xyzwh 2454 764.6 2010 11 147
+end
+durationcanvas 137986 classinstance_ref 137858 // :InputDispatcher
+  xyzwh 2603 787 2010 11 127
+end
+durationcanvas 138626 classinstance_ref 138370 // :InputDispatcher::Connection
+  xyzwh 2751 802 2010 11 37
+end
+durationcanvas 139522 classinstance_ref 135938 // :InputChannel
+  xyzwh 2038 923 2010 11 56
+end
+durationcanvas 140418 classinstance_ref 140290 // :ViewRootImpl::WindowInputEventReceiver
+  xyzwh 1067 1286.8 2010 11 181
+end
+durationcanvas 140802 classinstance_ref 140674 // :InputEventReceiver
+  xyzwh 1679 1301.6 2010 11 172
+end
+durationcanvas 141314 classinstance_ref 141058 // :none3
+  xyzwh 1855 1302.7 2010 11 169
+end
+durationcanvas 141826 classinstance_ref 141570 // :NativeInputEventReceiver
+  xyzwh 2234 1298.6 2010 11 60
+end
+durationcanvas 143234 classinstance_ref 142722 // :Looper
+  xyzwh 2529 1651.8 2010 11 461
+  overlappingdurationcanvas 143618
+    xyzwh 2535 1692.6 2020 11 400
+    overlappingdurationcanvas 143874
+      xyzwh 2541 1725.6 2030 11 25
+    end
+    overlappingdurationcanvas 144130
+      xyzwh 2541 1788 2030 11 25
+    end
+    overlappingdurationcanvas 144386
+      xyzwh 2541 1852.2 2030 11 25
+    end
+  end
+end
+durationcanvas 144898 classinstance_ref 141570 // :NativeInputEventReceiver
+  xyzwh 2234 1915.2 2010 11 169
+  overlappingdurationcanvas 145154
+    xyzwh 2240 1963.6 2020 11 98
+  end
+end
+durationcanvas 145410 classinstance_ref 141570 // :NativeInputEventReceiver
+  xyzwh 2234 1399.7 2010 11 69
+  overlappingdurationcanvas 145666
+    xyzwh 2240 1409.8 2020 11 46
+  end
+end
+durationcanvas 146178 classinstance_ref 142722 // :Looper
+  xyzwh 2529 1428.7 2010 11 50
+end
+lostfoundmsgsupport 128258 xyz 86 217 2015
+lostfoundmsgsupport 143362 xyz 2654.4 1654 2015
+msg 128386 found_synchronous
+  from lostfoundmsgsupport_ref 128258
+  to durationcanvas_ref 128130
+  yz 215 2015 explicitmsg "handleResumeActivity"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 107 200
+msg 128770 synchronous
+  from durationcanvas_ref 128130
+  to durationcanvas_ref 128642
+  yz 245 2015 explicitmsg "A1. ViewManager wm = a.getWindowManager();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 268 230
+msg 129154 synchronous
+  from durationcanvas_ref 128130
+  to durationcanvas_ref 129026
+  yz 325 2015 explicitmsg "A2. wm.addView(decor, l);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 267 310
+msg 129538 synchronous
+  from durationcanvas_ref 129026
+  to durationcanvas_ref 129410
+  yz 338 2020 explicitmsg "B1. mGlobal.addView(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 710 323
+msg 129922 synchronous
+  from durationcanvas_ref 129410
+  to durationcanvas_ref 129794
+  yz 356 2025 explicitmsg "C1. root = new ViewRootImpl(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 880 336
+msg 130178 synchronous
+  from durationcanvas_ref 129410
+  to durationcanvas_ref 130050
+  yz 419 2015 explicitmsg "C2. root.setView(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 875 404
+msg 130818 synchronous
+  from durationcanvas_ref 130050
+  to durationcanvas_ref 130690
+  yz 443 2020 explicitmsg "D1. mWindowSession.addToDisplay(...,mInputChannel);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1002 412
+reflexivemsg 131074 synchronous
+  to durationcanvas_ref 130946
+  yz 444 2025 explicitmsg "E1. mRemote.transact(Stub.TRANSACTION_addToDisplay,...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1166 431
+reflexivemsg 131330 synchronous
+  to durationcanvas_ref 131202
+  yz 1011 2025 explicitmsg "E2. outInputChannel.readFromParcel(_reply);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1157 996
+msg 133122 synchronous
+  from durationcanvas_ref 131586
+  to durationcanvas_ref 132994
+  yz 488 2015 explicitmsg "H1. addWindow"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1344 476
+msg 133506 synchronous
+  from durationcanvas_ref 132994
+  to durationcanvas_ref 133378
+  yz 486 2020 explicitmsg "I1. InputChannel[] inputChannels = InputChannel.openInputChannelPair(name);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1474 462
+msg 133762 synchronous
+  from durationcanvas_ref 132994
+  to durationcanvas_ref 133634
+  yz 568 2015 explicitmsg "I2. win.setInputChannel(inputChannels[0]);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1483 553
+msg 134018 synchronous
+  from durationcanvas_ref 132994
+  to durationcanvas_ref 133890
+  yz 662 2015 explicitmsg "I3. inputChannels[1].transferTo(outInputChannel);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1479 630
+msg 134658 synchronous
+  from durationcanvas_ref 133378
+  to durationcanvas_ref 134530
+  yz 499 2015 explicitmsg "J1. nativeOpenInputChannelPair"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1641 484
+reflexivemsg 134914 synchronous
+  to durationcanvas_ref 134786
+  yz 506 2025 explicitmsg "K1. android_view_InputChannel_nativeOpenInputChannelPair"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1943 493
+msg 135554 synchronous
+  from durationcanvas_ref 132994
+  to durationcanvas_ref 135426
+  yz 718 2015 explicitmsg "I4. mInputManager.registerInputChannel"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1487 706
+msg 136194 synchronous
+  from durationcanvas_ref 134786
+  to durationcanvas_ref 136066
+  yz 538 2025 explicitmsg "L1. openInputChannelPair"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1958 523
+reflexivemsg 136450 synchronous
+  to durationcanvas_ref 136322
+  yz 567 2025 explicitmsg "M1. socketpair"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2048 549
+msg 136834 synchronous
+  from durationcanvas_ref 135426
+  to durationcanvas_ref 136706
+  yz 725 2020 explicitmsg "J1. nativeRegisterInputChannel"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2178 710
+reflexivemsg 137218 synchronous
+  to durationcanvas_ref 137090
+  yz 747 2025 explicitmsg "K1. nativeRegisterInputChannel"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2311 730
+msg 137730 synchronous
+  from durationcanvas_ref 137090
+  to durationcanvas_ref 137602
+  yz 778 2025 explicitmsg "L1. im->registerInputChannel"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2327 756
+msg 138114 synchronous
+  from durationcanvas_ref 137602
+  to durationcanvas_ref 137986
+  yz 798 2030 explicitmsg "M1. registerInputChannel"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2469 783
+msg 138754 synchronous
+  from durationcanvas_ref 137986
+  to durationcanvas_ref 138626
+  yz 815 2015 explicitmsg "N1. connection = new Connection(inputChannel, inputWindowHandle, monitor)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2608 796
+reflexivemsg 139138 synchronous
+  to durationcanvas_ref 139010
+  yz 482 2035 explicitmsg "F1. onTransact"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1159 470
+msg 139394 synchronous
+  from durationcanvas_ref 139010
+  to durationcanvas_ref 131586
+  yz 522 2035 explicitmsg "G1. addToDisplay"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1169 506
+msg 139650 synchronous
+  from durationcanvas_ref 139010
+  to durationcanvas_ref 139522
+  yz 945 3005 explicitmsg "G2. _arg6.writeToParcel"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1172 930
+msg 140546 synchronous
+  from durationcanvas_ref 130050
+  to durationcanvas_ref 140418
+  yz 1291 2015 explicitmsg "D2. mInputEventReceiver = new WindowInputEventReceiver(mInputChannel,Looper.myLooper());"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 998 1263
+msg 140930 synchronous
+  from durationcanvas_ref 140418
+  to durationcanvas_ref 140802
+  yz 1327 2020 explicitmsg "E1. InputEventReceiver"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1090 1312
+msg 141442 synchronous
+  from durationcanvas_ref 140802
+  to durationcanvas_ref 141314
+  yz 1319 2025 explicitmsg "F1. nativeInit"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1709 1304
+msg 141954 synchronous
+  from durationcanvas_ref 141314
+  to durationcanvas_ref 141826
+  yz 1303 2030 explicitmsg "G1. receiver = new NativeInputEventReceiver"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1879 1286
+msg 143490 found_synchronous
+  from lostfoundmsgsupport_ref 143362
+  to durationcanvas_ref 143234
+  yz 1652 2015 explicitmsg "pollOnce"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2555 1634
+reflexivemsg 143746 synchronous
+  to durationcanvas_ref 143618
+  yz 1692 2025 explicitmsg "A3. pollInner"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2550 1672
+reflexivemsg 144002 synchronous
+  to durationcanvas_ref 143874
+  yz 1725 2035 explicitmsg "B1. epoll_wait"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2555 1705
+reflexivemsg 144258 synchronous
+  to durationcanvas_ref 144130
+  yz 1788 2035 explicitmsg "B2. pushResponse(events, mRequests.valueAt(requestIndex));"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2550 1771
+reflexivemsg 144514 synchronous
+  to durationcanvas_ref 144386
+  yz 1852 2035 explicitmsg "B3. Response& response = mResponses.editItemAt(i);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2545 1833
+msg 145026 synchronous
+  from durationcanvas_ref 143618
+  to durationcanvas_ref 144898
+  yz 1919 2025 explicitmsg "B4. int callbackResult = response.request.callback->handleEvent(fd, events, data);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2255 1901
+reflexivemsg 145282 synchronous
+  to durationcanvas_ref 145154
+  yz 1963 2025 explicitmsg "C1. consumeEvents(env, false /*consumeBatches*/, -1, NULL);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2252 1945
+msg 145538 synchronous
+  from durationcanvas_ref 141314
+  to durationcanvas_ref 145410
+  yz 1401 2015 explicitmsg "G2. receiver->initialize()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1885 1386
+reflexivemsg 145794 synchronous
+  to durationcanvas_ref 145666
+  yz 1409 2025 explicitmsg "H1. setFdEvents"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2253 1394
+msg 146306 synchronous
+  from durationcanvas_ref 145666
+  to durationcanvas_ref 146178
+  yz 1443 2030 explicitmsg "I1. mMessageQueue->getLooper()->addFd(fd, 0, events, this, NULL);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2274 1424
+end

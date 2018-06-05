@@ -1,0 +1,131 @@
+class SelectionModifierCursorController
+!!!2256898.java!!!	SelectionModifierCursorController()
+            resetTouchOffsets();
+!!!2257026.java!!!	show() : void
+            if (mTextView.isInBatchEditMode()) {
+                return;
+            }
+            initDrawables();
+            initHandles();
+            hideInsertionPointCursorController();
+!!!2257154.java!!!	initDrawables() : void
+            if (mSelectHandleLeft == null) {
+                mSelectHandleLeft = mTextView.getContext().getDrawable(
+                        mTextView.mTextSelectHandleLeftRes);
+            }
+            if (mSelectHandleRight == null) {
+                mSelectHandleRight = mTextView.getContext().getDrawable(
+                        mTextView.mTextSelectHandleRightRes);
+            }
+!!!2257282.java!!!	initHandles() : void
+            // Lazy object creation has to be done before updatePosition() is called.
+            if (mStartHandle == null) {
+                mStartHandle = new SelectionStartHandleView(mSelectHandleLeft, mSelectHandleRight);
+            }
+            if (mEndHandle == null) {
+                mEndHandle = new SelectionEndHandleView(mSelectHandleRight, mSelectHandleLeft);
+            }
+
+            mStartHandle.show();
+            mEndHandle.show();
+
+            // Make sure both left and right handles share the same ActionPopupWindow (so that
+            // moving any of the handles hides the action popup).
+            mStartHandle.showActionPopupWindow(DELAY_BEFORE_REPLACE_ACTION);
+            mEndHandle.setActionPopupWindow(mStartHandle.getActionPopupWindow());
+
+            hideInsertionPointCursorController();
+!!!2257410.java!!!	hide() : void
+            if (mStartHandle != null) mStartHandle.hide();
+            if (mEndHandle != null) mEndHandle.hide();
+!!!2257538.java!!!	onTouchEvent(inout event : MotionEvent) : void
+            // This is done even when the View does not have focus, so that long presses can start
+            // selection and tap can move cursor from this tap position.
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    final float x = event.getX();
+                    final float y = event.getY();
+
+                    // Remember finger down position, to be able to start selection from there
+                    mMinTouchOffset = mMaxTouchOffset = mTextView.getOffsetForPosition(x, y);
+
+                    // Double tap detection
+                    if (mGestureStayedInTapRegion) {
+                        long duration = SystemClock.uptimeMillis() - mPreviousTapUpTime;
+                        if (duration <= ViewConfiguration.getDoubleTapTimeout()) {
+                            final float deltaX = x - mDownPositionX;
+                            final float deltaY = y - mDownPositionY;
+                            final float distanceSquared = deltaX * deltaX + deltaY * deltaY;
+
+                            ViewConfiguration viewConfiguration = ViewConfiguration.get(
+                                    mTextView.getContext());
+                            int doubleTapSlop = viewConfiguration.getScaledDoubleTapSlop();
+                            boolean stayedInArea = distanceSquared < doubleTapSlop * doubleTapSlop;
+
+                            if (stayedInArea && isPositionOnText(x, y)) {
+                                startSelectionActionMode();
+                                mDiscardNextActionUp = true;
+                            }
+                        }
+                    }
+
+                    mDownPositionX = x;
+                    mDownPositionY = y;
+                    mGestureStayedInTapRegion = true;
+                    break;
+
+                case MotionEvent.ACTION_POINTER_DOWN:
+                case MotionEvent.ACTION_POINTER_UP:
+                    // Handle multi-point gestures. Keep min and max offset positions.
+                    // Only activated for devices that correctly handle multi-touch.
+                    if (mTextView.getContext().getPackageManager().hasSystemFeature(
+                            PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH_DISTINCT)) {
+                        updateMinAndMaxOffsets(event);
+                    }
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+                    if (mGestureStayedInTapRegion) {
+                        final float deltaX = event.getX() - mDownPositionX;
+                        final float deltaY = event.getY() - mDownPositionY;
+                        final float distanceSquared = deltaX * deltaX + deltaY * deltaY;
+
+                        final ViewConfiguration viewConfiguration = ViewConfiguration.get(
+                                mTextView.getContext());
+                        int doubleTapTouchSlop = viewConfiguration.getScaledDoubleTapTouchSlop();
+
+                        if (distanceSquared > doubleTapTouchSlop * doubleTapTouchSlop) {
+                            mGestureStayedInTapRegion = false;
+                        }
+                    }
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                    mPreviousTapUpTime = SystemClock.uptimeMillis();
+                    break;
+            }
+!!!2257666.java!!!	updateMinAndMaxOffsets(inout event : MotionEvent) : void
+            int pointerCount = event.getPointerCount();
+            for (int index = 0; index < pointerCount; index++) {
+                int offset = mTextView.getOffsetForPosition(event.getX(index), event.getY(index));
+                if (offset < mMinTouchOffset) mMinTouchOffset = offset;
+                if (offset > mMaxTouchOffset) mMaxTouchOffset = offset;
+            }
+!!!2257794.java!!!	getMinTouchOffset() : int
+            return mMinTouchOffset;
+!!!2257922.java!!!	getMaxTouchOffset() : int
+            return mMaxTouchOffset;
+!!!2258050.java!!!	resetTouchOffsets() : void
+            mMinTouchOffset = mMaxTouchOffset = -1;
+!!!2258178.java!!!	isSelectionStartDragged() : boolean
+            return mStartHandle != null && mStartHandle.isDragging();
+!!!2258306.java!!!	onTouchModeChanged(inout isInTouchMode : boolean) : void
+            if (!isInTouchMode) {
+                hide();
+            }
+!!!2258434.java!!!	onDetached() : void
+            final ViewTreeObserver observer = mTextView.getViewTreeObserver();
+            observer.removeOnTouchModeChangeListener(this);
+
+            if (mStartHandle != null) mStartHandle.onDetached();
+            if (mEndHandle != null) mEndHandle.onDetached();

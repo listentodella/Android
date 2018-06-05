@@ -1,0 +1,37 @@
+class SavedState
+!!!2525570.java!!!	SavedState(inout superState : Parcelable, in hour : int, in minute : int, inout is24HourMode : boolean, inout isKbMode : boolean, inout typedTimes : ArrayList<Integer>, in currentItemShowing : int)
+            super(superState);
+            mHour = hour;
+            mMinute = minute;
+            mIs24HourMode = is24HourMode;
+            mInKbMode = isKbMode;
+            mTypedTimes = typedTimes;
+            mCurrentItemShowing = currentItemShowing;
+!!!2525698.java!!!	SavedState(inout in : Parcel)
+            super(in);
+            mHour = in.readInt();
+            mMinute = in.readInt();
+            mIs24HourMode = (in.readInt() == 1);
+            mInKbMode = (in.readInt() == 1);
+            mTypedTimes = in.readArrayList(getClass().getClassLoader());
+            mCurrentItemShowing = in.readInt();
+!!!2525826.java!!!	getHour() : int
+            return mHour;
+!!!2525954.java!!!	getMinute() : int
+            return mMinute;
+!!!2526082.java!!!	is24HourMode() : boolean
+            return mIs24HourMode;
+!!!2526210.java!!!	inKbMode() : boolean
+            return mInKbMode;
+!!!2526338.java!!!	getTypesTimes() : ArrayList<Integer>
+            return mTypedTimes;
+!!!2526466.java!!!	getCurrentItemShowing() : int
+            return mCurrentItemShowing;
+!!!2526594.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            super.writeToParcel(dest, flags);
+            dest.writeInt(mHour);
+            dest.writeInt(mMinute);
+            dest.writeInt(mIs24HourMode ? 1 : 0);
+            dest.writeInt(mInKbMode ? 1 : 0);
+            dest.writeList(mTypedTimes);
+            dest.writeInt(mCurrentItemShowing);

@@ -1,0 +1,52 @@
+class SinglePressAction
+!!!453378.java!!!	SinglePressAction(in iconResId : int, in messageResId : int)
+            mIconResId = iconResId;
+            mMessageResId = messageResId;
+            mMessage = null;
+            mIcon = null;
+!!!453506.java!!!	SinglePressAction(in iconResId : int, inout icon : Drawable, inout message : CharSequence)
+            mIconResId = iconResId;
+            mMessageResId = 0;
+            mMessage = message;
+            mIcon = icon;
+!!!453634.java!!!	SinglePressAction(in iconResId : int, inout message : CharSequence)
+            mIconResId = iconResId;
+            mMessageResId = 0;
+            mMessage = message;
+            mIcon = null;
+!!!453762.java!!!	isEnabled() : boolean
+            return true;
+!!!453890.java!!!	getStatus() : String
+            return null;
+!!!454146.java!!!	getLabelForAccessibility(inout context : Context) : CharSequence
+            if (mMessage != null) {
+                return mMessage;
+            } else {
+                return context.getString(mMessageResId);
+            }
+!!!454274.java!!!	create(inout context : Context, inout convertView : View, inout parent : ViewGroup, inout inflater : LayoutInflater) : View
+            View v = inflater.inflate(R.layout.global_actions_item, parent, false);
+
+            ImageView icon = (ImageView) v.findViewById(R.id.icon);
+            TextView messageView = (TextView) v.findViewById(R.id.message);
+
+            TextView statusView = (TextView) v.findViewById(R.id.status);
+            final String status = getStatus();
+            if (!TextUtils.isEmpty(status)) {
+                statusView.setText(status);
+            } else {
+                statusView.setVisibility(View.GONE);
+            }
+            if (mIcon != null) {
+                icon.setImageDrawable(mIcon);
+                icon.setScaleType(ScaleType.CENTER_CROP);
+            } else if (mIconResId != 0) {
+                icon.setImageDrawable(context.getDrawable(mIconResId));
+            }
+            if (mMessage != null) {
+                messageView.setText(mMessage);
+            } else {
+                messageView.setText(mMessageResId);
+            }
+
+            return v;

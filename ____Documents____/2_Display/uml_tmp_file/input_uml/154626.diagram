@@ -1,0 +1,311 @@
+format 76
+
+classinstance 128002 class_ref 136962 // InputDispatcher
+ color red  name ""   xyz 462.8 16.4 2000 life_line_z 2000
+note 128386 "InputDispatcher.cpp"
+  xyzwh 455.8 62.7 2005 131 35
+classinstance 128898 class_ref 145538 // KeyboardInputMapper
+ color red  name ""   xyz 124.6 18.6 2000 life_line_z 2000
+note 129026 "InputReader.cpp"
+  xyzwh 133.9 66 2005 117 35
+classinstance 129794 class_ref 161410 // KeyEvent
+ color red  name ""   xyz 661.8 12 2000 life_line_z 2000
+note 129922 "Input.cpp"
+  xyzwh 644.5 63.8 2005 77 35
+classinstance 130306 class_ref 129794 // NativeInputManager
+ color red  name ""   xyz 816.2 13.6 2000 life_line_z 2000
+note 130434 "com_android_server_input_InputManagerService.cpp"
+  xyzwh 834.9 63.8 2005 325 35
+classinstance 131586 class_ref 184322 // Looper
+ color red  name ""   xyz 746.8 13.6 2000 life_line_z 2000
+note 131714 "Looper.cpp"
+  xyzwh 736.2 63.3 2005 87 35
+classinstance 132610 class_ref 203522 // PhoneWindowManager
+  name ""   xyz 1586.2 10.8 2000 life_line_z 2000
+classinstance 132738 class_ref 212866 // KeyEvent
+  name ""   xyz 1158 10.8 2000 life_line_z 2000
+note 134658 "KeyEvent.java"
+  xyzwh 1174.9 62.2 2005 95 35
+note 135042 "PhoneWindowManager.java"
+  xyzwh 1568.8 51.1 2005 175 35
+classinstance 135426 class_ref 131842 // InputManagerService
+  name ""   xyz 1308.8 11.4 2000 life_line_z 2000
+classinstance 135938 class_ref 260610 // InputMonitor
+  name ""   xyz 1459.4 8.6 2000 life_line_z 2000
+note 137090 "Decide whether ACTION_PASS_TO_USER
+Wakup the system ?
+Handle special keys"
+  xyzwh 1695.6 383.3 2005 327 65
+classinstance 137730 class_ref 141314 // InputDispatcherThread
+ color red  name ""   xyz 287.2 15.8 2000 life_line_z 2000
+durationcanvas 129154 classinstance_ref 128898 // :KeyboardInputMapper
+  xyzwh 186 134.8 2010 11 358
+end
+durationcanvas 129538 classinstance_ref 128002 // :InputDispatcher
+  xyzwh 507 150.6 2010 11 342
+  overlappingdurationcanvas 130818
+    xyzwh 513 303.6 2020 11 37
+  end
+  overlappingdurationcanvas 131330
+    xyzwh 513 357.6 2020 11 68
+    overlappingdurationcanvas 137346
+      xyzwh 519 395.2 2030 11 25
+    end
+  end
+  overlappingdurationcanvas 132098
+    xyzwh 513 157.4 2020 11 25
+  end
+end
+durationcanvas 130050 classinstance_ref 129794 // :KeyEvent
+  xyzwh 688 201.8 2010 11 25
+end
+durationcanvas 130562 classinstance_ref 130306 // :NativeInputManager
+  xyzwh 872 269.8 2010 11 199
+  overlappingdurationcanvas 132354
+    xyzwh 878 278 2020 11 25
+  end
+  overlappingdurationcanvas 136578
+    xyzwh 878 398.4 2020 11 64
+    overlappingdurationcanvas 136834
+      xyzwh 884 431.8 2030 11 25
+    end
+  end
+end
+durationcanvas 131842 classinstance_ref 131586 // :Looper
+  xyzwh 767 455.2 2010 11 26
+end
+durationcanvas 134786 classinstance_ref 132738 // :KeyEvent
+  xyzwh 1184 309.6 2010 11 34
+end
+durationcanvas 135682 classinstance_ref 135426 // :InputManagerService
+  xyzwh 1367 354 2010 11 64
+end
+durationcanvas 136066 classinstance_ref 135938 // :InputMonitor
+  xyzwh 1494 359.6 2010 11 55
+end
+durationcanvas 136322 classinstance_ref 132610 // :PhoneWindowManager
+  xyzwh 1651 389.4 2010 11 31
+end
+durationcanvas 137858 classinstance_ref 137730 // :InputDispatcherThread
+  xyzwh 352 623.2 2010 11 249
+end
+durationcanvas 138242 classinstance_ref 128002 // :InputDispatcher
+  xyzwh 506 660 2010 11 578
+  overlappingdurationcanvas 138498
+    xyzwh 512 675.6 2020 11 433
+    overlappingdurationcanvas 139266
+      xyzwh 518 698.6 2030 11 25
+    end
+    overlappingdurationcanvas 139522
+      xyzwh 518 751.4 2030 11 25
+    end
+    overlappingdurationcanvas 139778
+      xyzwh 518 814.4 2030 11 288
+      overlappingdurationcanvas 140034
+	xyzwh 524 835.6 2040 11 30
+      end
+      overlappingdurationcanvas 140290
+	xyzwh 524 876.8 2040 11 25
+      end
+      overlappingdurationcanvas 140546
+	xyzwh 524 927.8 2040 11 169
+	overlappingdurationcanvas 140802
+	  xyzwh 530 947.8 2050 11 143
+	  overlappingdurationcanvas 141058
+	    xyzwh 536 976.4 2060 11 108
+	    overlappingdurationcanvas 141314
+	      xyzwh 542 997 2070 11 46
+	      overlappingdurationcanvas 141570
+		xyzwh 548 1012.4 2080 11 25
+	      end
+	    end
+	    overlappingdurationcanvas 141826
+	      xyzwh 542 1053 2070 11 25
+	    end
+	  end
+	end
+      end
+    end
+  end
+  overlappingdurationcanvas 138754
+    xyzwh 512 1128.4 2020 11 55
+  end
+end
+durationcanvas 139010 classinstance_ref 131586 // :Looper
+  xyzwh 767 1189.2 2010 11 34
+end
+lostfoundmsgsupport 129282 xyz 69.2 137 2015
+lostfoundmsgsupport 137986 xyz 54.8 625 2015
+msg 129410 found_synchronous
+  from lostfoundmsgsupport_ref 129282
+  to durationcanvas_ref 129154
+  yz 135 2015 explicitmsg "processKey"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 99 120
+msg 129666 synchronous
+  from durationcanvas_ref 129154
+  to durationcanvas_ref 129538
+  yz 165 2015 explicitmsg "A1.getListener()->notifyKey(&args)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 212 152
+msg 130178 synchronous
+  from durationcanvas_ref 129538
+  to durationcanvas_ref 130050
+  yz 208 2015 explicitmsg "B2. event.initialize(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 527 194
+msg 130690 synchronous
+  from durationcanvas_ref 129538
+  to durationcanvas_ref 130562
+  yz 276 2015 explicitmsg "B3. mPolicy->interceptKeyBeforeQueueing(&event, policyFlags)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 526 261
+reflexivemsg 130946 synchronous
+  to durationcanvas_ref 130818
+  yz 303 2025 explicitmsg "B4. KeyEntry* newEntry = new KeyEntry(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 527 289
+reflexivemsg 131458 synchronous
+  to durationcanvas_ref 131330
+  yz 357 2025 explicitmsg "B5. enqueueInboundEventLocked(newEntry)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 527 343
+msg 131970 synchronous
+  from durationcanvas_ref 129538
+  to durationcanvas_ref 131842
+  yz 459 2015 explicitmsg "B6. mLooper->wake()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 528 447
+reflexivemsg 132226 synchronous
+  to durationcanvas_ref 132098
+  yz 157 2025 explicitmsg "B1. policyFlags |= POLICY_FLAG_TRUSTED"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 529 137
+reflexivemsg 132482 synchronous
+  to durationcanvas_ref 132354
+  yz 278 2025 explicitmsg "C1. policyFlags |= POLICY_FLAG_INTERACTIVE"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 896 259
+msg 134914 synchronous
+  from durationcanvas_ref 130562
+  to durationcanvas_ref 134786
+  yz 317 2025 explicitmsg "C2. jobject keyEventObj = android_view_KeyEvent_fromNative(env, keyEvent)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 897 294
+msg 135810 synchronous
+  from durationcanvas_ref 130562
+  to durationcanvas_ref 135682
+  yz 368 2015 explicitmsg "C3. wmActions = env->CallIntMethod(...gServiceClassInfo.interceptKeyBeforeQueueing...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 890 350
+msg 136194 synchronous
+  from durationcanvas_ref 135682
+  to durationcanvas_ref 136066
+  yz 368 2020 explicitmsg "D1. mWindowManagerCallbacks.interceptKeyBeforeQueueing(event, policyFlags)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1387 349
+msg 136450 synchronous
+  from durationcanvas_ref 136066
+  to durationcanvas_ref 136322
+  yz 399 2015 explicitmsg "E1.interceptKeyBeforeQueueing"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1513 379
+reflexivemsg 136706 synchronous
+  to durationcanvas_ref 136578
+  yz 398 2025 explicitmsg "C4. handleInterceptActions(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 886 381
+reflexivemsg 136962 synchronous
+  to durationcanvas_ref 136834
+  yz 431 2035 explicitmsg "D1. policyFlags |= POLICY_FLAG_PASS_TO_USER // opt"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 898 419
+reflexivemsg 137474 synchronous
+  to durationcanvas_ref 137346
+  yz 395 2035 explicitmsg "C1.mInboundQueue.enqueueAtTail(entry)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 536 379
+msg 138114 found_synchronous
+  from lostfoundmsgsupport_ref 137986
+  to durationcanvas_ref 137858
+  yz 623 2015 explicitmsg "threadLoop"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 78 610
+msg 138370 synchronous
+  from durationcanvas_ref 137858
+  to durationcanvas_ref 138242
+  yz 660 2015 explicitmsg "A1.dispatchOnce"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 380 646
+reflexivemsg 138626 synchronous
+  to durationcanvas_ref 138498
+  yz 675 2025 explicitmsg "B1. dispatchOnceInnerLocked(&nextWakeupTime)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 525 658
+reflexivemsg 138882 synchronous
+  to durationcanvas_ref 138754
+  yz 1128 2025 explicitmsg "B2. runCommandsLockedInterruptible()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 528 1111
+msg 139138 synchronous
+  from durationcanvas_ref 138242
+  to durationcanvas_ref 139010
+  yz 1200 2015 explicitmsg "B3. mLooper->pollOnce(..)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 524 1187
+reflexivemsg 139394 synchronous
+  to durationcanvas_ref 139266
+  yz 698 2035 explicitmsg "C1. mPendingEvent = mInboundQueue.dequeueAtHead()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 532 682
+reflexivemsg 139650 synchronous
+  to durationcanvas_ref 139522
+  yz 751 2035 explicitmsg "C2. KeyEntry* typedEntry = static_cast<KeyEntry*>(mPendingEvent);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 531 733
+reflexivemsg 139906 synchronous
+  to durationcanvas_ref 139778
+  yz 814 2035 explicitmsg "C3. dispatchKeyLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 531 799
+reflexivemsg 140162 synchronous
+  to durationcanvas_ref 140034
+  yz 835 2045 explicitmsg "D1. postCommandLocked(&InputDispatcher::doInterceptKeyBeforeDispatchingLockedInterruptible);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 543 823
+reflexivemsg 140418 synchronous
+  to durationcanvas_ref 140290
+  yz 876 2045 explicitmsg "D2. findFocusedWindowTargetsLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 540 861
+reflexivemsg 140674 synchronous
+  to durationcanvas_ref 140546
+  yz 927 2045 explicitmsg "D3. dispatchEventLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 539 909
+reflexivemsg 140930 synchronous
+  to durationcanvas_ref 140802
+  yz 947 2055 explicitmsg "E1. prepareDispatchCycleLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 546 935
+reflexivemsg 141186 synchronous
+  to durationcanvas_ref 141058
+  yz 976 2065 explicitmsg "F1. enqueueDispatchEntriesLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 547 961
+reflexivemsg 141442 synchronous
+  to durationcanvas_ref 141314
+  yz 996 2075 explicitmsg "G1. enqueueDispatchEntryLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 565 983
+reflexivemsg 141698 synchronous
+  to durationcanvas_ref 141570
+  yz 1012 2085 explicitmsg "H1. connection->outboundQueue.enqueueAtTail"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 571 998
+reflexivemsg 141954 synchronous
+  to durationcanvas_ref 141826
+  yz 1053 2075 explicitmsg "G2. startDispatchCycleLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 564 1036
+end

@@ -1,0 +1,33 @@
+class SeekBar
+!!!2434946.java!!!	SeekBar(inout context : Context)
+        this(context, null);
+!!!2435074.java!!!	SeekBar(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, com.android.internal.R.attr.seekBarStyle);
+!!!2435202.java!!!	SeekBar(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2435330.java!!!	SeekBar(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+!!!2435458.java!!!	onProgressRefresh(in scale : float, inout fromUser : boolean) : void
+        super.onProgressRefresh(scale, fromUser);
+
+        if (mOnSeekBarChangeListener != null) {
+            mOnSeekBarChangeListener.onProgressChanged(this, getProgress(), fromUser);
+        }
+!!!2435586.java!!!	setOnSeekBarChangeListener(inout l : SeekBar::OnSeekBarChangeListener) : void
+        mOnSeekBarChangeListener = l;
+!!!2435714.java!!!	onStartTrackingTouch() : void
+        super.onStartTrackingTouch();
+        if (mOnSeekBarChangeListener != null) {
+            mOnSeekBarChangeListener.onStartTrackingTouch(this);
+        }
+!!!2435842.java!!!	onStopTrackingTouch() : void
+        super.onStopTrackingTouch();
+        if (mOnSeekBarChangeListener != null) {
+            mOnSeekBarChangeListener.onStopTrackingTouch(this);
+        }
+!!!2435970.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(SeekBar.class.getName());
+!!!2436098.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(SeekBar.class.getName());

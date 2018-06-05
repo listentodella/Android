@@ -1,0 +1,165 @@
+class EditorImpl
+!!!1742466.java!!!	putString(in key : String, in value : String) : Editor
+            synchronized (this) {
+                mModified.put(key, value);
+                return this;
+            }
+!!!1742594.java!!!	putStringSet(in key : String, inout values : Set<String>) : Editor
+            synchronized (this) {
+                mModified.put(key,
+                        (values == null) ? null : new HashSet<String>(values));
+                return this;
+            }
+!!!1742722.java!!!	putInt(in key : String, in value : int) : Editor
+            synchronized (this) {
+                mModified.put(key, value);
+                return this;
+            }
+!!!1742850.java!!!	putLong(in key : String, in value : long) : Editor
+            synchronized (this) {
+                mModified.put(key, value);
+                return this;
+            }
+!!!1742978.java!!!	putFloat(in key : String, in value : float) : Editor
+            synchronized (this) {
+                mModified.put(key, value);
+                return this;
+            }
+!!!1743106.java!!!	putBoolean(in key : String, inout value : boolean) : Editor
+            synchronized (this) {
+                mModified.put(key, value);
+                return this;
+            }
+!!!1743234.java!!!	remove(in key : String) : Editor
+            synchronized (this) {
+                mModified.put(key, this);
+                return this;
+            }
+!!!1743362.java!!!	clear() : Editor
+            synchronized (this) {
+                mClear = true;
+                return this;
+            }
+!!!1743490.java!!!	apply() : void
+            final MemoryCommitResult mcr = commitToMemory();
+            final Runnable awaitCommit = new Runnable() {
+                    public void run() {
+                        try {
+                            mcr.writtenToDiskLatch.await();
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                };
+
+            QueuedWork.add(awaitCommit);
+
+            Runnable postWriteRunnable = new Runnable() {
+                    public void run() {
+                        awaitCommit.run();
+                        QueuedWork.remove(awaitCommit);
+                    }
+                };
+
+            SharedPreferencesImpl.this.enqueueDiskWrite(mcr, postWriteRunnable);
+
+            // Okay to notify the listeners before it's hit disk
+            // because the listeners should always get the same
+            // SharedPreferences instance back, which has the
+            // changes reflected in memory.
+            notifyListeners(mcr);
+!!!1743618.java!!!	commitToMemory() : SharedPreferencesImpl::MemoryCommitResult
+            MemoryCommitResult mcr = new MemoryCommitResult();
+            synchronized (SharedPreferencesImpl.this) {
+                // We optimistically don't make a deep copy until
+                // a memory commit comes in when we're already
+                // writing to disk.
+                if (mDiskWritesInFlight > 0) {
+                    // We can't modify our mMap as a currently
+                    // in-flight write owns it.  Clone it before
+                    // modifying it.
+                    // noinspection unchecked
+                    mMap = new HashMap<String, Object>(mMap);
+                }
+                mcr.mapToWriteToDisk = mMap;
+                mDiskWritesInFlight++;
+
+                boolean hasListeners = mListeners.size() > 0;
+                if (hasListeners) {
+                    mcr.keysModified = new ArrayList<String>();
+                    mcr.listeners =
+                            new HashSet<OnSharedPreferenceChangeListener>(mListeners.keySet());
+                }
+
+                synchronized (this) {
+                    if (mClear) {
+                        if (!mMap.isEmpty()) {
+                            mcr.changesMade = true;
+                            mMap.clear();
+                        }
+                        mClear = false;
+                    }
+
+                    for (Map.Entry<String, Object> e : mModified.entrySet()) {
+                        String k = e.getKey();
+                        Object v = e.getValue();
+                        // "this" is the magic value for a removal mutation. In addition,
+                        // setting a value to "null" for a given key is specified to be
+                        // equivalent to calling remove on that key.
+                        if (v == this || v == null) {
+                            if (!mMap.containsKey(k)) {
+                                continue;
+                            }
+                            mMap.remove(k);
+                        } else {
+                            if (mMap.containsKey(k)) {
+                                Object existingValue = mMap.get(k);
+                                if (existingValue != null && existingValue.equals(v)) {
+                                    continue;
+                                }
+                            }
+                            mMap.put(k, v);
+                        }
+
+                        mcr.changesMade = true;
+                        if (hasListeners) {
+                            mcr.keysModified.add(k);
+                        }
+                    }
+
+                    mModified.clear();
+                }
+            }
+            return mcr;
+!!!1743746.java!!!	commit() : boolean
+            MemoryCommitResult mcr = commitToMemory();
+            SharedPreferencesImpl.this.enqueueDiskWrite(
+                mcr, null /* sync write on this thread okay */);
+            try {
+                mcr.writtenToDiskLatch.await();
+            } catch (InterruptedException e) {
+                return false;
+            }
+            notifyListeners(mcr);
+            return mcr.writeToDiskResult;
+!!!1743874.java!!!	notifyListeners(in mcr : SharedPreferencesImpl::MemoryCommitResult) : void
+            if (mcr.listeners == null || mcr.keysModified == null ||
+                mcr.keysModified.size() == 0) {
+                return;
+            }
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                for (int i = mcr.keysModified.size() - 1; i >= 0; i--) {
+                    final String key = mcr.keysModified.get(i);
+                    for (OnSharedPreferenceChangeListener listener : mcr.listeners) {
+                        if (listener != null) {
+                            listener.onSharedPreferenceChanged(SharedPreferencesImpl.this, key);
+                        }
+                    }
+                }
+            } else {
+                // Run this function on the main thread.
+                ActivityThread.sMainThreadHandler.post(new Runnable() {
+                        public void run() {
+                            notifyListeners(mcr);
+                        }
+                    });
+            }

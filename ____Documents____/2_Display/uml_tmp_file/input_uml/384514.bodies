@@ -1,0 +1,6 @@
+class ChangeCurrentByOneFromLongPressCommand
+!!!2370178.java!!!	setStep(inout increment : boolean) : void
+            mIncrement = increment;
+!!!2370306.java!!!	run() : void
+            changeValueByOne(mIncrement);
+            postDelayed(this, mLongPressUpdateInterval);

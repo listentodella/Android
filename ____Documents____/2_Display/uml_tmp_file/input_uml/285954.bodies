@@ -1,0 +1,16 @@
+class AlarmClockInfo
+!!!1477250.java!!!	AlarmClockInfo(in triggerTime : long, inout showIntent : PendingIntent)
+            mTriggerTime = triggerTime;
+            mShowIntent = showIntent;
+!!!1477378.java!!!	AlarmClockInfo(inout in : Parcel)
+            mTriggerTime = in.readLong();
+            mShowIntent = in.readParcelable(PendingIntent.class.getClassLoader());
+!!!1477506.java!!!	getTriggerTime() : long
+            return mTriggerTime;
+!!!1477634.java!!!	getShowIntent() : PendingIntent
+            return mShowIntent;
+!!!1477762.java!!!	describeContents() : int
+            return 0;
+!!!1477890.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            dest.writeLong(mTriggerTime);
+            dest.writeParcelable(mShowIntent, flags);

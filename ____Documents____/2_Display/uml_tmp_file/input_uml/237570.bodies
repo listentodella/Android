@@ -1,0 +1,30 @@
+class AccessibilityInteractionConnectionManager
+!!!986498.java!!!	onAccessibilityStateChanged(inout enabled : boolean) : void
+            if (enabled) {
+                ensureConnection();
+                if (mAttachInfo.mHasWindowFocus) {
+                    mView.sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+                    View focusedView = mView.findFocus();
+                    if (focusedView != null && focusedView != mView) {
+                        focusedView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED);
+                    }
+                }
+            } else {
+                ensureNoConnection();
+                mHandler.obtainMessage(MSG_CLEAR_ACCESSIBILITY_FOCUS_HOST).sendToTarget();
+            }
+!!!986626.java!!!	ensureConnection() : void
+            final boolean registered =
+                    mAttachInfo.mAccessibilityWindowId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID;
+            if (!registered) {
+                mAttachInfo.mAccessibilityWindowId =
+                        mAccessibilityManager.addAccessibilityInteractionConnection(mWindow,
+                                new AccessibilityInteractionConnection(ViewRootImpl.this));
+            }
+!!!986754.java!!!	ensureNoConnection() : void
+            final boolean registered =
+                mAttachInfo.mAccessibilityWindowId != AccessibilityNodeInfo.UNDEFINED_ITEM_ID;
+            if (registered) {
+                mAttachInfo.mAccessibilityWindowId = AccessibilityNodeInfo.UNDEFINED_ITEM_ID;
+                mAccessibilityManager.removeAccessibilityInteractionConnection(mWindow);
+            }

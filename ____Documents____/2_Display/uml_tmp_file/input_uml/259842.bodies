@@ -1,0 +1,3 @@
+class Entry
+!!!1205634.java!!!	Entry(in _name : String)
+            name = _name;

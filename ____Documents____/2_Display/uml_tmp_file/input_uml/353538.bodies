@@ -1,0 +1,11 @@
+class SavedState
+!!!1972610.java!!!	SavedState(inout superState : Parcelable)
+            super(superState);
+!!!1972738.java!!!	SavedState(inout in : Parcel)
+            super(in);
+            progress = in.readInt();
+            secondaryProgress = in.readInt();
+!!!1972866.java!!!	writeToParcel(inout out : Parcel, in flags : int) : void
+            super.writeToParcel(out, flags);
+            out.writeInt(progress);
+            out.writeInt(secondaryProgress);

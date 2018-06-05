@@ -1,0 +1,3 @@
+class AppEntry
+!!!1500034.java!!!	AppEntry(in _uid : int)
+            uid = _uid;

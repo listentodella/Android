@@ -1,0 +1,84 @@
+class ShareActionProvider
+!!!2436354.java!!!	ShareActionProvider(inout context : Context)
+        super(context);
+        mContext = context;
+!!!2436482.java!!!	setOnShareTargetSelectedListener(inout listener : ShareActionProvider::OnShareTargetSelectedListener) : void
+        mOnShareTargetSelectedListener = listener;
+        setActivityChooserPolicyIfNeeded();
+!!!2436610.java!!!	onCreateActionView() : View
+        // Create the view and set its data model.
+        ActivityChooserView activityChooserView = new ActivityChooserView(mContext);
+        if (!activityChooserView.isInEditMode()) {
+            ActivityChooserModel dataModel = ActivityChooserModel.get(mContext, mShareHistoryFileName);
+            activityChooserView.setActivityChooserModel(dataModel);
+        }
+
+        // Lookup and set the expand action icon.
+        TypedValue outTypedValue = new TypedValue();
+        mContext.getTheme().resolveAttribute(R.attr.actionModeShareDrawable, outTypedValue, true);
+        Drawable drawable = mContext.getDrawable(outTypedValue.resourceId);
+        activityChooserView.setExpandActivityOverflowButtonDrawable(drawable);
+        activityChooserView.setProvider(this);
+
+        // Set content description.
+        activityChooserView.setDefaultActionButtonContentDescription(
+                R.string.shareactionprovider_share_with_application);
+        activityChooserView.setExpandActivityOverflowButtonContentDescription(
+                R.string.shareactionprovider_share_with);
+
+        return activityChooserView;
+!!!2436738.java!!!	hasSubMenu() : boolean
+        return true;
+!!!2436866.java!!!	onPrepareSubMenu(inout subMenu : SubMenu) : void
+        // Clear since the order of items may change.
+        subMenu.clear();
+
+        ActivityChooserModel dataModel = ActivityChooserModel.get(mContext, mShareHistoryFileName);
+        PackageManager packageManager = mContext.getPackageManager();
+
+        final int expandedActivityCount = dataModel.getActivityCount();
+        final int collapsedActivityCount = Math.min(expandedActivityCount, mMaxShownActivityCount);
+
+        // Populate the sub-menu with a sub set of the activities.
+        for (int i = 0; i < collapsedActivityCount; i++) {
+            ResolveInfo activity = dataModel.getActivity(i);
+            subMenu.add(0, i, i, activity.loadLabel(packageManager))
+                .setIcon(activity.loadIcon(packageManager))
+                .setOnMenuItemClickListener(mOnMenuItemClickListener);
+        }
+
+        if (collapsedActivityCount < expandedActivityCount) {
+            // Add a sub-menu for showing all activities as a list item.
+            SubMenu expandedSubMenu = subMenu.addSubMenu(Menu.NONE, collapsedActivityCount,
+                    collapsedActivityCount,
+                    mContext.getString(R.string.activity_chooser_view_see_all));
+            for (int i = 0; i < expandedActivityCount; i++) {
+                ResolveInfo activity = dataModel.getActivity(i);
+                expandedSubMenu.add(0, i, i, activity.loadLabel(packageManager))
+                    .setIcon(activity.loadIcon(packageManager))
+                    .setOnMenuItemClickListener(mOnMenuItemClickListener);
+            }
+        }
+!!!2436994.java!!!	setShareHistoryFileName(in shareHistoryFile : String) : void
+        mShareHistoryFileName = shareHistoryFile;
+        setActivityChooserPolicyIfNeeded();
+!!!2437122.java!!!	setShareIntent(inout shareIntent : Intent) : void
+        if (shareIntent != null) {
+            final String action = shareIntent.getAction();
+            if (Intent.ACTION_SEND.equals(action) || Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+                shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+            }
+        }
+        ActivityChooserModel dataModel = ActivityChooserModel.get(mContext,
+            mShareHistoryFileName);
+        dataModel.setIntent(shareIntent);
+!!!2437378.java!!!	setActivityChooserPolicyIfNeeded() : void
+        if (mOnShareTargetSelectedListener == null) {
+            return;
+        }
+        if (mOnChooseActivityListener == null) {
+            mOnChooseActivityListener = new ShareActivityChooserModelPolicy();
+        }
+        ActivityChooserModel dataModel = ActivityChooserModel.get(mContext, mShareHistoryFileName);
+        dataModel.setOnChooseActivityListener(mOnChooseActivityListener);

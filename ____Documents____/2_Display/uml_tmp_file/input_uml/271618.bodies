@@ -1,0 +1,24 @@
+class LayoutParams
+!!!1307138.java!!!	LayoutParams(inout c : Context, inout attrs : AttributeSet)
+            super(c, attrs);
+
+            TypedArray a = c.obtainStyledAttributes(attrs,
+                    com.android.internal.R.styleable.ActionBar_LayoutParams);
+            gravity = a.getInt(
+                    com.android.internal.R.styleable.ActionBar_LayoutParams_layout_gravity,
+                    Gravity.NO_GRAVITY);
+            a.recycle();
+!!!1307266.java!!!	LayoutParams(in width : int, in height : int)
+            super(width, height);
+            this.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
+!!!1307394.java!!!	LayoutParams(in width : int, in height : int, in gravity : int)
+            super(width, height);
+
+            this.gravity = gravity;
+!!!1307522.java!!!	LayoutParams(in gravity : int)
+            this(WRAP_CONTENT, MATCH_PARENT, gravity);
+!!!1307650.java!!!	LayoutParams(inout source : ActionBar::LayoutParams)
+            super(source);
+            this.gravity = source.gravity;
+!!!1307778.java!!!	LayoutParams(inout source : ViewGroup::LayoutParams)
+            super(source);

@@ -1,0 +1,27 @@
+class Task
+!!!1222402.java!!!	Task(inout wtoken : AppWindowToken, inout stack : TaskStack, in userId : int)
+        taskId = wtoken.groupId;
+        mAppTokens.add(wtoken);
+        mStack = stack;
+        mUserId = userId;
+!!!1222530.java!!!	getDisplayContent() : DisplayContent
+        return mStack.getDisplayContent();
+!!!1222658.java!!!	addAppToken(in addPos : int, inout wtoken : AppWindowToken) : void
+        final int lastPos = mAppTokens.size();
+        for (int pos = 0; pos < lastPos && pos < addPos; ++pos) {
+            if (mAppTokens.get(pos).removed) {
+                // addPos assumes removed tokens are actually gone.
+                ++addPos;
+            }
+        }
+        mAppTokens.add(addPos, wtoken);
+        mDeferRemoval = false;
+!!!1222786.java!!!	removeAppToken(inout wtoken : AppWindowToken) : boolean
+        boolean removed = mAppTokens.remove(wtoken);
+        if (mAppTokens.size() == 0) {
+            EventLog.writeEvent(com.android.server.EventLogTags.WM_TASK_REMOVED, taskId,
+                    "removeAppToken: last token");
+        }
+        return removed;
+!!!1222914.java!!!	toString() : String
+        return "{taskId=" + taskId + " appTokens=" + mAppTokens + "}";

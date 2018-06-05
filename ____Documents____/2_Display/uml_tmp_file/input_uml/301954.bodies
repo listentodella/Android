@@ -1,0 +1,3 @@
+class PackageDeleteObserver
+!!!1709058.java!!!	getBinder() : IPackageDeleteObserver2
+        return mBinder;

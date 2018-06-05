@@ -1,0 +1,48 @@
+class ZoomControls
+!!!2565506.java!!!	ZoomControls(inout context : Context)
+        this(context, null);
+!!!2565634.java!!!	ZoomControls(inout context : Context, inout attrs : AttributeSet)
+        super(context, attrs);
+        setFocusable(false);
+        
+        LayoutInflater inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater.inflate(R.layout.zoom_controls, this, // we are the parent
+                true);
+        
+        mZoomIn = (ZoomButton) findViewById(R.id.zoomIn);
+        mZoomOut = (ZoomButton) findViewById(R.id.zoomOut);
+!!!2565762.java!!!	setOnZoomInClickListener(inout listener : OnClickListener) : void
+        mZoomIn.setOnClickListener(listener);
+!!!2565890.java!!!	setOnZoomOutClickListener(inout listener : OnClickListener) : void
+        mZoomOut.setOnClickListener(listener);
+!!!2566018.java!!!	setZoomSpeed(in speed : long) : void
+        mZoomIn.setZoomSpeed(speed);
+        mZoomOut.setZoomSpeed(speed);
+!!!2566146.java!!!	onTouchEvent(inout event : MotionEvent) : boolean
+        
+        /* Consume all touch events so they don't get dispatched to the view
+         * beneath this view.
+         */
+        return true;
+!!!2566274.java!!!	show() : void
+        fade(View.VISIBLE, 0.0f, 1.0f);
+!!!2566402.java!!!	hide() : void
+        fade(View.GONE, 1.0f, 0.0f);
+!!!2566530.java!!!	fade(in visibility : int, in startAlpha : float, in endAlpha : float) : void
+        AlphaAnimation anim = new AlphaAnimation(startAlpha, endAlpha);
+        anim.setDuration(500);
+        startAnimation(anim);
+        setVisibility(visibility);
+!!!2566658.java!!!	setIsZoomInEnabled(inout isEnabled : boolean) : void
+        mZoomIn.setEnabled(isEnabled);
+!!!2566786.java!!!	setIsZoomOutEnabled(inout isEnabled : boolean) : void
+        mZoomOut.setEnabled(isEnabled);
+!!!2566914.java!!!	hasFocus() : boolean
+        return mZoomIn.hasFocus() || mZoomOut.hasFocus();
+!!!2567042.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(ZoomControls.class.getName());
+!!!2567170.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(ZoomControls.class.getName());

@@ -1,0 +1,15 @@
+class CheckBox
+!!!2152834.java!!!	CheckBox(inout context : Context)
+        this(context, null);
+!!!2152962.java!!!	CheckBox(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, com.android.internal.R.attr.checkboxStyle);
+!!!2153090.java!!!	CheckBox(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2153218.java!!!	CheckBox(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+!!!2153346.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(CheckBox.class.getName());
+!!!2153474.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(CheckBox.class.getName());

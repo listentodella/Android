@@ -1,0 +1,12 @@
+class MutablePair
+!!!2398466.java!!!	MutablePair(inout first : F, inout second : S)
+            this.first = first;
+            this.second = second;
+!!!2398594.java!!!	equals(inout o : Object) : boolean
+            if (!(o instanceof MutablePair)) {
+                return false;
+            }
+            MutablePair<?, ?> p = (MutablePair<?, ?>) o;
+            return Objects.equal(p.first, first) && Objects.equal(p.second, second);
+!!!2398722.java!!!	hashCode() : int
+            return (first == null ? 0 : first.hashCode()) ^ (second == null ? 0 : second.hashCode());

@@ -1,0 +1,3 @@
+class DataModelPackageMonitor
+!!!2019458.java!!!	onSomePackagesChanged() : void
+            mReloadActivities = true;

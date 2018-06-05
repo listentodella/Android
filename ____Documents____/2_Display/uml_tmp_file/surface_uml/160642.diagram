@@ -1,0 +1,144 @@
+format 76
+
+classinstance 129794 class_ref 144898 // SurfaceFlinger
+  name ""   xyz 342.7 31.8 2000 life_line_z 2000
+classinstance 178306 class_ref 144770 // Layer
+  name ""   xyz 760.9 18.9 2000 life_line_z 2000
+classinstance 185730 class_ref 149634 // SurfaceFlingerConsumer
+  name ""   xyz 1026.6 25.8 2000 life_line_z 2000
+classinstance 186626 class_ref 176130 // GLConsumer
+  name ""   xyz 1253.3 26.1 2000 life_line_z 2000
+classinstance 187010 class_ref 169730 // ConsumerBase
+  name ""   xyz 1402.7 24.3 2000 life_line_z 2000
+classinstance 187394 class_ref 235650 // EglImage
+  name ""   xyz 1558.8 25.2 2000 life_line_z 2000
+classinstance 187778 class_ref 172034 // BufferQueueConsumer
+  name ""   xyz 1709 25.2 2000 life_line_z 2000
+note 198530 "return mQueuedFrames > 0 || mSidebandStreamChanged;"
+  xyzwh 799.2 201.8 2015 351 35
+note 198914 "// if (hw->isDisplayOn())"
+  xyzwh 449 415 2000 167 35
+note 199298 "hw->setVisibleLayersSortedByZ(layersSortedByZ);
+hw->undefinedRegion.set(bounds);
+hw->undefinedRegion.subtractSelf(tr.transform(opaqueRegion));
+hw->dirtyRegion.orSelf(dirtyRegion);"
+  xyzwh 443 511 2000 385 89
+note 199682 "// for (size_t dpy=0 ; dpy<mDisplays.size() ; dpy++)
+    // if (hw->isDisplayOn())"
+  xyzwh 416 957 2000 315 51
+durationcanvas 196610 classinstance_ref 129794 // :SurfaceFlinger
+  xyzwh 384 146 2010 11 1363
+  overlappingdurationcanvas 196994
+    xyzwh 390 172 2020 11 73
+  end
+  overlappingdurationcanvas 197250
+    xyzwh 390 366 2020 11 248
+    overlappingdurationcanvas 198658
+      xyzwh 396 406 2030 11 68
+    end
+    overlappingdurationcanvas 199042
+      xyzwh 396 516 2030 11 92
+    end
+  end
+  overlappingdurationcanvas 197506
+    xyzwh 390 718 2020 11 153
+    overlappingdurationcanvas 199426
+      xyzwh 396 752 2030 11 74
+    end
+  end
+  overlappingdurationcanvas 197762
+    xyzwh 390 939 2020 11 410
+    overlappingdurationcanvas 199810
+      xyzwh 396 1033 2030 11 64
+    end
+    overlappingdurationcanvas 200066
+      xyzwh 396 1129 2030 11 43
+    end
+    overlappingdurationcanvas 200322
+      xyzwh 396 1214 2030 11 47
+    end
+    overlappingdurationcanvas 200578
+      xyzwh 396 1298 2030 11 25
+    end
+  end
+  overlappingdurationcanvas 198018
+    xyzwh 390 1449 2020 11 31
+  end
+end
+durationcanvas 198274 classinstance_ref 178306 // :Layer
+  xyzwh 779 196 2010 11 47
+end
+lostfoundmsgsupport 196738 xyz 121 149 2015
+msg 196866 found_synchronous
+  from lostfoundmsgsupport_ref 196738
+  to durationcanvas_ref 196610
+  yz 147 2015 explicitmsg "handleMessageRefresh"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 141 133
+reflexivemsg 197122 synchronous
+  to durationcanvas_ref 196994
+  yz 172 2025 explicitmsg "A1. preComposition()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 400 153
+reflexivemsg 197378 synchronous
+  to durationcanvas_ref 197250
+  yz 366 2025 explicitmsg "A2. rebuildLayerStacks() // rebuild the visible layer list per screen"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 405 348
+reflexivemsg 197634 synchronous
+  to durationcanvas_ref 197506
+  yz 718 2025 explicitmsg "A3. setUpHWComposer()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 398 697
+reflexivemsg 197890 synchronous
+  to durationcanvas_ref 197762
+  yz 939 2025 explicitmsg "A4. doComposition()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 408 920
+reflexivemsg 198146 synchronous
+  to durationcanvas_ref 198018
+  yz 1449 2025 explicitmsg "A5. postComposition()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 410 1429
+msg 198402 synchronous
+  from durationcanvas_ref 196994
+  to durationcanvas_ref 198274
+  yz 196 2025 explicitmsg "B1. layers[i]->onPreComposition()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 433 182
+reflexivemsg 198786 synchronous
+  to durationcanvas_ref 198658
+  yz 406 2035 explicitmsg "B1. SurfaceFlinger::computeVisibleRegions(layers, hw->getLayerStack(), dirtyRegion, opaqueRegion);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 418 389
+reflexivemsg 199170 synchronous
+  to durationcanvas_ref 199042
+  yz 516 2035 explicitmsg "B2. //"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 410 496
+reflexivemsg 199554 synchronous
+  to durationcanvas_ref 199426
+  yz 752 2035 explicitmsg "B1. // if (hwc.initCheck() == NO_ERROR)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 421 736
+reflexivemsg 199938 synchronous
+  to durationcanvas_ref 199810
+  yz 1033 2035 explicitmsg "B1. // transform the dirty region into this screen's coordinate space"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 425 1015
+reflexivemsg 200194 synchronous
+  to durationcanvas_ref 200066
+  yz 1129 2035 explicitmsg "B2. // repaint the framebuffer (if needed)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 419 1108
+reflexivemsg 200450 synchronous
+  to durationcanvas_ref 200322
+  yz 1214 2035 explicitmsg "B3. // inform the h/w that we're done compositing"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 416 1193
+reflexivemsg 200706 synchronous
+  to durationcanvas_ref 200578
+  yz 1298 2035 explicitmsg "B4. postFramebuffer();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 411 1282
+end

@@ -1,0 +1,57 @@
+class TrustManager
+!!!1822082.java!!!	TrustManager(inout b : IBinder)
+        mService = ITrustManager.Stub.asInterface(b);
+        mTrustListeners = new ArrayMap<TrustListener, ITrustListener>();
+!!!1822210.java!!!	reportUnlockAttempt(inout successful : boolean, in userId : int) : void
+        try {
+            mService.reportUnlockAttempt(successful, userId);
+        } catch (RemoteException e) {
+            onError(e);
+        }
+!!!1822338.java!!!	reportEnabledTrustAgentsChanged(in userId : int) : void
+        try {
+            mService.reportEnabledTrustAgentsChanged(userId);
+        } catch (RemoteException e) {
+            onError(e);
+        }
+!!!1822466.java!!!	reportRequireCredentialEntry(in userId : int) : void
+        try {
+            mService.reportRequireCredentialEntry(userId);
+        } catch (RemoteException e) {
+            onError(e);
+        }
+!!!1822594.java!!!	registerTrustListener(in trustListener : TrustManager::TrustListener) : void
+        try {
+            ITrustListener.Stub iTrustListener = new ITrustListener.Stub() {
+                @Override
+                public void onTrustChanged(boolean enabled, int userId, boolean initiatedByUser) {
+                    Message m = mHandler.obtainMessage(MSG_TRUST_CHANGED, (enabled ? 1 : 0), userId,
+                            trustListener);
+                    if (initiatedByUser) {
+                        m.getData().putBoolean(DATA_INITIATED_BY_USER, initiatedByUser);
+                    }
+                    m.sendToTarget();
+                }
+
+                @Override
+                public void onTrustManagedChanged(boolean managed, int userId) {
+                    mHandler.obtainMessage(MSG_TRUST_MANAGED_CHANGED, (managed ? 1 : 0), userId,
+                            trustListener).sendToTarget();
+                }
+            };
+            mService.registerTrustListener(iTrustListener);
+            mTrustListeners.put(trustListener, iTrustListener);
+        } catch (RemoteException e) {
+            onError(e);
+        }
+!!!1822722.java!!!	unregisterTrustListener(in trustListener : TrustManager::TrustListener) : void
+        ITrustListener iTrustListener = mTrustListeners.remove(trustListener);
+        if (iTrustListener != null) {
+            try {
+                mService.unregisterTrustListener(iTrustListener);
+            } catch (RemoteException e) {
+                onError(e);
+            }
+        }
+!!!1822850.java!!!	onError(inout e : Exception) : void
+        Log.e(TAG, "Error while calling TrustManagerService", e);

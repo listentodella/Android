@@ -1,0 +1,5 @@
+class Alignment
+!!!2313346.java!!!	getSizeInCell(inout view : View, in viewSize : int, in cellSize : int) : int
+            return viewSize;
+!!!2313474.java!!!	getBounds() : GridLayout::Bounds
+            return new Bounds();

@@ -1,0 +1,27 @@
+class MotionRange
+!!!740226.java!!!	MotionRange(in axis : int, in source : int, in min : float, in max : float, in flat : float, in fuzz : float, in resolution : float)
+            mAxis = axis;
+            mSource = source;
+            mMin = min;
+            mMax = max;
+            mFlat = flat;
+            mFuzz = fuzz;
+            mResolution = resolution;
+!!!740354.java!!!	getAxis() : int
+            return mAxis;
+!!!740482.java!!!	getSource() : int
+            return mSource;
+!!!740610.java!!!	isFromSource(in source : int) : boolean
+            return (getSource() & source) == source;
+!!!740738.java!!!	getMin() : float
+            return mMin;
+!!!740866.java!!!	getMax() : float
+            return mMax;
+!!!740994.java!!!	getRange() : float
+            return mMax - mMin;
+!!!741122.java!!!	getFlat() : float
+            return mFlat;
+!!!741250.java!!!	getFuzz() : float
+            return mFuzz;
+!!!741378.java!!!	getResolution() : float
+            return mResolution;

@@ -1,0 +1,34 @@
+class Space
+!!!2458114.java!!!	Space(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+        if (getVisibility() == VISIBLE) {
+            setVisibility(INVISIBLE);
+        }
+!!!2458242.java!!!	Space(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2458370.java!!!	Space(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!2458498.java!!!	Space(inout context : Context)
+        //noinspection NullableProblems
+        this(context, null);
+!!!2458754.java!!!	getDefaultSize2(in size : int, in measureSpec : int) : int
+        int result = size;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        switch (specMode) {
+            case MeasureSpec.UNSPECIFIED:
+                result = size;
+                break;
+            case MeasureSpec.AT_MOST:
+                result = Math.min(size, specSize);
+                break;
+            case MeasureSpec.EXACTLY:
+                result = specSize;
+                break;
+        }
+        return result;
+!!!2458882.java!!!	onMeasure(in widthMeasureSpec : int, in heightMeasureSpec : int) : void
+        setMeasuredDimension(
+                getDefaultSize2(getSuggestedMinimumWidth(), widthMeasureSpec),
+                getDefaultSize2(getSuggestedMinimumHeight(), heightMeasureSpec));

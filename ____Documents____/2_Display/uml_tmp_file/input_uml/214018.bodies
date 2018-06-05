@@ -1,0 +1,23 @@
+class ConfigParam
+!!!568322.java!!!	ConfigParam()
+            mode = "test";
+            rotation = 0;
+            xOverScan = 0;
+            yOverScan = 0;
+            mirror = 0;
+            colorDepth = 0;
+            keepRate = SETTING_MODE_KEEP_PRIMARY_RATE;
+            resolution = 10806011;
+	        rotAngle = 1;
+            navBarVisible = 1;
+!!!568450.java!!!	writeToParcel(inout out : Parcel) : void
+            out.writeInt(rotation);
+            out.writeInt(xOverScan);
+            out.writeInt(yOverScan);
+            out.writeInt(mirror);
+            out.writeInt(colorDepth);
+            out.writeInt(keepRate);
+            out.writeInt(resolution);
+            out.writeInt(rotAngle);
+            out.writeInt(navBarVisible);
+            out.writeString(mode);

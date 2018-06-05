@@ -1,0 +1,786 @@
+class TimePickerSpinnerDelegate
+!!!2521602.java!!!	TimePickerSpinnerDelegate(inout delegator : TimePicker, inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(delegator, context);
+
+        // process style attributes
+        final TypedArray a = mContext.obtainStyledAttributes(attrs,
+                R.styleable.TimePicker, defStyleAttr, defStyleRes);
+        final LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(
+                Context.LAYOUT_INFLATER_SERVICE);
+        final Resources res = mContext.getResources();
+
+        mHourPickerDescription = res.getString(R.string.hour_picker_description);
+        mSelectHours = res.getString(R.string.select_hours);
+        mMinutePickerDescription = res.getString(R.string.minute_picker_description);
+        mSelectMinutes = res.getString(R.string.select_minutes);
+
+        String[] amPmStrings = TimePickerClockDelegate.getAmPmStrings(context);
+        mAmText = amPmStrings[0];
+        mPmText = amPmStrings[1];
+
+        final int layoutResourceId = a.getResourceId(R.styleable.TimePicker_internalLayout,
+                R.layout.time_picker_holo);
+        final View mainView = inflater.inflate(layoutResourceId, null);
+        mDelegator.addView(mainView);
+
+        mHourView = (TextView) mainView.findViewById(R.id.hours);
+        mSeparatorView = (TextView) mainView.findViewById(R.id.separator);
+        mMinuteView = (TextView) mainView.findViewById(R.id.minutes);
+        mAmPmTextView = (TextView) mainView.findViewById(R.id.ampm_label);
+
+        // Set up text appearances from style.
+        final int headerTimeTextAppearance = a.getResourceId(
+                R.styleable.TimePicker_headerTimeTextAppearance, 0);
+        if (headerTimeTextAppearance != 0) {
+            mHourView.setTextAppearance(context, headerTimeTextAppearance);
+            mSeparatorView.setTextAppearance(context, headerTimeTextAppearance);
+            mMinuteView.setTextAppearance(context, headerTimeTextAppearance);
+        }
+
+        final int headerSelectedTextColor = a.getColor(
+                R.styleable.TimePicker_headerSelectedTextColor,
+                res.getColor(R.color.timepicker_default_selector_color_material));
+        mHourView.setTextColor(ColorStateList.addFirstIfMissing(mHourView.getTextColors(),
+                R.attr.state_selected, headerSelectedTextColor));
+        mMinuteView.setTextColor(ColorStateList.addFirstIfMissing(mMinuteView.getTextColors(),
+                R.attr.state_selected, headerSelectedTextColor));
+
+        final int headerAmPmTextAppearance = a.getResourceId(
+                R.styleable.TimePicker_headerAmPmTextAppearance, 0);
+        if (headerAmPmTextAppearance != 0) {
+            mAmPmTextView.setTextAppearance(context, headerAmPmTextAppearance);
+        }
+
+        mHeaderView = mainView.findViewById(R.id.time_header);
+        mHeaderView.setBackground(a.getDrawable(R.styleable.TimePicker_headerBackground));
+
+        a.recycle();
+
+        mRadialTimePickerView = (RadialTimePickerView) mainView.findViewById(
+                R.id.radial_picker);
+
+        setupListeners();
+
+        mAllowAutoAdvance = true;
+
+        // Set up for keyboard mode.
+        mDoublePlaceholderText = res.getString(R.string.time_placeholder);
+        mDeletedKeyFormat = res.getString(R.string.deleted_key);
+        mPlaceholderText = mDoublePlaceholderText.charAt(0);
+        mAmKeyCode = mPmKeyCode = -1;
+        generateLegalTimesTree();
+
+        // Initialize with current time
+        final Calendar calendar = Calendar.getInstance(mCurrentLocale);
+        final int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        final int currentMinute = calendar.get(Calendar.MINUTE);
+        initialize(currentHour, currentMinute, false /* 12h */, HOUR_INDEX);
+!!!2521730.java!!!	initialize(in hourOfDay : int, in minute : int, inout is24HourView : boolean, in index : int) : void
+        mInitialHourOfDay = hourOfDay;
+        mInitialMinute = minute;
+        mIs24HourView = is24HourView;
+        mInKbMode = false;
+        updateUI(index);
+!!!2521858.java!!!	setupListeners() : void
+        mHeaderView.setOnKeyListener(mKeyListener);
+        mHeaderView.setOnFocusChangeListener(mFocusListener);
+        mHeaderView.setFocusable(true);
+
+        mRadialTimePickerView.setOnValueSelectedListener(this);
+
+        mHourView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setCurrentItemShowing(HOUR_INDEX, true, true);
+                tryVibrate();
+            }
+        });
+        mMinuteView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setCurrentItemShowing(MINUTE_INDEX, true, true);
+                tryVibrate();
+            }
+        });
+!!!2521986.java!!!	updateUI(in index : int) : void
+        // Update RadialPicker values
+        updateRadialPicker(index);
+        // Enable or disable the AM/PM view.
+        updateHeaderAmPm();
+        // Update Hour and Minutes
+        updateHeaderHour(mInitialHourOfDay, true);
+        // Update time separator
+        updateHeaderSeparator();
+        // Update Minutes
+        updateHeaderMinute(mInitialMinute);
+        // Invalidate everything
+        mDelegator.invalidate();
+!!!2522114.java!!!	updateRadialPicker(in index : int) : void
+        mRadialTimePickerView.initialize(mInitialHourOfDay, mInitialMinute, mIs24HourView);
+        setCurrentItemShowing(index, false, true);
+!!!2522242.java!!!	computeMaxWidthOfNumbers(in max : int) : int
+        TextView tempView = new TextView(mContext);
+        tempView.setTextAppearance(mContext, R.style.TextAppearance_Material_TimePicker_TimeLabel);
+        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        tempView.setLayoutParams(lp);
+        int maxWidth = 0;
+        for (int minutes = 0; minutes < max; minutes++) {
+            final String text = String.format("%02d", minutes);
+            tempView.setText(text);
+            tempView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            maxWidth = Math.max(maxWidth, tempView.getMeasuredWidth());
+        }
+        return maxWidth;
+!!!2522370.java!!!	updateHeaderAmPm() : void
+        if (mIs24HourView) {
+            mAmPmTextView.setVisibility(View.GONE);
+        } else {
+            mAmPmTextView.setVisibility(View.VISIBLE);
+            final String bestDateTimePattern = DateFormat.getBestDateTimePattern(mCurrentLocale,
+                    "hm");
+
+            boolean amPmOnLeft = bestDateTimePattern.startsWith("a");
+            if (TextUtils.getLayoutDirectionFromLocale(mCurrentLocale) ==
+                    View.LAYOUT_DIRECTION_RTL) {
+                amPmOnLeft = !amPmOnLeft;
+            }
+
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
+                    mAmPmTextView.getLayoutParams();
+
+            if (amPmOnLeft) {
+                layoutParams.rightMargin = computeMaxWidthOfNumbers(12 /* for hours */);
+                layoutParams.removeRule(RelativeLayout.RIGHT_OF);
+                layoutParams.addRule(RelativeLayout.LEFT_OF, R.id.separator);
+            } else {
+                layoutParams.leftMargin = computeMaxWidthOfNumbers(60 /* for minutes */);
+                layoutParams.removeRule(RelativeLayout.LEFT_OF);
+                layoutParams.addRule(RelativeLayout.RIGHT_OF, R.id.separator);
+            }
+
+            updateAmPmDisplay(mInitialHourOfDay < 12 ? AM : PM);
+            mAmPmTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tryVibrate();
+                    int amOrPm = mRadialTimePickerView.getAmOrPm();
+                    if (amOrPm == AM) {
+                        amOrPm = PM;
+                    } else if (amOrPm == PM){
+                        amOrPm = AM;
+                    }
+                    updateAmPmDisplay(amOrPm);
+                    mRadialTimePickerView.setAmOrPm(amOrPm);
+                }
+            });
+        }
+!!!2522498.java!!!	setCurrentHour(inout currentHour : Integer) : void
+        if (mInitialHourOfDay == currentHour) {
+            return;
+        }
+        mInitialHourOfDay = currentHour;
+        updateHeaderHour(currentHour, true /* accessibility announce */);
+        updateHeaderAmPm();
+        mRadialTimePickerView.setCurrentHour(currentHour);
+        mRadialTimePickerView.setAmOrPm(mInitialHourOfDay < 12 ? AM : PM);
+        mDelegator.invalidate();
+        onTimeChanged();
+!!!2522626.java!!!	getCurrentHour() : Integer
+        int currentHour = mRadialTimePickerView.getCurrentHour();
+        if (mIs24HourView) {
+            return currentHour;
+        } else {
+            switch(mRadialTimePickerView.getAmOrPm()) {
+                case PM:
+                    return (currentHour % HOURS_IN_HALF_DAY) + HOURS_IN_HALF_DAY;
+                case AM:
+                default:
+                    return currentHour % HOURS_IN_HALF_DAY;
+            }
+        }
+!!!2522754.java!!!	setCurrentMinute(inout currentMinute : Integer) : void
+        if (mInitialMinute == currentMinute) {
+            return;
+        }
+        mInitialMinute = currentMinute;
+        updateHeaderMinute(currentMinute);
+        mRadialTimePickerView.setCurrentMinute(currentMinute);
+        mDelegator.invalidate();
+        onTimeChanged();
+!!!2522882.java!!!	getCurrentMinute() : Integer
+        return mRadialTimePickerView.getCurrentMinute();
+!!!2523010.java!!!	setIs24HourView(inout is24HourView : Boolean) : void
+        if (is24HourView == mIs24HourView) {
+            return;
+        }
+        mIs24HourView = is24HourView;
+        generateLegalTimesTree();
+        int hour = mRadialTimePickerView.getCurrentHour();
+        mInitialHourOfDay = hour;
+        updateHeaderHour(hour, false /* no accessibility announce */);
+        updateHeaderAmPm();
+        updateRadialPicker(mRadialTimePickerView.getCurrentItemShowing());
+        mDelegator.invalidate();
+!!!2523138.java!!!	is24HourView() : boolean
+        return mIs24HourView;
+!!!2523266.java!!!	setOnTimeChangedListener(inout callback : TimePicker::OnTimeChangedListener) : void
+        mOnTimeChangedListener = callback;
+!!!2523394.java!!!	setEnabled(inout enabled : boolean) : void
+        mHourView.setEnabled(enabled);
+        mMinuteView.setEnabled(enabled);
+        mAmPmTextView.setEnabled(enabled);
+        mRadialTimePickerView.setEnabled(enabled);
+        mIsEnabled = enabled;
+!!!2523522.java!!!	isEnabled() : boolean
+        return mIsEnabled;
+!!!2523650.java!!!	getBaseline() : int
+        // does not support baseline alignment
+        return -1;
+!!!2523778.java!!!	onConfigurationChanged(inout newConfig : Configuration) : void
+        updateUI(mRadialTimePickerView.getCurrentItemShowing());
+!!!2523906.java!!!	onSaveInstanceState(inout superState : Parcelable) : Parcelable
+        return new SavedState(superState, getCurrentHour(), getCurrentMinute(),
+                is24HourView(), inKbMode(), getTypedTimes(), getCurrentItemShowing());
+!!!2524034.java!!!	onRestoreInstanceState(inout state : Parcelable) : void
+        SavedState ss = (SavedState) state;
+        setInKbMode(ss.inKbMode());
+        setTypedTimes(ss.getTypesTimes());
+        initialize(ss.getHour(), ss.getMinute(), ss.is24HourMode(), ss.getCurrentItemShowing());
+        mRadialTimePickerView.invalidate();
+        if (mInKbMode) {
+            tryStartingKbMode(-1);
+            mHourView.invalidate();
+        }
+!!!2524162.java!!!	setCurrentLocale(inout locale : Locale) : void
+        super.setCurrentLocale(locale);
+        mTempCalendar = Calendar.getInstance(locale);
+!!!2524290.java!!!	dispatchPopulateAccessibilityEvent(inout event : AccessibilityEvent) : boolean
+        onPopulateAccessibilityEvent(event);
+        return true;
+!!!2524418.java!!!	onPopulateAccessibilityEvent(inout event : AccessibilityEvent) : void
+        int flags = DateUtils.FORMAT_SHOW_TIME;
+        if (mIs24HourView) {
+            flags |= DateUtils.FORMAT_24HOUR;
+        } else {
+            flags |= DateUtils.FORMAT_12HOUR;
+        }
+        mTempCalendar.set(Calendar.HOUR_OF_DAY, getCurrentHour());
+        mTempCalendar.set(Calendar.MINUTE, getCurrentMinute());
+        String selectedDate = DateUtils.formatDateTime(mContext,
+                mTempCalendar.getTimeInMillis(), flags);
+        event.getText().add(selectedDate);
+!!!2524546.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        event.setClassName(TimePicker.class.getName());
+!!!2524674.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        info.setClassName(TimePicker.class.getName());
+!!!2524802.java!!!	setInKbMode(inout inKbMode : boolean) : void
+        mInKbMode = inKbMode;
+!!!2524930.java!!!	inKbMode() : boolean
+        return mInKbMode;
+!!!2525058.java!!!	setTypedTimes(inout typeTimes : ArrayList<Integer>) : void
+        mTypedTimes = typeTimes;
+!!!2525186.java!!!	getTypedTimes() : ArrayList<Integer>
+        return mTypedTimes;
+!!!2525314.java!!!	getCurrentItemShowing() : int
+        return mRadialTimePickerView.getCurrentItemShowing();
+!!!2525442.java!!!	onTimeChanged() : void
+        mDelegator.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
+        if (mOnTimeChangedListener != null) {
+            mOnTimeChangedListener.onTimeChanged(mDelegator,
+                    getCurrentHour(), getCurrentMinute());
+        }
+!!!2526722.java!!!	tryVibrate() : void
+        mDelegator.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+!!!2526850.java!!!	updateAmPmDisplay(in amOrPm : int) : void
+        if (amOrPm == AM) {
+            mAmPmTextView.setText(mAmText);
+            mRadialTimePickerView.announceForAccessibility(mAmText);
+        } else if (amOrPm == PM){
+            mAmPmTextView.setText(mPmText);
+            mRadialTimePickerView.announceForAccessibility(mPmText);
+        } else {
+            mAmPmTextView.setText(mDoublePlaceholderText);
+        }
+!!!2526978.java!!!	onValueSelected(in pickerIndex : int, in newValue : int, inout autoAdvance : boolean) : void
+        if (pickerIndex == HOUR_INDEX) {
+            updateHeaderHour(newValue, false);
+            String announcement = String.format("%d", newValue);
+            if (mAllowAutoAdvance && autoAdvance) {
+                setCurrentItemShowing(MINUTE_INDEX, true, false);
+                announcement += ". " + mSelectMinutes;
+            } else {
+                mRadialTimePickerView.setContentDescription(
+                        mHourPickerDescription + ": " + newValue);
+            }
+
+            mRadialTimePickerView.announceForAccessibility(announcement);
+        } else if (pickerIndex == MINUTE_INDEX){
+            updateHeaderMinute(newValue);
+            mRadialTimePickerView.setContentDescription(mMinutePickerDescription + ": " + newValue);
+        } else if (pickerIndex == AMPM_INDEX) {
+            updateAmPmDisplay(newValue);
+        } else if (pickerIndex == ENABLE_PICKER_INDEX) {
+            if (!isTypedTimeFullyLegal()) {
+                mTypedTimes.clear();
+            }
+            finishKbMode();
+        }
+!!!2527106.java!!!	updateHeaderHour(in value : int, inout announce : boolean) : void
+        final String bestDateTimePattern = DateFormat.getBestDateTimePattern(mCurrentLocale,
+                (mIs24HourView) ? "Hm" : "hm");
+        final int lengthPattern = bestDateTimePattern.length();
+        boolean hourWithTwoDigit = false;
+        char hourFormat = '\0';
+        // Check if the returned pattern is single or double 'H', 'h', 'K', 'k'. We also save
+        // the hour format that we found.
+        for (int i = 0; i < lengthPattern; i++) {
+            final char c = bestDateTimePattern.charAt(i);
+            if (c == 'H' || c == 'h' || c == 'K' || c == 'k') {
+                hourFormat = c;
+                if (i + 1 < lengthPattern && c == bestDateTimePattern.charAt(i + 1)) {
+                    hourWithTwoDigit = true;
+                }
+                break;
+            }
+        }
+        final String format;
+        if (hourWithTwoDigit) {
+            format = "%02d";
+        } else {
+            format = "%d";
+        }
+        if (mIs24HourView) {
+            // 'k' means 1-24 hour
+            if (hourFormat == 'k' && value == 0) {
+                value = 24;
+            }
+        } else {
+            // 'K' means 0-11 hour
+            value = modulo12(value, hourFormat == 'K');
+        }
+        CharSequence text = String.format(format, value);
+        mHourView.setText(text);
+        if (announce) {
+            mRadialTimePickerView.announceForAccessibility(text);
+        }
+!!!2527234.java!!!	modulo12(in n : int, inout startWithZero : boolean) : int
+        int value = n % 12;
+        if (value == 0 && !startWithZero) {
+            value = 12;
+        }
+        return value;
+!!!2527362.java!!!	updateHeaderSeparator() : void
+        final String bestDateTimePattern = DateFormat.getBestDateTimePattern(mCurrentLocale,
+                (mIs24HourView) ? "Hm" : "hm");
+        final String separatorText;
+        // See http://www.unicode.org/reports/tr35/tr35-dates.html for hour formats
+        final char[] hourFormats = {'H', 'h', 'K', 'k'};
+        int hIndex = lastIndexOfAny(bestDateTimePattern, hourFormats);
+        if (hIndex == -1) {
+            // Default case
+            separatorText = ":";
+        } else {
+            separatorText = Character.toString(bestDateTimePattern.charAt(hIndex + 1));
+        }
+        mSeparatorView.setText(separatorText);
+!!!2527490.java!!!	lastIndexOfAny(in str : String, inout any : char) : int
+        final int lengthAny = any.length;
+        if (lengthAny > 0) {
+            for (int i = str.length() - 1; i >= 0; i--) {
+                char c = str.charAt(i);
+                for (int j = 0; j < lengthAny; j++) {
+                    if (c == any[j]) {
+                        return i;
+                    }
+                }
+            }
+        }
+        return -1;
+!!!2527618.java!!!	updateHeaderMinute(in value : int) : void
+        if (value == 60) {
+            value = 0;
+        }
+        CharSequence text = String.format(mCurrentLocale, "%02d", value);
+        mRadialTimePickerView.announceForAccessibility(text);
+        mMinuteView.setText(text);
+!!!2527746.java!!!	setCurrentItemShowing(in index : int, inout animateCircle : boolean, inout announce : boolean) : void
+        mRadialTimePickerView.setCurrentItemShowing(index, animateCircle);
+
+        if (index == HOUR_INDEX) {
+            int hours = mRadialTimePickerView.getCurrentHour();
+            if (!mIs24HourView) {
+                hours = hours % 12;
+            }
+            mRadialTimePickerView.setContentDescription(mHourPickerDescription + ": " + hours);
+            if (announce) {
+                mRadialTimePickerView.announceForAccessibility(mSelectHours);
+            }
+        } else {
+            int minutes = mRadialTimePickerView.getCurrentMinute();
+            mRadialTimePickerView.setContentDescription(mMinutePickerDescription + ": " + minutes);
+            if (announce) {
+                mRadialTimePickerView.announceForAccessibility(mSelectMinutes);
+            }
+        }
+
+        mHourView.setSelected(index == HOUR_INDEX);
+        mMinuteView.setSelected(index == MINUTE_INDEX);
+!!!2527874.java!!!	processKeyUp(in keyCode : int) : boolean
+        if (keyCode == KeyEvent.KEYCODE_DEL) {
+            if (mInKbMode) {
+                if (!mTypedTimes.isEmpty()) {
+                    int deleted = deleteLastTypedKey();
+                    String deletedKeyStr;
+                    if (deleted == getAmOrPmKeyCode(AM)) {
+                        deletedKeyStr = mAmText;
+                    } else if (deleted == getAmOrPmKeyCode(PM)) {
+                        deletedKeyStr = mPmText;
+                    } else {
+                        deletedKeyStr = String.format("%d", getValFromKeyCode(deleted));
+                    }
+                    mRadialTimePickerView.announceForAccessibility(
+                            String.format(mDeletedKeyFormat, deletedKeyStr));
+                    updateDisplay(true);
+                }
+            }
+        } else if (keyCode == KeyEvent.KEYCODE_0 || keyCode == KeyEvent.KEYCODE_1
+                || keyCode == KeyEvent.KEYCODE_2 || keyCode == KeyEvent.KEYCODE_3
+                || keyCode == KeyEvent.KEYCODE_4 || keyCode == KeyEvent.KEYCODE_5
+                || keyCode == KeyEvent.KEYCODE_6 || keyCode == KeyEvent.KEYCODE_7
+                || keyCode == KeyEvent.KEYCODE_8 || keyCode == KeyEvent.KEYCODE_9
+                || (!mIs24HourView &&
+                (keyCode == getAmOrPmKeyCode(AM) || keyCode == getAmOrPmKeyCode(PM)))) {
+            if (!mInKbMode) {
+                if (mRadialTimePickerView == null) {
+                    // Something's wrong, because time picker should definitely not be null.
+                    Log.e(TAG, "Unable to initiate keyboard mode, TimePicker was null.");
+                    return true;
+                }
+                mTypedTimes.clear();
+                tryStartingKbMode(keyCode);
+                return true;
+            }
+            // We're already in keyboard mode.
+            if (addKeyIfLegal(keyCode)) {
+                updateDisplay(false);
+            }
+            return true;
+        }
+        return false;
+!!!2528002.java!!!	tryStartingKbMode(in keyCode : int) : void
+        if (keyCode == -1 || addKeyIfLegal(keyCode)) {
+            mInKbMode = true;
+            onValidationChanged(false);
+            updateDisplay(false);
+            mRadialTimePickerView.setInputEnabled(false);
+        }
+!!!2528130.java!!!	addKeyIfLegal(in keyCode : int) : boolean
+        // If we're in 24hour mode, we'll need to check if the input is full. If in AM/PM mode,
+        // we'll need to see if AM/PM have been typed.
+        if ((mIs24HourView && mTypedTimes.size() == 4) ||
+                (!mIs24HourView && isTypedTimeFullyLegal())) {
+            return false;
+        }
+
+        mTypedTimes.add(keyCode);
+        if (!isTypedTimeLegalSoFar()) {
+            deleteLastTypedKey();
+            return false;
+        }
+
+        int val = getValFromKeyCode(keyCode);
+        mRadialTimePickerView.announceForAccessibility(String.format("%d", val));
+        // Automatically fill in 0's if AM or PM was legally entered.
+        if (isTypedTimeFullyLegal()) {
+            if (!mIs24HourView && mTypedTimes.size() <= 3) {
+                mTypedTimes.add(mTypedTimes.size() - 1, KeyEvent.KEYCODE_0);
+                mTypedTimes.add(mTypedTimes.size() - 1, KeyEvent.KEYCODE_0);
+            }
+            onValidationChanged(true);
+        }
+
+        return true;
+!!!2528258.java!!!	isTypedTimeLegalSoFar() : boolean
+        Node node = mLegalTimesTree;
+        for (int keyCode : mTypedTimes) {
+            node = node.canReach(keyCode);
+            if (node == null) {
+                return false;
+            }
+        }
+        return true;
+!!!2528386.java!!!	isTypedTimeFullyLegal() : boolean
+        if (mIs24HourView) {
+            // For 24-hour mode, the time is legal if the hours and minutes are each legal. Note:
+            // getEnteredTime() will ONLY call isTypedTimeFullyLegal() when NOT in 24hour mode.
+            int[] values = getEnteredTime(null);
+            return (values[0] >= 0 && values[1] >= 0 && values[1] < 60);
+        } else {
+            // For AM/PM mode, the time is legal if it contains an AM or PM, as those can only be
+            // legally added at specific times based on the tree's algorithm.
+            return (mTypedTimes.contains(getAmOrPmKeyCode(AM)) ||
+                    mTypedTimes.contains(getAmOrPmKeyCode(PM)));
+        }
+!!!2528514.java!!!	deleteLastTypedKey() : int
+        int deleted = mTypedTimes.remove(mTypedTimes.size() - 1);
+        if (!isTypedTimeFullyLegal()) {
+            onValidationChanged(false);
+        }
+        return deleted;
+!!!2528642.java!!!	finishKbMode() : void
+        mInKbMode = false;
+        if (!mTypedTimes.isEmpty()) {
+            int values[] = getEnteredTime(null);
+            mRadialTimePickerView.setCurrentHour(values[0]);
+            mRadialTimePickerView.setCurrentMinute(values[1]);
+            if (!mIs24HourView) {
+                mRadialTimePickerView.setAmOrPm(values[2]);
+            }
+            mTypedTimes.clear();
+        }
+        updateDisplay(false);
+        mRadialTimePickerView.setInputEnabled(true);
+!!!2528770.java!!!	updateDisplay(inout allowEmptyDisplay : boolean) : void
+        if (!allowEmptyDisplay && mTypedTimes.isEmpty()) {
+            int hour = mRadialTimePickerView.getCurrentHour();
+            int minute = mRadialTimePickerView.getCurrentMinute();
+            updateHeaderHour(hour, true);
+            updateHeaderMinute(minute);
+            if (!mIs24HourView) {
+                updateAmPmDisplay(hour < 12 ? AM : PM);
+            }
+            setCurrentItemShowing(mRadialTimePickerView.getCurrentItemShowing(), true, true);
+            onValidationChanged(true);
+        } else {
+            boolean[] enteredZeros = {false, false};
+            int[] values = getEnteredTime(enteredZeros);
+            String hourFormat = enteredZeros[0] ? "%02d" : "%2d";
+            String minuteFormat = (enteredZeros[1]) ? "%02d" : "%2d";
+            String hourStr = (values[0] == -1) ? mDoublePlaceholderText :
+                    String.format(hourFormat, values[0]).replace(' ', mPlaceholderText);
+            String minuteStr = (values[1] == -1) ? mDoublePlaceholderText :
+                    String.format(minuteFormat, values[1]).replace(' ', mPlaceholderText);
+            mHourView.setText(hourStr);
+            mHourView.setSelected(false);
+            mMinuteView.setText(minuteStr);
+            mMinuteView.setSelected(false);
+            if (!mIs24HourView) {
+                updateAmPmDisplay(values[2]);
+            }
+        }
+!!!2528898.java!!!	getValFromKeyCode(in keyCode : int) : int
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_0:
+                return 0;
+            case KeyEvent.KEYCODE_1:
+                return 1;
+            case KeyEvent.KEYCODE_2:
+                return 2;
+            case KeyEvent.KEYCODE_3:
+                return 3;
+            case KeyEvent.KEYCODE_4:
+                return 4;
+            case KeyEvent.KEYCODE_5:
+                return 5;
+            case KeyEvent.KEYCODE_6:
+                return 6;
+            case KeyEvent.KEYCODE_7:
+                return 7;
+            case KeyEvent.KEYCODE_8:
+                return 8;
+            case KeyEvent.KEYCODE_9:
+                return 9;
+            default:
+                return -1;
+        }
+!!!2529026.java!!!	getEnteredTime(inout enteredZeros : boolean) : int
+        int amOrPm = -1;
+        int startIndex = 1;
+        if (!mIs24HourView && isTypedTimeFullyLegal()) {
+            int keyCode = mTypedTimes.get(mTypedTimes.size() - 1);
+            if (keyCode == getAmOrPmKeyCode(AM)) {
+                amOrPm = AM;
+            } else if (keyCode == getAmOrPmKeyCode(PM)){
+                amOrPm = PM;
+            }
+            startIndex = 2;
+        }
+        int minute = -1;
+        int hour = -1;
+        for (int i = startIndex; i <= mTypedTimes.size(); i++) {
+            int val = getValFromKeyCode(mTypedTimes.get(mTypedTimes.size() - i));
+            if (i == startIndex) {
+                minute = val;
+            } else if (i == startIndex+1) {
+                minute += 10 * val;
+                if (enteredZeros != null && val == 0) {
+                    enteredZeros[1] = true;
+                }
+            } else if (i == startIndex+2) {
+                hour = val;
+            } else if (i == startIndex+3) {
+                hour += 10 * val;
+                if (enteredZeros != null && val == 0) {
+                    enteredZeros[0] = true;
+                }
+            }
+        }
+
+        return new int[] { hour, minute, amOrPm };
+!!!2529154.java!!!	getAmOrPmKeyCode(in amOrPm : int) : int
+        // Cache the codes.
+        if (mAmKeyCode == -1 || mPmKeyCode == -1) {
+            // Find the first character in the AM/PM text that is unique.
+            KeyCharacterMap kcm = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
+            char amChar;
+            char pmChar;
+            for (int i = 0; i < Math.max(mAmText.length(), mPmText.length()); i++) {
+                amChar = mAmText.toLowerCase(mCurrentLocale).charAt(i);
+                pmChar = mPmText.toLowerCase(mCurrentLocale).charAt(i);
+                if (amChar != pmChar) {
+                    KeyEvent[] events = kcm.getEvents(new char[]{amChar, pmChar});
+                    // There should be 4 events: a down and up for both AM and PM.
+                    if (events != null && events.length == 4) {
+                        mAmKeyCode = events[0].getKeyCode();
+                        mPmKeyCode = events[2].getKeyCode();
+                    } else {
+                        Log.e(TAG, "Unable to find keycodes for AM and PM.");
+                    }
+                    break;
+                }
+            }
+        }
+        if (amOrPm == AM) {
+            return mAmKeyCode;
+        } else if (amOrPm == PM) {
+            return mPmKeyCode;
+        }
+
+        return -1;
+!!!2529282.java!!!	generateLegalTimesTree() : void
+        // Create a quick cache of numbers to their keycodes.
+        final int k0 = KeyEvent.KEYCODE_0;
+        final int k1 = KeyEvent.KEYCODE_1;
+        final int k2 = KeyEvent.KEYCODE_2;
+        final int k3 = KeyEvent.KEYCODE_3;
+        final int k4 = KeyEvent.KEYCODE_4;
+        final int k5 = KeyEvent.KEYCODE_5;
+        final int k6 = KeyEvent.KEYCODE_6;
+        final int k7 = KeyEvent.KEYCODE_7;
+        final int k8 = KeyEvent.KEYCODE_8;
+        final int k9 = KeyEvent.KEYCODE_9;
+
+        // The root of the tree doesn't contain any numbers.
+        mLegalTimesTree = new Node();
+        if (mIs24HourView) {
+            // We'll be re-using these nodes, so we'll save them.
+            Node minuteFirstDigit = new Node(k0, k1, k2, k3, k4, k5);
+            Node minuteSecondDigit = new Node(k0, k1, k2, k3, k4, k5, k6, k7, k8, k9);
+            // The first digit must be followed by the second digit.
+            minuteFirstDigit.addChild(minuteSecondDigit);
+
+            // The first digit may be 0-1.
+            Node firstDigit = new Node(k0, k1);
+            mLegalTimesTree.addChild(firstDigit);
+
+            // When the first digit is 0-1, the second digit may be 0-5.
+            Node secondDigit = new Node(k0, k1, k2, k3, k4, k5);
+            firstDigit.addChild(secondDigit);
+            // We may now be followed by the first minute digit. E.g. 00:09, 15:58.
+            secondDigit.addChild(minuteFirstDigit);
+
+            // When the first digit is 0-1, and the second digit is 0-5, the third digit may be 6-9.
+            Node thirdDigit = new Node(k6, k7, k8, k9);
+            // The time must now be finished. E.g. 0:55, 1:08.
+            secondDigit.addChild(thirdDigit);
+
+            // When the first digit is 0-1, the second digit may be 6-9.
+            secondDigit = new Node(k6, k7, k8, k9);
+            firstDigit.addChild(secondDigit);
+            // We must now be followed by the first minute digit. E.g. 06:50, 18:20.
+            secondDigit.addChild(minuteFirstDigit);
+
+            // The first digit may be 2.
+            firstDigit = new Node(k2);
+            mLegalTimesTree.addChild(firstDigit);
+
+            // When the first digit is 2, the second digit may be 0-3.
+            secondDigit = new Node(k0, k1, k2, k3);
+            firstDigit.addChild(secondDigit);
+            // We must now be followed by the first minute digit. E.g. 20:50, 23:09.
+            secondDigit.addChild(minuteFirstDigit);
+
+            // When the first digit is 2, the second digit may be 4-5.
+            secondDigit = new Node(k4, k5);
+            firstDigit.addChild(secondDigit);
+            // We must now be followd by the last minute digit. E.g. 2:40, 2:53.
+            secondDigit.addChild(minuteSecondDigit);
+
+            // The first digit may be 3-9.
+            firstDigit = new Node(k3, k4, k5, k6, k7, k8, k9);
+            mLegalTimesTree.addChild(firstDigit);
+            // We must now be followed by the first minute digit. E.g. 3:57, 8:12.
+            firstDigit.addChild(minuteFirstDigit);
+        } else {
+            // We'll need to use the AM/PM node a lot.
+            // Set up AM and PM to respond to "a" and "p".
+            Node ampm = new Node(getAmOrPmKeyCode(AM), getAmOrPmKeyCode(PM));
+
+            // The first hour digit may be 1.
+            Node firstDigit = new Node(k1);
+            mLegalTimesTree.addChild(firstDigit);
+            // We'll allow quick input of on-the-hour times. E.g. 1pm.
+            firstDigit.addChild(ampm);
+
+            // When the first digit is 1, the second digit may be 0-2.
+            Node secondDigit = new Node(k0, k1, k2);
+            firstDigit.addChild(secondDigit);
+            // Also for quick input of on-the-hour times. E.g. 10pm, 12am.
+            secondDigit.addChild(ampm);
+
+            // When the first digit is 1, and the second digit is 0-2, the third digit may be 0-5.
+            Node thirdDigit = new Node(k0, k1, k2, k3, k4, k5);
+            secondDigit.addChild(thirdDigit);
+            // The time may be finished now. E.g. 1:02pm, 1:25am.
+            thirdDigit.addChild(ampm);
+
+            // When the first digit is 1, the second digit is 0-2, and the third digit is 0-5,
+            // the fourth digit may be 0-9.
+            Node fourthDigit = new Node(k0, k1, k2, k3, k4, k5, k6, k7, k8, k9);
+            thirdDigit.addChild(fourthDigit);
+            // The time must be finished now. E.g. 10:49am, 12:40pm.
+            fourthDigit.addChild(ampm);
+
+            // When the first digit is 1, and the second digit is 0-2, the third digit may be 6-9.
+            thirdDigit = new Node(k6, k7, k8, k9);
+            secondDigit.addChild(thirdDigit);
+            // The time must be finished now. E.g. 1:08am, 1:26pm.
+            thirdDigit.addChild(ampm);
+
+            // When the first digit is 1, the second digit may be 3-5.
+            secondDigit = new Node(k3, k4, k5);
+            firstDigit.addChild(secondDigit);
+
+            // When the first digit is 1, and the second digit is 3-5, the third digit may be 0-9.
+            thirdDigit = new Node(k0, k1, k2, k3, k4, k5, k6, k7, k8, k9);
+            secondDigit.addChild(thirdDigit);
+            // The time must be finished now. E.g. 1:39am, 1:50pm.
+            thirdDigit.addChild(ampm);
+
+            // The hour digit may be 2-9.
+            firstDigit = new Node(k2, k3, k4, k5, k6, k7, k8, k9);
+            mLegalTimesTree.addChild(firstDigit);
+            // We'll allow quick input of on-the-hour-times. E.g. 2am, 5pm.
+            firstDigit.addChild(ampm);
+
+            // When the first digit is 2-9, the second digit may be 0-5.
+            secondDigit = new Node(k0, k1, k2, k3, k4, k5);
+            firstDigit.addChild(secondDigit);
+
+            // When the first digit is 2-9, and the second digit is 0-5, the third digit may be 0-9.
+            thirdDigit = new Node(k0, k1, k2, k3, k4, k5, k6, k7, k8, k9);
+            secondDigit.addChild(thirdDigit);
+            // The time must be finished now. E.g. 2:57am, 9:30pm.
+            thirdDigit.addChild(ampm);
+        }

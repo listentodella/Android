@@ -1,0 +1,137 @@
+class KeyguardServiceWrapper
+!!!533506.java!!!	KeyguardServiceWrapper(inout service : IKeyguardService)
+        mService = service;
+!!!533634.java!!!	isShowing() : boolean
+        try {
+            return mService.isShowing();
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+        return false;
+!!!533762.java!!!	isSecure() : boolean
+        try {
+            return mService.isSecure();
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+        return false; // TODO cache state
+!!!533890.java!!!	isShowingAndNotOccluded() : boolean
+        try {
+            return mService.isShowingAndNotOccluded();
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+        return false; // TODO cache state
+!!!534018.java!!!	isInputRestricted() : boolean
+        try {
+            return mService.isInputRestricted();
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+        return false; // TODO cache state
+!!!534146.java!!!	isDismissable() : boolean
+        try {
+            return mService.isDismissable();
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+        return true; // TODO cache state
+!!!534274.java!!!	verifyUnlock(inout callback : IKeyguardExitCallback) : void
+        try {
+            mService.verifyUnlock(callback);
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!534402.java!!!	keyguardDone(inout authenticated : boolean, inout wakeup : boolean) : void
+        try {
+            mService.keyguardDone(authenticated, wakeup);
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!534530.java!!!	setOccluded(inout isOccluded : boolean) : int
+        try {
+            return mService.setOccluded(isOccluded);
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+            return IKeyguardServiceConstants.KEYGUARD_SERVICE_SET_OCCLUDED_RESULT_NONE;
+        }
+!!!534658.java!!!	dismiss() : void
+        try {
+            mService.dismiss();
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!534786.java!!!	onDreamingStarted() : void
+        try {
+            mService.onDreamingStarted();
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!534914.java!!!	onDreamingStopped() : void
+        try {
+            mService.onDreamingStopped();
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!535042.java!!!	onScreenTurnedOff(in reason : int) : void
+        try {
+            mService.onScreenTurnedOff(reason);
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!535170.java!!!	onScreenTurnedOn(inout result : IKeyguardShowCallback) : void
+        try {
+            mService.onScreenTurnedOn(result);
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!535298.java!!!	setKeyguardEnabled(inout enabled : boolean) : void
+        try {
+            mService.setKeyguardEnabled(enabled);
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!535426.java!!!	onSystemReady() : void
+        try {
+            mService.onSystemReady();
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!535554.java!!!	doKeyguardTimeout(inout options : Bundle) : void
+        try {
+            mService.doKeyguardTimeout(options);
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!535682.java!!!	setCurrentUser(in userId : int) : void
+        try {
+            mService.setCurrentUser(userId);
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!535810.java!!!	onBootCompleted() : void
+        try {
+            mService.onBootCompleted();
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!535938.java!!!	startKeyguardExitAnimation(in startTime : long, in fadeoutDuration : long) : void
+        try {
+            mService.startKeyguardExitAnimation(startTime, fadeoutDuration);
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!536066.java!!!	onActivityDrawn() : void
+        try {
+            mService.onActivityDrawn();
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+!!!536194.java!!!	showAssistant() : void
+        // Not used by PhoneWindowManager
+!!!536322.java!!!	dispatch(inout event : MotionEvent) : void
+        // Not used by PhoneWindowManager.  See code in {@link NavigationBarView}
+!!!536450.java!!!	launchCamera() : void
+        // Not used by PhoneWindowManager.  See code in {@link NavigationBarView}
+!!!536578.java!!!	asBinder() : IBinder
+        return mService.asBinder();

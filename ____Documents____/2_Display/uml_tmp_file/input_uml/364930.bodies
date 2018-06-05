@@ -1,0 +1,5 @@
+class MyWatcher
+!!!2117506.java!!!	afterTextChanged(inout s : Editable) : void
+            doAfterTextChanged();
+!!!2117634.java!!!	beforeTextChanged(inout s : CharSequence, in start : int, in count : int, in after : int) : void
+            doBeforeTextChanged();

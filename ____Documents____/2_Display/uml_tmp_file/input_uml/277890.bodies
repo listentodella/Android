@@ -1,0 +1,15 @@
+class WaitResult
+!!!1387906.java!!!	describeContents() : int
+            return 0;
+!!!1388034.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            dest.writeInt(result);
+            dest.writeInt(timeout ? 1 : 0);
+            ComponentName.writeToParcel(who, dest);
+            dest.writeLong(thisTime);
+            dest.writeLong(totalTime);
+!!!1388162.java!!!	WaitResult(inout source : Parcel)
+            result = source.readInt();
+            timeout = source.readInt() != 0;
+            who = ComponentName.readFromParcel(source);
+            thisTime = source.readLong();
+            totalTime = source.readLong();

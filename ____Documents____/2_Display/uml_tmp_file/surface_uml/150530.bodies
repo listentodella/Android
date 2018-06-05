@@ -1,0 +1,4 @@
+class LayerCleaner
+!!!188290.cpp!!!	~LayerCleaner()
+    // destroy client resources
+    mFlinger->onLayerDestroyed(mLayer);

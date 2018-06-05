@@ -1,0 +1,3 @@
+class UnavailableException
+!!!755714.java!!!	UnavailableException(in msg : String)
+            super(msg);

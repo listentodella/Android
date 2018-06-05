@@ -1,0 +1,12 @@
+class RemoteViewsCacheKey
+!!!1923330.java!!!	RemoteViewsCacheKey(inout filter : Intent.FilterComparison, in widgetId : int)
+            this.filter = filter;
+            this.widgetId = widgetId;
+!!!1923458.java!!!	equals(inout o : Object) : boolean
+            if (!(o instanceof RemoteViewsCacheKey)) {
+                return false;
+            }
+            RemoteViewsCacheKey other = (RemoteViewsCacheKey) o;
+            return other.filter.equals(filter) && other.widgetId == widgetId;
+!!!1923586.java!!!	hashCode() : int
+            return (filter == null ? 0 : filter.hashCode()) ^ (widgetId << 2);

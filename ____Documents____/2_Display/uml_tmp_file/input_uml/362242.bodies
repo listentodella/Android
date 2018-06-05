@@ -1,0 +1,143 @@
+class ArrayAdapter
+!!!2054146.java!!!	ArrayAdapter(inout context : Context, in resource : int)
+        init(context, resource, 0, new ArrayList<T>());
+!!!2054274.java!!!	ArrayAdapter(inout context : Context, in resource : int, in textViewResourceId : int)
+        init(context, resource, textViewResourceId, new ArrayList<T>());
+!!!2054402.java!!!	ArrayAdapter(inout context : Context, in resource : int, inout objects : T)
+        init(context, resource, 0, Arrays.asList(objects));
+!!!2054530.java!!!	ArrayAdapter(inout context : Context, in resource : int, in textViewResourceId : int, inout objects : T)
+        init(context, resource, textViewResourceId, Arrays.asList(objects));
+!!!2054658.java!!!	ArrayAdapter(inout context : Context, in resource : int, inout objects : List<T>)
+        init(context, resource, 0, objects);
+!!!2054786.java!!!	ArrayAdapter(inout context : Context, in resource : int, in textViewResourceId : int, inout objects : List<T>)
+        init(context, resource, textViewResourceId, objects);
+!!!2054914.java!!!	add(inout object : T) : void
+        synchronized (mLock) {
+            if (mOriginalValues != null) {
+                mOriginalValues.add(object);
+            } else {
+                mObjects.add(object);
+            }
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+!!!2055042.java!!!	addAll(inout collection : Collection<? extends T>) : void
+        synchronized (mLock) {
+            if (mOriginalValues != null) {
+                mOriginalValues.addAll(collection);
+            } else {
+                mObjects.addAll(collection);
+            }
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+!!!2055170.java!!!	addAll(inout items : T) : void
+        synchronized (mLock) {
+            if (mOriginalValues != null) {
+                Collections.addAll(mOriginalValues, items);
+            } else {
+                Collections.addAll(mObjects, items);
+            }
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+!!!2055298.java!!!	insert(inout object : T, in index : int) : void
+        synchronized (mLock) {
+            if (mOriginalValues != null) {
+                mOriginalValues.add(index, object);
+            } else {
+                mObjects.add(index, object);
+            }
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+!!!2055426.java!!!	remove(inout object : T) : void
+        synchronized (mLock) {
+            if (mOriginalValues != null) {
+                mOriginalValues.remove(object);
+            } else {
+                mObjects.remove(object);
+            }
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+!!!2055554.java!!!	clear() : void
+        synchronized (mLock) {
+            if (mOriginalValues != null) {
+                mOriginalValues.clear();
+            } else {
+                mObjects.clear();
+            }
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+!!!2055682.java!!!	sort(inout comparator : Comparator<? super T>) : void
+        synchronized (mLock) {
+            if (mOriginalValues != null) {
+                Collections.sort(mOriginalValues, comparator);
+            } else {
+                Collections.sort(mObjects, comparator);
+            }
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+!!!2055810.java!!!	notifyDataSetChanged() : void
+        super.notifyDataSetChanged();
+        mNotifyOnChange = true;
+!!!2055938.java!!!	setNotifyOnChange(inout notifyOnChange : boolean) : void
+        mNotifyOnChange = notifyOnChange;
+!!!2056066.java!!!	init(inout context : Context, in resource : int, in textViewResourceId : int, inout objects : List<T>) : void
+        mContext = context;
+        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mResource = mDropDownResource = resource;
+        mObjects = objects;
+        mFieldId = textViewResourceId;
+!!!2056194.java!!!	getContext() : Context
+        return mContext;
+!!!2056322.java!!!	getCount() : int
+        return mObjects.size();
+!!!2056450.java!!!	getItem(in position : int) : T
+        return mObjects.get(position);
+!!!2056578.java!!!	getPosition(inout item : T) : int
+        return mObjects.indexOf(item);
+!!!2056706.java!!!	getItemId(in position : int) : long
+        return position;
+!!!2056834.java!!!	getView(in position : int, inout convertView : View, inout parent : ViewGroup) : View
+        return createViewFromResource(position, convertView, parent, mResource);
+!!!2056962.java!!!	createViewFromResource(in position : int, inout convertView : View, inout parent : ViewGroup, in resource : int) : View
+        View view;
+        TextView text;
+
+        if (convertView == null) {
+            view = mInflater.inflate(resource, parent, false);
+        } else {
+            view = convertView;
+        }
+
+        try {
+            if (mFieldId == 0) {
+                //  If no custom field is assigned, assume the whole resource is a TextView
+                text = (TextView) view;
+            } else {
+                //  Otherwise, find the TextView field within the layout
+                text = (TextView) view.findViewById(mFieldId);
+            }
+        } catch (ClassCastException e) {
+            Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
+            throw new IllegalStateException(
+                    "ArrayAdapter requires the resource ID to be a TextView", e);
+        }
+
+        T item = getItem(position);
+        if (item instanceof CharSequence) {
+            text.setText((CharSequence)item);
+        } else {
+            text.setText(item.toString());
+        }
+
+        return view;
+!!!2057090.java!!!	setDropDownViewResource(in resource : int) : void
+        this.mDropDownResource = resource;
+!!!2057218.java!!!	getDropDownView(in position : int, inout convertView : View, inout parent : ViewGroup) : View
+        return createViewFromResource(position, convertView, parent, mDropDownResource);
+!!!2057346.java!!!	createFromResource(inout context : Context, in textArrayResId : int, in textViewResId : int) : ArrayAdapter
+        CharSequence[] strings = context.getResources().getTextArray(textArrayResId);
+        return new ArrayAdapter<CharSequence>(context, textViewResId, strings);
+!!!2057474.java!!!	getFilter() : Filter
+        if (mFilter == null) {
+            mFilter = new ArrayFilter();
+        }
+        return mFilter;

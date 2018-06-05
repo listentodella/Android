@@ -1,0 +1,47 @@
+format 76
+
+classinstance 128002 class_ref 128514 // Ext7
+  name ""   xyz 96 4 2000 life_line_z 2000
+classinstance 128130 class_ref 128386 // Son
+  name ""   xyz 226 4 2000 life_line_z 2000
+durationcanvas 128258 classinstance_ref 128002 // :Ext7
+  xyzwh 115 97 2010 11 157
+  overlappingdurationcanvas 130306
+    xyzwh 121 206 2020 11 25
+  end
+end
+durationcanvas 128642 classinstance_ref 128130 // :Son
+  xyzwh 245 103 2010 11 25
+end
+durationcanvas 128898 classinstance_ref 128130 // :Son
+  xyzwh 245 154 2010 11 35
+end
+lostfoundmsgsupport 128386 xyz 61 99 2015
+msg 128514 found_synchronous
+  from lostfoundmsgsupport_ref 128386
+  to durationcanvas_ref 128258
+  yz 97 2015 explicitmsg "main"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 78 82
+msg 128770 synchronous
+  from durationcanvas_ref 128258
+  to durationcanvas_ref 128642
+  yz 109 2020 explicitmsg "1. new Son()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 151 94
+msg 129026 synchronous
+  from durationcanvas_ref 128258
+  to durationcanvas_ref 128898
+  yz 159 2015 explicitmsg "2. study()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 160 144
+msg 130178 return
+  from durationcanvas_ref 128898
+  to durationcanvas_ref 128258
+  yz 178 2015 unspecifiedmsg
+  show_full_operations_definition default drawing_language default show_context_mode default
+reflexivemsg 130434 synchronous
+  to durationcanvas_ref 130306
+  yz 206 2025 unspecifiedmsg
+  show_full_operations_definition default drawing_language default show_context_mode default
+end

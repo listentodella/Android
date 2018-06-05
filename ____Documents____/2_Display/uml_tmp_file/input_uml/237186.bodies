@@ -1,0 +1,38 @@
+class QueuedInputEvent
+!!!968962.java!!!	shouldSkipIme() : boolean
+            if ((mFlags & FLAG_DELIVER_POST_IME) != 0) {
+                return true;
+            }
+            return mEvent instanceof MotionEvent
+                    && mEvent.isFromSource(InputDevice.SOURCE_CLASS_POINTER);
+!!!969090.java!!!	shouldSendToSynthesizer() : boolean
+            if ((mFlags & FLAG_UNHANDLED) != 0) {
+                return true;
+            }
+
+            return false;
+!!!969218.java!!!	toString() : String
+            StringBuilder sb = new StringBuilder("QueuedInputEvent{flags=");
+            boolean hasPrevious = false;
+            hasPrevious = flagToString("DELIVER_POST_IME", FLAG_DELIVER_POST_IME, hasPrevious, sb);
+            hasPrevious = flagToString("DEFERRED", FLAG_DEFERRED, hasPrevious, sb);
+            hasPrevious = flagToString("FINISHED", FLAG_FINISHED, hasPrevious, sb);
+            hasPrevious = flagToString("FINISHED_HANDLED", FLAG_FINISHED_HANDLED, hasPrevious, sb);
+            hasPrevious = flagToString("RESYNTHESIZED", FLAG_RESYNTHESIZED, hasPrevious, sb);
+            hasPrevious = flagToString("UNHANDLED", FLAG_UNHANDLED, hasPrevious, sb);
+            if (!hasPrevious) {
+                sb.append("0");
+            }
+            sb.append(", hasNextQueuedEvent=" + (mEvent != null ? "true" : "false"));
+            sb.append(", hasInputEventReceiver=" + (mReceiver != null ? "true" : "false"));
+            sb.append(", mEvent=" + mEvent + "}");
+            return sb.toString();
+!!!969346.java!!!	flagToString(in name : String, in flag : int, inout hasPrevious : boolean, inout sb : StringBuilder) : boolean
+            if ((mFlags & flag) != 0) {
+                if (hasPrevious) {
+                    sb.append("|");
+                }
+                sb.append(name);
+                return true;
+            }
+            return hasPrevious;

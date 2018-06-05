@@ -1,0 +1,19 @@
+class ActivityContainerCallback
+!!!1473538.java!!!	ActivityContainerCallback(inout activityView : ActivityView)
+            mActivityViewWeakReference = new WeakReference<ActivityView>(activityView);
+!!!1473666.java!!!	setVisible(inout container : IBinder, inout visible : boolean) : void
+            if (DEBUG) Log.v(TAG, "setVisible(): container=" + container + " visible=" + visible +
+                    " ActivityView=" + mActivityViewWeakReference.get());
+!!!1473794.java!!!	onAllActivitiesComplete(inout container : IBinder) : void
+            final ActivityView activityView = mActivityViewWeakReference.get();
+            if (activityView != null) {
+                final ActivityViewCallback callback = activityView.mActivityViewCallback;
+                if (callback != null) {
+                    activityView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onAllActivitiesComplete(activityView);
+                        }
+                    });
+                }
+            }

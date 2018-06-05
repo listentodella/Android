@@ -1,0 +1,6 @@
+class ServiceHandler
+!!!1638018.java!!!	ServiceHandler(inout looper : Looper)
+            super(looper);
+!!!1638146.java!!!	handleMessage(inout msg : Message) : void
+            onHandleIntent((Intent)msg.obj);
+            stopSelf(msg.arg1);

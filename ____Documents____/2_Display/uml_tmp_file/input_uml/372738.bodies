@@ -1,0 +1,5 @@
+class FormatChangeObserver
+!!!2225410.java!!!	FormatChangeObserver()
+            super(new Handler());
+!!!2225538.java!!!	onChange(inout selfChange : boolean) : void
+            setFormat();

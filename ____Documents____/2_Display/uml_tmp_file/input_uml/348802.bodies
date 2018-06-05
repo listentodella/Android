@@ -1,0 +1,382 @@
+class FrameLayout
+!!!1913730.java!!!	FrameLayout(inout context : Context)
+        super(context);
+!!!1913858.java!!!	FrameLayout(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!1913986.java!!!	FrameLayout(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!1914114.java!!!	FrameLayout(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, com.android.internal.R.styleable.FrameLayout, defStyleAttr, defStyleRes);
+
+        mForegroundGravity = a.getInt(
+                com.android.internal.R.styleable.FrameLayout_foregroundGravity, mForegroundGravity);
+
+        final Drawable d = a.getDrawable(com.android.internal.R.styleable.FrameLayout_foreground);
+        if (d != null) {
+            setForeground(d);
+        }
+        
+        if (a.getBoolean(com.android.internal.R.styleable.FrameLayout_measureAllChildren, false)) {
+            setMeasureAllChildren(true);
+        }
+
+        if (a.hasValue(R.styleable.FrameLayout_foregroundTintMode)) {
+            mForegroundTintMode = Drawable.parseTintMode(a.getInt(
+                    R.styleable.FrameLayout_foregroundTintMode, -1), mForegroundTintMode);
+            mHasForegroundTintMode = true;
+        }
+
+        if (a.hasValue(R.styleable.FrameLayout_foregroundTint)) {
+            mForegroundTintList = a.getColorStateList(R.styleable.FrameLayout_foregroundTint);
+            mHasForegroundTint = true;
+        }
+
+        mForegroundInPadding = a.getBoolean(R.styleable.FrameLayout_foregroundInsidePadding, true);
+
+        a.recycle();
+
+        applyForegroundTint();
+!!!1914242.java!!!	getForegroundGravity() : int
+        return mForegroundGravity;
+!!!1914370.java!!!	setForegroundGravity(in foregroundGravity : int) : void
+        if (mForegroundGravity != foregroundGravity) {
+            if ((foregroundGravity & Gravity.RELATIVE_HORIZONTAL_GRAVITY_MASK) == 0) {
+                foregroundGravity |= Gravity.START;
+            }
+
+            if ((foregroundGravity & Gravity.VERTICAL_GRAVITY_MASK) == 0) {
+                foregroundGravity |= Gravity.TOP;
+            }
+
+            mForegroundGravity = foregroundGravity;
+
+
+            if (mForegroundGravity == Gravity.FILL && mForeground != null) {
+                Rect padding = new Rect();
+                if (mForeground.getPadding(padding)) {
+                    mForegroundPaddingLeft = padding.left;
+                    mForegroundPaddingTop = padding.top;
+                    mForegroundPaddingRight = padding.right;
+                    mForegroundPaddingBottom = padding.bottom;
+                }
+            } else {
+                mForegroundPaddingLeft = 0;
+                mForegroundPaddingTop = 0;
+                mForegroundPaddingRight = 0;
+                mForegroundPaddingBottom = 0;
+            }
+
+            requestLayout();
+        }
+!!!1914498.java!!!	setVisibility(in visibility : int) : void
+        super.setVisibility(visibility);
+        if (mForeground != null) {
+            mForeground.setVisible(visibility == VISIBLE, false);
+        }
+!!!1914626.java!!!	verifyDrawable(inout who : Drawable) : boolean
+        return super.verifyDrawable(who) || (who == mForeground);
+!!!1914754.java!!!	jumpDrawablesToCurrentState() : void
+        super.jumpDrawablesToCurrentState();
+        if (mForeground != null) mForeground.jumpToCurrentState();
+!!!1914882.java!!!	drawableStateChanged() : void
+        super.drawableStateChanged();
+        if (mForeground != null && mForeground.isStateful()) {
+            mForeground.setState(getDrawableState());
+        }
+!!!1915010.java!!!	drawableHotspotChanged(in x : float, in y : float) : void
+        super.drawableHotspotChanged(x, y);
+
+        if (mForeground != null) {
+            mForeground.setHotspot(x, y);
+        }
+!!!1915138.java!!!	generateDefaultLayoutParams() : FrameLayout::LayoutParams
+        return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+!!!1915266.java!!!	setForeground(inout d : Drawable) : void
+        if (mForeground != d) {
+            if (mForeground != null) {
+                mForeground.setCallback(null);
+                unscheduleDrawable(mForeground);
+            }
+
+            mForeground = d;
+            mForegroundPaddingLeft = 0;
+            mForegroundPaddingTop = 0;
+            mForegroundPaddingRight = 0;
+            mForegroundPaddingBottom = 0;
+
+            if (d != null) {
+                setWillNotDraw(false);
+                d.setCallback(this);
+                d.setLayoutDirection(getLayoutDirection());
+                if (d.isStateful()) {
+                    d.setState(getDrawableState());
+                }
+                applyForegroundTint();
+                if (mForegroundGravity == Gravity.FILL) {
+                    Rect padding = new Rect();
+                    if (d.getPadding(padding)) {
+                        mForegroundPaddingLeft = padding.left;
+                        mForegroundPaddingTop = padding.top;
+                        mForegroundPaddingRight = padding.right;
+                        mForegroundPaddingBottom = padding.bottom;
+                    }
+                }
+            }  else {
+                setWillNotDraw(true);
+            }
+            requestLayout();
+            invalidate();
+        }
+!!!1915394.java!!!	getForeground() : Drawable
+        return mForeground;
+!!!1915522.java!!!	setForegroundTintList(inout tint : ColorStateList) : void
+        mForegroundTintList = tint;
+        mHasForegroundTint = true;
+
+        applyForegroundTint();
+!!!1915650.java!!!	getForegroundTintList() : ColorStateList
+        return mForegroundTintList;
+!!!1915778.java!!!	setForegroundTintMode(inout tintMode : PorterDuff.Mode) : void
+        mForegroundTintMode = tintMode;
+        mHasForegroundTintMode = true;
+
+        applyForegroundTint();
+!!!1915906.java!!!	getForegroundTintMode() : PorterDuff.Mode
+        return mForegroundTintMode;
+!!!1916034.java!!!	applyForegroundTint() : void
+        if (mForeground != null && (mHasForegroundTint || mHasForegroundTintMode)) {
+            mForeground = mForeground.mutate();
+
+            if (mHasForegroundTint) {
+                mForeground.setTintList(mForegroundTintList);
+            }
+
+            if (mHasForegroundTintMode) {
+                mForeground.setTintMode(mForegroundTintMode);
+            }
+        }
+!!!1916162.java!!!	getPaddingLeftWithForeground() : int
+        return mForegroundInPadding ? Math.max(mPaddingLeft, mForegroundPaddingLeft) :
+            mPaddingLeft + mForegroundPaddingLeft;
+!!!1916290.java!!!	getPaddingRightWithForeground() : int
+        return mForegroundInPadding ? Math.max(mPaddingRight, mForegroundPaddingRight) :
+            mPaddingRight + mForegroundPaddingRight;
+!!!1916418.java!!!	getPaddingTopWithForeground() : int
+        return mForegroundInPadding ? Math.max(mPaddingTop, mForegroundPaddingTop) :
+            mPaddingTop + mForegroundPaddingTop;
+!!!1916546.java!!!	getPaddingBottomWithForeground() : int
+        return mForegroundInPadding ? Math.max(mPaddingBottom, mForegroundPaddingBottom) :
+            mPaddingBottom + mForegroundPaddingBottom;
+!!!1916674.java!!!	onMeasure(in widthMeasureSpec : int, in heightMeasureSpec : int) : void
+        int count = getChildCount();
+
+        final boolean measureMatchParentChildren =
+                MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.EXACTLY ||
+                MeasureSpec.getMode(heightMeasureSpec) != MeasureSpec.EXACTLY;
+        mMatchParentChildren.clear();
+
+        int maxHeight = 0;
+        int maxWidth = 0;
+        int childState = 0;
+
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (mMeasureAllChildren || child.getVisibility() != GONE) {
+                measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                maxWidth = Math.max(maxWidth,
+                        child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin);
+                maxHeight = Math.max(maxHeight,
+                        child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin);
+                childState = combineMeasuredStates(childState, child.getMeasuredState());
+                if (measureMatchParentChildren) {
+                    if (lp.width == LayoutParams.MATCH_PARENT ||
+                            lp.height == LayoutParams.MATCH_PARENT) {
+                        mMatchParentChildren.add(child);
+                    }
+                }
+            }
+        }
+
+        // Account for padding too
+        maxWidth += getPaddingLeftWithForeground() + getPaddingRightWithForeground();
+        maxHeight += getPaddingTopWithForeground() + getPaddingBottomWithForeground();
+
+        // Check against our minimum height and width
+        maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight());
+        maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
+
+        // Check against our foreground's minimum height and width
+        final Drawable drawable = getForeground();
+        if (drawable != null) {
+            maxHeight = Math.max(maxHeight, drawable.getMinimumHeight());
+            maxWidth = Math.max(maxWidth, drawable.getMinimumWidth());
+        }
+
+        setMeasuredDimension(resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
+                resolveSizeAndState(maxHeight, heightMeasureSpec,
+                        childState << MEASURED_HEIGHT_STATE_SHIFT));
+
+        count = mMatchParentChildren.size();
+        if (count > 1) {
+            for (int i = 0; i < count; i++) {
+                final View child = mMatchParentChildren.get(i);
+
+                final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
+                int childWidthMeasureSpec;
+                int childHeightMeasureSpec;
+                
+                if (lp.width == LayoutParams.MATCH_PARENT) {
+                    childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredWidth() -
+                            getPaddingLeftWithForeground() - getPaddingRightWithForeground() -
+                            lp.leftMargin - lp.rightMargin,
+                            MeasureSpec.EXACTLY);
+                } else {
+                    childWidthMeasureSpec = getChildMeasureSpec(widthMeasureSpec,
+                            getPaddingLeftWithForeground() + getPaddingRightWithForeground() +
+                            lp.leftMargin + lp.rightMargin,
+                            lp.width);
+                }
+                
+                if (lp.height == LayoutParams.MATCH_PARENT) {
+                    childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(getMeasuredHeight() -
+                            getPaddingTopWithForeground() - getPaddingBottomWithForeground() -
+                            lp.topMargin - lp.bottomMargin,
+                            MeasureSpec.EXACTLY);
+                } else {
+                    childHeightMeasureSpec = getChildMeasureSpec(heightMeasureSpec,
+                            getPaddingTopWithForeground() + getPaddingBottomWithForeground() +
+                            lp.topMargin + lp.bottomMargin,
+                            lp.height);
+                }
+
+                child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+            }
+        }
+!!!1916802.java!!!	onLayout(inout changed : boolean, in left : int, in top : int, in right : int, in bottom : int) : void
+        layoutChildren(left, top, right, bottom, false /* no force left gravity */);
+!!!1916930.java!!!	layoutChildren(in left : int, in top : int, in right : int, in bottom : int, inout forceLeftGravity : boolean) : void
+        final int count = getChildCount();
+
+        final int parentLeft = getPaddingLeftWithForeground();
+        final int parentRight = right - left - getPaddingRightWithForeground();
+
+        final int parentTop = getPaddingTopWithForeground();
+        final int parentBottom = bottom - top - getPaddingBottomWithForeground();
+
+        mForegroundBoundsChanged = true;
+        
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.getVisibility() != GONE) {
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+
+                final int width = child.getMeasuredWidth();
+                final int height = child.getMeasuredHeight();
+
+                int childLeft;
+                int childTop;
+
+                int gravity = lp.gravity;
+                if (gravity == -1) {
+                    gravity = DEFAULT_CHILD_GRAVITY;
+                }
+
+                final int layoutDirection = getLayoutDirection();
+                final int absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection);
+                final int verticalGravity = gravity & Gravity.VERTICAL_GRAVITY_MASK;
+
+                switch (absoluteGravity & Gravity.HORIZONTAL_GRAVITY_MASK) {
+                    case Gravity.CENTER_HORIZONTAL:
+                        childLeft = parentLeft + (parentRight - parentLeft - width) / 2 +
+                        lp.leftMargin - lp.rightMargin;
+                        break;
+                    case Gravity.RIGHT:
+                        if (!forceLeftGravity) {
+                            childLeft = parentRight - width - lp.rightMargin;
+                            break;
+                        }
+                    case Gravity.LEFT:
+                    default:
+                        childLeft = parentLeft + lp.leftMargin;
+                }
+
+                switch (verticalGravity) {
+                    case Gravity.TOP:
+                        childTop = parentTop + lp.topMargin;
+                        break;
+                    case Gravity.CENTER_VERTICAL:
+                        childTop = parentTop + (parentBottom - parentTop - height) / 2 +
+                        lp.topMargin - lp.bottomMargin;
+                        break;
+                    case Gravity.BOTTOM:
+                        childTop = parentBottom - height - lp.bottomMargin;
+                        break;
+                    default:
+                        childTop = parentTop + lp.topMargin;
+                }
+
+                child.layout(childLeft, childTop, childLeft + width, childTop + height);
+            }
+        }
+!!!1917058.java!!!	onSizeChanged(in w : int, in h : int, in oldw : int, in oldh : int) : void
+        super.onSizeChanged(w, h, oldw, oldh);
+        mForegroundBoundsChanged = true;
+!!!1917186.java!!!	draw(inout canvas : Canvas) : void
+        super.draw(canvas);
+
+        if (mForeground != null) {
+            final Drawable foreground = mForeground;
+
+            if (mForegroundBoundsChanged) {
+                mForegroundBoundsChanged = false;
+                final Rect selfBounds = mSelfBounds;
+                final Rect overlayBounds = mOverlayBounds;
+
+                final int w = mRight-mLeft;
+                final int h = mBottom-mTop;
+
+                if (mForegroundInPadding) {
+                    selfBounds.set(0, 0, w, h);
+                } else {
+                    selfBounds.set(mPaddingLeft, mPaddingTop, w - mPaddingRight, h - mPaddingBottom);
+                }
+
+                final int layoutDirection = getLayoutDirection();
+                Gravity.apply(mForegroundGravity, foreground.getIntrinsicWidth(),
+                        foreground.getIntrinsicHeight(), selfBounds, overlayBounds,
+                        layoutDirection);
+                foreground.setBounds(overlayBounds);
+            }
+            
+            foreground.draw(canvas);
+        }
+!!!1917314.java!!!	gatherTransparentRegion(inout region : Region) : boolean
+        boolean opaque = super.gatherTransparentRegion(region);
+        if (region != null && mForeground != null) {
+            applyDrawableToTransparentRegion(mForeground, region);
+        }
+        return opaque;
+!!!1917442.java!!!	setMeasureAllChildren(inout measureAll : boolean) : void
+        mMeasureAllChildren = measureAll;
+!!!1917570.java!!!	getConsiderGoneChildrenWhenMeasuring() : boolean
+        return getMeasureAllChildren();
+!!!1917698.java!!!	getMeasureAllChildren() : boolean
+        return mMeasureAllChildren;
+!!!1917826.java!!!	generateLayoutParams(inout attrs : AttributeSet) : FrameLayout::LayoutParams
+        return new FrameLayout.LayoutParams(getContext(), attrs);        
+!!!1917954.java!!!	shouldDelayChildPressedState() : boolean
+        return false;
+!!!1918082.java!!!	checkLayoutParams(inout p : ViewGroup::LayoutParams) : boolean
+        return p instanceof LayoutParams;
+!!!1918210.java!!!	generateLayoutParams(inout p : ViewGroup::LayoutParams) : ViewGroup::LayoutParams
+        return new LayoutParams(p);
+!!!1918338.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(FrameLayout.class.getName());
+!!!1918466.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(FrameLayout.class.getName());

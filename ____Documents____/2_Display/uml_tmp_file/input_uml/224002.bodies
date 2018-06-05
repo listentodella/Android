@@ -1,0 +1,12 @@
+class HardwareCanvas
+!!!699778.java!!!	isHardwareAccelerated() : boolean
+        return true;
+!!!699906.java!!!	setBitmap(inout bitmap : Bitmap) : void
+        throw new UnsupportedOperationException();
+!!!700290.java!!!	drawRenderNode(inout renderNode : RenderNode) : void
+        drawRenderNode(renderNode, null, RenderNode.FLAG_CLIP_CHILDREN);
+!!!700674.java!!!	callDrawGLFunction(in drawGLFunction : long) : int
+        // Noop - this is done in the display list recorder subclass
+        return RenderNode.STATUS_DONE;
+!!!701058.java!!!	setProperty(in name : String, in value : String) : void
+        GLES20Canvas.setProperty(name, value);

@@ -1,0 +1,16 @@
+class MediaRouterCallback
+!!!1666946.java!!!	MediaRouterCallback(inout provider : MediaRouteActionProvider)
+            mProviderWeak = new WeakReference<MediaRouteActionProvider>(provider);
+!!!1667074.java!!!	onRouteAdded(inout router : MediaRouter, inout info : RouteInfo) : void
+            refreshRoute(router);
+!!!1667202.java!!!	onRouteRemoved(inout router : MediaRouter, inout info : RouteInfo) : void
+            refreshRoute(router);
+!!!1667330.java!!!	onRouteChanged(inout router : MediaRouter, inout info : RouteInfo) : void
+            refreshRoute(router);
+!!!1667458.java!!!	refreshRoute(inout router : MediaRouter) : void
+            MediaRouteActionProvider provider = mProviderWeak.get();
+            if (provider != null) {
+                provider.refreshRoute();
+            } else {
+                router.removeCallback(this);
+            }

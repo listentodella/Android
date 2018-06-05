@@ -1,0 +1,15 @@
+class PopupPresenterCallback
+!!!2013826.java!!!	onOpenSubMenu(inout subMenu : MenuBuilder) : boolean
+            if (subMenu == null) return false;
+
+            mOpenSubMenuId = ((SubMenuBuilder) subMenu).getItem().getItemId();
+            final Callback cb = getCallback();
+            return cb != null ? cb.onOpenSubMenu(subMenu) : false;
+!!!2013954.java!!!	onCloseMenu(inout menu : MenuBuilder, inout allMenusAreClosing : boolean) : void
+            if (menu instanceof SubMenuBuilder) {
+                ((SubMenuBuilder) menu).getRootMenu().close(false);
+            }
+            final Callback cb = getCallback();
+            if (cb != null) {
+                cb.onCloseMenu(menu, allMenusAreClosing);
+            }

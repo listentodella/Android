@@ -1,0 +1,48 @@
+class Filter
+!!!523650.java!!!	Filter(inout whitelist : ArraySet<String>, inout blacklist : ArraySet<String>)
+            mWhitelist = whitelist;
+            mBlacklist = blacklist;
+!!!523778.java!!!	matches(inout attrs : LayoutParams) : boolean
+            if (attrs == null) return false;
+            boolean isApp = attrs.type >= WindowManager.LayoutParams.FIRST_APPLICATION_WINDOW
+                    && attrs.type <= WindowManager.LayoutParams.LAST_APPLICATION_WINDOW;
+            if (isApp && mBlacklist.contains(APPS)) return false;
+            if (onBlacklist(attrs.packageName)) return false;
+            if (isApp && mWhitelist.contains(APPS)) return true;
+            return onWhitelist(attrs.packageName);
+!!!523906.java!!!	matches(in packageName : String) : boolean
+            return !onBlacklist(packageName) && onWhitelist(packageName);
+!!!524034.java!!!	onBlacklist(in packageName : String) : boolean
+            return mBlacklist.contains(packageName) || mBlacklist.contains(ALL);
+!!!524162.java!!!	onWhitelist(in packageName : String) : boolean
+            return mWhitelist.contains(ALL) || mWhitelist.contains(packageName);
+!!!524290.java!!!	dump(inout pw : PrintWriter) : void
+            pw.print("Filter[");
+            dump("whitelist", mWhitelist, pw); pw.print(',');
+            dump("blacklist", mBlacklist, pw); pw.print(']');
+!!!524418.java!!!	dump(in name : String, inout set : ArraySet<String>, inout pw : PrintWriter) : void
+            pw.print(name); pw.print("=(");
+            final int n = set.size();
+            for (int i = 0; i < n; i++) {
+                if (i > 0) pw.print(',');
+                pw.print(set.valueAt(i));
+            }
+            pw.print(')');
+!!!524546.java!!!	toString() : String
+            StringWriter sw = new StringWriter();
+            dump(new PrintWriter(sw, true));
+            return sw.toString();
+!!!524674.java!!!	parse(in value : String) : PolicyControl::Filter
+            if (value == null) return null;
+            ArraySet<String> whitelist = new ArraySet<String>();
+            ArraySet<String> blacklist = new ArraySet<String>();
+            for (String token : value.split(",")) {
+                token = token.trim();
+                if (token.startsWith("-") && token.length() > 1) {
+                    token = token.substring(1);
+                    blacklist.add(token);
+                } else {
+                    whitelist.add(token);
+                }
+            }
+            return new Filter(whitelist, blacklist);

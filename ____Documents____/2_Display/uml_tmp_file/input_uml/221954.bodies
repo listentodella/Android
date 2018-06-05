@@ -1,0 +1,13 @@
+class ViewOverlay
+!!!923394.java!!!	ViewOverlay(inout context : Context, inout hostView : View)
+        mOverlayViewGroup = new OverlayViewGroup(context, hostView);
+!!!923522.java!!!	getOverlayView() : ViewGroup
+        return mOverlayViewGroup;
+!!!923650.java!!!	add(inout drawable : Drawable) : void
+        mOverlayViewGroup.add(drawable);
+!!!923778.java!!!	remove(inout drawable : Drawable) : void
+        mOverlayViewGroup.remove(drawable);
+!!!923906.java!!!	clear() : void
+        mOverlayViewGroup.clear();
+!!!924034.java!!!	isEmpty() : boolean
+        return mOverlayViewGroup.isEmpty();

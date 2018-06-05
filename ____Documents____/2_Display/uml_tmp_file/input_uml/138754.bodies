@@ -1,0 +1,23 @@
+class MotionEntry
+!!!182914.cpp!!!	MotionEntry(in eventTime : nsecs_t, in deviceId : int32_t, in source : uint32_t, in policyFlags : uint32_t, in action : int32_t, in flags : int32_t, in metaState : int32_t, in buttonState : int32_t, in edgeFlags : int32_t, in xPrecision : float, in yPrecision : float, in downTime : nsecs_t, in displayId : int32_t, in pointerCount : uint32_t, in pointerProperties : PointerProperties, in pointerCoords : PointerCoords, in xOffset : float, in yOffset : float)
+    for (uint32_t i = 0; i < pointerCount; i++) {
+        this->pointerProperties[i].copyFrom(pointerProperties[i]);
+        this->pointerCoords[i].copyFrom(pointerCoords[i]);
+        if (xOffset || yOffset) {
+            this->pointerCoords[i].applyOffset(xOffset, yOffset);
+        }
+    }
+!!!183042.cpp!!!	appendDescription(inout msg : String8) : void
+    msg.appendFormat("MotionEvent(deviceId=%d, source=0x%08x, action=%d, "
+            "flags=0x%08x, metaState=0x%08x, buttonState=0x%08x, edgeFlags=0x%08x, "
+            "xPrecision=%.1f, yPrecision=%.1f, displayId=%d, pointers=[",
+            deviceId, source, action, flags, metaState, buttonState, edgeFlags,
+            xPrecision, yPrecision, displayId);
+    for (uint32_t i = 0; i < pointerCount; i++) {
+        if (i) {
+            msg.append(", ");
+        }
+        msg.appendFormat("%d: (%.1f, %.1f)", pointerProperties[i].id,
+                pointerCoords[i].getX(), pointerCoords[i].getY());
+    }
+    msg.appendFormat("]), policyFlags=0x%08x", policyFlags);

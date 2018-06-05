@@ -1,0 +1,951 @@
+class AccessibilityNodeInfo
+!!!1073666.java!!!	getAccessibilityViewId(in accessibilityNodeId : long) : int
+        return (int) accessibilityNodeId;
+!!!1073794.java!!!	getVirtualDescendantId(in accessibilityNodeId : long) : int
+        return (int) ((accessibilityNodeId & VIRTUAL_DESCENDANT_ID_MASK)
+                >> VIRTUAL_DESCENDANT_ID_SHIFT);
+!!!1073922.java!!!	makeNodeId(in accessibilityViewId : int, in virtualDescendantId : int) : long
+        // We changed the value for undefined node to positive due to wrong
+        // global id composition (two 32-bin ints into one 64-bit long) but
+        // the value used for the host node provider view has id -1 so we
+        // remap it here.
+        if (virtualDescendantId == AccessibilityNodeProvider.HOST_VIEW_ID) {
+            virtualDescendantId = UNDEFINED_ITEM_ID;
+        }
+        return (((long) virtualDescendantId) << VIRTUAL_DESCENDANT_ID_SHIFT) | accessibilityViewId;
+!!!1074050.java!!!	AccessibilityNodeInfo()
+        /* do nothing */
+!!!1074178.java!!!	setSource(inout source : View) : void
+        setSource(source, UNDEFINED_ITEM_ID);
+!!!1074306.java!!!	setSource(inout root : View, in virtualDescendantId : int) : void
+        enforceNotSealed();
+        mWindowId = (root != null) ? root.getAccessibilityWindowId() : UNDEFINED_ITEM_ID;
+        final int rootAccessibilityViewId =
+            (root != null) ? root.getAccessibilityViewId() : UNDEFINED_ITEM_ID;
+        mSourceNodeId = makeNodeId(rootAccessibilityViewId, virtualDescendantId);
+!!!1074434.java!!!	findFocus(in focus : int) : AccessibilityNodeInfo
+        enforceSealed();
+        enforceValidFocusType(focus);
+        if (!canPerformRequestOverConnection(mSourceNodeId)) {
+            return null;
+        }
+        return AccessibilityInteractionClient.getInstance().findFocus(mConnectionId, mWindowId,
+                mSourceNodeId, focus);
+!!!1074562.java!!!	focusSearch(in direction : int) : AccessibilityNodeInfo
+        enforceSealed();
+        enforceValidFocusDirection(direction);
+        if (!canPerformRequestOverConnection(mSourceNodeId)) {
+            return null;
+        }
+        return AccessibilityInteractionClient.getInstance().focusSearch(mConnectionId, mWindowId,
+                mSourceNodeId, direction);
+!!!1074690.java!!!	getWindowId() : int
+        return mWindowId;
+!!!1074818.java!!!	refresh(inout bypassCache : boolean) : boolean
+        enforceSealed();
+        if (!canPerformRequestOverConnection(mSourceNodeId)) {
+            return false;
+        }
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        AccessibilityNodeInfo refreshedInfo = client.findAccessibilityNodeInfoByAccessibilityId(
+                mConnectionId, mWindowId, mSourceNodeId, bypassCache, 0);
+        if (refreshedInfo == null) {
+            return false;
+        }
+        init(refreshedInfo);
+        refreshedInfo.recycle();
+        return true;
+!!!1074946.java!!!	refresh() : boolean
+        return refresh(false);
+!!!1075074.java!!!	getChildNodeIds() : LongArray
+        return mChildNodeIds;
+!!!1075202.java!!!	getChildId(in index : int) : long
+        if (mChildNodeIds == null) {
+            throw new IndexOutOfBoundsException();
+        }
+        return mChildNodeIds.get(index);
+!!!1075330.java!!!	getChildCount() : int
+        return mChildNodeIds == null ? 0 : mChildNodeIds.size();
+!!!1075458.java!!!	getChild(in index : int) : AccessibilityNodeInfo
+        enforceSealed();
+        if (mChildNodeIds == null) {
+            return null;
+        }
+        if (!canPerformRequestOverConnection(mSourceNodeId)) {
+            return null;
+        }
+        final long childId = mChildNodeIds.get(index);
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        return client.findAccessibilityNodeInfoByAccessibilityId(mConnectionId, mWindowId,
+                childId, false, FLAG_PREFETCH_DESCENDANTS);
+!!!1075586.java!!!	addChild(inout child : View) : void
+        addChildInternal(child, UNDEFINED_ITEM_ID, true);
+!!!1075714.java!!!	addChildUnchecked(inout child : View) : void
+        addChildInternal(child, UNDEFINED_ITEM_ID, false);
+!!!1075842.java!!!	removeChild(inout child : View) : boolean
+        return removeChild(child, UNDEFINED_ITEM_ID);
+!!!1075970.java!!!	addChild(inout root : View, in virtualDescendantId : int) : void
+        addChildInternal(root, virtualDescendantId, true);
+!!!1076098.java!!!	addChildInternal(inout root : View, in virtualDescendantId : int, inout checked : boolean) : void
+        enforceNotSealed();
+        if (mChildNodeIds == null) {
+            mChildNodeIds = new LongArray();
+        }
+        final int rootAccessibilityViewId =
+            (root != null) ? root.getAccessibilityViewId() : UNDEFINED_ITEM_ID;
+        final long childNodeId = makeNodeId(rootAccessibilityViewId, virtualDescendantId);
+        // If we're checking uniqueness and the ID already exists, abort.
+        if (checked && mChildNodeIds.indexOf(childNodeId) >= 0) {
+            return;
+        }
+        mChildNodeIds.add(childNodeId);
+!!!1076226.java!!!	removeChild(inout root : View, in virtualDescendantId : int) : boolean
+        enforceNotSealed();
+        final LongArray childIds = mChildNodeIds;
+        if (childIds == null) {
+            return false;
+        }
+        final int rootAccessibilityViewId =
+                (root != null) ? root.getAccessibilityViewId() : UNDEFINED_ITEM_ID;
+        final long childNodeId = makeNodeId(rootAccessibilityViewId, virtualDescendantId);
+        final int index = childIds.indexOf(childNodeId);
+        if (index < 0) {
+            return false;
+        }
+        childIds.remove(index);
+        return true;
+!!!1076354.java!!!	getActionList() : AccessibilityNodeInfo::AccessibilityAction
+        if (mActions == null) {
+            return Collections.emptyList();
+        }
+
+        return mActions;
+!!!1076482.java!!!	getActions() : int
+        int returnValue = 0;
+
+        if (mActions == null) {
+            return returnValue;
+        }
+
+        final int actionSize = mActions.size();
+        for (int i = 0; i < actionSize; i++) {
+            int actionId = mActions.get(i).getId();
+            if (actionId <= LAST_LEGACY_STANDARD_ACTION) {
+                returnValue |= actionId;
+            }
+        }
+
+        return returnValue;
+!!!1076610.java!!!	addAction(inout action : AccessibilityNodeInfo::AccessibilityAction) : void
+        enforceNotSealed();
+
+        if (action == null) {
+            return;
+        }
+
+        if (mActions == null) {
+            mActions = new ArrayList<AccessibilityAction>();
+        }
+
+        mActions.remove(action);
+        mActions.add(action);
+!!!1076738.java!!!	addAction(in action : int) : void
+        enforceNotSealed();
+
+        if ((action & ACTION_TYPE_MASK) != 0) {
+            throw new IllegalArgumentException("Action is not a combination of the standard " +
+                    "actions: " + action);
+        }
+
+        addLegacyStandardActions(action);
+!!!1076866.java!!!	removeAction(in action : int) : void
+        enforceNotSealed();
+
+        removeAction(getActionSingleton(action));
+!!!1076994.java!!!	removeAction(inout action : AccessibilityNodeInfo::AccessibilityAction) : boolean
+        enforceNotSealed();
+
+        if (mActions == null || action == null) {
+            return false;
+        }
+
+        return mActions.remove(action);
+!!!1077122.java!!!	setMaxTextLength(in max : int) : void
+        enforceNotSealed();
+        mMaxTextLength = max;
+!!!1077250.java!!!	getMaxTextLength() : int
+        return mMaxTextLength;
+!!!1077378.java!!!	setMovementGranularities(in granularities : int) : void
+        enforceNotSealed();
+        mMovementGranularities = granularities;
+!!!1077506.java!!!	getMovementGranularities() : int
+        return mMovementGranularities;
+!!!1077634.java!!!	performAction(in action : int) : boolean
+        enforceSealed();
+        if (!canPerformRequestOverConnection(mSourceNodeId)) {
+            return false;
+        }
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        return client.performAccessibilityAction(mConnectionId, mWindowId, mSourceNodeId,
+                action, null);
+!!!1077762.java!!!	performAction(in action : int, inout arguments : Bundle) : boolean
+        enforceSealed();
+        if (!canPerformRequestOverConnection(mSourceNodeId)) {
+            return false;
+        }
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        return client.performAccessibilityAction(mConnectionId, mWindowId, mSourceNodeId,
+                action, arguments);
+!!!1077890.java!!!	findAccessibilityNodeInfosByText(in text : String) : AccessibilityNodeInfo
+        enforceSealed();
+        if (!canPerformRequestOverConnection(mSourceNodeId)) {
+            return Collections.emptyList();
+        }
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        return client.findAccessibilityNodeInfosByText(mConnectionId, mWindowId, mSourceNodeId,
+                text);
+!!!1078018.java!!!	findAccessibilityNodeInfosByViewId(in viewId : String) : AccessibilityNodeInfo
+        enforceSealed();
+        if (!canPerformRequestOverConnection(mSourceNodeId)) {
+            return Collections.emptyList();
+        }
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        return client.findAccessibilityNodeInfosByViewId(mConnectionId, mWindowId, mSourceNodeId,
+                viewId);
+!!!1078146.java!!!	getWindow() : AccessibilityWindowInfo
+        enforceSealed();
+        if (!canPerformRequestOverConnection(mSourceNodeId)) {
+            return null;
+        }
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        return client.getWindow(mConnectionId, mWindowId);
+!!!1078274.java!!!	getParent() : AccessibilityNodeInfo
+        enforceSealed();
+        if (!canPerformRequestOverConnection(mParentNodeId)) {
+            return null;
+        }
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        return client.findAccessibilityNodeInfoByAccessibilityId(mConnectionId,
+                mWindowId, mParentNodeId, false, FLAG_PREFETCH_PREDECESSORS
+                        | FLAG_PREFETCH_DESCENDANTS | FLAG_PREFETCH_SIBLINGS);
+!!!1078402.java!!!	getParentNodeId() : long
+        return mParentNodeId;
+!!!1078530.java!!!	setParent(inout parent : View) : void
+        setParent(parent, UNDEFINED_ITEM_ID);
+!!!1078658.java!!!	setParent(inout root : View, in virtualDescendantId : int) : void
+        enforceNotSealed();
+        final int rootAccessibilityViewId =
+            (root != null) ? root.getAccessibilityViewId() : UNDEFINED_ITEM_ID;
+        mParentNodeId = makeNodeId(rootAccessibilityViewId, virtualDescendantId);
+!!!1078786.java!!!	getBoundsInParent(inout outBounds : Rect) : void
+        outBounds.set(mBoundsInParent.left, mBoundsInParent.top,
+                mBoundsInParent.right, mBoundsInParent.bottom);
+!!!1078914.java!!!	setBoundsInParent(inout bounds : Rect) : void
+        enforceNotSealed();
+        mBoundsInParent.set(bounds.left, bounds.top, bounds.right, bounds.bottom);
+!!!1079042.java!!!	getBoundsInScreen(inout outBounds : Rect) : void
+        outBounds.set(mBoundsInScreen.left, mBoundsInScreen.top,
+                mBoundsInScreen.right, mBoundsInScreen.bottom);
+!!!1079170.java!!!	setBoundsInScreen(inout bounds : Rect) : void
+        enforceNotSealed();
+        mBoundsInScreen.set(bounds.left, bounds.top, bounds.right, bounds.bottom);
+!!!1079298.java!!!	isCheckable() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_CHECKABLE);
+!!!1079426.java!!!	setCheckable(inout checkable : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_CHECKABLE, checkable);
+!!!1079554.java!!!	isChecked() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_CHECKED);
+!!!1079682.java!!!	setChecked(inout checked : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_CHECKED, checked);
+!!!1079810.java!!!	isFocusable() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_FOCUSABLE);
+!!!1079938.java!!!	setFocusable(inout focusable : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_FOCUSABLE, focusable);
+!!!1080066.java!!!	isFocused() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_FOCUSED);
+!!!1080194.java!!!	setFocused(inout focused : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_FOCUSED, focused);
+!!!1080322.java!!!	isVisibleToUser() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_VISIBLE_TO_USER);
+!!!1080450.java!!!	setVisibleToUser(inout visibleToUser : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_VISIBLE_TO_USER, visibleToUser);
+!!!1080578.java!!!	isAccessibilityFocused() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_ACCESSIBILITY_FOCUSED);
+!!!1080706.java!!!	setAccessibilityFocused(inout focused : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_ACCESSIBILITY_FOCUSED, focused);
+!!!1080834.java!!!	isSelected() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_SELECTED);
+!!!1080962.java!!!	setSelected(inout selected : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_SELECTED, selected);
+!!!1081090.java!!!	isClickable() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_CLICKABLE);
+!!!1081218.java!!!	setClickable(inout clickable : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_CLICKABLE, clickable);
+!!!1081346.java!!!	isLongClickable() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_LONG_CLICKABLE);
+!!!1081474.java!!!	setLongClickable(inout longClickable : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_LONG_CLICKABLE, longClickable);
+!!!1081602.java!!!	isEnabled() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_ENABLED);
+!!!1081730.java!!!	setEnabled(inout enabled : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_ENABLED, enabled);
+!!!1081858.java!!!	isPassword() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_PASSWORD);
+!!!1081986.java!!!	setPassword(inout password : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_PASSWORD, password);
+!!!1082114.java!!!	isScrollable() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_SCROLLABLE);
+!!!1082242.java!!!	setScrollable(inout scrollable : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_SCROLLABLE, scrollable);
+!!!1082370.java!!!	isEditable() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_EDITABLE);
+!!!1082498.java!!!	setEditable(inout editable : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_EDITABLE, editable);
+!!!1082626.java!!!	getCollectionInfo() : AccessibilityNodeInfo::CollectionInfo
+        return mCollectionInfo;
+!!!1082754.java!!!	setCollectionInfo(inout collectionInfo : AccessibilityNodeInfo::CollectionInfo) : void
+        enforceNotSealed();
+        mCollectionInfo = collectionInfo;
+!!!1082882.java!!!	getCollectionItemInfo() : AccessibilityNodeInfo::CollectionItemInfo
+        return mCollectionItemInfo;
+!!!1083010.java!!!	setCollectionItemInfo(inout collectionItemInfo : AccessibilityNodeInfo::CollectionItemInfo) : void
+        enforceNotSealed();
+        mCollectionItemInfo = collectionItemInfo;
+!!!1083138.java!!!	getRangeInfo() : AccessibilityNodeInfo::RangeInfo
+        return mRangeInfo;
+!!!1083266.java!!!	setRangeInfo(inout rangeInfo : AccessibilityNodeInfo::RangeInfo) : void
+        enforceNotSealed();
+        mRangeInfo = rangeInfo;
+!!!1083394.java!!!	isContentInvalid() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_CONTENT_INVALID);
+!!!1083522.java!!!	setContentInvalid(inout contentInvalid : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_CONTENT_INVALID, contentInvalid);
+!!!1083650.java!!!	getLiveRegion() : int
+        return mLiveRegion;
+!!!1083778.java!!!	setLiveRegion(in mode : int) : void
+        enforceNotSealed();
+        mLiveRegion = mode;
+!!!1083906.java!!!	isMultiLine() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_MULTI_LINE);
+!!!1084034.java!!!	setMultiLine(inout multiLine : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_MULTI_LINE, multiLine);
+!!!1084162.java!!!	canOpenPopup() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_OPENS_POPUP);
+!!!1084290.java!!!	setCanOpenPopup(inout opensPopup : boolean) : void
+        enforceNotSealed();
+        setBooleanProperty(BOOLEAN_PROPERTY_OPENS_POPUP, opensPopup);
+!!!1084418.java!!!	isDismissable() : boolean
+        return getBooleanProperty(BOOLEAN_PROPERTY_DISMISSABLE);
+!!!1084546.java!!!	setDismissable(inout dismissable : boolean) : void
+        setBooleanProperty(BOOLEAN_PROPERTY_DISMISSABLE, dismissable);
+!!!1084674.java!!!	getPackageName() : CharSequence
+        return mPackageName;
+!!!1084802.java!!!	setPackageName(inout packageName : CharSequence) : void
+        enforceNotSealed();
+        mPackageName = packageName;
+!!!1084930.java!!!	getClassName() : CharSequence
+        return mClassName;
+!!!1085058.java!!!	setClassName(inout className : CharSequence) : void
+        enforceNotSealed();
+        mClassName = className;
+!!!1085186.java!!!	getText() : CharSequence
+        return mText;
+!!!1085314.java!!!	setText(inout text : CharSequence) : void
+        enforceNotSealed();
+        mText = text;
+!!!1085442.java!!!	setError(inout error : CharSequence) : void
+        enforceNotSealed();
+        mError = error;
+!!!1085570.java!!!	getError() : CharSequence
+        return mError;
+!!!1085698.java!!!	getContentDescription() : CharSequence
+        return mContentDescription;
+!!!1085826.java!!!	setContentDescription(inout contentDescription : CharSequence) : void
+        enforceNotSealed();
+        mContentDescription = contentDescription;
+!!!1085954.java!!!	setLabelFor(inout labeled : View) : void
+        setLabelFor(labeled, UNDEFINED_ITEM_ID);
+!!!1086082.java!!!	setLabelFor(inout root : View, in virtualDescendantId : int) : void
+        enforceNotSealed();
+        final int rootAccessibilityViewId = (root != null)
+                ? root.getAccessibilityViewId() : UNDEFINED_ITEM_ID;
+        mLabelForId = makeNodeId(rootAccessibilityViewId, virtualDescendantId);
+!!!1086210.java!!!	getLabelFor() : AccessibilityNodeInfo
+        enforceSealed();
+        if (!canPerformRequestOverConnection(mLabelForId)) {
+            return null;
+        }
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        return client.findAccessibilityNodeInfoByAccessibilityId(mConnectionId,
+                mWindowId, mLabelForId, false, FLAG_PREFETCH_PREDECESSORS
+                        | FLAG_PREFETCH_DESCENDANTS | FLAG_PREFETCH_SIBLINGS);
+!!!1086338.java!!!	setLabeledBy(inout label : View) : void
+        setLabeledBy(label, UNDEFINED_ITEM_ID);
+!!!1086466.java!!!	setLabeledBy(inout root : View, in virtualDescendantId : int) : void
+        enforceNotSealed();
+        final int rootAccessibilityViewId = (root != null)
+                ? root.getAccessibilityViewId() : UNDEFINED_ITEM_ID;
+        mLabeledById = makeNodeId(rootAccessibilityViewId, virtualDescendantId);
+!!!1086594.java!!!	getLabeledBy() : AccessibilityNodeInfo
+        enforceSealed();
+        if (!canPerformRequestOverConnection(mLabeledById)) {
+            return null;
+        }
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        return client.findAccessibilityNodeInfoByAccessibilityId(mConnectionId,
+                mWindowId, mLabeledById, false, FLAG_PREFETCH_PREDECESSORS
+                        | FLAG_PREFETCH_DESCENDANTS | FLAG_PREFETCH_SIBLINGS);
+!!!1086722.java!!!	setViewIdResourceName(in viewIdResName : String) : void
+        enforceNotSealed();
+        mViewIdResourceName = viewIdResName;
+!!!1086850.java!!!	getViewIdResourceName() : String
+        return mViewIdResourceName;
+!!!1086978.java!!!	getTextSelectionStart() : int
+        return mTextSelectionStart;
+!!!1087106.java!!!	getTextSelectionEnd() : int
+        return mTextSelectionEnd;
+!!!1087234.java!!!	setTextSelection(in start : int, in end : int) : void
+        enforceNotSealed();
+        mTextSelectionStart = start;
+        mTextSelectionEnd = end;
+!!!1087362.java!!!	getInputType() : int
+        return mInputType;
+!!!1087490.java!!!	setInputType(in inputType : int) : void
+        enforceNotSealed();
+        mInputType = inputType;
+!!!1087618.java!!!	getExtras() : Bundle
+        if (mExtras == null) {
+            mExtras = new Bundle();
+        }
+        return mExtras;
+!!!1087746.java!!!	getBooleanProperty(in property : int) : boolean
+        return (mBooleanProperties & property) != 0;
+!!!1087874.java!!!	setBooleanProperty(in property : int, inout value : boolean) : void
+        enforceNotSealed();
+        if (value) {
+            mBooleanProperties |= property;
+        } else {
+            mBooleanProperties &= ~property;
+        }
+!!!1088002.java!!!	setConnectionId(in connectionId : int) : void
+        enforceNotSealed();
+        mConnectionId = connectionId;
+!!!1088130.java!!!	describeContents() : int
+        return 0;
+!!!1088258.java!!!	getSourceNodeId() : long
+        return mSourceNodeId;
+!!!1088386.java!!!	setSealed(inout sealed : boolean) : void
+        mSealed = sealed;
+!!!1088514.java!!!	isSealed() : boolean
+        return mSealed;
+!!!1088642.java!!!	enforceSealed() : void
+        if (!isSealed()) {
+            throw new IllegalStateException("Cannot perform this "
+                    + "action on a not sealed instance.");
+        }
+!!!1088770.java!!!	enforceValidFocusDirection(in direction : int) : void
+        switch (direction) {
+            case View.FOCUS_DOWN:
+            case View.FOCUS_UP:
+            case View.FOCUS_LEFT:
+            case View.FOCUS_RIGHT:
+            case View.FOCUS_FORWARD:
+            case View.FOCUS_BACKWARD:
+                return;
+            default:
+                throw new IllegalArgumentException("Unknown direction: " + direction);
+        }
+!!!1088898.java!!!	enforceValidFocusType(in focusType : int) : void
+        switch (focusType) {
+            case FOCUS_INPUT:
+            case FOCUS_ACCESSIBILITY:
+                return;
+            default:
+                throw new IllegalArgumentException("Unknown focus type: " + focusType);
+        }
+!!!1089026.java!!!	enforceNotSealed() : void
+        if (isSealed()) {
+            throw new IllegalStateException("Cannot perform this "
+                    + "action on a sealed instance.");
+        }
+!!!1089154.java!!!	obtain(inout source : View) : AccessibilityNodeInfo
+        AccessibilityNodeInfo info = AccessibilityNodeInfo.obtain();
+        info.setSource(source);
+        return info;
+!!!1089282.java!!!	obtain(inout root : View, in virtualDescendantId : int) : AccessibilityNodeInfo
+        AccessibilityNodeInfo info = AccessibilityNodeInfo.obtain();
+        info.setSource(root, virtualDescendantId);
+        return info;
+!!!1089410.java!!!	obtain() : AccessibilityNodeInfo
+        AccessibilityNodeInfo info = sPool.acquire();
+        return (info != null) ? info : new AccessibilityNodeInfo();
+!!!1089538.java!!!	obtain(inout info : AccessibilityNodeInfo) : AccessibilityNodeInfo
+        AccessibilityNodeInfo infoClone = AccessibilityNodeInfo.obtain();
+        infoClone.init(info);
+        return infoClone;
+!!!1089666.java!!!	recycle() : void
+        clear();
+        sPool.release(this);
+!!!1089794.java!!!	writeToParcel(inout parcel : Parcel, in flags : int) : void
+        parcel.writeInt(isSealed() ? 1 : 0);
+        parcel.writeLong(mSourceNodeId);
+        parcel.writeInt(mWindowId);
+        parcel.writeLong(mParentNodeId);
+        parcel.writeLong(mLabelForId);
+        parcel.writeLong(mLabeledById);
+        parcel.writeInt(mConnectionId);
+
+        final LongArray childIds = mChildNodeIds;
+        if (childIds == null) {
+            parcel.writeInt(0);
+        } else {
+            final int childIdsSize = childIds.size();
+            parcel.writeInt(childIdsSize);
+            for (int i = 0; i < childIdsSize; i++) {
+                parcel.writeLong(childIds.get(i));
+            }
+        }
+
+        parcel.writeInt(mBoundsInParent.top);
+        parcel.writeInt(mBoundsInParent.bottom);
+        parcel.writeInt(mBoundsInParent.left);
+        parcel.writeInt(mBoundsInParent.right);
+
+        parcel.writeInt(mBoundsInScreen.top);
+        parcel.writeInt(mBoundsInScreen.bottom);
+        parcel.writeInt(mBoundsInScreen.left);
+        parcel.writeInt(mBoundsInScreen.right);
+
+        if (mActions != null && !mActions.isEmpty()) {
+            final int actionCount = mActions.size();
+            parcel.writeInt(actionCount);
+
+            int defaultLegacyStandardActions = 0;
+            for (int i = 0; i < actionCount; i++) {
+                AccessibilityAction action = mActions.get(i);
+                if (isDefaultLegacyStandardAction(action)) {
+                    defaultLegacyStandardActions |= action.getId();
+                }
+            }
+            parcel.writeInt(defaultLegacyStandardActions);
+
+            for (int i = 0; i < actionCount; i++) {
+                AccessibilityAction action = mActions.get(i);
+                if (!isDefaultLegacyStandardAction(action)) {
+                    parcel.writeInt(action.getId());
+                    parcel.writeCharSequence(action.getLabel());
+                }
+            }
+        } else {
+            parcel.writeInt(0);
+        }
+
+        parcel.writeInt(mMaxTextLength);
+        parcel.writeInt(mMovementGranularities);
+        parcel.writeInt(mBooleanProperties);
+
+        parcel.writeCharSequence(mPackageName);
+        parcel.writeCharSequence(mClassName);
+        parcel.writeCharSequence(mText);
+        parcel.writeCharSequence(mError);
+        parcel.writeCharSequence(mContentDescription);
+        parcel.writeString(mViewIdResourceName);
+
+        parcel.writeInt(mTextSelectionStart);
+        parcel.writeInt(mTextSelectionEnd);
+        parcel.writeInt(mInputType);
+        parcel.writeInt(mLiveRegion);
+
+        if (mExtras != null) {
+            parcel.writeInt(1);
+            parcel.writeBundle(mExtras);
+        } else {
+            parcel.writeInt(0);
+        }
+
+        if (mRangeInfo != null) {
+            parcel.writeInt(1);
+            parcel.writeInt(mRangeInfo.getType());
+            parcel.writeFloat(mRangeInfo.getMin());
+            parcel.writeFloat(mRangeInfo.getMax());
+            parcel.writeFloat(mRangeInfo.getCurrent());
+        } else {
+            parcel.writeInt(0);
+        }
+
+        if (mCollectionInfo != null) {
+            parcel.writeInt(1);
+            parcel.writeInt(mCollectionInfo.getRowCount());
+            parcel.writeInt(mCollectionInfo.getColumnCount());
+            parcel.writeInt(mCollectionInfo.isHierarchical() ? 1 : 0);
+            parcel.writeInt(mCollectionInfo.getSelectionMode());
+        } else {
+            parcel.writeInt(0);
+        }
+
+        if (mCollectionItemInfo != null) {
+            parcel.writeInt(1);
+            parcel.writeInt(mCollectionItemInfo.getColumnIndex());
+            parcel.writeInt(mCollectionItemInfo.getColumnSpan());
+            parcel.writeInt(mCollectionItemInfo.getRowIndex());
+            parcel.writeInt(mCollectionItemInfo.getRowSpan());
+            parcel.writeInt(mCollectionItemInfo.isHeading() ? 1 : 0);
+            parcel.writeInt(mCollectionItemInfo.isSelected() ? 1 : 0);
+        } else {
+            parcel.writeInt(0);
+        }
+
+        // Since instances of this class are fetched via synchronous i.e. blocking
+        // calls in IPCs we always recycle as soon as the instance is marshaled.
+        recycle();
+!!!1089922.java!!!	init(inout other : AccessibilityNodeInfo) : void
+        mSealed = other.mSealed;
+        mSourceNodeId = other.mSourceNodeId;
+        mParentNodeId = other.mParentNodeId;
+        mLabelForId = other.mLabelForId;
+        mLabeledById = other.mLabeledById;
+        mWindowId = other.mWindowId;
+        mConnectionId = other.mConnectionId;
+        mBoundsInParent.set(other.mBoundsInParent);
+        mBoundsInScreen.set(other.mBoundsInScreen);
+        mPackageName = other.mPackageName;
+        mClassName = other.mClassName;
+        mText = other.mText;
+        mError = other.mError;
+        mContentDescription = other.mContentDescription;
+        mViewIdResourceName = other.mViewIdResourceName;
+
+        final ArrayList<AccessibilityAction> otherActions = other.mActions;
+        if (otherActions != null && otherActions.size() > 0) {
+            if (mActions == null) {
+                mActions = new ArrayList(otherActions);
+            } else {
+                mActions.clear();
+                mActions.addAll(other.mActions);
+            }
+        }
+
+        mBooleanProperties = other.mBooleanProperties;
+        mMaxTextLength = other.mMaxTextLength;
+        mMovementGranularities = other.mMovementGranularities;
+
+        final LongArray otherChildNodeIds = other.mChildNodeIds;
+        if (otherChildNodeIds != null && otherChildNodeIds.size() > 0) {
+            if (mChildNodeIds == null) {
+                mChildNodeIds = otherChildNodeIds.clone();
+            } else {
+                mChildNodeIds.clear();
+                mChildNodeIds.addAll(otherChildNodeIds);
+            }
+        }
+
+        mTextSelectionStart = other.mTextSelectionStart;
+        mTextSelectionEnd = other.mTextSelectionEnd;
+        mInputType = other.mInputType;
+        mLiveRegion = other.mLiveRegion;
+        if (other.mExtras != null && !other.mExtras.isEmpty()) {
+            getExtras().putAll(other.mExtras);
+        }
+        mRangeInfo = (other.mRangeInfo != null)
+                ? RangeInfo.obtain(other.mRangeInfo) : null;
+        mCollectionInfo = (other.mCollectionInfo != null)
+                ? CollectionInfo.obtain(other.mCollectionInfo) : null;
+        mCollectionItemInfo =  (other.mCollectionItemInfo != null)
+                ? CollectionItemInfo.obtain(other.mCollectionItemInfo) : null;
+!!!1090050.java!!!	initFromParcel(inout parcel : Parcel) : void
+        mSealed = (parcel.readInt()  == 1);
+        mSourceNodeId = parcel.readLong();
+        mWindowId = parcel.readInt();
+        mParentNodeId = parcel.readLong();
+        mLabelForId = parcel.readLong();
+        mLabeledById = parcel.readLong();
+        mConnectionId = parcel.readInt();
+
+        final int childrenSize = parcel.readInt();
+        if (childrenSize <= 0) {
+            mChildNodeIds = null;
+        } else {
+            mChildNodeIds = new LongArray(childrenSize);
+            for (int i = 0; i < childrenSize; i++) {
+                final long childId = parcel.readLong();
+                mChildNodeIds.add(childId);
+            }
+        }
+
+        mBoundsInParent.top = parcel.readInt();
+        mBoundsInParent.bottom = parcel.readInt();
+        mBoundsInParent.left = parcel.readInt();
+        mBoundsInParent.right = parcel.readInt();
+
+        mBoundsInScreen.top = parcel.readInt();
+        mBoundsInScreen.bottom = parcel.readInt();
+        mBoundsInScreen.left = parcel.readInt();
+        mBoundsInScreen.right = parcel.readInt();
+
+        final int actionCount = parcel.readInt();
+        if (actionCount > 0) {
+            final int legacyStandardActions = parcel.readInt();
+            addLegacyStandardActions(legacyStandardActions);
+            final int nonLegacyActionCount = actionCount - Integer.bitCount(legacyStandardActions);
+            for (int i = 0; i < nonLegacyActionCount; i++) {
+                AccessibilityAction action = new AccessibilityAction(
+                        parcel.readInt(), parcel.readCharSequence());
+                addAction(action);
+            }
+        }
+
+        mMaxTextLength = parcel.readInt();
+        mMovementGranularities = parcel.readInt();
+        mBooleanProperties = parcel.readInt();
+
+        mPackageName = parcel.readCharSequence();
+        mClassName = parcel.readCharSequence();
+        mText = parcel.readCharSequence();
+        mError = parcel.readCharSequence();
+        mContentDescription = parcel.readCharSequence();
+        mViewIdResourceName = parcel.readString();
+
+        mTextSelectionStart = parcel.readInt();
+        mTextSelectionEnd = parcel.readInt();
+
+        mInputType = parcel.readInt();
+        mLiveRegion = parcel.readInt();
+
+        if (parcel.readInt() == 1) {
+            getExtras().putAll(parcel.readBundle());
+        }
+
+        if (parcel.readInt() == 1) {
+            mRangeInfo = RangeInfo.obtain(
+                    parcel.readInt(),
+                    parcel.readFloat(),
+                    parcel.readFloat(),
+                    parcel.readFloat());
+        }
+
+        if (parcel.readInt() == 1) {
+            mCollectionInfo = CollectionInfo.obtain(
+                    parcel.readInt(),
+                    parcel.readInt(),
+                    parcel.readInt() == 1,
+                    parcel.readInt());
+        }
+
+        if (parcel.readInt() == 1) {
+            mCollectionItemInfo = CollectionItemInfo.obtain(
+                    parcel.readInt(),
+                    parcel.readInt(),
+                    parcel.readInt(),
+                    parcel.readInt(),
+                    parcel.readInt() == 1,
+                    parcel.readInt() == 1);
+        }
+!!!1090178.java!!!	clear() : void
+        mSealed = false;
+        mSourceNodeId = ROOT_NODE_ID;
+        mParentNodeId = ROOT_NODE_ID;
+        mLabelForId = ROOT_NODE_ID;
+        mLabeledById = ROOT_NODE_ID;
+        mWindowId = UNDEFINED_ITEM_ID;
+        mConnectionId = UNDEFINED_CONNECTION_ID;
+        mMaxTextLength = -1;
+        mMovementGranularities = 0;
+        if (mChildNodeIds != null) {
+            mChildNodeIds.clear();
+        }
+        mBoundsInParent.set(0, 0, 0, 0);
+        mBoundsInScreen.set(0, 0, 0, 0);
+        mBooleanProperties = 0;
+        mPackageName = null;
+        mClassName = null;
+        mText = null;
+        mError = null;
+        mContentDescription = null;
+        mViewIdResourceName = null;
+        if (mActions != null) {
+            mActions.clear();
+        }
+        mTextSelectionStart = UNDEFINED_SELECTION_INDEX;
+        mTextSelectionEnd = UNDEFINED_SELECTION_INDEX;
+        mInputType = InputType.TYPE_NULL;
+        mLiveRegion = View.ACCESSIBILITY_LIVE_REGION_NONE;
+        if (mExtras != null) {
+            mExtras.clear();
+        }
+        if (mRangeInfo != null) {
+            mRangeInfo.recycle();
+            mRangeInfo = null;
+        }
+        if (mCollectionInfo != null) {
+            mCollectionInfo.recycle();
+            mCollectionInfo = null;
+        }
+        if (mCollectionItemInfo != null) {
+            mCollectionItemInfo.recycle();
+            mCollectionItemInfo = null;
+        }
+!!!1090306.java!!!	isDefaultLegacyStandardAction(inout action : AccessibilityNodeInfo::AccessibilityAction) : boolean
+        return (action.getId() <= LAST_LEGACY_STANDARD_ACTION
+                && TextUtils.isEmpty(action.getLabel()));
+!!!1090434.java!!!	getActionSingleton(in actionId : int) : AccessibilityNodeInfo::AccessibilityAction
+        final int actions = AccessibilityAction.sStandardActions.size();
+        for (int i = 0; i < actions; i++) {
+            AccessibilityAction currentAction = AccessibilityAction.sStandardActions.valueAt(i);
+            if (actionId == currentAction.getId()) {
+                return currentAction;
+            }
+        }
+
+        return null;
+!!!1090562.java!!!	addLegacyStandardActions(in actionMask : int) : void
+        int remainingIds = actionMask;
+        while (remainingIds > 0) {
+            final int id = 1 << Integer.numberOfTrailingZeros(remainingIds);
+            remainingIds &= ~id;
+            AccessibilityAction action = getActionSingleton(id);
+            addAction(action);
+        }
+!!!1090690.java!!!	getActionSymbolicName(in action : int) : String
+        switch (action) {
+            case ACTION_FOCUS:
+                return "ACTION_FOCUS";
+            case ACTION_CLEAR_FOCUS:
+                return "ACTION_CLEAR_FOCUS";
+            case ACTION_SELECT:
+                return "ACTION_SELECT";
+            case ACTION_CLEAR_SELECTION:
+                return "ACTION_CLEAR_SELECTION";
+            case ACTION_CLICK:
+                return "ACTION_CLICK";
+            case ACTION_LONG_CLICK:
+                return "ACTION_LONG_CLICK";
+            case ACTION_ACCESSIBILITY_FOCUS:
+                return "ACTION_ACCESSIBILITY_FOCUS";
+            case ACTION_CLEAR_ACCESSIBILITY_FOCUS:
+                return "ACTION_CLEAR_ACCESSIBILITY_FOCUS";
+            case ACTION_NEXT_AT_MOVEMENT_GRANULARITY:
+                return "ACTION_NEXT_AT_MOVEMENT_GRANULARITY";
+            case ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY:
+                return "ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY";
+            case ACTION_NEXT_HTML_ELEMENT:
+                return "ACTION_NEXT_HTML_ELEMENT";
+            case ACTION_PREVIOUS_HTML_ELEMENT:
+                return "ACTION_PREVIOUS_HTML_ELEMENT";
+            case ACTION_SCROLL_FORWARD:
+                return "ACTION_SCROLL_FORWARD";
+            case ACTION_SCROLL_BACKWARD:
+                return "ACTION_SCROLL_BACKWARD";
+            case ACTION_CUT:
+                return "ACTION_CUT";
+            case ACTION_COPY:
+                return "ACTION_COPY";
+            case ACTION_PASTE:
+                return "ACTION_PASTE";
+            case ACTION_SET_SELECTION:
+                return "ACTION_SET_SELECTION";
+            default:
+                return"ACTION_UNKNOWN";
+        }
+!!!1090818.java!!!	getMovementGranularitySymbolicName(in granularity : int) : String
+        switch (granularity) {
+            case MOVEMENT_GRANULARITY_CHARACTER:
+                return "MOVEMENT_GRANULARITY_CHARACTER";
+            case MOVEMENT_GRANULARITY_WORD:
+                return "MOVEMENT_GRANULARITY_WORD";
+            case MOVEMENT_GRANULARITY_LINE:
+                return "MOVEMENT_GRANULARITY_LINE";
+            case MOVEMENT_GRANULARITY_PARAGRAPH:
+                return "MOVEMENT_GRANULARITY_PARAGRAPH";
+            case MOVEMENT_GRANULARITY_PAGE:
+                return "MOVEMENT_GRANULARITY_PAGE";
+            default:
+                throw new IllegalArgumentException("Unknown movement granularity: " + granularity);
+        }
+!!!1090946.java!!!	canPerformRequestOverConnection(in accessibilityNodeId : long) : boolean
+        return (mWindowId != UNDEFINED_ITEM_ID
+                && getAccessibilityViewId(accessibilityNodeId) != UNDEFINED_ITEM_ID
+                && mConnectionId != UNDEFINED_CONNECTION_ID);
+!!!1091074.java!!!	equals(inout object : Object) : boolean
+        if (this == object) {
+            return true;
+        }
+        if (object == null) {
+            return false;
+        }
+        if (getClass() != object.getClass()) {
+            return false;
+        }
+        AccessibilityNodeInfo other = (AccessibilityNodeInfo) object;
+        if (mSourceNodeId != other.mSourceNodeId) {
+            return false;
+        }
+        if (mWindowId != other.mWindowId) {
+            return false;
+        }
+        return true;
+!!!1091202.java!!!	hashCode() : int
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + getAccessibilityViewId(mSourceNodeId);
+        result = prime * result + getVirtualDescendantId(mSourceNodeId);
+        result = prime * result + mWindowId;
+        return result;
+!!!1091330.java!!!	toString() : String
+        StringBuilder builder = new StringBuilder();
+        builder.append(super.toString());
+
+        if (DEBUG) {
+            builder.append("; sourceNodeId: " + mSourceNodeId);
+            builder.append("; accessibilityViewId: " + getAccessibilityViewId(mSourceNodeId));
+            builder.append("; virtualDescendantId: " + getVirtualDescendantId(mSourceNodeId));
+            builder.append("; mParentNodeId: " + mParentNodeId);
+
+            int granularities = mMovementGranularities;
+            builder.append("; MovementGranularities: [");
+            while (granularities != 0) {
+                final int granularity = 1 << Integer.numberOfTrailingZeros(granularities);
+                granularities &= ~granularity;
+                builder.append(getMovementGranularitySymbolicName(granularity));
+                if (granularities != 0) {
+                    builder.append(", ");
+                }
+            }
+            builder.append("]");
+
+            builder.append("; childAccessibilityIds: [");
+            final LongArray childIds = mChildNodeIds;
+            if (childIds != null) {
+                for (int i = 0, count = childIds.size(); i < count; i++) {
+                    builder.append(childIds.get(i));
+                    if (i < count - 1) {
+                        builder.append(", ");
+                    }
+                }
+            }
+            builder.append("]");
+        }
+
+        builder.append("; boundsInParent: " + mBoundsInParent);
+        builder.append("; boundsInScreen: " + mBoundsInScreen);
+
+        builder.append("; packageName: ").append(mPackageName);
+        builder.append("; className: ").append(mClassName);
+        builder.append("; text: ").append(mText);
+        builder.append("; error: ").append(mError);
+        builder.append("; maxTextLength: ").append(mMaxTextLength);
+        builder.append("; contentDescription: ").append(mContentDescription);
+        builder.append("; viewIdResName: ").append(mViewIdResourceName);
+
+        builder.append("; checkable: ").append(isCheckable());
+        builder.append("; checked: ").append(isChecked());
+        builder.append("; focusable: ").append(isFocusable());
+        builder.append("; focused: ").append(isFocused());
+        builder.append("; selected: ").append(isSelected());
+        builder.append("; clickable: ").append(isClickable());
+        builder.append("; longClickable: ").append(isLongClickable());
+        builder.append("; enabled: ").append(isEnabled());
+        builder.append("; password: ").append(isPassword());
+        builder.append("; scrollable: ").append(isScrollable());
+        builder.append("; actions: ").append(mActions);
+
+        return builder.toString();

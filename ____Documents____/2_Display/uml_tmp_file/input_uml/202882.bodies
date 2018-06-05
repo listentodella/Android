@@ -1,0 +1,30 @@
+class ActionModeCallbackWrapper
+!!!483074.java!!!	ActionModeCallbackWrapper(inout wrapped : ActionMode.Callback)
+                mWrapped = wrapped;
+!!!483202.java!!!	onCreateActionMode(inout mode : ActionMode, inout menu : Menu) : boolean
+                return mWrapped.onCreateActionMode(mode, menu);
+!!!483330.java!!!	onPrepareActionMode(inout mode : ActionMode, inout menu : Menu) : boolean
+                requestFitSystemWindows();
+                return mWrapped.onPrepareActionMode(mode, menu);
+!!!483458.java!!!	onActionItemClicked(inout mode : ActionMode, inout item : MenuItem) : boolean
+                return mWrapped.onActionItemClicked(mode, item);
+!!!483586.java!!!	onDestroyActionMode(inout mode : ActionMode) : void
+                mWrapped.onDestroyActionMode(mode);
+                if (mActionModePopup != null) {
+                    removeCallbacks(mShowActionModePopup);
+                    mActionModePopup.dismiss();
+                } else if (mActionModeView != null) {
+                    mActionModeView.setVisibility(GONE);
+                }
+                if (mActionModeView != null) {
+                    mActionModeView.removeAllViews();
+                }
+                if (getCallback() != null && !isDestroyed()) {
+                    try {
+                        getCallback().onActionModeFinished(mActionMode);
+                    } catch (AbstractMethodError ame) {
+                        // Older apps might not implement this callback method.
+                    }
+                }
+                mActionMode = null;
+                requestFitSystemWindows();

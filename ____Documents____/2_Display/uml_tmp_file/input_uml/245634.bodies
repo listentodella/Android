@@ -1,0 +1,83 @@
+class WindowInfo
+!!!1025282.java!!!	WindowInfo()
+        /* do nothing - hide constructor */
+!!!1025410.java!!!	obtain() : WindowInfo
+        WindowInfo window = sPool.acquire();
+        if (window == null) {
+            window = new WindowInfo();
+        }
+        return window;
+!!!1025538.java!!!	obtain(inout other : WindowInfo) : WindowInfo
+        WindowInfo window = obtain();
+        window.type = other.type;
+        window.layer = other.layer;
+        window.token = other.token;
+        window.parentToken = other.parentToken;
+        window.focused = other.focused;
+        window.boundsInScreen.set(other.boundsInScreen);
+
+        if (other.childTokens != null && !other.childTokens.isEmpty()) {
+            if (window.childTokens == null) {
+                window.childTokens = new ArrayList<IBinder>(other.childTokens);
+            } else {
+                window.childTokens.addAll(other.childTokens);
+            }
+        }
+
+        return window;
+!!!1025666.java!!!	recycle() : void
+        clear();
+        sPool.release(this);
+!!!1025794.java!!!	describeContents() : int
+        return 0;
+!!!1025922.java!!!	writeToParcel(inout parcel : Parcel, in flags : int) : void
+        parcel.writeInt(type);
+        parcel.writeInt(layer);
+        parcel.writeStrongBinder(token);
+        parcel.writeStrongBinder(parentToken);
+        parcel.writeInt(focused ? 1 : 0);
+        boundsInScreen.writeToParcel(parcel, flags);
+
+        if (childTokens != null && !childTokens.isEmpty()) {
+            parcel.writeInt(1);
+            parcel.writeBinderList(childTokens);
+        } else {
+            parcel.writeInt(0);
+        }
+!!!1026050.java!!!	toString() : String
+        StringBuilder builder = new StringBuilder();
+        builder.append("WindowInfo[");
+        builder.append("type=").append(type);
+        builder.append(", layer=").append(layer);
+        builder.append(", token=").append(token);
+        builder.append(", bounds=").append(boundsInScreen);
+        builder.append(", parent=").append(parentToken);
+        builder.append(", focused=").append(focused);
+        builder.append(", children=").append(childTokens);
+        builder.append(']');
+        return builder.toString();
+!!!1026178.java!!!	initFromParcel(inout parcel : Parcel) : void
+        type = parcel.readInt();
+        layer = parcel.readInt();
+        token = parcel.readStrongBinder();
+        parentToken = parcel.readStrongBinder();
+        focused = (parcel.readInt() == 1);
+        boundsInScreen.readFromParcel(parcel);
+
+        final boolean hasChildren = (parcel.readInt() == 1);
+        if (hasChildren) {
+            if (childTokens == null) {
+                childTokens = new ArrayList<IBinder>();
+            }
+            parcel.readBinderList(childTokens);
+        }
+!!!1026306.java!!!	clear() : void
+        type = 0;
+        layer = 0;
+        token = null;
+        parentToken = null;
+        focused = false;
+        boundsInScreen.setEmpty();
+        if (childTokens != null) {
+            childTokens.clear();
+        }

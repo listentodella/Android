@@ -1,0 +1,6 @@
+class MyOrientationListener
+!!!499330.java!!!	MyOrientationListener(inout context : Context, inout handler : Handler)
+            super(context, handler);
+!!!499458.java!!!	onProposedRotationChanged(in rotation : int) : void
+            if (localLOGV) Slog.v(TAG, "onProposedRotationChanged, rotation=" + rotation);
+            updateRotation(false);

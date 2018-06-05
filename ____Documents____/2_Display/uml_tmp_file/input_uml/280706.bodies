@@ -1,0 +1,552 @@
+class LoadedApk
+!!!1649282.java!!!	getApplication() : Application
+        return mApplication;
+!!!1649410.java!!!	LoadedApk(inout activityThread : ActivityThread, inout aInfo : ApplicationInfo, inout compatInfo : CompatibilityInfo, inout baseLoader : ClassLoader, inout securityViolation : boolean, inout includeCode : boolean, inout registerPackage : boolean)
+        final int myUid = Process.myUid();
+        aInfo = adjustNativeLibraryPaths(aInfo);
+
+        mActivityThread = activityThread;
+        mApplicationInfo = aInfo;
+        mPackageName = aInfo.packageName;
+        mAppDir = aInfo.sourceDir;
+        mResDir = aInfo.uid == myUid ? aInfo.sourceDir : aInfo.publicSourceDir;
+        mSplitAppDirs = aInfo.splitSourceDirs;
+        mSplitResDirs = aInfo.uid == myUid ? aInfo.splitSourceDirs : aInfo.splitPublicSourceDirs;
+        mOverlayDirs = aInfo.resourceDirs;
+        if (!UserHandle.isSameUser(aInfo.uid, myUid) && !Process.isIsolated()) {
+            aInfo.dataDir = PackageManager.getDataDirForUser(UserHandle.getUserId(myUid),
+                    mPackageName);
+        }
+        mSharedLibraries = aInfo.sharedLibraryFiles;
+        mDataDir = aInfo.dataDir;
+        mDataDirFile = mDataDir != null ? new File(mDataDir) : null;
+        mLibDir = aInfo.nativeLibraryDir;
+        mBaseClassLoader = baseLoader;
+        mSecurityViolation = securityViolation;
+        mIncludeCode = includeCode;
+        mRegisterPackage = registerPackage;
+        mDisplayAdjustments.setCompatibilityInfo(compatInfo);
+!!!1649538.java!!!	adjustNativeLibraryPaths(inout info : ApplicationInfo) : ApplicationInfo
+        // If we're dealing with a multi-arch application that has both
+        // 32 and 64 bit shared libraries, we might need to choose the secondary
+        // depending on what the current runtime's instruction set is.
+        if (info.primaryCpuAbi != null && info.secondaryCpuAbi != null) {
+            final String runtimeIsa = VMRuntime.getRuntime().vmInstructionSet();
+            final String secondaryIsa = VMRuntime.getInstructionSet(info.secondaryCpuAbi);
+
+            // If the runtimeIsa is the same as the primary isa, then we do nothing.
+            // Everything will be set up correctly because info.nativeLibraryDir will
+            // correspond to the right ISA.
+            if (runtimeIsa.equals(secondaryIsa)) {
+                final ApplicationInfo modified = new ApplicationInfo(info);
+                modified.nativeLibraryDir = modified.secondaryNativeLibraryDir;
+                return modified;
+            }
+        }
+
+        return info;
+!!!1649666.java!!!	LoadedApk(inout activityThread : ActivityThread)
+        mActivityThread = activityThread;
+        mApplicationInfo = new ApplicationInfo();
+        mApplicationInfo.packageName = "android";
+        mPackageName = "android";
+        mAppDir = null;
+        mResDir = null;
+        mSplitAppDirs = null;
+        mSplitResDirs = null;
+        mOverlayDirs = null;
+        mSharedLibraries = null;
+        mDataDir = null;
+        mDataDirFile = null;
+        mLibDir = null;
+        mBaseClassLoader = null;
+        mSecurityViolation = false;
+        mIncludeCode = true;
+        mRegisterPackage = false;
+        mClassLoader = ClassLoader.getSystemClassLoader();
+        mResources = Resources.getSystem();
+!!!1649794.java!!!	installSystemApplicationInfo(inout info : ApplicationInfo, inout classLoader : ClassLoader) : void
+        assert info.packageName.equals("android");
+        mApplicationInfo = info;
+        mClassLoader = classLoader;
+!!!1649922.java!!!	getPackageName() : String
+        return mPackageName;
+!!!1650050.java!!!	getApplicationInfo() : ApplicationInfo
+        return mApplicationInfo;
+!!!1650178.java!!!	isSecurityViolation() : boolean
+        return mSecurityViolation;
+!!!1650306.java!!!	getCompatibilityInfo() : CompatibilityInfo
+        return mDisplayAdjustments.getCompatibilityInfo();
+!!!1650434.java!!!	setCompatibilityInfo(inout compatInfo : CompatibilityInfo) : void
+        mDisplayAdjustments.setCompatibilityInfo(compatInfo);
+!!!1650562.java!!!	getLibrariesFor(in packageName : String) : String
+        ApplicationInfo ai = null;
+        try {
+            ai = ActivityThread.getPackageManager().getApplicationInfo(packageName,
+                    PackageManager.GET_SHARED_LIBRARY_FILES, UserHandle.myUserId());
+        } catch (RemoteException e) {
+            throw new AssertionError(e);
+        }
+
+        if (ai == null) {
+            return null;
+        }
+
+        return ai.sharedLibraryFiles;
+!!!1650690.java!!!	getClassLoader() : ClassLoader
+        synchronized (this) {
+            if (mClassLoader != null) {
+                return mClassLoader;
+            }
+
+            if (mIncludeCode && !mPackageName.equals("android")) {
+                // Avoid the binder call when the package is the current application package.
+                // The activity manager will perform ensure that dexopt is performed before
+                // spinning up the process.
+                if (!Objects.equals(mPackageName, ActivityThread.currentPackageName())) {
+                    final String isa = VMRuntime.getRuntime().vmInstructionSet();
+                    try {
+                        ActivityThread.getPackageManager().performDexOptIfNeeded(mPackageName, isa);
+                    } catch (RemoteException re) {
+                        // Ignored.
+                    }
+                }
+
+                final ArrayList<String> zipPaths = new ArrayList<>();
+                final ArrayList<String> libPaths = new ArrayList<>();
+
+                if (mRegisterPackage) {
+                    try {
+                        ActivityManagerNative.getDefault().addPackageDependency(mPackageName);
+                    } catch (RemoteException e) {
+                    }
+                }
+
+                zipPaths.add(mAppDir);
+                if (mSplitAppDirs != null) {
+                    Collections.addAll(zipPaths, mSplitAppDirs);
+                }
+
+                libPaths.add(mLibDir);
+
+                /*
+                 * The following is a bit of a hack to inject
+                 * instrumentation into the system: If the app
+                 * being started matches one of the instrumentation names,
+                 * then we combine both the "instrumentation" and
+                 * "instrumented" app into the path, along with the
+                 * concatenation of both apps' shared library lists.
+                 */
+
+                String instrumentationPackageName = mActivityThread.mInstrumentationPackageName;
+                String instrumentationAppDir = mActivityThread.mInstrumentationAppDir;
+                String[] instrumentationSplitAppDirs = mActivityThread.mInstrumentationSplitAppDirs;
+                String instrumentationLibDir = mActivityThread.mInstrumentationLibDir;
+
+                String instrumentedAppDir = mActivityThread.mInstrumentedAppDir;
+                String[] instrumentedSplitAppDirs = mActivityThread.mInstrumentedSplitAppDirs;
+                String instrumentedLibDir = mActivityThread.mInstrumentedLibDir;
+                String[] instrumentationLibs = null;
+
+                if (mAppDir.equals(instrumentationAppDir)
+                        || mAppDir.equals(instrumentedAppDir)) {
+                    zipPaths.clear();
+                    zipPaths.add(instrumentationAppDir);
+                    if (instrumentationSplitAppDirs != null) {
+                        Collections.addAll(zipPaths, instrumentationSplitAppDirs);
+                    }
+                    zipPaths.add(instrumentedAppDir);
+                    if (instrumentedSplitAppDirs != null) {
+                        Collections.addAll(zipPaths, instrumentedSplitAppDirs);
+                    }
+
+                    libPaths.clear();
+                    libPaths.add(instrumentationLibDir);
+                    libPaths.add(instrumentedLibDir);
+
+                    if (!instrumentedAppDir.equals(instrumentationAppDir)) {
+                        instrumentationLibs = getLibrariesFor(instrumentationPackageName);
+                    }
+                }
+
+                if (mSharedLibraries != null) {
+                    for (String lib : mSharedLibraries) {
+                        if (!zipPaths.contains(lib)) {
+                            zipPaths.add(0, lib);
+                        }
+                    }
+                }
+
+                if (instrumentationLibs != null) {
+                    for (String lib : instrumentationLibs) {
+                        if (!zipPaths.contains(lib)) {
+                            zipPaths.add(0, lib);
+                        }
+                    }
+                }
+
+                final String zip = TextUtils.join(File.pathSeparator, zipPaths);
+                final String lib = TextUtils.join(File.pathSeparator, libPaths);
+
+                /*
+                 * With all the combination done (if necessary, actually
+                 * create the class loader.
+                 */
+
+                if (ActivityThread.localLOGV)
+                    Slog.v(ActivityThread.TAG, "Class path: " + zip + ", JNI path: " + lib);
+
+                // Temporarily disable logging of disk reads on the Looper thread
+                // as this is early and necessary.
+                StrictMode.ThreadPolicy oldPolicy = StrictMode.allowThreadDiskReads();
+
+                mClassLoader = ApplicationLoaders.getDefault().getClassLoader(zip, lib,
+                        mBaseClassLoader);
+
+                StrictMode.setThreadPolicy(oldPolicy);
+            } else {
+                if (mBaseClassLoader == null) {
+                    mClassLoader = ClassLoader.getSystemClassLoader();
+                } else {
+                    mClassLoader = mBaseClassLoader;
+                }
+            }
+            return mClassLoader;
+        }
+!!!1650818.java!!!	initializeJavaContextClassLoader() : void
+        IPackageManager pm = ActivityThread.getPackageManager();
+        android.content.pm.PackageInfo pi;
+        try {
+            pi = pm.getPackageInfo(mPackageName, 0, UserHandle.myUserId());
+        } catch (RemoteException e) {
+            throw new IllegalStateException("Unable to get package info for "
+                    + mPackageName + "; is system dying?", e);
+        }
+        if (pi == null) {
+            throw new IllegalStateException("Unable to get package info for "
+                    + mPackageName + "; is package not installed?");
+        }
+        /*
+         * Two possible indications that this package could be
+         * sharing its virtual machine with other packages:
+         *
+         * 1.) the sharedUserId attribute is set in the manifest,
+         *     indicating a request to share a VM with other
+         *     packages with the same sharedUserId.
+         *
+         * 2.) the application element of the manifest has an
+         *     attribute specifying a non-default process name,
+         *     indicating the desire to run in another packages VM.
+         */
+        boolean sharedUserIdSet = (pi.sharedUserId != null);
+        boolean processNameNotDefault =
+            (pi.applicationInfo != null &&
+             !mPackageName.equals(pi.applicationInfo.processName));
+        boolean sharable = (sharedUserIdSet || processNameNotDefault);
+        ClassLoader contextClassLoader =
+            (sharable)
+            ? new WarningContextClassLoader()
+            : mClassLoader;
+        Thread.currentThread().setContextClassLoader(contextClassLoader);
+!!!1652098.java!!!	getAppDir() : String
+        return mAppDir;
+!!!1652226.java!!!	getLibDir() : String
+        return mLibDir;
+!!!1652354.java!!!	getResDir() : String
+        return mResDir;
+!!!1652482.java!!!	getSplitAppDirs() : String
+        return mSplitAppDirs;
+!!!1652610.java!!!	getSplitResDirs() : String
+        return mSplitResDirs;
+!!!1652738.java!!!	getOverlayDirs() : String
+        return mOverlayDirs;
+!!!1652866.java!!!	getDataDir() : String
+        return mDataDir;
+!!!1652994.java!!!	getDataDirFile() : File
+        return mDataDirFile;
+!!!1653122.java!!!	getAssets(inout mainThread : ActivityThread) : AssetManager
+        return getResources(mainThread).getAssets();
+!!!1653250.java!!!	getResources(inout mainThread : ActivityThread) : Resources
+        if (mResources == null) {
+            mResources = mainThread.getTopLevelResources(mResDir, mSplitResDirs, mOverlayDirs,
+                    mApplicationInfo.sharedLibraryFiles, Display.DEFAULT_DISPLAY, null, this);
+        }
+        return mResources;
+!!!1653378.java!!!	makeApplication(inout forceDefaultAppClass : boolean, inout instrumentation : Instrumentation) : Application
+        if (mApplication != null) {
+            return mApplication;
+        }
+
+        Application app = null;
+
+        String appClass = mApplicationInfo.className;
+        if (forceDefaultAppClass || (appClass == null)) {
+            appClass = "android.app.Application";
+        }
+
+        try {
+            java.lang.ClassLoader cl = getClassLoader();
+            if (!mPackageName.equals("android")) {
+                initializeJavaContextClassLoader();
+            }
+            ContextImpl appContext = ContextImpl.createAppContext(mActivityThread, this);
+            app = mActivityThread.mInstrumentation.newApplication(
+                    cl, appClass, appContext);
+            appContext.setOuterContext(app);
+        } catch (Exception e) {
+            if (!mActivityThread.mInstrumentation.onException(app, e)) {
+                throw new RuntimeException(
+                    "Unable to instantiate application " + appClass
+                    + ": " + e.toString(), e);
+            }
+        }
+        mActivityThread.mAllApplications.add(app);
+        mApplication = app;
+
+        if (instrumentation != null) {
+            try {
+                instrumentation.callApplicationOnCreate(app);
+            } catch (Exception e) {
+                if (!instrumentation.onException(app, e)) {
+                    throw new RuntimeException(
+                        "Unable to create application " + app.getClass().getName()
+                        + ": " + e.toString(), e);
+                }
+            }
+        }
+
+        // Rewrite the R 'constants' for all library apks.
+        SparseArray<String> packageIdentifiers = getAssets(mActivityThread)
+                .getAssignedPackageIdentifiers();
+        final int N = packageIdentifiers.size();
+        for (int i = 0; i < N; i++) {
+            final int id = packageIdentifiers.keyAt(i);
+            if (id == 0x01 || id == 0x7f) {
+                continue;
+            }
+
+            rewriteRValues(getClassLoader(), packageIdentifiers.valueAt(i), id);
+        }
+
+        return app;
+!!!1653506.java!!!	rewriteRValues(inout cl : ClassLoader, in packageName : String, in id : int) : void
+        final Class<?> rClazz;
+        try {
+            rClazz = cl.loadClass(packageName + ".R");
+        } catch (ClassNotFoundException e) {
+            // This is not necessarily an error, as some packages do not ship with resources
+            // (or they do not need rewriting).
+            Log.i(TAG, "No resource references to update in package " + packageName);
+            return;
+        }
+
+        final Method callback;
+        try {
+            callback = rClazz.getMethod("onResourcesLoaded", int.class);
+        } catch (NoSuchMethodException e) {
+            // No rewriting to be done.
+            return;
+        }
+
+        Throwable cause;
+        try {
+            callback.invoke(null, id);
+            return;
+        } catch (IllegalAccessException e) {
+            cause = e;
+        } catch (InvocationTargetException e) {
+            cause = e.getCause();
+        }
+
+        throw new RuntimeException("Failed to rewrite resource references for " + packageName,
+                cause);
+!!!1653634.java!!!	removeContextRegistrations(inout context : Context, in who : String, in what : String) : void
+        final boolean reportRegistrationLeaks = StrictMode.vmRegistrationLeaksEnabled();
+        ArrayMap<BroadcastReceiver, LoadedApk.ReceiverDispatcher> rmap =
+                mReceivers.remove(context);
+        if (rmap != null) {
+            for (int i=0; i<rmap.size(); i++) {
+                LoadedApk.ReceiverDispatcher rd = rmap.valueAt(i);
+                IntentReceiverLeaked leak = new IntentReceiverLeaked(
+                        what + " " + who + " has leaked IntentReceiver "
+                        + rd.getIntentReceiver() + " that was " +
+                        "originally registered here. Are you missing a " +
+                        "call to unregisterReceiver()?");
+                leak.setStackTrace(rd.getLocation().getStackTrace());
+                Slog.e(ActivityThread.TAG, leak.getMessage(), leak);
+                if (reportRegistrationLeaks) {
+                    StrictMode.onIntentReceiverLeaked(leak);
+                }
+                try {
+                    ActivityManagerNative.getDefault().unregisterReceiver(
+                            rd.getIIntentReceiver());
+                } catch (RemoteException e) {
+                    // system crashed, nothing we can do
+                }
+            }
+        }
+        mUnregisteredReceivers.remove(context);
+        //Slog.i(TAG, "Receiver registrations: " + mReceivers);
+        ArrayMap<ServiceConnection, LoadedApk.ServiceDispatcher> smap =
+            mServices.remove(context);
+        if (smap != null) {
+            for (int i=0; i<smap.size(); i++) {
+                LoadedApk.ServiceDispatcher sd = smap.valueAt(i);
+                ServiceConnectionLeaked leak = new ServiceConnectionLeaked(
+                        what + " " + who + " has leaked ServiceConnection "
+                        + sd.getServiceConnection() + " that was originally bound here");
+                leak.setStackTrace(sd.getLocation().getStackTrace());
+                Slog.e(ActivityThread.TAG, leak.getMessage(), leak);
+                if (reportRegistrationLeaks) {
+                    StrictMode.onServiceConnectionLeaked(leak);
+                }
+                try {
+                    ActivityManagerNative.getDefault().unbindService(
+                            sd.getIServiceConnection());
+                } catch (RemoteException e) {
+                    // system crashed, nothing we can do
+                }
+                sd.doForget();
+            }
+        }
+        mUnboundServices.remove(context);
+        //Slog.i(TAG, "Service registrations: " + mServices);
+!!!1653762.java!!!	getReceiverDispatcher(inout r : BroadcastReceiver, inout context : Context, inout handler : Handler, inout instrumentation : Instrumentation, inout registered : boolean) : IIntentReceiver
+        synchronized (mReceivers) {
+            LoadedApk.ReceiverDispatcher rd = null;
+            ArrayMap<BroadcastReceiver, LoadedApk.ReceiverDispatcher> map = null;
+            if (registered) {
+                map = mReceivers.get(context);
+                if (map != null) {
+                    rd = map.get(r);
+                }
+            }
+            if (rd == null) {
+                rd = new ReceiverDispatcher(r, context, handler,
+                        instrumentation, registered);
+                if (registered) {
+                    if (map == null) {
+                        map = new ArrayMap<BroadcastReceiver, LoadedApk.ReceiverDispatcher>();
+                        mReceivers.put(context, map);
+                    }
+                    map.put(r, rd);
+                }
+            } else {
+                rd.validate(context, handler);
+            }
+            rd.mForgotten = false;
+            return rd.getIIntentReceiver();
+        }
+!!!1653890.java!!!	forgetReceiverDispatcher(inout context : Context, inout r : BroadcastReceiver) : IIntentReceiver
+        synchronized (mReceivers) {
+            ArrayMap<BroadcastReceiver, LoadedApk.ReceiverDispatcher> map = mReceivers.get(context);
+            LoadedApk.ReceiverDispatcher rd = null;
+            if (map != null) {
+                rd = map.get(r);
+                if (rd != null) {
+                    map.remove(r);
+                    if (map.size() == 0) {
+                        mReceivers.remove(context);
+                    }
+                    if (r.getDebugUnregister()) {
+                        ArrayMap<BroadcastReceiver, LoadedApk.ReceiverDispatcher> holder
+                                = mUnregisteredReceivers.get(context);
+                        if (holder == null) {
+                            holder = new ArrayMap<BroadcastReceiver, LoadedApk.ReceiverDispatcher>();
+                            mUnregisteredReceivers.put(context, holder);
+                        }
+                        RuntimeException ex = new IllegalArgumentException(
+                                "Originally unregistered here:");
+                        ex.fillInStackTrace();
+                        rd.setUnregisterLocation(ex);
+                        holder.put(r, rd);
+                    }
+                    rd.mForgotten = true;
+                    return rd.getIIntentReceiver();
+                }
+            }
+            ArrayMap<BroadcastReceiver, LoadedApk.ReceiverDispatcher> holder
+                    = mUnregisteredReceivers.get(context);
+            if (holder != null) {
+                rd = holder.get(r);
+                if (rd != null) {
+                    RuntimeException ex = rd.getUnregisterLocation();
+                    throw new IllegalArgumentException(
+                            "Unregistering Receiver " + r
+                            + " that was already unregistered", ex);
+                }
+            }
+            if (context == null) {
+                throw new IllegalStateException("Unbinding Receiver " + r
+                        + " from Context that is no longer in use: " + context);
+            } else {
+                throw new IllegalArgumentException("Receiver not registered: " + r);
+            }
+
+        }
+!!!1655554.java!!!	getServiceDispatcher(inout c : ServiceConnection, inout context : Context, inout handler : Handler, in flags : int) : IServiceConnection
+        synchronized (mServices) {
+            LoadedApk.ServiceDispatcher sd = null;
+            ArrayMap<ServiceConnection, LoadedApk.ServiceDispatcher> map = mServices.get(context);
+            if (map != null) {
+                sd = map.get(c);
+            }
+            if (sd == null) {
+                sd = new ServiceDispatcher(c, context, handler, flags);
+                if (map == null) {
+                    map = new ArrayMap<ServiceConnection, LoadedApk.ServiceDispatcher>();
+                    mServices.put(context, map);
+                }
+                map.put(c, sd);
+            } else {
+                sd.validate(context, handler);
+            }
+            return sd.getIServiceConnection();
+        }
+!!!1655682.java!!!	forgetServiceDispatcher(inout context : Context, inout c : ServiceConnection) : IServiceConnection
+        synchronized (mServices) {
+            ArrayMap<ServiceConnection, LoadedApk.ServiceDispatcher> map
+                    = mServices.get(context);
+            LoadedApk.ServiceDispatcher sd = null;
+            if (map != null) {
+                sd = map.get(c);
+                if (sd != null) {
+                    map.remove(c);
+                    sd.doForget();
+                    if (map.size() == 0) {
+                        mServices.remove(context);
+                    }
+                    if ((sd.getFlags()&Context.BIND_DEBUG_UNBIND) != 0) {
+                        ArrayMap<ServiceConnection, LoadedApk.ServiceDispatcher> holder
+                                = mUnboundServices.get(context);
+                        if (holder == null) {
+                            holder = new ArrayMap<ServiceConnection, LoadedApk.ServiceDispatcher>();
+                            mUnboundServices.put(context, holder);
+                        }
+                        RuntimeException ex = new IllegalArgumentException(
+                                "Originally unbound here:");
+                        ex.fillInStackTrace();
+                        sd.setUnbindLocation(ex);
+                        holder.put(c, sd);
+                    }
+                    return sd.getIServiceConnection();
+                }
+            }
+            ArrayMap<ServiceConnection, LoadedApk.ServiceDispatcher> holder
+                    = mUnboundServices.get(context);
+            if (holder != null) {
+                sd = holder.get(c);
+                if (sd != null) {
+                    RuntimeException ex = sd.getUnbindLocation();
+                    throw new IllegalArgumentException(
+                            "Unbinding Service " + c
+                            + " that was already unbound", ex);
+                }
+            }
+            if (context == null) {
+                throw new IllegalStateException("Unbinding Service " + c
+                        + " from Context that is no longer in use: " + context);
+            } else {
+                throw new IllegalArgumentException("Service not registered: " + c);
+            }
+        }

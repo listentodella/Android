@@ -1,0 +1,103 @@
+class PolicyControl
+!!!522626.java!!!	getSystemUiVisibility(inout win : WindowState, inout attrs : LayoutParams) : int
+        attrs = attrs != null ? attrs : win.getAttrs();
+        int vis = win != null ? win.getSystemUiVisibility() : attrs.systemUiVisibility;
+        if (sImmersiveStatusFilter != null && sImmersiveStatusFilter.matches(attrs)) {
+            vis |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            vis &= ~(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.STATUS_BAR_TRANSLUCENT);
+        }
+        if (sImmersiveNavigationFilter != null && sImmersiveNavigationFilter.matches(attrs)) {
+            vis |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+            vis &= ~(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.NAVIGATION_BAR_TRANSLUCENT);
+        }
+        return vis;
+!!!522754.java!!!	getWindowFlags(inout win : WindowState, inout attrs : LayoutParams) : int
+        attrs = attrs != null ? attrs : win.getAttrs();
+        int flags = attrs.flags;
+        if (sImmersiveStatusFilter != null && sImmersiveStatusFilter.matches(attrs)) {
+            flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            flags &= ~(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+                    | WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        }
+        if (sImmersiveNavigationFilter != null && sImmersiveNavigationFilter.matches(attrs)) {
+            flags &= ~WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
+        }
+        return flags;
+!!!522882.java!!!	adjustClearableFlags(inout win : WindowState, in clearableFlags : int) : int
+        final LayoutParams attrs = win != null ? win.getAttrs() : null;
+        if (sImmersiveStatusFilter != null && sImmersiveStatusFilter.matches(attrs)) {
+            clearableFlags &= ~View.SYSTEM_UI_FLAG_FULLSCREEN;
+        }
+        return clearableFlags;
+!!!523010.java!!!	disableImmersiveConfirmation(in pkg : String) : boolean
+        return (sImmersivePreconfirmationsFilter != null
+                && sImmersivePreconfirmationsFilter.matches(pkg))
+                || ActivityManager.isRunningInTestHarness();
+!!!523138.java!!!	reloadFromSetting(inout context : Context) : void
+        if (DEBUG) Slog.d(TAG, "reloadFromSetting()");
+        String value = null;
+        try {
+            value = Settings.Global.getStringForUser(context.getContentResolver(),
+                    Settings.Global.POLICY_CONTROL,
+                    UserHandle.USER_CURRENT);
+            if (sSettingValue != null && sSettingValue.equals(value)) return;
+            setFilters(value);
+            sSettingValue = value;
+        } catch (Throwable t) {
+            Slog.w(TAG, "Error loading policy control, value=" + value, t);
+        }
+!!!523266.java!!!	dump(in prefix : String, inout pw : PrintWriter) : void
+        dump("sImmersiveStatusFilter", sImmersiveStatusFilter, prefix, pw);
+        dump("sImmersiveNavigationFilter", sImmersiveNavigationFilter, prefix, pw);
+        dump("sImmersivePreconfirmationsFilter", sImmersivePreconfirmationsFilter, prefix, pw);
+!!!523394.java!!!	dump(in name : String, inout filter : PolicyControl::Filter, in prefix : String, inout pw : PrintWriter) : void
+        pw.print(prefix); pw.print("PolicyControl."); pw.print(name); pw.print('=');
+        if (filter == null) {
+            pw.println("null");
+        } else {
+            filter.dump(pw); pw.println();
+        }
+!!!523522.java!!!	setFilters(in value : String) : void
+        if (DEBUG) Slog.d(TAG, "setFilters: " + value);
+        sImmersiveStatusFilter = null;
+        sImmersiveNavigationFilter = null;
+        sImmersivePreconfirmationsFilter = null;
+        if (value != null) {
+            String[] nvps = value.split(":");
+            for (String nvp : nvps) {
+                int i = nvp.indexOf('=');
+                if (i == -1) continue;
+                String n = nvp.substring(0, i);
+                String v = nvp.substring(i + 1);
+                if (n.equals(NAME_IMMERSIVE_FULL)) {
+                    Filter f = Filter.parse(v);
+                    sImmersiveStatusFilter = sImmersiveNavigationFilter = f;
+                    if (sImmersivePreconfirmationsFilter == null) {
+                        sImmersivePreconfirmationsFilter = f;
+                    }
+                } else if (n.equals(NAME_IMMERSIVE_STATUS)) {
+                    Filter f = Filter.parse(v);
+                    sImmersiveStatusFilter = f;
+                } else if (n.equals(NAME_IMMERSIVE_NAVIGATION)) {
+                    Filter f = Filter.parse(v);
+                    sImmersiveNavigationFilter = f;
+                    if (sImmersivePreconfirmationsFilter == null) {
+                        sImmersivePreconfirmationsFilter = f;
+                    }
+                } else if (n.equals(NAME_IMMERSIVE_PRECONFIRMATIONS)) {
+                    Filter f = Filter.parse(v);
+                    sImmersivePreconfirmationsFilter = f;
+                }
+            }
+        }
+        if (DEBUG) {
+            Slog.d(TAG, "immersiveStatusFilter: " + sImmersiveStatusFilter);
+            Slog.d(TAG, "immersiveNavigationFilter: " + sImmersiveNavigationFilter);
+            Slog.d(TAG, "immersivePreconfirmationsFilter: " + sImmersivePreconfirmationsFilter);
+        }

@@ -1,0 +1,404 @@
+class AccessibilityEvent
+!!!1065730.java!!!	init(inout event : AccessibilityEvent) : void
+        super.init(event);
+        mEventType = event.mEventType;
+        mMovementGranularity = event.mMovementGranularity;
+        mAction = event.mAction;
+        mContentChangeTypes = event.mContentChangeTypes;
+        mEventTime = event.mEventTime;
+        mPackageName = event.mPackageName;
+!!!1065858.java!!!	setSealed(inout sealed : boolean) : void
+        super.setSealed(sealed);
+        final List<AccessibilityRecord> records = mRecords;
+        if (records != null) {
+            final int recordCount = records.size();
+            for (int i = 0; i < recordCount; i++) {
+                AccessibilityRecord record = records.get(i);
+                record.setSealed(sealed);
+            }
+        }
+!!!1065986.java!!!	getRecordCount() : int
+        return mRecords == null ? 0 : mRecords.size();
+!!!1066114.java!!!	appendRecord(inout record : AccessibilityRecord) : void
+        enforceNotSealed();
+        if (mRecords == null) {
+            mRecords = new ArrayList<AccessibilityRecord>();
+        }
+        mRecords.add(record);
+!!!1066242.java!!!	getRecord(in index : int) : AccessibilityRecord
+        if (mRecords == null) {
+            throw new IndexOutOfBoundsException("Invalid index " + index + ", size is 0");
+        }
+        return mRecords.get(index);
+!!!1066370.java!!!	getEventType() : int
+        return mEventType;
+!!!1066498.java!!!	getContentChangeTypes() : int
+        return mContentChangeTypes;
+!!!1066626.java!!!	setContentChangeTypes(in changeTypes : int) : void
+        enforceNotSealed();
+        mContentChangeTypes = changeTypes;
+!!!1066754.java!!!	setEventType(in eventType : int) : void
+        enforceNotSealed();
+        mEventType = eventType;
+!!!1066882.java!!!	getEventTime() : long
+        return mEventTime;
+!!!1067010.java!!!	setEventTime(in eventTime : long) : void
+        enforceNotSealed();
+        mEventTime = eventTime;
+!!!1067138.java!!!	getPackageName() : CharSequence
+        return mPackageName;
+!!!1067266.java!!!	setPackageName(inout packageName : CharSequence) : void
+        enforceNotSealed();
+        mPackageName = packageName;
+!!!1067394.java!!!	setMovementGranularity(in granularity : int) : void
+        enforceNotSealed();
+        mMovementGranularity = granularity;
+!!!1067522.java!!!	getMovementGranularity() : int
+        return mMovementGranularity;
+!!!1067650.java!!!	setAction(in action : int) : void
+        enforceNotSealed();
+        mAction = action;
+!!!1067778.java!!!	getAction() : int
+        return mAction;
+!!!1067906.java!!!	obtain(in eventType : int) : AccessibilityEvent
+        AccessibilityEvent event = AccessibilityEvent.obtain();
+        event.setEventType(eventType);
+        return event;
+!!!1068034.java!!!	obtain(inout event : AccessibilityEvent) : AccessibilityEvent
+        AccessibilityEvent eventClone = AccessibilityEvent.obtain();
+        eventClone.init(event);
+
+        if (event.mRecords != null) {
+            final int recordCount = event.mRecords.size();
+            eventClone.mRecords = new ArrayList<AccessibilityRecord>(recordCount);
+            for (int i = 0; i < recordCount; i++) {
+                final AccessibilityRecord record = event.mRecords.get(i);
+                final AccessibilityRecord recordClone = AccessibilityRecord.obtain(record);
+                eventClone.mRecords.add(recordClone);
+            }
+        }
+
+        return eventClone;
+!!!1068162.java!!!	obtain() : AccessibilityEvent
+        AccessibilityEvent event = sPool.acquire();
+        return (event != null) ? event : new AccessibilityEvent();
+!!!1068290.java!!!	recycle() : void
+        clear();
+        sPool.release(this);
+!!!1068418.java!!!	clear() : void
+        super.clear();
+        mEventType = 0;
+        mMovementGranularity = 0;
+        mAction = 0;
+        mContentChangeTypes = 0;
+        mPackageName = null;
+        mEventTime = 0;
+        if (mRecords != null) {
+            while (!mRecords.isEmpty()) {
+                AccessibilityRecord record = mRecords.remove(0);
+                record.recycle();
+            }
+        }
+!!!1068546.java!!!	initFromParcel(inout parcel : Parcel) : void
+        mSealed = (parcel.readInt() == 1);
+        mEventType = parcel.readInt();
+        mMovementGranularity = parcel.readInt();
+        mAction = parcel.readInt();
+        mContentChangeTypes = parcel.readInt();
+        mPackageName = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
+        mEventTime = parcel.readLong();
+        mConnectionId = parcel.readInt();
+        readAccessibilityRecordFromParcel(this, parcel);
+
+        // Read the records.
+        final int recordCount = parcel.readInt();
+        if (recordCount > 0) {
+            mRecords = new ArrayList<AccessibilityRecord>(recordCount);
+            for (int i = 0; i < recordCount; i++) {
+                AccessibilityRecord record = AccessibilityRecord.obtain();
+                readAccessibilityRecordFromParcel(record, parcel);
+                record.mConnectionId = mConnectionId;
+                mRecords.add(record);
+            }
+        }
+!!!1068674.java!!!	readAccessibilityRecordFromParcel(inout record : AccessibilityRecord, inout parcel : Parcel) : void
+        record.mBooleanProperties = parcel.readInt();
+        record.mCurrentItemIndex = parcel.readInt();
+        record.mItemCount = parcel.readInt();
+        record.mFromIndex = parcel.readInt();
+        record.mToIndex = parcel.readInt();
+        record.mScrollX = parcel.readInt();
+        record.mScrollY =  parcel.readInt();
+        record.mMaxScrollX = parcel.readInt();
+        record.mMaxScrollY =  parcel.readInt();
+        record.mAddedCount = parcel.readInt();
+        record.mRemovedCount = parcel.readInt();
+        record.mClassName = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
+        record.mContentDescription = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
+        record.mBeforeText = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
+        record.mParcelableData = parcel.readParcelable(null);
+        parcel.readList(record.mText, null);
+        record.mSourceWindowId = parcel.readInt();
+        record.mSourceNodeId = parcel.readLong();
+        record.mSealed = (parcel.readInt() == 1);
+!!!1068802.java!!!	writeToParcel(inout parcel : Parcel, in flags : int) : void
+        parcel.writeInt(isSealed() ? 1 : 0);
+        parcel.writeInt(mEventType);
+        parcel.writeInt(mMovementGranularity);
+        parcel.writeInt(mAction);
+        parcel.writeInt(mContentChangeTypes);
+        TextUtils.writeToParcel(mPackageName, parcel, 0);
+        parcel.writeLong(mEventTime);
+        parcel.writeInt(mConnectionId);
+        writeAccessibilityRecordToParcel(this, parcel, flags);
+
+        // Write the records.
+        final int recordCount = getRecordCount();
+        parcel.writeInt(recordCount);
+        for (int i = 0; i < recordCount; i++) {
+            AccessibilityRecord record = mRecords.get(i);
+            writeAccessibilityRecordToParcel(record, parcel, flags);
+        }
+!!!1068930.java!!!	writeAccessibilityRecordToParcel(inout record : AccessibilityRecord, inout parcel : Parcel, in flags : int) : void
+        parcel.writeInt(record.mBooleanProperties);
+        parcel.writeInt(record.mCurrentItemIndex);
+        parcel.writeInt(record.mItemCount);
+        parcel.writeInt(record.mFromIndex);
+        parcel.writeInt(record.mToIndex);
+        parcel.writeInt(record.mScrollX);
+        parcel.writeInt(record.mScrollY);
+        parcel.writeInt(record.mMaxScrollX);
+        parcel.writeInt(record.mMaxScrollY);
+        parcel.writeInt(record.mAddedCount);
+        parcel.writeInt(record.mRemovedCount);
+        TextUtils.writeToParcel(record.mClassName, parcel, flags);
+        TextUtils.writeToParcel(record.mContentDescription, parcel, flags);
+        TextUtils.writeToParcel(record.mBeforeText, parcel, flags);
+        parcel.writeParcelable(record.mParcelableData, flags);
+        parcel.writeList(record.mText);
+        parcel.writeInt(record.mSourceWindowId);
+        parcel.writeLong(record.mSourceNodeId);
+        parcel.writeInt(record.mSealed ? 1 : 0);
+!!!1069058.java!!!	describeContents() : int
+        return 0;
+!!!1069186.java!!!	toString() : String
+        StringBuilder builder = new StringBuilder();
+        builder.append("EventType: ").append(eventTypeToString(mEventType));
+        builder.append("; EventTime: ").append(mEventTime);
+        builder.append("; PackageName: ").append(mPackageName);
+        builder.append("; MovementGranularity: ").append(mMovementGranularity);
+        builder.append("; Action: ").append(mAction);
+        builder.append(super.toString());
+        if (DEBUG) {
+            builder.append("\n");
+            builder.append("; ContentChangeTypes: ").append(mContentChangeTypes);
+            builder.append("; sourceWindowId: ").append(mSourceWindowId);
+            builder.append("; mSourceNodeId: ").append(mSourceNodeId);
+            for (int i = 0; i < getRecordCount(); i++) {
+                final AccessibilityRecord record = getRecord(i);
+                builder.append("  Record ");
+                builder.append(i);
+                builder.append(":");
+                builder.append(" [ ClassName: " + record.mClassName);
+                builder.append("; Text: " + record.mText);
+                builder.append("; ContentDescription: " + record.mContentDescription);
+                builder.append("; ItemCount: " + record.mItemCount);
+                builder.append("; CurrentItemIndex: " + record.mCurrentItemIndex);
+                builder.append("; IsEnabled: " + record.isEnabled());
+                builder.append("; IsPassword: " + record.isPassword());
+                builder.append("; IsChecked: " + record.isChecked());
+                builder.append("; IsFullScreen: " + record.isFullScreen());
+                builder.append("; Scrollable: " + record.isScrollable());
+                builder.append("; BeforeText: " + record.mBeforeText);
+                builder.append("; FromIndex: " + record.mFromIndex);
+                builder.append("; ToIndex: " + record.mToIndex);
+                builder.append("; ScrollX: " + record.mScrollX);
+                builder.append("; ScrollY: " + record.mScrollY);
+                builder.append("; AddedCount: " + record.mAddedCount);
+                builder.append("; RemovedCount: " + record.mRemovedCount);
+                builder.append("; ParcelableData: " + record.mParcelableData);
+                builder.append(" ]");
+                builder.append("\n");
+            }
+        } else {
+            builder.append("; recordCount: ").append(getRecordCount());
+        }
+        return builder.toString();
+!!!1069314.java!!!	eventTypeToString(in eventType : int) : String
+        if (eventType == TYPES_ALL_MASK) {
+            return "TYPES_ALL_MASK";
+        }
+        StringBuilder builder = new StringBuilder();
+        int eventTypeCount = 0;
+        while (eventType != 0) {
+            final int eventTypeFlag = 1 << Integer.numberOfTrailingZeros(eventType);
+            eventType &= ~eventTypeFlag;
+            switch (eventTypeFlag) {
+                case TYPE_VIEW_CLICKED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_CLICKED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_VIEW_LONG_CLICKED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_LONG_CLICKED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_VIEW_SELECTED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_SELECTED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_VIEW_FOCUSED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_FOCUSED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_VIEW_TEXT_CHANGED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_TEXT_CHANGED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_WINDOW_STATE_CHANGED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_WINDOW_STATE_CHANGED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_VIEW_HOVER_ENTER: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_HOVER_ENTER");
+                    eventTypeCount++;
+                } break;
+                case TYPE_VIEW_HOVER_EXIT: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_HOVER_EXIT");
+                    eventTypeCount++;
+                } break;
+                case TYPE_NOTIFICATION_STATE_CHANGED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_NOTIFICATION_STATE_CHANGED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_TOUCH_EXPLORATION_GESTURE_START: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_TOUCH_EXPLORATION_GESTURE_START");
+                    eventTypeCount++;
+                } break;
+                case TYPE_TOUCH_EXPLORATION_GESTURE_END: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_TOUCH_EXPLORATION_GESTURE_END");
+                    eventTypeCount++;
+                } break;
+                case TYPE_WINDOW_CONTENT_CHANGED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_WINDOW_CONTENT_CHANGED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_VIEW_TEXT_SELECTION_CHANGED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_TEXT_SELECTION_CHANGED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_VIEW_SCROLLED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_SCROLLED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_ANNOUNCEMENT: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_ANNOUNCEMENT");
+                    eventTypeCount++;
+                } break;
+                case TYPE_VIEW_ACCESSIBILITY_FOCUSED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_ACCESSIBILITY_FOCUSED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED");
+                    eventTypeCount++;
+                } break;
+                case TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_VIEW_TEXT_TRAVERSED_AT_MOVEMENT_GRANULARITY");
+                    eventTypeCount++;
+                } break;
+                case TYPE_GESTURE_DETECTION_START: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_GESTURE_DETECTION_START");
+                    eventTypeCount++;
+                } break;
+                case TYPE_GESTURE_DETECTION_END: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_GESTURE_DETECTION_END");
+                    eventTypeCount++;
+                } break;
+                case TYPE_TOUCH_INTERACTION_START: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_TOUCH_INTERACTION_START");
+                    eventTypeCount++;
+                } break;
+                case TYPE_TOUCH_INTERACTION_END: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_TOUCH_INTERACTION_END");
+                    eventTypeCount++;
+                } break;
+                case TYPE_WINDOWS_CHANGED: {
+                    if (eventTypeCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append("TYPE_WINDOWS_CHANGED");
+                    eventTypeCount++;
+                } break;
+            }
+        }
+        if (eventTypeCount > 1) {
+            builder.insert(0, '[');
+            builder.append(']');
+        }
+        return builder.toString();

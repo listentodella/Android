@@ -1,0 +1,449 @@
+class UiAutomation
+!!!1750530.java!!!	UiAutomation(inout looper : Looper, inout connection : IUiAutomationConnection)
+        if (looper == null) {
+            throw new IllegalArgumentException("Looper cannot be null!");
+        }
+        if (connection == null) {
+            throw new IllegalArgumentException("Connection cannot be null!");
+        }
+        mUiAutomationConnection = connection;
+        mClient = new IAccessibilityServiceClientImpl(looper);
+!!!1750658.java!!!	connect() : void
+        synchronized (mLock) {
+            throwIfConnectedLocked();
+            if (mIsConnecting) {
+                return;
+            }
+            mIsConnecting = true;
+        }
+
+        try {
+            // Calling out without a lock held.
+            mUiAutomationConnection.connect(mClient);
+        } catch (RemoteException re) {
+            throw new RuntimeException("Error while connecting UiAutomation", re);
+        }
+
+        synchronized (mLock) {
+            final long startTimeMillis = SystemClock.uptimeMillis();
+            try {
+                while (true) {
+                    if (isConnectedLocked()) {
+                        break;
+                    }
+                    final long elapsedTimeMillis = SystemClock.uptimeMillis() - startTimeMillis;
+                    final long remainingTimeMillis = CONNECT_TIMEOUT_MILLIS - elapsedTimeMillis;
+                    if (remainingTimeMillis <= 0) {
+                        throw new RuntimeException("Error while connecting UiAutomation");
+                    }
+                    try {
+                        mLock.wait(remainingTimeMillis);
+                    } catch (InterruptedException ie) {
+                        /* ignore */
+                    }
+                }
+            } finally {
+                mIsConnecting = false;
+            }
+        }
+!!!1750786.java!!!	disconnect() : void
+        synchronized (mLock) {
+            if (mIsConnecting) {
+                throw new IllegalStateException(
+                        "Cannot call disconnect() while connecting!");
+            }
+            throwIfNotConnectedLocked();
+            mConnectionId = CONNECTION_ID_UNDEFINED;
+        }
+        try {
+            // Calling out without a lock held.
+            mUiAutomationConnection.disconnect();
+        } catch (RemoteException re) {
+            throw new RuntimeException("Error while disconnecting UiAutomation", re);
+        }
+!!!1750914.java!!!	getConnectionId() : int
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+            return mConnectionId;
+        }
+!!!1751042.java!!!	setOnAccessibilityEventListener(inout listener : UiAutomation::OnAccessibilityEventListener) : void
+        synchronized (mLock) {
+            mOnAccessibilityEventListener = listener;
+        }
+!!!1751170.java!!!	performGlobalAction(in action : int) : boolean
+        final IAccessibilityServiceConnection connection;
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+            connection = AccessibilityInteractionClient.getInstance()
+                    .getConnection(mConnectionId);
+        }
+        // Calling out without a lock held.
+        if (connection != null) {
+            try {
+                return connection.performGlobalAction(action);
+            } catch (RemoteException re) {
+                Log.w(LOG_TAG, "Error while calling performGlobalAction", re);
+            }
+        }
+        return false;
+!!!1751298.java!!!	findFocus(in focus : int) : AccessibilityNodeInfo
+        return AccessibilityInteractionClient.getInstance().findFocus(mConnectionId,
+                AccessibilityNodeInfo.ANY_WINDOW_ID, AccessibilityNodeInfo.ROOT_NODE_ID, focus);
+!!!1751426.java!!!	getServiceInfo() : AccessibilityServiceInfo
+        final IAccessibilityServiceConnection connection;
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+            connection = AccessibilityInteractionClient.getInstance()
+                    .getConnection(mConnectionId);
+        }
+        // Calling out without a lock held.
+        if (connection != null) {
+            try {
+                return connection.getServiceInfo();
+            } catch (RemoteException re) {
+                Log.w(LOG_TAG, "Error while getting AccessibilityServiceInfo", re);
+            }
+        }
+        return null;
+!!!1751554.java!!!	setServiceInfo(inout info : AccessibilityServiceInfo) : void
+        final IAccessibilityServiceConnection connection;
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+            AccessibilityInteractionClient.getInstance().clearCache();
+            connection = AccessibilityInteractionClient.getInstance()
+                    .getConnection(mConnectionId);
+        }
+        // Calling out without a lock held.
+        if (connection != null) {
+            try {
+                connection.setServiceInfo(info);
+            } catch (RemoteException re) {
+                Log.w(LOG_TAG, "Error while setting AccessibilityServiceInfo", re);
+            }
+        }
+!!!1751682.java!!!	getWindows() : AccessibilityWindowInfo
+        final int connectionId;
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+            connectionId = mConnectionId;
+        }
+        // Calling out without a lock held.
+        return AccessibilityInteractionClient.getInstance()
+                .getWindows(connectionId);
+!!!1751810.java!!!	getRootInActiveWindow() : AccessibilityNodeInfo
+        final int connectionId;
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+            connectionId = mConnectionId;
+        }
+        // Calling out without a lock held.
+        return AccessibilityInteractionClient.getInstance()
+                .getRootInActiveWindow(connectionId);
+!!!1751938.java!!!	injectInputEvent(inout event : InputEvent, inout sync : boolean) : boolean
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+        }
+        try {
+            if (DEBUG) {
+                Log.i(LOG_TAG, "Injecting: " + event + " sync: " + sync);
+            }
+            // Calling out without a lock held.
+            return mUiAutomationConnection.injectInputEvent(event, sync);
+        } catch (RemoteException re) {
+            Log.e(LOG_TAG, "Error while injecting input event!", re);
+        }
+        return false;
+!!!1752066.java!!!	setRotation(in rotation : int) : boolean
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+        }
+        switch (rotation) {
+            case ROTATION_FREEZE_0:
+            case ROTATION_FREEZE_90:
+            case ROTATION_FREEZE_180:
+            case ROTATION_FREEZE_270:
+            case ROTATION_UNFREEZE:
+            case ROTATION_FREEZE_CURRENT: {
+                try {
+                    // Calling out without a lock held.
+                    mUiAutomationConnection.setRotation(rotation);
+                    return true;
+                } catch (RemoteException re) {
+                    Log.e(LOG_TAG, "Error while setting rotation!", re);
+                }
+            } return false;
+            default: {
+                throw new IllegalArgumentException("Invalid rotation.");
+            }
+        }
+!!!1752194.java!!!	executeAndWaitForEvent(inout command : Runnable, inout filter : UiAutomation::AccessibilityEventFilter, in timeoutMillis : long) : AccessibilityEvent
+        // Acquire the lock and prepare for receiving events.
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+            mEventQueue.clear();
+            // Prepare to wait for an event.
+            mWaitingForEventDelivery = true;
+        }
+
+        // Note: We have to release the lock since calling out with this lock held
+        // can bite. We will correctly filter out events from other interactions,
+        // so starting to collect events before running the action is just fine.
+
+        // We will ignore events from previous interactions.
+        final long executionStartTimeMillis = SystemClock.uptimeMillis();
+        // Execute the command *without* the lock being held.
+        command.run();
+
+        // Acquire the lock and wait for the event.
+        synchronized (mLock) {
+            try {
+                // Wait for the event.
+                final long startTimeMillis = SystemClock.uptimeMillis();
+                while (true) {
+                    // Drain the event queue
+                    while (!mEventQueue.isEmpty()) {
+                        AccessibilityEvent event = mEventQueue.remove(0);
+                        // Ignore events from previous interactions.
+                        if (event.getEventTime() < executionStartTimeMillis) {
+                            continue;
+                        }
+                        if (filter.accept(event)) {
+                            return event;
+                        }
+                        event.recycle();
+                    }
+                    // Check if timed out and if not wait.
+                    final long elapsedTimeMillis = SystemClock.uptimeMillis() - startTimeMillis;
+                    final long remainingTimeMillis = timeoutMillis - elapsedTimeMillis;
+                    if (remainingTimeMillis <= 0) {
+                        throw new TimeoutException("Expected event not received within: "
+                                + timeoutMillis + " ms.");
+                    }
+                    try {
+                        mLock.wait(remainingTimeMillis);
+                    } catch (InterruptedException ie) {
+                        /* ignore */
+                    }
+                }
+            } finally {
+                mWaitingForEventDelivery = false;
+                mEventQueue.clear();
+                mLock.notifyAll();
+            }
+        }
+!!!1752322.java!!!	waitForIdle(in idleTimeoutMillis : long, in globalTimeoutMillis : long) : void
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+
+            final long startTimeMillis = SystemClock.uptimeMillis();
+            if (mLastEventTimeMillis <= 0) {
+                mLastEventTimeMillis = startTimeMillis;
+            }
+
+            while (true) {
+                final long currentTimeMillis = SystemClock.uptimeMillis();
+                // Did we get idle state within the global timeout?
+                final long elapsedGlobalTimeMillis = currentTimeMillis - startTimeMillis;
+                final long remainingGlobalTimeMillis =
+                        globalTimeoutMillis - elapsedGlobalTimeMillis;
+                if (remainingGlobalTimeMillis <= 0) {
+                    throw new TimeoutException("No idle state with idle timeout: "
+                            + idleTimeoutMillis + " within global timeout: "
+                            + globalTimeoutMillis);
+                }
+                // Did we get an idle state within the idle timeout?
+                final long elapsedIdleTimeMillis = currentTimeMillis - mLastEventTimeMillis;
+                final long remainingIdleTimeMillis = idleTimeoutMillis - elapsedIdleTimeMillis;
+                if (remainingIdleTimeMillis <= 0) {
+                    return;
+                }
+                try {
+                     mLock.wait(remainingIdleTimeMillis);
+                } catch (InterruptedException ie) {
+                     /* ignore */
+                }
+            }
+        }
+!!!1752450.java!!!	takeScreenshot() : Bitmap
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+        }
+        Display display = DisplayManagerGlobal.getInstance()
+                .getRealDisplay(Display.DEFAULT_DISPLAY);
+        Point displaySize = new Point();
+        display.getRealSize(displaySize);
+        final int displayWidth = displaySize.x;
+        final int displayHeight = displaySize.y;
+
+        final float screenshotWidth;
+        final float screenshotHeight;
+
+        final int rotation = display.getRotation();
+        switch (rotation) {
+            case ROTATION_FREEZE_0: {
+                screenshotWidth = displayWidth;
+                screenshotHeight = displayHeight;
+            } break;
+            case ROTATION_FREEZE_90: {
+                screenshotWidth = displayHeight;
+                screenshotHeight = displayWidth;
+            } break;
+            case ROTATION_FREEZE_180: {
+                screenshotWidth = displayWidth;
+                screenshotHeight = displayHeight;
+            } break;
+            case ROTATION_FREEZE_270: {
+                screenshotWidth = displayHeight;
+                screenshotHeight = displayWidth;
+            } break;
+            default: {
+                throw new IllegalArgumentException("Invalid rotation: "
+                        + rotation);
+            }
+        }
+
+        // Take the screenshot
+        Bitmap screenShot = null;
+        try {
+            // Calling out without a lock held.
+            screenShot = mUiAutomationConnection.takeScreenshot((int) screenshotWidth,
+                    (int) screenshotHeight);
+            if (screenShot == null) {
+                return null;
+            }
+        } catch (RemoteException re) {
+            Log.e(LOG_TAG, "Error while taking screnshot!", re);
+            return null;
+        }
+
+        // Rotate the screenshot to the current orientation
+        if (rotation != ROTATION_FREEZE_0) {
+            Bitmap unrotatedScreenShot = Bitmap.createBitmap(displayWidth, displayHeight,
+                    Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(unrotatedScreenShot);
+            canvas.translate(unrotatedScreenShot.getWidth() / 2,
+                    unrotatedScreenShot.getHeight() / 2);
+            canvas.rotate(getDegreesForRotation(rotation));
+            canvas.translate(- screenshotWidth / 2, - screenshotHeight / 2);
+            canvas.drawBitmap(screenShot, 0, 0, null);
+            canvas.setBitmap(null);
+            screenShot.recycle();
+            screenShot = unrotatedScreenShot;
+        }
+
+        // Optimization
+        screenShot.setHasAlpha(false);
+
+        return screenShot;
+!!!1752578.java!!!	setRunAsMonkey(inout enable : boolean) : void
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+        }
+        try {
+            ActivityManagerNative.getDefault().setUserIsMonkey(enable);
+        } catch (RemoteException re) {
+            Log.e(LOG_TAG, "Error while setting run as monkey!", re);
+        }
+!!!1752706.java!!!	clearWindowContentFrameStats(in windowId : int) : boolean
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+        }
+        try {
+            if (DEBUG) {
+                Log.i(LOG_TAG, "Clearing content frame stats for window: " + windowId);
+            }
+            // Calling out without a lock held.
+            return mUiAutomationConnection.clearWindowContentFrameStats(windowId);
+        } catch (RemoteException re) {
+            Log.e(LOG_TAG, "Error clearing window content frame stats!", re);
+        }
+        return false;
+!!!1752834.java!!!	getWindowContentFrameStats(in windowId : int) : WindowContentFrameStats
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+        }
+        try {
+            if (DEBUG) {
+                Log.i(LOG_TAG, "Getting content frame stats for window: " + windowId);
+            }
+            // Calling out without a lock held.
+            return mUiAutomationConnection.getWindowContentFrameStats(windowId);
+        } catch (RemoteException re) {
+            Log.e(LOG_TAG, "Error getting window content frame stats!", re);
+        }
+        return null;
+!!!1752962.java!!!	clearWindowAnimationFrameStats() : void
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+        }
+        try {
+            if (DEBUG) {
+                Log.i(LOG_TAG, "Clearing window animation frame stats");
+            }
+            // Calling out without a lock held.
+            mUiAutomationConnection.clearWindowAnimationFrameStats();
+        } catch (RemoteException re) {
+            Log.e(LOG_TAG, "Error clearing window animation frame stats!", re);
+        }
+!!!1753090.java!!!	getWindowAnimationFrameStats() : WindowAnimationFrameStats
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+        }
+        try {
+            if (DEBUG) {
+                Log.i(LOG_TAG, "Getting window animation frame stats");
+            }
+            // Calling out without a lock held.
+            return mUiAutomationConnection.getWindowAnimationFrameStats();
+        } catch (RemoteException re) {
+            Log.e(LOG_TAG, "Error getting window animation frame stats!", re);
+        }
+        return null;
+!!!1753218.java!!!	executeShellCommand(in command : String) : ParcelFileDescriptor
+        synchronized (mLock) {
+            throwIfNotConnectedLocked();
+        }
+
+        ParcelFileDescriptor source = null;
+        ParcelFileDescriptor sink = null;
+
+        try {
+            ParcelFileDescriptor[] pipe = ParcelFileDescriptor.createPipe();
+            source = pipe[0];
+            sink = pipe[1];
+
+            // Calling out without a lock held.
+            mUiAutomationConnection.executeShellCommand(command, sink);
+        } catch (IOException ioe) {
+            Log.e(LOG_TAG, "Error executing shell command!", ioe);
+        } catch (RemoteException re) {
+            Log.e(LOG_TAG, "Error executing shell command!", re);
+        } finally {
+            IoUtils.closeQuietly(sink);
+        }
+
+        return source;
+!!!1753346.java!!!	getDegreesForRotation(in value : int) : float
+        switch (value) {
+            case Surface.ROTATION_90: {
+                return 360f - 90f;
+            }
+            case Surface.ROTATION_180: {
+                return 360f - 180f;
+            }
+            case Surface.ROTATION_270: {
+                return 360f - 270f;
+            } default: {
+                return 0;
+            }
+        }
+!!!1753474.java!!!	isConnectedLocked() : boolean
+        return mConnectionId != CONNECTION_ID_UNDEFINED;
+!!!1753602.java!!!	throwIfConnectedLocked() : void
+        if (mConnectionId != CONNECTION_ID_UNDEFINED) {
+            throw new IllegalStateException("UiAutomation not connected!");
+        }
+!!!1753730.java!!!	throwIfNotConnectedLocked() : void
+        if (!isConnectedLocked()) {
+            throw new IllegalStateException("UiAutomation not connected!");
+        }

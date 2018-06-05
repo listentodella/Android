@@ -1,0 +1,101 @@
+class W
+!!!979842.java!!!	W(inout viewAncestor : ViewRootImpl)
+            mViewAncestor = new WeakReference<ViewRootImpl>(viewAncestor);
+            mWindowSession = viewAncestor.mWindowSession;
+!!!979970.java!!!	resized(inout frame : Rect, inout overscanInsets : Rect, inout contentInsets : Rect, inout visibleInsets : Rect, inout stableInsets : Rect, inout reportDraw : boolean, inout newConfig : Configuration) : void
+            final ViewRootImpl viewAncestor = mViewAncestor.get();
+            if (viewAncestor != null) {
+                viewAncestor.dispatchResized(frame, overscanInsets, contentInsets,
+                        visibleInsets, stableInsets, reportDraw, newConfig);
+            }
+!!!980098.java!!!	moved(in newX : int, in newY : int) : void
+            final ViewRootImpl viewAncestor = mViewAncestor.get();
+            if (viewAncestor != null) {
+                viewAncestor.dispatchMoved(newX, newY);
+            }
+!!!980226.java!!!	dispatchAppVisibility(inout visible : boolean) : void
+            final ViewRootImpl viewAncestor = mViewAncestor.get();
+            if (viewAncestor != null) {
+                viewAncestor.dispatchAppVisibility(visible);
+            }
+!!!980354.java!!!	dispatchGetNewSurface() : void
+            final ViewRootImpl viewAncestor = mViewAncestor.get();
+            if (viewAncestor != null) {
+                viewAncestor.dispatchGetNewSurface();
+            }
+!!!980482.java!!!	windowFocusChanged(inout hasFocus : boolean, inout inTouchMode : boolean) : void
+            final ViewRootImpl viewAncestor = mViewAncestor.get();
+            if (viewAncestor != null) {
+                viewAncestor.windowFocusChanged(hasFocus, inTouchMode);
+            }
+!!!980610.java!!!	checkCallingPermission(in permission : String) : int
+            try {
+                return ActivityManagerNative.getDefault().checkPermission(
+                        permission, Binder.getCallingPid(), Binder.getCallingUid());
+            } catch (RemoteException e) {
+                return PackageManager.PERMISSION_DENIED;
+            }
+!!!980738.java!!!	executeCommand(in command : String, in parameters : String, inout out : ParcelFileDescriptor) : void
+            final ViewRootImpl viewAncestor = mViewAncestor.get();
+            if (viewAncestor != null) {
+                final View view = viewAncestor.mView;
+                if (view != null) {
+                    if (checkCallingPermission(Manifest.permission.DUMP) !=
+                            PackageManager.PERMISSION_GRANTED) {
+                        throw new SecurityException("Insufficient permissions to invoke"
+                                + " executeCommand() from pid=" + Binder.getCallingPid()
+                                + ", uid=" + Binder.getCallingUid());
+                    }
+
+                    OutputStream clientStream = null;
+                    try {
+                        clientStream = new ParcelFileDescriptor.AutoCloseOutputStream(out);
+                        ViewDebug.dispatchCommand(view, command, parameters, clientStream);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (clientStream != null) {
+                            try {
+                                clientStream.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+!!!980866.java!!!	closeSystemDialogs(in reason : String) : void
+            final ViewRootImpl viewAncestor = mViewAncestor.get();
+            if (viewAncestor != null) {
+                viewAncestor.dispatchCloseSystemDialogs(reason);
+            }
+!!!980994.java!!!	dispatchWallpaperOffsets(in x : float, in y : float, in xStep : float, in yStep : float, inout sync : boolean) : void
+            if (sync) {
+                try {
+                    mWindowSession.wallpaperOffsetsComplete(asBinder());
+                } catch (RemoteException e) {
+                }
+            }
+!!!981122.java!!!	dispatchWallpaperCommand(in action : String, in x : int, in y : int, in z : int, inout extras : Bundle, inout sync : boolean) : void
+            if (sync) {
+                try {
+                    mWindowSession.wallpaperCommandComplete(asBinder(), null);
+                } catch (RemoteException e) {
+                }
+            }
+!!!981250.java!!!	dispatchDragEvent(inout event : DragEvent) : void
+            final ViewRootImpl viewAncestor = mViewAncestor.get();
+            if (viewAncestor != null) {
+                viewAncestor.dispatchDragEvent(event);
+            }
+!!!981378.java!!!	dispatchSystemUiVisibilityChanged(in seq : int, in globalVisibility : int, in localValue : int, in localChanges : int) : void
+            final ViewRootImpl viewAncestor = mViewAncestor.get();
+            if (viewAncestor != null) {
+                viewAncestor.dispatchSystemUiVisibilityChanged(seq, globalVisibility,
+                        localValue, localChanges);
+            }
+!!!981506.java!!!	doneAnimating() : void
+            final ViewRootImpl viewAncestor = mViewAncestor.get();
+            if (viewAncestor != null) {
+                viewAncestor.dispatchDoneAnimating();
+            }

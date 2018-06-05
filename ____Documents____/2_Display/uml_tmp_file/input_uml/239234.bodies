@@ -1,0 +1,34 @@
+class CompletionInfo
+!!!1142914.java!!!	CompletionInfo(in id : long, in index : int, inout text : CharSequence)
+        mId = id;
+        mPosition = index;
+        mText = text;
+        mLabel = null;
+!!!1143042.java!!!	CompletionInfo(in id : long, in index : int, inout text : CharSequence, inout label : CharSequence)
+        mId = id;
+        mPosition = index;
+        mText = text;
+        mLabel = label;
+!!!1143170.java!!!	CompletionInfo(inout source : Parcel)
+        mId = source.readLong();
+        mPosition = source.readInt();
+        mText = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(source);
+        mLabel = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(source);
+!!!1143298.java!!!	getId() : long
+        return mId;
+!!!1143426.java!!!	getPosition() : int
+        return mPosition;
+!!!1143554.java!!!	getText() : CharSequence
+        return mText;
+!!!1143682.java!!!	getLabel() : CharSequence
+        return mLabel;
+!!!1143810.java!!!	toString() : String
+        return "CompletionInfo{#" + mPosition + " \"" + mText
+                + "\" id=" + mId + " label=" + mLabel + "}";
+!!!1143938.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        dest.writeLong(mId);
+        dest.writeInt(mPosition);
+        TextUtils.writeToParcel(mText, dest, flags);
+        TextUtils.writeToParcel(mLabel, dest, flags);
+!!!1144066.java!!!	describeContents() : int
+        return 0;

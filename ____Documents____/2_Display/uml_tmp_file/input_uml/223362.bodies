@@ -1,0 +1,7 @@
+class InvalidateInfo
+!!!694274.java!!!	obtain() : View::AttachInfo::InvalidateInfo
+                InvalidateInfo instance = sPool.acquire();
+                return (instance != null) ? instance : new InvalidateInfo();
+!!!694402.java!!!	recycle() : void
+                target = null;
+                sPool.release(this);

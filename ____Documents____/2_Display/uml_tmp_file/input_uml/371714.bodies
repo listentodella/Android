@@ -1,0 +1,43 @@
+class ScrollStateRunnable
+!!!2212738.java!!!	ScrollStateRunnable(inout view : View)
+            mParent = view;
+!!!2212866.java!!!	doScrollStateChange(inout view : AbsListView, in scrollState : int) : void
+            mParent.removeCallbacks(this);
+            mNewState = scrollState;
+            mParent.postDelayed(this, SCROLL_CHANGE_DELAY);
+!!!2212994.java!!!	run() : void
+            mCurrentScrollState = mNewState;
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG,
+                        "new scroll state: " + mNewState + " old state: " + mPreviousScrollState);
+            }
+            // Fix the position after a scroll or a fling ends
+            if (mNewState == OnScrollListener.SCROLL_STATE_IDLE
+                    && mPreviousScrollState != OnScrollListener.SCROLL_STATE_IDLE
+                    && mPreviousScrollState != OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                mPreviousScrollState = mNewState;
+                int i = 0;
+                View child = getChildAt(i);
+                while (child != null && child.getBottom() <= 0) {
+                    child = getChildAt(++i);
+                }
+                if (child == null) {
+                    // The view is no longer visible, just return
+                    return;
+                }
+                int firstPosition = getFirstVisiblePosition();
+                int lastPosition = getLastVisiblePosition();
+                boolean scroll = firstPosition != 0 && lastPosition != getCount() - 1;
+                final int top = child.getTop();
+                final int bottom = child.getBottom();
+                final int midpoint = getHeight() / 2;
+                if (scroll && top < LIST_TOP_OFFSET) {
+                    if (bottom > midpoint) {
+                        smoothScrollBy(top, GOTO_SCROLL_DURATION);
+                    } else {
+                        smoothScrollBy(bottom, GOTO_SCROLL_DURATION);
+                    }
+                }
+            } else {
+                mPreviousScrollState = mNewState;
+            }

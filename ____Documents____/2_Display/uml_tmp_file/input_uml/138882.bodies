@@ -1,0 +1,12 @@
+class DispatchEntry
+!!!183298.cpp!!!	DispatchEntry(inout eventEntry : InputDispatcher::EventEntry, in targetFlags : int32_t, in xOffset : float, in yOffset : float, in scaleFactor : float)
+    eventEntry->refCount += 1;
+!!!183426.cpp!!!	~DispatchEntry()
+    eventEntry->release();
+!!!183810.cpp!!!	nextSeq() : uint32_t
+    // Sequence number 0 is reserved and will never be returned.
+    uint32_t seq;
+    do {
+        seq = android_atomic_inc(&sNextSeqAtomic);
+    } while (!seq);
+    return seq;

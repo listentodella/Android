@@ -1,0 +1,38 @@
+class CollectionInfo
+!!!1093378.java!!!	obtain(inout other : AccessibilityNodeInfo::CollectionInfo) : AccessibilityNodeInfo::CollectionInfo
+            return CollectionInfo.obtain(other.mRowCount, other.mColumnCount, other.mHierarchical,
+                    other.mSelectionMode);
+!!!1093506.java!!!	obtain(in rowCount : int, in columnCount : int, inout hierarchical : boolean) : AccessibilityNodeInfo::CollectionInfo
+            return obtain(rowCount, columnCount, hierarchical, SELECTION_MODE_NONE);
+!!!1093634.java!!!	obtain(in rowCount : int, in columnCount : int, inout hierarchical : boolean, in selectionMode : int) : AccessibilityNodeInfo::CollectionInfo
+           final CollectionInfo info = sPool.acquire();
+            if (info == null) {
+                return new CollectionInfo(rowCount, columnCount, hierarchical, selectionMode);
+            }
+
+            info.mRowCount = rowCount;
+            info.mColumnCount = columnCount;
+            info.mHierarchical = hierarchical;
+            info.mSelectionMode = selectionMode;
+            return info;
+!!!1093762.java!!!	CollectionInfo(in rowCount : int, in columnCount : int, inout hierarchical : boolean, in selectionMode : int)
+            mRowCount = rowCount;
+            mColumnCount = columnCount;
+            mHierarchical = hierarchical;
+            mSelectionMode = selectionMode;
+!!!1093890.java!!!	getRowCount() : int
+            return mRowCount;
+!!!1094018.java!!!	getColumnCount() : int
+            return mColumnCount;
+!!!1094146.java!!!	isHierarchical() : boolean
+            return mHierarchical;
+!!!1094274.java!!!	getSelectionMode() : int
+            return mSelectionMode;
+!!!1094402.java!!!	recycle() : void
+            clear();
+            sPool.release(this);
+!!!1094530.java!!!	clear() : void
+            mRowCount = 0;
+            mColumnCount = 0;
+            mHierarchical = false;
+            mSelectionMode = SELECTION_MODE_NONE;

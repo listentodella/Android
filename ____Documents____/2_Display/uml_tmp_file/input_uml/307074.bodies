@@ -1,0 +1,88 @@
+class Globals
+!!!1764354.java!!!	Globals(inout looper : Looper)
+            IBinder b = ServiceManager.getService(Context.WALLPAPER_SERVICE);
+            mService = IWallpaperManager.Stub.asInterface(b);
+!!!1764482.java!!!	onWallpaperChanged() : void
+            /* The wallpaper has changed but we shouldn't eagerly load the
+             * wallpaper as that would be inefficient. Reset the cached wallpaper
+             * to null so if the user requests the wallpaper again then we'll
+             * fetch it.
+             */
+            synchronized (this) {
+                mWallpaper = null;
+                mDefaultWallpaper = null;
+            }
+!!!1764610.java!!!	peekWallpaperBitmap(inout context : Context, inout returnDefault : boolean) : Bitmap
+            synchronized (this) {
+                if (mWallpaper != null) {
+                    return mWallpaper;
+                }
+                if (mDefaultWallpaper != null) {
+                    return mDefaultWallpaper;
+                }
+                mWallpaper = null;
+                try {
+                    mWallpaper = getCurrentWallpaperLocked(context);
+                } catch (OutOfMemoryError e) {
+                    Log.w(TAG, "No memory load current wallpaper", e);
+                }
+                if (returnDefault) {
+                    if (mWallpaper == null) {
+                        mDefaultWallpaper = getDefaultWallpaperLocked(context);
+                        return mDefaultWallpaper;
+                    } else {
+                        mDefaultWallpaper = null;
+                    }
+                }
+                return mWallpaper;
+            }
+!!!1764738.java!!!	forgetLoadedWallpaper() : void
+            synchronized (this) {
+                mWallpaper = null;
+                mDefaultWallpaper = null;
+            }
+!!!1764866.java!!!	getCurrentWallpaperLocked(inout context : Context) : Bitmap
+            if (mService == null) {
+                Log.w(TAG, "WallpaperService not running");
+                return null;
+            }
+
+            try {
+                Bundle params = new Bundle();
+                ParcelFileDescriptor fd = mService.getWallpaper(this, params);
+                if (fd != null) {
+                    try {
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        return BitmapFactory.decodeFileDescriptor(
+                                fd.getFileDescriptor(), null, options);
+                    } catch (OutOfMemoryError e) {
+                        Log.w(TAG, "Can't decode file", e);
+                    } finally {
+                        try {
+                            fd.close();
+                        } catch (IOException e) {
+                            // Ignore
+                        }
+                    }
+                }
+            } catch (RemoteException e) {
+                // Ignore
+            }
+            return null;
+!!!1764994.java!!!	getDefaultWallpaperLocked(inout context : Context) : Bitmap
+            InputStream is = openDefaultWallpaper(context);
+            if (is != null) {
+                try {
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    return BitmapFactory.decodeStream(is, null, options);
+                } catch (OutOfMemoryError e) {
+                    Log.w(TAG, "Can't decode stream", e);
+                } finally {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+            }
+            return null;

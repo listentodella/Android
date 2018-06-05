@@ -1,0 +1,14 @@
+class Node
+!!!2221570.java!!!	acquire(inout view : View) : RelativeLayout::DependencyGraph::Node
+                Node node = sPool.acquire();
+                if (node == null) {
+                    node = new Node();
+                }
+                node.view = view;
+                return node;
+!!!2221698.java!!!	release() : void
+                view = null;
+                dependents.clear();
+                dependencies.clear();
+
+                sPool.release(this);

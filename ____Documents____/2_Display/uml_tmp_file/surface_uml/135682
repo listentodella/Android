@@ -1,0 +1,464 @@
+format 76
+"tests" // surfaceflinger::tests
+  revision 1
+  modified_by 2 "thisway_diy"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  cpp_h_dir "L:/android_projects/uml_tmp_file/surfaceflinger/tests/"
+  cpp_src_dir "L:/android_projects/uml_tmp_file/surfaceflinger/tests/"
+  cpp_namespace "android"
+  classview 135682 "tests"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 162050 "ScreenCapture"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " A ScreenCapture is a screenshot from SurfaceFlinger that can be used to check
+ individual pixel values for testing purposes."
+      classrelation 155266 // <generalisation>
+	relation 155266 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 155266 // <generalisation>
+	  b parent class_ref 162178 // typedef28
+      end
+
+      operation 250242 "captureScreen"
+	class_operation cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param inout name "sc" explicit_type "sp<ScreenCapture>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        sp<IMemoryHeap> heap;
+        uint32_t w=0, h=0;
+        PixelFormat fmt=0;
+        sp<ISurfaceComposer> sf(ComposerService::getComposerService());
+        sp<IBinder> display(sf->getBuiltInDisplay(ISurfaceComposer::eDisplayIdMain));
+        ASSERT_EQ(NO_ERROR, sf->captureScreen(display, &heap, &w, &h, &fmt, 0, 0,
+                0, INT_MAX));
+        ASSERT_TRUE(heap != NULL);
+        ASSERT_EQ(PIXEL_FORMAT_RGBA_8888, fmt);
+        *sc = new ScreenCapture(w, h, heap);
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 250370 "checkPixel"
+	cpp_inline public explicit_return_type "void"
+	nparams 5
+	  param in name "x" explicit_type "uint32_t"
+	  param in name "y" explicit_type "uint32_t"
+	  param in name "r" explicit_type "uint8_t"
+	  param in name "g" explicit_type "uint8_t"
+	  param in name "b" explicit_type "uint8_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}, ${t4} ${p4}${v4}${)}${const}${volatile}${throw}${abstract} {
+        const uint8_t* img = reinterpret_cast<const uint8_t*>(mHeap->base());
+        const uint8_t* pixel = img + (4 * (y*mWidth + x));
+        if (r != pixel[0] || g != pixel[1] || b != pixel[2]) {
+            String8 err(String8::format(\"pixel @ (%3d, %3d): \"
+                    \"expected [%3d, %3d, %3d], got [%3d, %3d, %3d]\",
+                    x, y, r, g, b, pixel[0], pixel[1], pixel[2]));
+            EXPECT_EQ(String8(), err);
+        }
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 250498 "ScreenCapture"
+	cpp_inline private explicit_return_type ""
+	nparams 3
+	  param in name "w" explicit_type "uint32_t"
+	  param in name "h" explicit_type "uint32_t"
+	  param in name "heap" explicit_type "sp<IMemoryHeap>"
+	cpp_decl "    ${comment}${inline}${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, const ${t2} & ${p2}${v2}${)}${volatile}${throw} :
+        mWidth(w),
+        mHeight(h),
+        mHeap(heap)
+    {};
+"
+	
+	
+	
+	
+      end
+
+      attribute 204034 "mWidth"
+	const_attribute private explicit_type "uint32_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 204162 "mHeight"
+	const_attribute private explicit_type "uint32_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 204290 "mHeap"
+	private explicit_type "IMemoryHeap"
+	stereotype "sp"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 162178 "typedef28"
+      visibility package stereotype "typedef" explicit_base_type "RefBase"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 162306 "LayerUpdateTest"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 155394 // <generalisation>
+	relation 155394 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 155394 // <generalisation>
+	  b parent class_ref 162434 // typedef29
+      end
+
+      operation 250626 "SetUp"
+	cpp_virtual cpp_inline protected explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        mComposerClient = new SurfaceComposerClient;
+        ASSERT_EQ(NO_ERROR, mComposerClient->initCheck());
+
+        sp<IBinder> display(SurfaceComposerClient::getBuiltInDisplay(
+                ISurfaceComposer::eDisplayIdMain));
+        DisplayInfo info;
+        SurfaceComposerClient::getDisplayInfo(display, &info);
+
+        ssize_t displayWidth = info.w;
+        ssize_t displayHeight = info.h;
+
+        // Background surface
+        mBGSurfaceControl = mComposerClient->createSurface(
+                String8(\"BG Test Surface\"), displayWidth, displayHeight,
+                PIXEL_FORMAT_RGBA_8888, 0);
+        ASSERT_TRUE(mBGSurfaceControl != NULL);
+        ASSERT_TRUE(mBGSurfaceControl->isValid());
+        fillSurfaceRGBA8(mBGSurfaceControl, 63, 63, 195);
+
+        // Foreground surface
+        mFGSurfaceControl = mComposerClient->createSurface(
+                String8(\"FG Test Surface\"), 64, 64, PIXEL_FORMAT_RGBA_8888, 0);
+        ASSERT_TRUE(mFGSurfaceControl != NULL);
+        ASSERT_TRUE(mFGSurfaceControl->isValid());
+
+        fillSurfaceRGBA8(mFGSurfaceControl, 195, 63, 63);
+
+        // Synchronization surface
+        mSyncSurfaceControl = mComposerClient->createSurface(
+                String8(\"Sync Test Surface\"), 1, 1, PIXEL_FORMAT_RGBA_8888, 0);
+        ASSERT_TRUE(mSyncSurfaceControl != NULL);
+        ASSERT_TRUE(mSyncSurfaceControl->isValid());
+
+        fillSurfaceRGBA8(mSyncSurfaceControl, 31, 31, 31);
+
+        SurfaceComposerClient::openGlobalTransaction();
+
+        ASSERT_EQ(NO_ERROR, mBGSurfaceControl->setLayer(INT_MAX-2));
+        ASSERT_EQ(NO_ERROR, mBGSurfaceControl->show());
+
+        ASSERT_EQ(NO_ERROR, mFGSurfaceControl->setLayer(INT_MAX-1));
+        ASSERT_EQ(NO_ERROR, mFGSurfaceControl->setPosition(64, 64));
+        ASSERT_EQ(NO_ERROR, mFGSurfaceControl->show());
+
+        ASSERT_EQ(NO_ERROR, mSyncSurfaceControl->setLayer(INT_MAX-1));
+        ASSERT_EQ(NO_ERROR, mSyncSurfaceControl->setPosition(displayWidth-2,
+                displayHeight-2));
+        ASSERT_EQ(NO_ERROR, mSyncSurfaceControl->show());
+
+        SurfaceComposerClient::closeGlobalTransaction(true);
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 250754 "TearDown"
+	cpp_virtual cpp_inline protected explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        mComposerClient->dispose();
+        mBGSurfaceControl = 0;
+        mFGSurfaceControl = 0;
+        mSyncSurfaceControl = 0;
+        mComposerClient = 0;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 250882 "waitForPostedBuffers"
+	cpp_inline protected explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        // Since the sync surface is in synchronous mode (i.e. double buffered)
+        // posting three buffers to it should ensure that at least two
+        // SurfaceFlinger::handlePageFlip calls have been made, which should
+        // guaranteed that a buffer posted to another Surface has been retired.
+        fillSurfaceRGBA8(mSyncSurfaceControl, 31, 31, 31);
+        fillSurfaceRGBA8(mSyncSurfaceControl, 31, 31, 31);
+        fillSurfaceRGBA8(mSyncSurfaceControl, 31, 31, 31);
+    };
+"
+	
+	
+	
+	
+      end
+
+      attribute 204418 "mComposerClient"
+	protected explicit_type "SurfaceComposerClient"
+	stereotype "sp"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 204546 "mBGSurfaceControl"
+	protected explicit_type "SurfaceControl"
+	stereotype "sp"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 204674 "mFGSurfaceControl"
+	protected explicit_type "SurfaceControl"
+	stereotype "sp"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 204802 "mSyncSurfaceControl"
+	protected explicit_type "SurfaceControl"
+	stereotype "sp"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " This surface is used to ensure that the buffers posted to
+ mFGSurfaceControl have been picked up by SurfaceFlinger."
+      end
+    end
+
+    class 162434 "typedef29"
+      visibility package stereotype "typedef" explicit_base_type "::testing::Test"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+  end
+
+  deploymentview 135682 "tests"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 147586 "typedef28"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 162178 // typedef28
+      end
+    end
+
+    artifact 147714 "ScreenCapture"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 162050 // ScreenCapture
+      end
+    end
+
+    artifact 147842 "typedef29"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 162434 // typedef29
+      end
+    end
+
+    artifact 147970 "LayerUpdateTest"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 162306 // LayerUpdateTest
+      end
+    end
+  end
+
+  package_ref 135810 // resize
+
+  package_ref 135938 // screencap
+
+  package_ref 136066 // transform
+
+  package_ref 136194 // vsync
+
+  package_ref 136322 // waitforvsync
+end

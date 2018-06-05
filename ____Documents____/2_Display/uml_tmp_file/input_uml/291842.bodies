@@ -1,0 +1,144 @@
+class Request
+!!!1603458.java!!!	Request(inout uri : Uri)
+            if (uri == null) {
+                throw new NullPointerException();
+            }
+            String scheme = uri.getScheme();
+            if (scheme == null || (!scheme.equals("http") && !scheme.equals("https"))) {
+                throw new IllegalArgumentException("Can only download HTTP/HTTPS URIs: " + uri);
+            }
+            mUri = uri;
+!!!1603586.java!!!	Request(in uriString : String)
+            mUri = Uri.parse(uriString);
+!!!1603714.java!!!	setDestinationUri(inout uri : Uri) : DownloadManager::Request
+            mDestinationUri = uri;
+            return this;
+!!!1603842.java!!!	setDestinationToSystemCache() : DownloadManager::Request
+            mUseSystemCache = true;
+            return this;
+!!!1603970.java!!!	setDestinationInExternalFilesDir(inout context : Context, in dirType : String, in subPath : String) : DownloadManager::Request
+            final File file = context.getExternalFilesDir(dirType);
+            if (file == null) {
+                throw new IllegalStateException("Failed to get external storage files directory");
+            } else if (file.exists()) {
+                if (!file.isDirectory()) {
+                    throw new IllegalStateException(file.getAbsolutePath() +
+                            " already exists and is not a directory");
+                }
+            } else {
+                if (!file.mkdirs()) {
+                    throw new IllegalStateException("Unable to create directory: "+
+                            file.getAbsolutePath());
+                }
+            }
+            setDestinationFromBase(file, subPath);
+            return this;
+!!!1604098.java!!!	setDestinationInExternalPublicDir(in dirType : String, in subPath : String) : DownloadManager::Request
+            File file = Environment.getExternalStoragePublicDirectory(dirType);
+            if (file == null) {
+                throw new IllegalStateException("Failed to get external storage public directory");
+            } else if (file.exists()) {
+                if (!file.isDirectory()) {
+                    throw new IllegalStateException(file.getAbsolutePath() +
+                            " already exists and is not a directory");
+                }
+            } else {
+                if (!file.mkdirs()) {
+                    throw new IllegalStateException("Unable to create directory: "+
+                            file.getAbsolutePath());
+                }
+            }
+            setDestinationFromBase(file, subPath);
+            return this;
+!!!1604226.java!!!	setDestinationFromBase(inout base : File, in subPath : String) : void
+            if (subPath == null) {
+                throw new NullPointerException("subPath cannot be null");
+            }
+            mDestinationUri = Uri.withAppendedPath(Uri.fromFile(base), subPath);
+!!!1604354.java!!!	allowScanningByMediaScanner() : void
+            mScannable = true;
+!!!1604482.java!!!	addRequestHeader(in header : String, in value : String) : DownloadManager::Request
+            if (header == null) {
+                throw new NullPointerException("header cannot be null");
+            }
+            if (header.contains(":")) {
+                throw new IllegalArgumentException("header may not contain ':'");
+            }
+            if (value == null) {
+                value = "";
+            }
+            mRequestHeaders.add(Pair.create(header, value));
+            return this;
+!!!1604610.java!!!	setTitle(inout title : CharSequence) : DownloadManager::Request
+            mTitle = title;
+            return this;
+!!!1604738.java!!!	setDescription(inout description : CharSequence) : DownloadManager::Request
+            mDescription = description;
+            return this;
+!!!1604866.java!!!	setMimeType(in mimeType : String) : DownloadManager::Request
+            mMimeType = mimeType;
+            return this;
+!!!1604994.java!!!	setShowRunningNotification(inout show : boolean) : DownloadManager::Request
+            return (show) ? setNotificationVisibility(VISIBILITY_VISIBLE) :
+                    setNotificationVisibility(VISIBILITY_HIDDEN);
+!!!1605122.java!!!	setNotificationVisibility(in visibility : int) : DownloadManager::Request
+            mNotificationVisibility = visibility;
+            return this;
+!!!1605250.java!!!	setAllowedNetworkTypes(in flags : int) : DownloadManager::Request
+            mAllowedNetworkTypes = flags;
+            return this;
+!!!1605378.java!!!	setAllowedOverRoaming(inout allowed : boolean) : DownloadManager::Request
+            mRoamingAllowed = allowed;
+            return this;
+!!!1605506.java!!!	setAllowedOverMetered(inout allow : boolean) : DownloadManager::Request
+            mMeteredAllowed = allow;
+            return this;
+!!!1605634.java!!!	setVisibleInDownloadsUi(inout isVisible : boolean) : DownloadManager::Request
+            mIsVisibleInDownloadsUi = isVisible;
+            return this;
+!!!1605762.java!!!	toContentValues(in packageName : String) : ContentValues
+            ContentValues values = new ContentValues();
+            assert mUri != null;
+            values.put(Downloads.Impl.COLUMN_URI, mUri.toString());
+            values.put(Downloads.Impl.COLUMN_IS_PUBLIC_API, true);
+            values.put(Downloads.Impl.COLUMN_NOTIFICATION_PACKAGE, packageName);
+
+            if (mDestinationUri != null) {
+                values.put(Downloads.Impl.COLUMN_DESTINATION, Downloads.Impl.DESTINATION_FILE_URI);
+                values.put(Downloads.Impl.COLUMN_FILE_NAME_HINT, mDestinationUri.toString());
+            } else {
+                values.put(Downloads.Impl.COLUMN_DESTINATION,
+                           (this.mUseSystemCache) ?
+                                   Downloads.Impl.DESTINATION_SYSTEMCACHE_PARTITION :
+                                   Downloads.Impl.DESTINATION_CACHE_PARTITION_PURGEABLE);
+            }
+            // is the file supposed to be media-scannable?
+            values.put(Downloads.Impl.COLUMN_MEDIA_SCANNED, (mScannable) ? SCANNABLE_VALUE_YES :
+                    SCANNABLE_VALUE_NO);
+
+            if (!mRequestHeaders.isEmpty()) {
+                encodeHttpHeaders(values);
+            }
+
+            putIfNonNull(values, Downloads.Impl.COLUMN_TITLE, mTitle);
+            putIfNonNull(values, Downloads.Impl.COLUMN_DESCRIPTION, mDescription);
+            putIfNonNull(values, Downloads.Impl.COLUMN_MIME_TYPE, mMimeType);
+
+            values.put(Downloads.Impl.COLUMN_VISIBILITY, mNotificationVisibility);
+            values.put(Downloads.Impl.COLUMN_ALLOWED_NETWORK_TYPES, mAllowedNetworkTypes);
+            values.put(Downloads.Impl.COLUMN_ALLOW_ROAMING, mRoamingAllowed);
+            values.put(Downloads.Impl.COLUMN_ALLOW_METERED, mMeteredAllowed);
+            values.put(Downloads.Impl.COLUMN_IS_VISIBLE_IN_DOWNLOADS_UI, mIsVisibleInDownloadsUi);
+
+            return values;
+!!!1605890.java!!!	encodeHttpHeaders(inout values : ContentValues) : void
+            int index = 0;
+            for (Pair<String, String> header : mRequestHeaders) {
+                String headerString = header.first + ": " + header.second;
+                values.put(Downloads.Impl.RequestHeaders.INSERT_KEY_PREFIX + index, headerString);
+                index++;
+            }
+!!!1606018.java!!!	putIfNonNull(inout contentValues : ContentValues, in key : String, inout value : Object) : void
+            if (value != null) {
+                contentValues.put(key, value.toString());
+            }

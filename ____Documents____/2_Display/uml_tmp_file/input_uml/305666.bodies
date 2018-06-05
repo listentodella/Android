@@ -1,0 +1,243 @@
+class UiAutomationConnection
+!!!1753986.java!!!	connect(inout client : IAccessibilityServiceClient) : void
+        if (client == null) {
+            throw new IllegalArgumentException("Client cannot be null!");
+        }
+        synchronized (mLock) {
+            throwIfShutdownLocked();
+            if (isConnectedLocked()) {
+                throw new IllegalStateException("Already connected.");
+            }
+            mOwningUid = Binder.getCallingUid();
+            registerUiTestAutomationServiceLocked(client);
+            storeRotationStateLocked();
+        }
+!!!1754114.java!!!	disconnect() : void
+        synchronized (mLock) {
+            throwIfCalledByNotTrustedUidLocked();
+            throwIfShutdownLocked();
+            if (!isConnectedLocked()) {
+                throw new IllegalStateException("Already disconnected.");
+            }
+            mOwningUid = -1;
+            unregisterUiTestAutomationServiceLocked();
+            restoreRotationStateLocked();
+        }
+!!!1754242.java!!!	injectInputEvent(inout event : InputEvent, inout sync : boolean) : boolean
+        synchronized (mLock) {
+            throwIfCalledByNotTrustedUidLocked();
+            throwIfShutdownLocked();
+            throwIfNotConnectedLocked();
+        }
+        final int mode = (sync) ? InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH
+                : InputManager.INJECT_INPUT_EVENT_MODE_ASYNC;
+        final long identity = Binder.clearCallingIdentity();
+        try {
+            return InputManager.getInstance().injectInputEvent(event, mode);
+        } finally {
+            Binder.restoreCallingIdentity(identity);
+        }
+!!!1754370.java!!!	setRotation(in rotation : int) : boolean
+        synchronized (mLock) {
+            throwIfCalledByNotTrustedUidLocked();
+            throwIfShutdownLocked();
+            throwIfNotConnectedLocked();
+        }
+        final long identity = Binder.clearCallingIdentity();
+        try {
+            if (rotation == UiAutomation.ROTATION_UNFREEZE) {
+                mWindowManager.thawRotation();
+            } else {
+                mWindowManager.freezeRotation(rotation);
+            }
+            return true;
+        } catch (RemoteException re) {
+            /* ignore */
+        } finally {
+            Binder.restoreCallingIdentity(identity);
+        }
+        return false;
+!!!1754498.java!!!	takeScreenshot(in width : int, in height : int) : Bitmap
+        synchronized (mLock) {
+            throwIfCalledByNotTrustedUidLocked();
+            throwIfShutdownLocked();
+            throwIfNotConnectedLocked();
+        }
+        final long identity = Binder.clearCallingIdentity();
+        try {
+            return SurfaceControl.screenshot(width, height);
+        } finally {
+            Binder.restoreCallingIdentity(identity);
+        }
+!!!1754626.java!!!	clearWindowContentFrameStats(in windowId : int) : boolean
+        synchronized (mLock) {
+            throwIfCalledByNotTrustedUidLocked();
+            throwIfShutdownLocked();
+            throwIfNotConnectedLocked();
+        }
+        final long identity = Binder.clearCallingIdentity();
+        try {
+            IBinder token = mAccessibilityManager.getWindowToken(windowId);
+            if (token == null) {
+                return false;
+            }
+            return mWindowManager.clearWindowContentFrameStats(token);
+        } finally {
+            Binder.restoreCallingIdentity(identity);
+        }
+!!!1754754.java!!!	getWindowContentFrameStats(in windowId : int) : WindowContentFrameStats
+        synchronized (mLock) {
+            throwIfCalledByNotTrustedUidLocked();
+            throwIfShutdownLocked();
+            throwIfNotConnectedLocked();
+        }
+        final long identity = Binder.clearCallingIdentity();
+        try {
+            IBinder token = mAccessibilityManager.getWindowToken(windowId);
+            if (token == null) {
+                return null;
+            }
+            return mWindowManager.getWindowContentFrameStats(token);
+        } finally {
+            Binder.restoreCallingIdentity(identity);
+        }
+!!!1754882.java!!!	clearWindowAnimationFrameStats() : void
+        synchronized (mLock) {
+            throwIfCalledByNotTrustedUidLocked();
+            throwIfShutdownLocked();
+            throwIfNotConnectedLocked();
+        }
+        final long identity = Binder.clearCallingIdentity();
+        try {
+            SurfaceControl.clearAnimationFrameStats();
+        } finally {
+            Binder.restoreCallingIdentity(identity);
+        }
+!!!1755010.java!!!	getWindowAnimationFrameStats() : WindowAnimationFrameStats
+        synchronized (mLock) {
+            throwIfCalledByNotTrustedUidLocked();
+            throwIfShutdownLocked();
+            throwIfNotConnectedLocked();
+        }
+        final long identity = Binder.clearCallingIdentity();
+        try {
+            WindowAnimationFrameStats stats = new WindowAnimationFrameStats();
+            SurfaceControl.getAnimationFrameStats(stats);
+            return stats;
+        } finally {
+            Binder.restoreCallingIdentity(identity);
+        }
+!!!1755138.java!!!	executeShellCommand(in command : String, inout sink : ParcelFileDescriptor) : void
+        synchronized (mLock) {
+            throwIfCalledByNotTrustedUidLocked();
+            throwIfShutdownLocked();
+            throwIfNotConnectedLocked();
+        }
+
+        InputStream in = null;
+        OutputStream out = null;
+
+        try {
+            java.lang.Process process = Runtime.getRuntime().exec(command);
+
+            in = process.getInputStream();
+            out = new FileOutputStream(sink.getFileDescriptor());
+
+            final byte[] buffer = new byte[8192];
+            while (true) {
+                final int readByteCount = in.read(buffer);
+                if (readByteCount < 0) {
+                    break;
+                }
+                out.write(buffer, 0, readByteCount);
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException("Error running shell command", ioe);
+        } finally {
+            IoUtils.closeQuietly(in);
+            IoUtils.closeQuietly(out);
+            IoUtils.closeQuietly(sink);
+        }
+!!!1755266.java!!!	shutdown() : void
+        synchronized (mLock) {
+            if (isConnectedLocked()) {
+                throwIfCalledByNotTrustedUidLocked();
+            }
+            throwIfShutdownLocked();
+            mIsShutdown = true;
+            if (isConnectedLocked()) {
+                disconnect();
+            }
+        }
+!!!1755394.java!!!	registerUiTestAutomationServiceLocked(inout client : IAccessibilityServiceClient) : void
+        IAccessibilityManager manager = IAccessibilityManager.Stub.asInterface(
+                ServiceManager.getService(Context.ACCESSIBILITY_SERVICE));
+        AccessibilityServiceInfo info = new AccessibilityServiceInfo();
+        info.eventTypes = AccessibilityEvent.TYPES_ALL_MASK;
+        info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
+        info.flags |= AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS
+                | AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS;
+        info.setCapabilities(AccessibilityServiceInfo.CAPABILITY_CAN_RETRIEVE_WINDOW_CONTENT
+                | AccessibilityServiceInfo.CAPABILITY_CAN_REQUEST_TOUCH_EXPLORATION
+                | AccessibilityServiceInfo.CAPABILITY_CAN_REQUEST_ENHANCED_WEB_ACCESSIBILITY
+                | AccessibilityServiceInfo.CAPABILITY_CAN_REQUEST_FILTER_KEY_EVENTS);
+        try {
+            // Calling out with a lock held is fine since if the system
+            // process is gone the client calling in will be killed.
+            manager.registerUiTestAutomationService(mToken, client, info);
+            mClient = client;
+        } catch (RemoteException re) {
+            throw new IllegalStateException("Error while registering UiTestAutomationService.", re);
+        }
+!!!1755522.java!!!	unregisterUiTestAutomationServiceLocked() : void
+        IAccessibilityManager manager = IAccessibilityManager.Stub.asInterface(
+              ServiceManager.getService(Context.ACCESSIBILITY_SERVICE));
+        try {
+            // Calling out with a lock held is fine since if the system
+            // process is gone the client calling in will be killed.
+            manager.unregisterUiTestAutomationService(mClient);
+            mClient = null;
+        } catch (RemoteException re) {
+            throw new IllegalStateException("Error while unregistering UiTestAutomationService",
+                    re);
+        }
+!!!1755650.java!!!	storeRotationStateLocked() : void
+        try {
+            if (mWindowManager.isRotationFrozen()) {
+                // Calling out with a lock held is fine since if the system
+                // process is gone the client calling in will be killed.
+                mInitialFrozenRotation = mWindowManager.getRotation();
+            }
+        } catch (RemoteException re) {
+            /* ignore */
+        }
+!!!1755778.java!!!	restoreRotationStateLocked() : void
+        try {
+            if (mInitialFrozenRotation != INITIAL_FROZEN_ROTATION_UNSPECIFIED) {
+                // Calling out with a lock held is fine since if the system
+                // process is gone the client calling in will be killed.
+                mWindowManager.freezeRotation(mInitialFrozenRotation);
+            } else {
+                // Calling out with a lock held is fine since if the system
+                // process is gone the client calling in will be killed.
+                mWindowManager.thawRotation();
+            }
+        } catch (RemoteException re) {
+            /* ignore */
+        }
+!!!1755906.java!!!	isConnectedLocked() : boolean
+        return mClient != null;
+!!!1756034.java!!!	throwIfShutdownLocked() : void
+        if (mIsShutdown) {
+            throw new IllegalStateException("Connection shutdown!");
+        }
+!!!1756162.java!!!	throwIfNotConnectedLocked() : void
+        if (!isConnectedLocked()) {
+            throw new IllegalStateException("Not connected!");
+        }
+!!!1756290.java!!!	throwIfCalledByNotTrustedUidLocked() : void
+        final int callingUid = Binder.getCallingUid();
+        if (callingUid != mOwningUid && mOwningUid != Process.SYSTEM_UID
+                && callingUid != 0 /*root*/) {
+            throw new SecurityException("Calling from not trusted UID!");
+        }

@@ -1,0 +1,472 @@
+class ActivityManager
+!!!1343362.java!!!	ActivityManager(inout context : Context, inout handler : Handler)
+        mContext = context;
+        mHandler = handler;
+!!!1343490.java!!!	getFrontActivityScreenCompatMode() : int
+        try {
+            return ActivityManagerNative.getDefault().getFrontActivityScreenCompatMode();
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return 0;
+        }
+!!!1343618.java!!!	setFrontActivityScreenCompatMode(in mode : int) : void
+        try {
+            ActivityManagerNative.getDefault().setFrontActivityScreenCompatMode(mode);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+        }
+!!!1343746.java!!!	getPackageScreenCompatMode(in packageName : String) : int
+        try {
+            return ActivityManagerNative.getDefault().getPackageScreenCompatMode(packageName);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return 0;
+        }
+!!!1343874.java!!!	setPackageScreenCompatMode(in packageName : String, in mode : int) : void
+        try {
+            ActivityManagerNative.getDefault().setPackageScreenCompatMode(packageName, mode);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+        }
+!!!1344002.java!!!	getPackageAskScreenCompat(in packageName : String) : boolean
+        try {
+            return ActivityManagerNative.getDefault().getPackageAskScreenCompat(packageName);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return false;
+        }
+!!!1344130.java!!!	setPackageAskScreenCompat(in packageName : String, inout ask : boolean) : void
+        try {
+            ActivityManagerNative.getDefault().setPackageAskScreenCompat(packageName, ask);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+        }
+!!!1344258.java!!!	getMemoryClass() : int
+        return staticGetMemoryClass();
+!!!1344386.java!!!	staticGetMemoryClass() : int
+        // Really brain dead right now -- just take this from the configured
+        // vm heap size, and assume it is in megabytes and thus ends with "m".
+        String vmHeapSize = SystemProperties.get("dalvik.vm.heapgrowthlimit", "");
+        if (vmHeapSize != null && !"".equals(vmHeapSize)) {
+            return Integer.parseInt(vmHeapSize.substring(0, vmHeapSize.length()-1));
+        }
+        return staticGetLargeMemoryClass();
+!!!1344514.java!!!	getLargeMemoryClass() : int
+        return staticGetLargeMemoryClass();
+!!!1344642.java!!!	staticGetLargeMemoryClass() : int
+        // Really brain dead right now -- just take this from the configured
+        // vm heap size, and assume it is in megabytes and thus ends with "m".
+        String vmHeapSize = SystemProperties.get("dalvik.vm.heapsize", "16m");
+        return Integer.parseInt(vmHeapSize.substring(0, vmHeapSize.length() - 1));
+!!!1344770.java!!!	isLowRamDevice() : boolean
+        return isLowRamDeviceStatic();
+!!!1344898.java!!!	isLowRamDeviceStatic() : boolean
+        return "true".equals(SystemProperties.get("ro.config.low_ram", "false"));
+!!!1345026.java!!!	isHighEndGfx() : boolean
+        return !isLowRamDeviceStatic() &&
+                !Resources.getSystem().getBoolean(com.android.internal.R.bool.config_avoidGfxAccel);
+!!!1345154.java!!!	getMaxRecentTasksStatic() : int
+        if (gMaxRecentTasks < 0) {
+            return gMaxRecentTasks = isLowRamDeviceStatic() ? 50 : 100;
+        }
+        return gMaxRecentTasks;
+!!!1345282.java!!!	getDefaultAppRecentsLimitStatic() : int
+        return getMaxRecentTasksStatic() / 6;
+!!!1345410.java!!!	getMaxAppRecentsLimitStatic() : int
+        return getMaxRecentTasksStatic() / 2;
+!!!1349122.java!!!	getRecentTasks(in maxNum : int, in flags : int) : ActivityManager::RecentTaskInfo
+        try {
+            return ActivityManagerNative.getDefault().getRecentTasks(maxNum,
+                    flags, UserHandle.myUserId());
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return null;
+        }
+!!!1349250.java!!!	getRecentTasksForUser(in maxNum : int, in flags : int, in userId : int) : ActivityManager::RecentTaskInfo
+        try {
+            return ActivityManagerNative.getDefault().getRecentTasks(maxNum,
+                    flags, userId);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return null;
+        }
+!!!1350018.java!!!	getAppTasks() : ActivityManager::AppTask
+        ArrayList<AppTask> tasks = new ArrayList<AppTask>();
+        List<IAppTask> appTasks;
+        try {
+            appTasks = ActivityManagerNative.getDefault().getAppTasks(mContext.getPackageName());
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return null;
+        }
+        int numAppTasks = appTasks.size();
+        for (int i = 0; i < numAppTasks; i++) {
+            tasks.add(new AppTask(appTasks.get(i)));
+        }
+        return tasks;
+!!!1350146.java!!!	getAppTaskThumbnailSize() : Size
+        synchronized (this) {
+            ensureAppTaskThumbnailSizeLocked();
+            return new Size(mAppTaskThumbnailSize.x, mAppTaskThumbnailSize.y);
+        }
+!!!1350274.java!!!	ensureAppTaskThumbnailSizeLocked() : void
+        if (mAppTaskThumbnailSize == null) {
+            try {
+                mAppTaskThumbnailSize = ActivityManagerNative.getDefault().getAppTaskThumbnailSize();
+            } catch (RemoteException e) {
+                throw new IllegalStateException("System dead?", e);
+            }
+        }
+!!!1350402.java!!!	addAppTask(inout activity : Activity, inout intent : Intent, inout description : ActivityManager::TaskDescription, inout thumbnail : Bitmap) : int
+        Point size;
+        synchronized (this) {
+            ensureAppTaskThumbnailSizeLocked();
+            size = mAppTaskThumbnailSize;
+        }
+        final int tw = thumbnail.getWidth();
+        final int th = thumbnail.getHeight();
+        if (tw != size.x || th != size.y) {
+            Bitmap bm = Bitmap.createBitmap(size.x, size.y, thumbnail.getConfig());
+
+            // Use ScaleType.CENTER_CROP, except we leave the top edge at the top.
+            float scale;
+            float dx = 0, dy = 0;
+            if (tw * size.x > size.y * th) {
+                scale = (float) size.x / (float) th;
+                dx = (size.y - tw * scale) * 0.5f;
+            } else {
+                scale = (float) size.y / (float) tw;
+                dy = (size.x - th * scale) * 0.5f;
+            }
+            Matrix matrix = new Matrix();
+            matrix.setScale(scale, scale);
+            matrix.postTranslate((int) (dx + 0.5f), 0);
+
+            Canvas canvas = new Canvas(bm);
+            canvas.drawBitmap(thumbnail, matrix, null);
+            canvas.setBitmap(null);
+
+            thumbnail = bm;
+        }
+        if (description == null) {
+            description = new TaskDescription();
+        }
+        try {
+            return ActivityManagerNative.getDefault().addAppTask(activity.getActivityToken(),
+                    intent, description, thumbnail);
+        } catch (RemoteException e) {
+            throw new IllegalStateException("System dead?", e);
+        }
+!!!1350530.java!!!	getRunningTasks(in maxNum : int) : ActivityManager::RunningTaskInfo
+        try {
+            return ActivityManagerNative.getDefault().getTasks(maxNum, 0);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return null;
+        }
+!!!1350658.java!!!	removeTask(in taskId : int, in flags : int) : boolean
+        try {
+            return ActivityManagerNative.getDefault().removeTask(taskId, flags);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return false;
+        }
+!!!1351426.java!!!	getTaskThumbnail(in id : int) : ActivityManager::TaskThumbnail
+        try {
+            return ActivityManagerNative.getDefault().getTaskThumbnail(id);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return null;
+        }
+!!!1351554.java!!!	isInHomeStack(in taskId : int) : boolean
+        try {
+            return ActivityManagerNative.getDefault().isInHomeStack(taskId);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return false;
+        }
+!!!1351682.java!!!	moveTaskToFront(in taskId : int, in flags : int) : void
+        moveTaskToFront(taskId, flags, null);
+!!!1351810.java!!!	moveTaskToFront(in taskId : int, in flags : int, inout options : Bundle) : void
+        try {
+            ActivityManagerNative.getDefault().moveTaskToFront(taskId, flags, options);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+        }
+!!!1352578.java!!!	getRunningServices(in maxNum : int) : ActivityManager::RunningServiceInfo
+        try {
+            return ActivityManagerNative.getDefault()
+                    .getServices(maxNum, 0);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return null;
+        }
+!!!1352706.java!!!	getRunningServiceControlPanel(inout service : ComponentName) : PendingIntent
+        try {
+            return ActivityManagerNative.getDefault()
+                    .getRunningServiceControlPanel(service);
+        } catch (RemoteException e) {
+            // System dead, we will be dead too soon!
+            return null;
+        }
+!!!1353474.java!!!	getMemoryInfo(inout outInfo : ActivityManager::MemoryInfo) : void
+        try {
+            ActivityManagerNative.getDefault().getMemoryInfo(outInfo);
+        } catch (RemoteException e) {
+        }
+!!!1354498.java!!!	clearApplicationUserData(in packageName : String, inout observer : IPackageDataObserver) : boolean
+        try {
+            return ActivityManagerNative.getDefault().clearApplicationUserData(packageName, 
+                    observer, UserHandle.myUserId());
+        } catch (RemoteException e) {
+            return false;
+        }
+!!!1354626.java!!!	clearApplicationUserData() : boolean
+        return clearApplicationUserData(mContext.getPackageName(), null);
+!!!1355394.java!!!	getProcessesInErrorState() : ActivityManager::ProcessErrorStateInfo
+        try {
+            return ActivityManagerNative.getDefault().getProcessesInErrorState();
+        } catch (RemoteException e) {
+            return null;
+        }
+!!!1356418.java!!!	getRunningExternalApplications() : List<ApplicationInfo>
+        try {
+            return ActivityManagerNative.getDefault().getRunningExternalApplications();
+        } catch (RemoteException e) {
+            return null;
+        }
+!!!1356546.java!!!	getRunningAppProcesses() : ActivityManager::RunningAppProcessInfo
+        try {
+            return ActivityManagerNative.getDefault().getRunningAppProcesses();
+        } catch (RemoteException e) {
+            return null;
+        }
+!!!1356674.java!!!	getMyMemoryState(inout outState : ActivityManager::RunningAppProcessInfo) : void
+        try {
+            ActivityManagerNative.getDefault().getMyMemoryState(outState);
+        } catch (RemoteException e) {
+        }
+!!!1356802.java!!!	getProcessMemoryInfo(inout pids : int) : Debug.MemoryInfo
+        try {
+            return ActivityManagerNative.getDefault().getProcessMemoryInfo(pids);
+        } catch (RemoteException e) {
+            return null;
+        }
+!!!1356930.java!!!	restartPackage(in packageName : String) : void
+        killBackgroundProcesses(packageName);
+!!!1357058.java!!!	killBackgroundProcesses(in packageName : String) : void
+        try {
+            ActivityManagerNative.getDefault().killBackgroundProcesses(packageName,
+                    UserHandle.myUserId());
+        } catch (RemoteException e) {
+        }
+!!!1357186.java!!!	forceStopPackageAsUser(in packageName : String, in userId : int) : void
+        try {
+            ActivityManagerNative.getDefault().forceStopPackage(packageName, userId);
+        } catch (RemoteException e) {
+        }
+!!!1357314.java!!!	forceStopPackage(in packageName : String) : void
+        forceStopPackageAsUser(packageName, UserHandle.myUserId());
+!!!1357442.java!!!	getDeviceConfigurationInfo() : ConfigurationInfo
+        try {
+            return ActivityManagerNative.getDefault().getDeviceConfigurationInfo();
+        } catch (RemoteException e) {
+        }
+        return null;
+!!!1357570.java!!!	getLauncherLargeIconDensity() : int
+        final Resources res = mContext.getResources();
+        final int density = res.getDisplayMetrics().densityDpi;
+        final int sw = res.getConfiguration().smallestScreenWidthDp;
+
+        if (sw < 600) {
+            // Smaller than approx 7" tablets, use the regular icon size.
+            return density;
+        }
+
+        switch (density) {
+            case DisplayMetrics.DENSITY_LOW:
+                return DisplayMetrics.DENSITY_MEDIUM;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                return DisplayMetrics.DENSITY_HIGH;
+            case DisplayMetrics.DENSITY_TV:
+                return DisplayMetrics.DENSITY_XHIGH;
+            case DisplayMetrics.DENSITY_HIGH:
+                return DisplayMetrics.DENSITY_XHIGH;
+            case DisplayMetrics.DENSITY_XHIGH:
+                return DisplayMetrics.DENSITY_XXHIGH;
+            case DisplayMetrics.DENSITY_XXHIGH:
+                return DisplayMetrics.DENSITY_XHIGH * 2;
+            default:
+                // The density is some abnormal value.  Return some other
+                // abnormal value that is a reasonable scaling of it.
+                return (int)((density*1.5f)+.5f);
+        }
+!!!1357698.java!!!	getLauncherLargeIconSize() : int
+        return getLauncherLargeIconSizeInner(mContext);
+!!!1357826.java!!!	getLauncherLargeIconSizeInner(inout context : Context) : int
+        final Resources res = context.getResources();
+        final int size = res.getDimensionPixelSize(android.R.dimen.app_icon_size);
+        final int sw = res.getConfiguration().smallestScreenWidthDp;
+
+        if (sw < 600) {
+            // Smaller than approx 7" tablets, use the regular icon size.
+            return size;
+        }
+
+        final int density = res.getDisplayMetrics().densityDpi;
+
+        switch (density) {
+            case DisplayMetrics.DENSITY_LOW:
+                return (size * DisplayMetrics.DENSITY_MEDIUM) / DisplayMetrics.DENSITY_LOW;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                return (size * DisplayMetrics.DENSITY_HIGH) / DisplayMetrics.DENSITY_MEDIUM;
+            case DisplayMetrics.DENSITY_TV:
+                return (size * DisplayMetrics.DENSITY_XHIGH) / DisplayMetrics.DENSITY_HIGH;
+            case DisplayMetrics.DENSITY_HIGH:
+                return (size * DisplayMetrics.DENSITY_XHIGH) / DisplayMetrics.DENSITY_HIGH;
+            case DisplayMetrics.DENSITY_XHIGH:
+                return (size * DisplayMetrics.DENSITY_XXHIGH) / DisplayMetrics.DENSITY_XHIGH;
+            case DisplayMetrics.DENSITY_XXHIGH:
+                return (size * DisplayMetrics.DENSITY_XHIGH*2) / DisplayMetrics.DENSITY_XXHIGH;
+            default:
+                // The density is some abnormal value.  Return some other
+                // abnormal value that is a reasonable scaling of it.
+                return (int)((size*1.5f) + .5f);
+        }
+!!!1357954.java!!!	isUserAMonkey() : boolean
+        try {
+            return ActivityManagerNative.getDefault().isUserAMonkey();
+        } catch (RemoteException e) {
+        }
+        return false;
+!!!1358082.java!!!	isRunningInTestHarness() : boolean
+        return SystemProperties.getBoolean("ro.test_harness", false);
+!!!1358210.java!!!	checkComponentPermission(in permission : String, in uid : int, in owningUid : int, inout exported : boolean) : int
+        // Root, system server get to do everything.
+        if (uid == 0 || uid == Process.SYSTEM_UID) {
+            return PackageManager.PERMISSION_GRANTED;
+        }
+        // Isolated processes don't get any permissions.
+        if (UserHandle.isIsolated(uid)) {
+            return PackageManager.PERMISSION_DENIED;
+        }
+        // If there is a uid that owns whatever is being accessed, it has
+        // blanket access to it regardless of the permissions it requires.
+        if (owningUid >= 0 && UserHandle.isSameApp(uid, owningUid)) {
+            return PackageManager.PERMISSION_GRANTED;
+        }
+        // If the target is not exported, then nobody else can get to it.
+        if (!exported) {
+            /*
+            RuntimeException here = new RuntimeException("here");
+            here.fillInStackTrace();
+            Slog.w(TAG, "Permission denied: checkComponentPermission() owningUid=" + owningUid,
+                    here);
+            */
+            return PackageManager.PERMISSION_DENIED;
+        }
+        if (permission == null) {
+            return PackageManager.PERMISSION_GRANTED;
+        }
+        try {
+            return AppGlobals.getPackageManager()
+                    .checkUidPermission(permission, uid);
+        } catch (RemoteException e) {
+            // Should never happen, but if it does... deny!
+            Slog.e(TAG, "PackageManager is dead?!?", e);
+        }
+        return PackageManager.PERMISSION_DENIED;
+!!!1358338.java!!!	checkUidPermission(in permission : String, in uid : int) : int
+        try {
+            return AppGlobals.getPackageManager()
+                    .checkUidPermission(permission, uid);
+        } catch (RemoteException e) {
+            // Should never happen, but if it does... deny!
+            Slog.e(TAG, "PackageManager is dead?!?", e);
+        }
+        return PackageManager.PERMISSION_DENIED;
+!!!1358466.java!!!	handleIncomingUser(in callingPid : int, in callingUid : int, in userId : int, inout allowAll : boolean, inout requireFull : boolean, in name : String, in callerPackage : String) : int
+        if (UserHandle.getUserId(callingUid) == userId) {
+            return userId;
+        }
+        try {
+            return ActivityManagerNative.getDefault().handleIncomingUser(callingPid,
+                    callingUid, userId, allowAll, requireFull, name, callerPackage);
+        } catch (RemoteException e) {
+            throw new SecurityException("Failed calling activity manager", e);
+        }
+!!!1358594.java!!!	getCurrentUser() : int
+        UserInfo ui;
+        try {
+            ui = ActivityManagerNative.getDefault().getCurrentUser();
+            return ui != null ? ui.id : 0;
+        } catch (RemoteException e) {
+            return 0;
+        }
+!!!1358722.java!!!	switchUser(in userid : int) : boolean
+        try {
+            return ActivityManagerNative.getDefault().switchUser(userid);
+        } catch (RemoteException e) {
+            return false;
+        }
+!!!1358850.java!!!	isUserRunning(in userid : int) : boolean
+        try {
+            return ActivityManagerNative.getDefault().isUserRunning(userid, false);
+        } catch (RemoteException e) {
+            return false;
+        }
+!!!1358978.java!!!	dumpPackageState(inout fd : FileDescriptor, in packageName : String) : void
+        dumpPackageStateStatic(fd, packageName);
+!!!1359106.java!!!	dumpPackageStateStatic(inout fd : FileDescriptor, in packageName : String) : void
+        FileOutputStream fout = new FileOutputStream(fd);
+        PrintWriter pw = new FastPrintWriter(fout);
+        dumpService(pw, fd, "package", new String[] { packageName });
+        pw.println();
+        dumpService(pw, fd, Context.ACTIVITY_SERVICE, new String[] {
+                "-a", "package", packageName });
+        pw.println();
+        dumpService(pw, fd, "meminfo", new String[] { "--local", "--package", packageName });
+        pw.println();
+        dumpService(pw, fd, ProcessStats.SERVICE_NAME, new String[] { packageName });
+        pw.println();
+        dumpService(pw, fd, "usagestats", new String[] { "--packages", packageName });
+        pw.println();
+        dumpService(pw, fd, BatteryStats.SERVICE_NAME, new String[] { packageName });
+        pw.flush();
+!!!1359234.java!!!	dumpService(inout pw : PrintWriter, inout fd : FileDescriptor, in name : String, inout args : String) : void
+        pw.print("DUMP OF SERVICE "); pw.print(name); pw.println(":");
+        IBinder service = ServiceManager.checkService(name);
+        if (service == null) {
+            pw.println("  (Service not found)");
+            return;
+        }
+        TransferPipe tp = null;
+        try {
+            pw.flush();
+            tp = new TransferPipe();
+            tp.setBufferPrefix("  ");
+            service.dumpAsync(tp.getWriteFd().getFileDescriptor(), args);
+            tp.go(fd, 10000);
+        } catch (Throwable e) {
+            if (tp != null) {
+                tp.kill();
+            }
+            pw.println("Failure dumping service:");
+            e.printStackTrace(pw);
+        }
+!!!1359362.java!!!	startLockTaskMode(in taskId : int) : void
+        try {
+            ActivityManagerNative.getDefault().startLockTaskMode(taskId);
+        } catch (RemoteException e) {
+        }
+!!!1359490.java!!!	stopLockTaskMode() : void
+        try {
+            ActivityManagerNative.getDefault().stopLockTaskMode();
+        } catch (RemoteException e) {
+        }
+!!!1359618.java!!!	isInLockTaskMode() : boolean
+        try {
+            return ActivityManagerNative.getDefault().isInLockTaskMode();
+        } catch (RemoteException e) {
+            return false;
+        }

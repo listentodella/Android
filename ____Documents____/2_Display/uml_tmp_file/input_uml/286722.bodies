@@ -1,0 +1,63 @@
+class AppImportanceMonitor
+!!!1500162.java!!!	AppImportanceMonitor(inout context : Context, inout looper : Looper)
+        mContext = context;
+        mHandler = new Handler(looper) {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case MSG_UPDATE:
+                        onImportanceChanged(msg.arg1, msg.arg2&0xffff, msg.arg2>>16);
+                        break;
+                    default:
+                        super.handleMessage(msg);
+                }
+            }
+        };
+        ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        try {
+            ActivityManagerNative.getDefault().registerProcessObserver(mProcessObserver);
+        } catch (RemoteException e) {
+        }
+        List<ActivityManager.RunningAppProcessInfo> apps = am.getRunningAppProcesses();
+        if (apps != null) {
+            for (int i=0; i<apps.size(); i++) {
+                ActivityManager.RunningAppProcessInfo app = apps.get(i);
+                updateImportanceLocked(app.uid, app.pid, app.importance, false);
+            }
+        }
+!!!1500290.java!!!	getImportance(in uid : int) : int
+        AppEntry ent = mApps.get(uid);
+        if (ent == null) {
+            return ActivityManager.RunningAppProcessInfo.IMPORTANCE_GONE;
+        }
+        return ent.importance;
+!!!1500546.java!!!	updateImportanceLocked(in uid : int, in pid : int, in importance : int, inout repChange : boolean) : void
+        AppEntry ent = mApps.get(uid);
+        if (ent == null) {
+            ent = new AppEntry(uid);
+            mApps.put(uid, ent);
+        }
+        if (importance >= ActivityManager.RunningAppProcessInfo.IMPORTANCE_GONE) {
+            ent.procs.remove(pid);
+        } else {
+            ent.procs.put(pid, importance);
+        }
+        updateImportanceLocked(ent, repChange);
+!!!1500674.java!!!	updateImportanceLocked(inout ent : AppImportanceMonitor::AppEntry, inout repChange : boolean) : void
+        int appImp = ActivityManager.RunningAppProcessInfo.IMPORTANCE_GONE;
+        for (int i=0; i<ent.procs.size(); i++) {
+            int procImp = ent.procs.valueAt(i);
+            if (procImp < appImp) {
+                appImp = procImp;
+            }
+        }
+        if (appImp != ent.importance) {
+            int impCode = appImp | (ent.importance<<16);
+            ent.importance = appImp;
+            if (appImp >= ActivityManager.RunningAppProcessInfo.IMPORTANCE_GONE) {
+                mApps.remove(ent.uid);
+            }
+            if (repChange) {
+                mHandler.obtainMessage(MSG_UPDATE, ent.uid, impCode).sendToTarget();
+            }
+        }

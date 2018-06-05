@@ -1,0 +1,83 @@
+class FocusedStackFrame
+!!!1209474.java!!!	FocusedStackFrame(inout display : Display, inout session : SurfaceSession)
+        SurfaceControl ctrl = null;
+        try {
+            if (DEBUG_SURFACE_TRACE) {
+                ctrl = new SurfaceTrace(session, "FocusedStackFrame",
+                    1, 1, PixelFormat.TRANSLUCENT, SurfaceControl.HIDDEN);
+            } else {
+                ctrl = new SurfaceControl(session, "FocusedStackFrame",
+                    1, 1, PixelFormat.TRANSLUCENT, SurfaceControl.HIDDEN);
+            }
+            ctrl.setLayerStack(display.getLayerStack());
+            ctrl.setAlpha(ALPHA);
+            mSurface.copyFrom(ctrl);
+        } catch (OutOfResourcesException e) {
+        }
+        mSurfaceControl = ctrl;
+!!!1209602.java!!!	draw(inout bounds : Rect, in color : int) : void
+        if (false && DEBUG_STACK) Slog.i(TAG, "draw: bounds=" + bounds.toShortString() +
+                " color=" + Integer.toHexString(color));
+        mTmpDrawRect.set(bounds);
+        Canvas c = null;
+        try {
+            c = mSurface.lockCanvas(mTmpDrawRect);
+        } catch (IllegalArgumentException e) {
+        } catch (Surface.OutOfResourcesException e) {
+        }
+        if (c == null) {
+            return;
+        }
+
+        final int w = bounds.width();
+        final int h = bounds.height();
+
+        // Top
+        mTmpDrawRect.set(0, 0, w, THICKNESS);
+        c.clipRect(mTmpDrawRect, Region.Op.REPLACE);
+        c.drawColor(color);
+        // Left (not including Top or Bottom stripe).
+        mTmpDrawRect.set(0, THICKNESS, THICKNESS, h - THICKNESS);
+        c.clipRect(mTmpDrawRect, Region.Op.REPLACE);
+        c.drawColor(color);
+        // Right (not including Top or Bottom stripe).
+        mTmpDrawRect.set(w - THICKNESS, THICKNESS, w, h - THICKNESS);
+        c.clipRect(mTmpDrawRect, Region.Op.REPLACE);
+        c.drawColor(color);
+        // Bottom
+        mTmpDrawRect.set(0, h - THICKNESS, w, h);
+        c.clipRect(mTmpDrawRect, Region.Op.REPLACE);
+        c.drawColor(color);
+
+        mSurface.unlockCanvasAndPost(c);
+!!!1209730.java!!!	positionSurface(inout bounds : Rect) : void
+        if (false && DEBUG_STACK) Slog.i(TAG, "positionSurface: bounds=" + bounds.toShortString());
+        mSurfaceControl.setSize(bounds.width(), bounds.height());
+        mSurfaceControl.setPosition(bounds.left, bounds.top);
+!!!1209858.java!!!	setVisibility(inout on : boolean) : void
+        if (false && DEBUG_STACK) Slog.i(TAG, "setVisibility: on=" + on +
+                " mLastBounds=" + mLastBounds.toShortString() +
+                " mBounds=" + mBounds.toShortString());
+        if (mSurfaceControl == null) {
+            return;
+        }
+        if (on) {
+            if (!mLastBounds.equals(mBounds)) {
+                // Erase the previous rectangle.
+                positionSurface(mLastBounds);
+                draw(mLastBounds, Color.TRANSPARENT);
+                // Draw the latest rectangle.
+                positionSurface(mBounds);
+                draw(mBounds, Color.WHITE);
+                // Update the history.
+                mLastBounds.set(mBounds);
+            }
+            mSurfaceControl.show();
+        } else {
+            mSurfaceControl.hide();
+        }
+!!!1209986.java!!!	setBounds(inout stack : TaskStack) : void
+        stack.getBounds(mBounds);
+        if (false && DEBUG_STACK) Slog.i(TAG, "setBounds: bounds=" + mBounds);
+!!!1210114.java!!!	setLayer(in layer : int) : void
+        mSurfaceControl.setLayer(layer);

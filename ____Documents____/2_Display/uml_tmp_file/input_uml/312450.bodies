@@ -1,0 +1,14 @@
+class JobService
+!!!1820930.java!!!	ensureHandler() : void
+        synchronized (mHandlerLock) {
+            if (mHandler == null) {
+                mHandler = new JobHandler(getMainLooper());
+            }
+        }
+!!!1821570.java!!!	onBind(inout intent : Intent) : IBinder
+        return mBinder.asBinder();
+!!!1821954.java!!!	jobFinished(inout params : JobParameters, inout needsReschedule : boolean) : void
+        ensureHandler();
+        Message m = Message.obtain(mHandler, MSG_JOB_FINISHED, params);
+        m.arg2 = needsReschedule ? 1 : 0;
+        m.sendToTarget();

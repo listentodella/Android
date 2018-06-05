@@ -1,0 +1,12 @@
+class PopupDataSetObserver
+!!!2122754.java!!!	PopupDataSetObserver(inout view : AutoCompleteTextView)
+            mViewReference = new WeakReference<AutoCompleteTextView>(view);
+!!!2122882.java!!!	onChanged() : void
+            final AutoCompleteTextView textView = mViewReference.get();
+            if (textView != null && textView.mAdapter != null) {
+                // If the popup is not showing already, showing it will cause
+                // the list of data set observers attached to the adapter to
+                // change. We can't do it from here, because we are in the middle
+                // of iterating through the list of observers.
+                textView.post(updateRunnable);
+            }

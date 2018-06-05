@@ -1,0 +1,72 @@
+class Transformation
+!!!1132802.java!!!	Transformation()
+        clear();
+!!!1132930.java!!!	clear() : void
+        if (mMatrix == null) {
+            mMatrix = new Matrix();
+        } else {
+            mMatrix.reset();
+        }
+        mClipRect.setEmpty();
+        mHasClipRect = false;
+        mAlpha = 1.0f;
+        mTransformationType = TYPE_BOTH;
+!!!1133058.java!!!	getTransformationType() : int
+        return mTransformationType;
+!!!1133186.java!!!	setTransformationType(in transformationType : int) : void
+        mTransformationType = transformationType;
+!!!1133314.java!!!	set(inout t : Transformation) : void
+        mAlpha = t.getAlpha();
+        mMatrix.set(t.getMatrix());
+        if (t.mHasClipRect) {
+            setClipRect(t.getClipRect());
+        } else {
+            mHasClipRect = false;
+            mClipRect.setEmpty();
+        }
+        mTransformationType = t.getTransformationType();
+!!!1133442.java!!!	compose(inout t : Transformation) : void
+        mAlpha *= t.getAlpha();
+        mMatrix.preConcat(t.getMatrix());
+        if (t.mHasClipRect) {
+            setClipRect(t.getClipRect());
+        }
+!!!1133570.java!!!	postCompose(inout t : Transformation) : void
+        mAlpha *= t.getAlpha();
+        mMatrix.postConcat(t.getMatrix());
+        if (t.mHasClipRect) {
+            setClipRect(t.getClipRect());
+        }
+!!!1133698.java!!!	getMatrix() : Matrix
+        return mMatrix;
+!!!1133826.java!!!	setAlpha(in alpha : float) : void
+        mAlpha = alpha;
+!!!1133954.java!!!	setClipRect(inout r : Rect) : void
+        setClipRect(r.left, r.top, r.right, r.bottom);
+!!!1134082.java!!!	setClipRect(in l : int, in t : int, in r : int, in b : int) : void
+        mClipRect.set(l, t, r, b);
+        mHasClipRect = true;
+!!!1134210.java!!!	getClipRect() : Rect
+        return mClipRect;
+!!!1134338.java!!!	hasClipRect() : boolean
+        return mHasClipRect;
+!!!1134466.java!!!	getAlpha() : float
+        return mAlpha;
+!!!1134594.java!!!	toString() : String
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("Transformation");
+        toShortString(sb);
+        return sb.toString();
+!!!1134722.java!!!	toShortString() : String
+        StringBuilder sb = new StringBuilder(64);
+        toShortString(sb);
+        return sb.toString();
+!!!1134850.java!!!	toShortString(inout sb : StringBuilder) : void
+        sb.append("{alpha="); sb.append(mAlpha);
+        sb.append(" matrix="); mMatrix.toShortString(sb);
+        sb.append('}');
+!!!1134978.java!!!	printShortString(inout pw : PrintWriter) : void
+        pw.print("{alpha="); pw.print(mAlpha);
+        pw.print(" matrix=");
+        mMatrix.printShortString(pw);
+        pw.print('}');

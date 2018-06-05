@@ -1,0 +1,13 @@
+window_sizes 960 672 240 720 512 86
+diagrams
+  active  sequencediagram_ref 128002 // seq
+    567 406 100 4 0 0
+end
+show_stereotypes
+selected sequencediagram_ref 128002 // seq
+open
+  classview_ref 128002 // uml_tmp_file
+  deploymentview_ref 128002 // uml_tmp_file
+  classview_ref 128130 // class_view
+end
+end

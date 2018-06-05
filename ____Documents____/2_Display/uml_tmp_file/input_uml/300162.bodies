@@ -1,0 +1,35 @@
+class Builder
+!!!1677698.java!!!	Builder(in icon : int, inout title : CharSequence, inout intent : PendingIntent)
+                this(icon, title, intent, new Bundle(), null);
+!!!1677826.java!!!	Builder(inout action : Notification::Action)
+                this(action.icon, action.title, action.actionIntent, new Bundle(action.mExtras),
+                        action.getRemoteInputs());
+!!!1677954.java!!!	Builder(in icon : int, inout title : CharSequence, inout intent : PendingIntent, inout extras : Bundle, inout remoteInputs : RemoteInput)
+                mIcon = icon;
+                mTitle = title;
+                mIntent = intent;
+                mExtras = extras;
+                if (remoteInputs != null) {
+                    mRemoteInputs = new ArrayList<RemoteInput>(remoteInputs.length);
+                    Collections.addAll(mRemoteInputs, remoteInputs);
+                }
+!!!1678082.java!!!	addExtras(inout extras : Bundle) : Notification::Action::Builder
+                if (extras != null) {
+                    mExtras.putAll(extras);
+                }
+                return this;
+!!!1678210.java!!!	getExtras() : Bundle
+                return mExtras;
+!!!1678338.java!!!	addRemoteInput(inout remoteInput : RemoteInput) : Notification::Action::Builder
+                if (mRemoteInputs == null) {
+                    mRemoteInputs = new ArrayList<RemoteInput>();
+                }
+                mRemoteInputs.add(remoteInput);
+                return this;
+!!!1678466.java!!!	extend(inout extender : Notification::Action::Extender) : Notification::Action::Builder
+                extender.extend(this);
+                return this;
+!!!1678594.java!!!	build() : Notification::Action
+                RemoteInput[] remoteInputs = mRemoteInputs != null
+                        ? mRemoteInputs.toArray(new RemoteInput[mRemoteInputs.size()]) : null;
+                return new Action(mIcon, mTitle, mIntent, mExtras, remoteInputs);

@@ -1,0 +1,8 @@
+class AlarmImpl
+!!!1861634.cpp!!!	AlarmImpl(inout fds_ : int, in n_fds : size_t)
+    memcpy(fds, fds_, n_fds * sizeof(fds[0]));
+!!!1861762.cpp!!!	~AlarmImpl()
+    for (size_t i = 0; i < n_fds; i++) {
+        close(fds[i]);
+    }
+    delete [] fds;

@@ -1,0 +1,4454 @@
+format 76
+"DisplayHardware" // surfaceflinger::DisplayHardware
+  revision 1
+  modified_by 2 "thisway_diy"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  cpp_h_dir "L:/android_projects/uml_tmp_file/surfaceflinger/DisplayHardware/"
+  cpp_src_dir "L:/android_projects/uml_tmp_file/surfaceflinger/DisplayHardware/"
+  cpp_namespace "android"
+  classview 135042 "DisplayHardware"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 146178 "HWComposer"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      class 150402 "HWCLayerInterface"
+	abstract visibility package 
+	cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	operation 207618 "~HWCLayerInterface"
+	  cpp_virtual cpp_inline protected explicit_return_type ""
+	  nparams 0
+	  cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw} { };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 207746 "getCompositionType"
+	  abstract const cpp_virtual public explicit_return_type "int32_t"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 207874 "getHints"
+	  abstract const cpp_virtual public explicit_return_type "uint32_t"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 208002 "getAndResetReleaseFence"
+	  abstract cpp_virtual public explicit_return_type "sp<Fence>"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 208130 "setDefaultState"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 208258 "setSkip"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 1
+	    param in name "skip" explicit_type "bool"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 208386 "setIsCursorLayerHint"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 1
+	    param in name "isCursor" explicit_type "bool"
+	      defaultvalue "true"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 208514 "setBlending"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 1
+	    param in name "blending" explicit_type "uint32_t"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 208642 "setTransform"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 1
+	    param in name "transform" explicit_type "uint32_t"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 208770 "setFrame"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 1
+	    param in name "frame" explicit_type "Rect"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 208898 "setCrop"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 1
+	    param in name "crop" type class_ref 150658 // FloatRect
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 209026 "setVisibleRegionScreen"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 1
+	    param in name "reg" explicit_type "Region"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 209154 "setSidebandStream"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 1
+	    param in name "stream" explicit_type "sp<NativeHandle>"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 209282 "setBuffer"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 1
+	    param in name "buffer" explicit_type "sp<GraphicBuffer>"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 209410 "setAcquireFenceFd"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 1
+	    param in name "fenceFd" explicit_type "int"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 209538 "setPlaneAlpha"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 1
+	    param in name "alpha" explicit_type "uint8_t"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 209666 "onDisplayed"
+	  abstract cpp_virtual public explicit_return_type "void"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+      end
+
+      class 152578 "EventHandler"
+	abstract visibility package 
+	cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 147842 // <dependency>
+	  relation 147842 -_->
+	    stereotype "friend"
+	    a default
+	      cpp default "Generated"
+	      classrelation_ref 147842 // <dependency>
+	    b parent class_ref 146178 // HWComposer
+	end
+
+	operation 204418 "onVSyncReceived"
+	  abstract cpp_virtual private explicit_return_type "void"
+	  nparams 2
+	    param in name "disp" explicit_type "int"
+	    param in name "timestamp" explicit_type "nsecs_t"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 204546 "onHotplugReceived"
+	  abstract cpp_virtual private explicit_return_type "void"
+	  nparams 2
+	    param in name "disp" explicit_type "int"
+	    param in name "connected" explicit_type "bool"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 204674 "~EventHandler"
+	  cpp_virtual cpp_inline protected explicit_return_type ""
+	  nparams 0
+	  cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw} {};
+"
+	  
+	  
+	  
+	  
+	end
+      end
+
+      class 154498 "anonymous17"
+	visibility package stereotype "enum"
+	cpp_decl "${comment}enum  {
+${items}
+};
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 178690 "NUM_BUILTIN_DISPLAYS"
+	  public type class_ref 154498 // anonymous17
+	  init_value " HWC_NUM_PHYSICAL_DISPLAY_TYPES"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 178818 "MAX_HWC_DISPLAYS"
+	  public type class_ref 154498 // anonymous17
+	  init_value " HWC_NUM_DISPLAY_TYPES"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 178946 "VIRTUAL_DISPLAY_ID_BASE"
+	  public type class_ref 154498 // anonymous17
+	  init_value " HWC_DISPLAY_VIRTUAL"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      operation 204802 "HWComposer"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "flinger" explicit_type "sp<SurfaceFlinger>"
+	  param inout name "handler" type class_ref 152578 // EventHandler
+	cpp_decl "    ${comment}${inline}${name}${(}const ${t0} & ${p0}${v0}, ${t1} & ${p1}${v1}${)}${volatile}${throw};
+"
+	cpp_def "// ---------------------------------------------------------------------------
+
+${inline}${class}::${name}${(}const ${t0} & ${p0}, ${t1} & ${p1}${)}
+    : mFlinger(flinger),
+      mFbDev(0), mHwc(0), mNumDisplays(1),
+      mCBContext(new cb_context),
+      mEventHandler(handler),
+      mDebugForceFakeVSync(false)
+${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 204930 "~HWComposer"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 205058 "initCheck"
+	preserve_cpp_body_indent const public explicit_return_type "status_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 205186 "allocateDisplayId"
+	preserve_cpp_body_indent public explicit_return_type "int32_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Returns a display ID starting at VIRTUAL_DISPLAY_ID_BASE, this ID is to
+ be used with createWorkList (and all other methods requiring an ID
+ below).
+ IDs below NUM_BUILTIN_DISPLAYS are pre-defined and therefore are
+ always valid.
+ Returns -1 if an ID cannot be allocated"
+      end
+
+      operation 205314 "freeDisplayId"
+	preserve_cpp_body_indent public explicit_return_type "status_t"
+	nparams 1
+	  param in name "id" explicit_type "int32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Recycles the given virtual display ID and frees the associated worklist.
+ IDs below NUM_BUILTIN_DISPLAYS are not recycled."
+      end
+
+      operation 205442 "prepare"
+	preserve_cpp_body_indent public explicit_return_type "status_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Asks the HAL what it can do"
+      end
+
+      operation 205570 "commit"
+	preserve_cpp_body_indent public explicit_return_type "status_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " commits the list"
+      end
+
+      operation 205698 "setPowerMode"
+	preserve_cpp_body_indent public explicit_return_type "status_t"
+	nparams 2
+	  param in name "disp" explicit_type "int"
+	  param in name "mode" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " set power mode"
+      end
+
+      operation 205826 "setActiveConfig"
+	preserve_cpp_body_indent public explicit_return_type "status_t"
+	nparams 2
+	  param in name "disp" explicit_type "int"
+	  param in name "mode" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " set active config"
+      end
+
+      operation 205954 "disconnectDisplay"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " reset state when an external, non-virtual display is disconnected"
+      end
+
+      operation 206082 "createWorkList"
+	preserve_cpp_body_indent public explicit_return_type "status_t"
+	nparams 2
+	  param in name "id" explicit_type "int32_t"
+	  param in name "numLayers" explicit_type "size_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " create a work list for numLayers layer. sets HWC_GEOMETRY_CHANGED."
+      end
+
+      operation 206210 "supportsFramebufferTarget"
+	preserve_cpp_body_indent const public explicit_return_type "bool"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 206338 "hasHwcComposition"
+	preserve_cpp_body_indent const public explicit_return_type "bool"
+	nparams 1
+	  param in name "id" explicit_type "int32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " does this display have layers handled by HWC"
+      end
+
+      operation 206466 "hasGlesComposition"
+	preserve_cpp_body_indent const public explicit_return_type "bool"
+	nparams 1
+	  param in name "id" explicit_type "int32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " does this display have layers handled by GLES"
+      end
+
+      operation 206594 "getAndResetReleaseFence"
+	preserve_cpp_body_indent public explicit_return_type "sp<Fence>"
+	nparams 1
+	  param in name "id" explicit_type "int32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " get the releaseFence file descriptor for a display's framebuffer layer.
+ the release fence is only valid after commit()"
+      end
+
+      extra_member 134658 "LayerListIterator"
+	
+	stereotype "class"
+	cpp "    class LayerListIterator;
+" ""
+	java ""
+	php ""
+	python ""
+	idl ""
+      end
+
+      operation 206722 "getVisualID"
+	preserve_cpp_body_indent const public explicit_return_type "int"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " return the visual id to be used to find a suitable EGLConfig for
+ *ALL* displays."
+      end
+
+      operation 206850 "fbPost"
+	preserve_cpp_body_indent public explicit_return_type "int"
+	nparams 3
+	  param in name "id" explicit_type "int32_t"
+	  param in name "acquireFence" explicit_type "sp<Fence>"
+	  param in name "buffer" explicit_type "sp<GraphicBuffer>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, const ${t1} & ${p1}${v1}, const ${t2} & ${p2}${v2}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, const ${t1} & ${p1}, const ${t2} & ${p2}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Forwarding to FB HAL for pre-HWC-1.1 code (see FramebufferSurface)."
+      end
+
+      operation 206978 "fbCompositionComplete"
+	preserve_cpp_body_indent public explicit_return_type "int"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 207106 "fbDump"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param inout name "result" explicit_type "String8"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 207234 "setOutputBuffer"
+	preserve_cpp_body_indent public explicit_return_type "status_t"
+	nparams 3
+	  param in name "id" explicit_type "int32_t"
+	  param in name "acquireFence" explicit_type "sp<Fence>"
+	  param in name "buf" explicit_type "sp<GraphicBuffer>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, const ${t1} & ${p1}${v1}, const ${t2} & ${p2}${v2}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, const ${t1} & ${p1}, const ${t2} & ${p2}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Set the output buffer and acquire fence for a virtual display.
+ Returns INVALID_OPERATION if id is not a virtual display."
+      end
+
+      operation 207362 "getLastRetireFence"
+	preserve_cpp_body_indent const public explicit_return_type "sp<Fence>"
+	nparams 1
+	  param in name "id" explicit_type "int32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Get the retire fence for the last committed frame. This fence will
+ signal when the h/w composer is completely finished with the frame.
+ For physical displays, it is no longer being displayed. For virtual
+ displays, writes to the output buffer are complete."
+      end
+
+      operation 207490 "setCursorPositionAsync"
+	preserve_cpp_body_indent public explicit_return_type "status_t"
+	nparams 2
+	  param in name "id" explicit_type "int32_t"
+	  param in name "pos" explicit_type "Rect"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, const ${t1} & ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, const ${t1} & ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      class 154626 "HWCLayer"
+	abstract visibility package 
+	cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 147970 // <generalisation>
+	  relation 147970 ---|>
+	    a public
+	      cpp default "${type}"
+	      classrelation_ref 147970 // <generalisation>
+	    b parent class_ref 150402 // HWCLayerInterface
+	end
+
+	classrelation 148098 // <dependency>
+	  relation 148098 -_->
+	    stereotype "friend"
+	    a default
+	      cpp default "Generated"
+	      classrelation_ref 148098 // <dependency>
+	    b parent class_ref 154754 // LayerListIterator
+	end
+
+	operation 209794 "setLayer"
+	  abstract cpp_virtual private explicit_return_type "status_t"
+	  nparams 1
+	    param in name "index" explicit_type "size_t"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	  comment " select the layer at the given index"
+	end
+
+	operation 209922 "dup"
+	  abstract cpp_virtual private return_type class_ref 154626 // HWCLayer
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 210050 "copy"
+	  class_operation cpp_inline private return_type class_ref 154626 // HWCLayer
+	  nparams 1
+	    param inout name "rhs" type class_ref 154626 // HWCLayer
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+            return rhs ? rhs->dup() : NULL;
+        };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 210178 "~HWCLayer"
+	  cpp_virtual cpp_inline protected explicit_return_type ""
+	  nparams 0
+	  cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw} { };
+"
+	  
+	  
+	  
+	  
+	end
+      end
+
+      class 154754 "LayerListIterator"
+	visibility package 
+	cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 148226 // <dependency>
+	  relation 148226 -_->
+	    stereotype "friend"
+	    a default
+	      cpp default "Generated"
+	      classrelation_ref 148226 // <dependency>
+	    b parent class_ref 146178 // HWComposer
+	end
+
+	attribute 179074 "mLayerList"
+	  private type class_ref 154626 // HWCLayer
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * const ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 179202 "mIndex"
+	  private explicit_type "size_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	operation 210306 "LayerListIterator"
+	  cpp_inline private explicit_return_type ""
+	  nparams 0
+	  cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw} : mLayerList(NULL), mIndex(0) { };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 210434 "LayerListIterator"
+	  cpp_inline private explicit_return_type ""
+	  nparams 2
+	    param inout name "layer" type class_ref 154626 // HWCLayer
+	    param in name "index" explicit_type "size_t"
+	  cpp_decl "    ${comment}${inline}${name}${(}${t0} * ${p0}${v0}, ${t1} ${p1}${v1}${)}${volatile}${throw} : mLayerList(layer), mIndex(index) { };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 210562 "operator ="
+	  private return_type class_ref 154754 // LayerListIterator
+	  nparams 1
+	    param in name "rhs" type class_ref 154754 // LayerListIterator
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} & ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  
+	  comment " we don't allow assignment, because we don't need it for now"
+	end
+
+	operation 210690 "LayerListIterator"
+	  cpp_inline public explicit_return_type ""
+	  nparams 1
+	    param in name "rhs" type class_ref 154754 // LayerListIterator
+	  cpp_decl "    ${comment}${inline}${name}${(}const ${t0} & ${p0}${v0}${)}${volatile}${throw} : mLayerList(HWCLayer::copy(rhs.mLayerList)), mIndex(rhs.mIndex) {
+        };
+"
+	  
+	  
+	  
+	  
+	  comment " copy operators"
+	end
+
+	operation 210818 "~LayerListIterator"
+	  cpp_inline public explicit_return_type ""
+	  nparams 0
+	  cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw} { delete mLayerList; };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 210946 "operator ++"
+	  cpp_inline public return_type class_ref 154754 // LayerListIterator
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+            mLayerList->setLayer(++mIndex);
+            return *this;
+        };
+"
+	  
+	  
+	  
+	  
+	  comment " pre-increment"
+	end
+
+	operation 211074 "operator *"
+	  cpp_inline public return_type class_ref 150402 // HWCLayerInterface
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}${)}${const}${volatile}${throw}${abstract} { return *mLayerList; };
+"
+	  
+	  
+	  
+	  
+	  comment " dereference"
+	end
+
+	operation 211202 "operator ->"
+	  cpp_inline public return_type class_ref 150402 // HWCLayerInterface
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract} { return mLayerList; };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 211330 "operator =="
+	  const cpp_inline public explicit_return_type "bool"
+	  nparams 1
+	    param in name "rhs" type class_ref 154754 // LayerListIterator
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+            return mIndex == rhs.mIndex;
+        };
+"
+	  
+	  
+	  
+	  
+	  comment " comparison"
+	end
+
+	operation 211458 "operator !="
+	  const cpp_inline public explicit_return_type "bool"
+	  nparams 1
+	    param in name "rhs" type class_ref 154754 // LayerListIterator
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+            return !operator==(rhs);
+        };
+"
+	  
+	  
+	  
+	  
+	end
+      end
+
+      operation 211586 "begin"
+	preserve_cpp_body_indent public return_type class_ref 154754 // LayerListIterator
+	nparams 1
+	  param in name "id" explicit_type "int32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "// * returns an iterator on the beginning of the layer list
+
+${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Returns an iterator to the beginning of the layer list"
+      end
+
+      operation 211714 "end"
+	preserve_cpp_body_indent public return_type class_ref 154754 // LayerListIterator
+	nparams 1
+	  param in name "id" explicit_type "int32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "// * returns an iterator on the end of the layer list
+
+${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Returns an iterator to the end of the layer list"
+      end
+
+      class 154882 "anonymous18"
+	visibility package stereotype "enum"
+	cpp_decl "${comment}enum  {
+${items}
+};
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 179330 "EVENT_VSYNC"
+	  public type class_ref 154882 // anonymous18
+	  init_value " HWC_EVENT_VSYNC
+    "
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      operation 211842 "eventControl"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 3
+	  param in name "disp" explicit_type "int"
+	  param in name "event" explicit_type "int"
+	  param in name "enabled" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      class 155010 "DisplayConfig"
+	visibility package stereotype "struct"
+	cpp_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 179458 "width"
+	  public explicit_type "uint32_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 179586 "height"
+	  public explicit_type "uint32_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 179714 "xdpi"
+	  public explicit_type "float"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 179842 "ydpi"
+	  public explicit_type "float"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 179970 "refresh"
+	  public explicit_type "nsecs_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      operation 211970 "getRefreshTimestamp"
+	preserve_cpp_body_indent const public explicit_return_type "nsecs_t"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Query display parameters.  Pass in a display index (e.g.
+ HWC_DISPLAY_PRIMARY)."
+      end
+
+      operation 212098 "getDisplayFence"
+	preserve_cpp_body_indent const public explicit_return_type "sp<Fence>"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 212226 "getFormat"
+	preserve_cpp_body_indent const public explicit_return_type "uint32_t"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 212354 "isConnected"
+	preserve_cpp_body_indent const public explicit_return_type "bool"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 212482 "getWidth"
+	preserve_cpp_body_indent const public explicit_return_type "uint32_t"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " These return the values for the current config of a given display index.
+ To get the values for all configs, use getConfigs below."
+      end
+
+      operation 212610 "getHeight"
+	preserve_cpp_body_indent const public explicit_return_type "uint32_t"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 212738 "getDpiX"
+	preserve_cpp_body_indent const public explicit_return_type "float"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 212866 "getDpiY"
+	preserve_cpp_body_indent const public explicit_return_type "float"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 212994 "getRefreshPeriod"
+	preserve_cpp_body_indent const public explicit_return_type "nsecs_t"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 213122 "getConfigs"
+	preserve_cpp_body_indent const public explicit_return_type "Vector<DisplayConfig>"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} & ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}const ${type} & ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 213250 "getCurrentConfig"
+	preserve_cpp_body_indent const public explicit_return_type "size_t"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 213378 "setVirtualDisplayProperties"
+	preserve_cpp_body_indent public explicit_return_type "status_t"
+	nparams 4
+	  param in name "id" explicit_type "int32_t"
+	  param in name "w" explicit_type "uint32_t"
+	  param in name "h" explicit_type "uint32_t"
+	  param in name "format" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      class 155138 "VSyncThread"
+	visibility package 
+	cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 148354 // <generalisation>
+	  relation 148354 ---|>
+	    a public
+	      cpp default "${type}"
+	      classrelation_ref 148354 // <generalisation>
+	    b parent class_ref 155266 // typedef21
+	end
+
+	classrelation 148482 // mHwc (<unidirectional association>)
+	  relation 148482 --->
+	    a role_name "mHwc" private
+	      cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} & ${name}${value};
+"
+	      classrelation_ref 148482 // mHwc (<unidirectional association>)
+	    b parent class_ref 146178 // HWComposer
+	end
+
+	attribute 180098 "mLock"
+	  private explicit_type "Mutex"
+	  cpp_mutable cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 180226 "mCondition"
+	  private explicit_type "Condition"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 180354 "mEnabled"
+	  private explicit_type "bool"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 180482 "mNextFakeVSync"
+	  private explicit_type "nsecs_t"
+	  cpp_mutable cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 180610 "mRefreshPeriod"
+	  private explicit_type "nsecs_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	operation 213506 "onFirstRef"
+	  preserve_cpp_body_indent cpp_virtual private explicit_return_type "void"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 213634 "threadLoop"
+	  preserve_cpp_body_indent cpp_virtual private explicit_return_type "bool"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 213762 "VSyncThread"
+	  preserve_cpp_body_indent public explicit_return_type ""
+	  nparams 1
+	    param inout name "hwc" type class_ref 146178 // HWComposer
+	  cpp_decl "    ${comment}${inline}${name}${(}${t0} & ${p0}${v0}${)}${volatile}${throw};
+"
+	  cpp_def "// ---------------------------------------------------------------------------
+
+${inline}${class}::${name}${(}${t0} & ${p0}${)}
+    : mHwc(hwc), mEnabled(false),
+      mNextFakeVSync(0),
+      mRefreshPeriod(hwc.getRefreshPeriod(HWC_DISPLAY_PRIMARY))
+${throw}{
+  ${body}}
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 213890 "setEnabled"
+	  preserve_cpp_body_indent public explicit_return_type "void"
+	  nparams 1
+	    param in name "enabled" explicit_type "bool"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  
+	end
+      end
+
+      class 155266 "typedef21"
+	visibility package stereotype "typedef" explicit_base_type "Thread"
+	cpp_decl "${comment}typedef ${type} ${name};
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+      end
+
+      classrelation 148610 // <dependency>
+	relation 148610 -_->
+	  stereotype "friend"
+	  a default
+	    cpp default "Generated"
+	    classrelation_ref 148610 // <dependency>
+	  b parent class_ref 155138 // VSyncThread
+      end
+
+      operation 214018 "dump"
+	preserve_cpp_body_indent const public explicit_return_type "void"
+	nparams 1
+	  param inout name "result" explicit_type "String8"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " for debugging ----------------------------------------------------------"
+      end
+
+      operation 214146 "loadHwcModule"
+	preserve_cpp_body_indent private explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "// Load and prepare the hardware composer module.  Sets mHwc.
+
+${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 214274 "loadFbHalModule"
+	preserve_cpp_body_indent private explicit_return_type "int"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "// Load and prepare the FB HAL, which uses the gralloc module.  Sets mFbDev.
+
+${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 214402 "getLayerIterator"
+	preserve_cpp_body_indent private return_type class_ref 154754 // LayerListIterator
+	nparams 2
+	  param in name "id" explicit_type "int32_t"
+	  param in name "index" explicit_type "size_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "// * returns an iterator initialized at a given index in the layer list
+
+${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      extra_member 134786 "cb_context"
+	
+	stereotype "struct"
+	cpp "    struct cb_context;
+" ""
+	java ""
+	php ""
+	python ""
+	idl ""
+      end
+
+      operation 214530 "hook_invalidate"
+	class_operation preserve_cpp_body_indent private explicit_return_type "void"
+	nparams 1
+	  param in name "procs" explicit_type "hwc_procs"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} * ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 214658 "hook_vsync"
+	class_operation preserve_cpp_body_indent private explicit_return_type "void"
+	nparams 3
+	  param in name "procs" explicit_type "hwc_procs"
+	  param in name "disp" explicit_type "int"
+	  param in name "timestamp" explicit_type "int64_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} * ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 214786 "hook_hotplug"
+	class_operation preserve_cpp_body_indent private explicit_return_type "void"
+	nparams 3
+	  param in name "procs" explicit_type "hwc_procs"
+	  param in name "disp" explicit_type "int"
+	  param in name "connected" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} * ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 214914 "invalidate"
+	preserve_cpp_body_indent cpp_inline private explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 215042 "vsync"
+	preserve_cpp_body_indent cpp_inline private explicit_return_type "void"
+	nparams 2
+	  param in name "disp" explicit_type "int"
+	  param in name "timestamp" explicit_type "int64_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 215170 "hotplug"
+	preserve_cpp_body_indent cpp_inline private explicit_return_type "void"
+	nparams 2
+	  param in name "disp" explicit_type "int"
+	  param in name "connected" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 215298 "queryDisplayProperties"
+	preserve_cpp_body_indent private explicit_return_type "status_t"
+	nparams 1
+	  param in name "disp" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 215426 "setFramebufferTarget"
+	preserve_cpp_body_indent private explicit_return_type "status_t"
+	nparams 3
+	  param in name "id" explicit_type "int32_t"
+	  param in name "acquireFence" explicit_type "sp<Fence>"
+	  param in name "buf" explicit_type "sp<GraphicBuffer>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, const ${t1} & ${p1}${v1}, const ${t2} & ${p2}${v2}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, const ${t1} & ${p1}, const ${t2} & ${p2}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      class 155394 "DisplayData"
+	visibility package stereotype "struct"
+	cpp_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	operation 215554 "DisplayData"
+	  preserve_cpp_body_indent public explicit_return_type ""
+	  nparams 0
+	  cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	  cpp_def "${comment}${inline}${class}::${name}${(}${)}
+:   configs(),
+    currentConfig(0),
+    format(HAL_PIXEL_FORMAT_RGBA_8888),
+    connected(false),
+    hasFbComp(false), hasOvComp(false),
+    capacity(0), list(NULL),
+    framebufferTarget(NULL), fbTargetHandle(0),
+    lastRetireFence(Fence::NO_FENCE), lastDisplayFence(Fence::NO_FENCE),
+    outbufHandle(NULL), outbufAcquireFence(Fence::NO_FENCE),
+    events(0)
+${throw}{
+  ${body}}
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 215682 "~DisplayData"
+	  preserve_cpp_body_indent public explicit_return_type ""
+	  nparams 0
+	  cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	  cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	  
+	  
+	  
+	  
+	end
+
+	classrelation 148738 // configs (<directional composition>)
+	  relation 148738 *-->
+	    stereotype "Vector"
+	    a role_name "configs" public
+	      cpp default "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	      classrelation_ref 148738 // configs (<directional composition>)
+	    b parent class_ref 155010 // DisplayConfig
+	end
+
+	attribute 180738 "currentConfig"
+	  public explicit_type "size_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 180866 "format"
+	  public explicit_type "uint32_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment " pixel format from FB hal, for pre-hwc-1.1"
+	end
+
+	attribute 180994 "connected"
+	  public explicit_type "bool"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 181122 "hasFbComp"
+	  public explicit_type "bool"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 181250 "hasOvComp"
+	  public explicit_type "bool"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 181378 "capacity"
+	  public explicit_type "size_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 181506 "list"
+	  public explicit_type "hwc_display_contents_1"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 181634 "framebufferTarget"
+	  public explicit_type "hwc_layer_1"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 181762 "fbTargetHandle"
+	  public explicit_type "buffer_handle_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 181890 "lastRetireFence"
+	  public explicit_type "Fence"
+	  stereotype "sp"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment " signals when the last set op retires"
+	end
+
+	attribute 182018 "lastDisplayFence"
+	  public explicit_type "Fence"
+	  stereotype "sp"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment " signals when the last set op takes"
+	end
+
+	attribute 182146 "outbufHandle"
+	  public explicit_type "buffer_handle_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment " effect on screen"
+	end
+
+	attribute 182274 "outbufAcquireFence"
+	  public explicit_type "Fence"
+	  stereotype "sp"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 182402 "events"
+	  public explicit_type "int32_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment " protected by mEventControlLock"
+	end
+      end
+
+      classrelation 148866 // mFlinger (<directional composition>)
+	relation 148866 *-->
+	  stereotype "sp"
+	  a role_name "mFlinger" private
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	    classrelation_ref 148866 // mFlinger (<directional composition>)
+	  b parent class_ref 144898 // SurfaceFlinger
+      end
+
+      attribute 182530 "mFbDev"
+	private explicit_type "framebuffer_device_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 182658 "mHwc"
+	private explicit_type "hwc_composer_device_1"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}struct ${type} * ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 182786 "mLists"
+	private explicit_type "hwc_display_contents_1"
+	multiplicity "[MAX_HWC_DISPLAYS]"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}struct ${type} * ${name}${multiplicity}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " invariant: mLists[0] != NULL iff mHwc != NULL
+ mLists[i>0] can be NULL. that display is to be ignored"
+      end
+
+      classrelation 148994 // mDisplayData (<directional composition>)
+	relation 148994 *-->
+	  a role_name "mDisplayData" multiplicity "[MAX_HWC_DISPLAYS]" private
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${multiplicity}${value};
+"
+	    classrelation_ref 148994 // mDisplayData (<directional composition>)
+	  b parent class_ref 155394 // DisplayData
+      end
+
+      attribute 182914 "mNumDisplays"
+	private explicit_type "size_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 183042 "mCBContext"
+	private explicit_type "cb_context"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      classrelation 149122 // mEventHandler (<unidirectional association>)
+	relation 149122 --->
+	  a role_name "mEventHandler" private
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} & ${name}${value};
+"
+	    classrelation_ref 149122 // mEventHandler (<unidirectional association>)
+	  b parent class_ref 152578 // EventHandler
+      end
+
+      attribute 183170 "mVSyncCounts"
+	private explicit_type "size_t"
+	multiplicity "[HWC_NUM_PHYSICAL_DISPLAY_TYPES]"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${multiplicity}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      classrelation 149250 // mVSyncThread (<directional composition>)
+	relation 149250 *-->
+	  stereotype "sp"
+	  a role_name "mVSyncThread" private
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	    classrelation_ref 149250 // mVSyncThread (<directional composition>)
+	  b parent class_ref 155138 // VSyncThread
+      end
+
+      attribute 183298 "mDebugForceFakeVSync"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 183426 "mAllocatedDisplayIDs"
+	private explicit_type "BitSet32"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 183554 "mLock"
+	private explicit_type "Mutex"
+	cpp_mutable cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " protected by mLock"
+      end
+
+      attribute 183682 "mLastHwVSync"
+	private explicit_type "nsecs_t"
+	multiplicity "[HWC_NUM_PHYSICAL_DISPLAY_TYPES]"
+	cpp_mutable cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${multiplicity}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 183810 "mEventControlLock"
+	private explicit_type "Mutex"
+	cpp_mutable cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " thread-safe"
+      end
+    end
+
+    class 146306 "DisplaySurface"
+      abstract visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 147202 // <generalisation>
+	relation 147202 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 147202 // <generalisation>
+	  b parent class_ref 153858 // typedef18
+      end
+
+      classrelation 147330 // <generalisation>
+	relation 147330 ---|>
+	  a private
+	    cpp default "${type}"
+	    classrelation_ref 147330 // <generalisation>
+	  b parent class_ref 153986 // typedef19
+      end
+
+      operation 201090 "beginFrame"
+	abstract cpp_virtual public explicit_return_type "status_t"
+	nparams 1
+	  param in name "mustRecompose" explicit_type "bool"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment " beginFrame is called at the beginning of the composition loop, before
+ the configuration is known. The DisplaySurface should do anything it
+ needs to do to enable HWComposer to decide how to compose the frame.
+ We pass in mustRecompose so we can keep VirtualDisplaySurface's state
+ machine happy without actually queueing a buffer if nothing has changed."
+      end
+
+      class 154114 "CompositionType"
+	visibility package stereotype "enum"
+	cpp_decl "${comment}enum ${name} {
+${items}
+};
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 177282 "COMPOSITION_UNKNOWN"
+	  public type class_ref 154114 // CompositionType
+	  init_value " 0"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 177410 "COMPOSITION_GLES"
+	  public type class_ref 154114 // CompositionType
+	  init_value " 1"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 177538 "COMPOSITION_HWC"
+	  public type class_ref 154114 // CompositionType
+	  init_value " 2"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 177666 "COMPOSITION_MIXED"
+	  public type class_ref 154114 // CompositionType
+	  init_value " COMPOSITION_GLES | COMPOSITION_HWC
+    "
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      operation 201218 "prepareFrame"
+	abstract cpp_virtual public explicit_return_type "status_t"
+	nparams 1
+	  param in name "compositionType" type class_ref 154114 // CompositionType
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 201346 "compositionComplete"
+	abstract cpp_virtual public explicit_return_type "status_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment " Should be called when composition rendering is complete for a frame (but
+ eglSwapBuffers hasn't necessarily been called). Required by certain
+ older drivers for synchronization.
+ TODO: Remove this when we drop support for HWC 1.0."
+      end
+
+      operation 201474 "advanceFrame"
+	abstract cpp_virtual public explicit_return_type "status_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment " Inform the surface that GLES composition is complete for this frame, and
+ the surface should make sure that HWComposer has the correct buffer for
+ this frame. Some implementations may only push a new buffer to
+ HWComposer if GLES composition took place, others need to push a new
+ buffer on every frame.
+
+ advanceFrame must be followed by a call to  onFrameCommitted before
+ advanceFrame may be called again."
+      end
+
+      operation 201602 "onFrameCommitted"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment " onFrameCommitted is called after the frame has been committed to the
+ hardware composer. The surface collects the release fence for this
+ frame's buffer."
+      end
+
+      operation 201730 "dump"
+	abstract const cpp_virtual public explicit_return_type "void"
+	nparams 1
+	  param inout name "result" explicit_type "String8"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 201858 "resizeBuffers"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 2
+	  param in name "w" explicit_type "uint32_t"
+	  param in name "h" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} ${p0}${v0}, const ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 201986 "DisplaySurface"
+	cpp_inline protected explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw} {};
+"
+	
+	
+	
+	
+      end
+
+      operation 202114 "~DisplaySurface"
+	cpp_virtual cpp_inline protected explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw} {};
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 148994 "PowerHAL"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " ---------------------------------------------------------------------------"
+      operation 215810 "vsyncHint"
+	preserve_cpp_body_indent public explicit_return_type "status_t"
+	nparams 1
+	  param in name "enabled" explicit_type "bool"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "// ---------------------------------------------------------------------------
+
+${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      attribute 183938 "mPowerManager"
+	private explicit_type "IPowerManager"
+	stereotype "sp"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 184066 "mlock"
+	private explicit_type "Mutex"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 150658 "FloatRect"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 177794 "left"
+	public explicit_type "float"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 177922 "top"
+	public explicit_type "float"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 178050 "right"
+	public explicit_type "float"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 178178 "bottom"
+	public explicit_type "float"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 202242 "FloatRect"
+	cpp_inline public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw} { };
+"
+	
+	
+	
+	
+      end
+
+      operation 202370 "FloatRect"
+	cpp_inline public explicit_return_type ""
+	nparams 1
+	  param in name "other" explicit_type "Rect"
+	cpp_decl "    ${comment}${inline}${name}${(}const ${t0} & ${p0}${v0}${)}${volatile}${throw} : left(other.left), top(other.top), right(other.right), bottom(other.bottom) { };
+"
+	
+	
+	
+	
+      end
+
+      operation 202498 "getWidth"
+	const cpp_inline public explicit_return_type "float"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} { return right - left; };
+"
+	
+	
+	
+	
+      end
+
+      operation 202626 "getHeight"
+	const cpp_inline public explicit_return_type "float"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} { return bottom - top; };
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 153858 "typedef18"
+      visibility package stereotype "typedef" explicit_base_type "virtual"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 153986 "typedef19"
+      visibility package stereotype "typedef" explicit_base_type "RefBase"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 154242 "FramebufferSurface"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " ---------------------------------------------------------------------------"
+      classrelation 147458 // <generalisation>
+	relation 147458 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 147458 // <generalisation>
+	  b parent class_ref 154370 // typedef20
+      end
+
+      classrelation 147586 // <generalisation>
+	relation 147586 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 147586 // <generalisation>
+	  b parent class_ref 146306 // DisplaySurface
+      end
+
+      operation 202754 "FramebufferSurface"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 3
+	  param inout name "hwc" type class_ref 146178 // HWComposer
+	  param in name "disp" explicit_type "int"
+	  param in name "consumer" explicit_type "sp<IGraphicBufferConsumer>"
+	cpp_decl "    ${comment}${inline}${name}${(}${t0} & ${p0}${v0}, ${t1} ${p1}${v1}, const ${t2} & ${p2}${v2}${)}${volatile}${throw};
+"
+	cpp_def "// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+//
+// * This implements the (main) framebuffer management. This class is used
+// * mostly by SurfaceFlinger, but also by command line GL application.
+// *
+
+${inline}${class}::${name}${(}${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}${)} :
+    ConsumerBase(consumer),
+    mDisplayType(disp),
+    mCurrentBufferSlot(-1),
+    mCurrentBuffer(0),
+    mHwc(hwc)
+${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 202882 "beginFrame"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "status_t"
+	nparams 1
+	  param in name "mustRecompose" explicit_type "bool"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 203010 "prepareFrame"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "status_t"
+	nparams 1
+	  param in name "compositionType" explicit_type "CompositionType"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 203138 "compositionComplete"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "status_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 203266 "advanceFrame"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "status_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 203394 "onFrameCommitted"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 203522 "dump"
+	preserve_cpp_body_indent const cpp_virtual public explicit_return_type "void"
+	nparams 1
+	  param inout name "result" explicit_type "String8"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "// Since DisplaySurface and ConsumerBase both have a method with this
+// signature, results will vary based on the static pointer type the caller is
+// using:
+//   void dump(FrameBufferSurface* fbs, String8& s) {
+//       // calls FramebufferSurface::dump()
+//       fbs->dump(s);
+//
+//       // calls ConsumerBase::dump() since it is non-virtual
+//       static_cast<ConsumerBase*>(fbs)->dump(s);
+//
+//       // calls FramebufferSurface::dump() since it is virtual
+//       static_cast<DisplaySurface*>(fbs)->dump(s);
+//   }
+// To make sure that all of these end up doing the same thing, we just redirect
+// to ConsumerBase::dump() here. It will take the internal lock, and then call
+// virtual dumpLocked(), which is where the real work happens.
+
+${inline}${type} ${class}::${name}${(}${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Implementation of DisplaySurface::dump(). Note that ConsumerBase also
+ has a non-virtual dump() with the same signature."
+      end
+
+      operation 203650 "resizeBuffers"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 2
+	  param in name "" explicit_type "uint32_t"
+	  param in name "" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} ${p0}${v0}, const ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract} { };
+"
+	
+	
+	
+	
+	comment " Cannot resize a buffers in a FramebufferSurface. Only works with virtual
+ displays."
+      end
+
+      operation 203778 "~FramebufferSurface"
+	cpp_virtual cpp_inline private explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw} { };
+"
+	
+	
+	
+	
+      end
+
+      operation 203906 "onFrameAvailable"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "// Overrides ConsumerBase::onFrameAvailable(), does not call base class impl.
+
+${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " this class cannot be overloaded"
+      end
+
+      operation 204034 "freeBufferLocked"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "void"
+	nparams 1
+	  param in name "slotIndex" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 204162 "dumpLocked"
+	preserve_cpp_body_indent const cpp_virtual private explicit_return_type "void"
+	nparams 2
+	  param inout name "result" explicit_type "String8"
+	  param in name "prefix" explicit_type "char"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} & ${p0}${v0}, const ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} & ${p0}, const ${t1} * ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 204290 "nextBuffer"
+	preserve_cpp_body_indent private explicit_return_type "status_t"
+	nparams 2
+	  param inout name "outBuffer" explicit_type "sp<GraphicBuffer>"
+	  param inout name "outFence" explicit_type "sp<Fence>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} & ${p0}${v0}, ${t1} & ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} & ${p0}, ${t1} & ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " nextBuffer waits for and then latches the next buffer from the
+ BufferQueue and releases the previously latched buffer to the
+ BufferQueue.  The new buffer is returned in the 'buffer' argument."
+      end
+
+      attribute 178306 "mDisplayType"
+	private explicit_type "int"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " mDisplayType must match one of the HWC display types"
+      end
+
+      attribute 178434 "mCurrentBufferSlot"
+	private explicit_type "int"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " mCurrentBufferIndex is the slot index of the current buffer or
+ INVALID_BUFFER_SLOT to indicate that either there is no current buffer
+ or the buffer is not associated with a slot."
+      end
+
+      attribute 178562 "mCurrentBuffer"
+	private explicit_type "GraphicBuffer"
+	stereotype "sp"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " mCurrentBuffer is the current buffer or NULL to indicate that there is
+ no current buffer."
+      end
+
+      classrelation 147714 // mHwc (<unidirectional association>)
+	relation 147714 --->
+	  a role_name "mHwc" private
+	    comment " Hardware composer, owned by SurfaceFlinger."
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} & ${name}${value};
+"
+	    classrelation_ref 147714 // mHwc (<unidirectional association>)
+	  b parent class_ref 146178 // HWComposer
+      end
+    end
+
+    class 154370 "typedef20"
+      visibility package stereotype "typedef" explicit_base_type "ConsumerBase"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 155522 "VirtualDisplaySurface"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " This DisplaySurface implementation supports virtual displays, where GLES
+ * and/or HWC compose into a buffer that is then passed to an arbitrary
+ * consumer (the sink) running in another process.
+ *
+ * The simplest case is when the virtual display will never use the h/w
+ * composer -- either the h/w composer doesn't support writing to buffers, or
+ * there are more virtual displays than it supports simultaneously. In this
+ * case, the GLES driver works directly with the output buffer queue, and
+ * calls to the VirtualDisplay from SurfaceFlinger and DisplayHardware do
+ * nothing.
+ *
+ * If h/w composer might be used, then each frame will fall into one of three
+ * configurations: GLES-only, HWC-only, and MIXED composition. In all of these,
+ * we must provide a FB target buffer and output buffer for the HWC set() call.
+ *
+ * In GLES-only composition, the GLES driver is given a buffer from the sink to
+ * render into. When the GLES driver queues the buffer to the
+ * VirtualDisplaySurface, the VirtualDisplaySurface holds onto it instead of
+ * immediately queueing it to the sink. The buffer is used as both the FB
+ * target and output buffer for HWC, though on these frames the HWC doesn't
+ * do any work for this display and doesn't write to the output buffer. After
+ * composition is complete, the buffer is queued to the sink.
+ *
+ * In HWC-only composition, the VirtualDisplaySurface dequeues a buffer from
+ * the sink and passes it to HWC as both the FB target buffer and output
+ * buffer. The HWC doesn't need to read from the FB target buffer, but does
+ * write to the output buffer. After composition is complete, the buffer is
+ * queued to the sink.
+ *
+ * On MIXED frames, things become more complicated, since some h/w composer
+ * implementations can't read from and write to the same buffer. This class has
+ * an internal BufferQueue that it uses as a scratch buffer pool. The GLES
+ * driver is given a scratch buffer to render into. When it finishes rendering,
+ * the buffer is queued and then immediately acquired by the
+ * VirtualDisplaySurface. The scratch buffer is then used as the FB target
+ * buffer for HWC, and a separate buffer is dequeued from the sink and used as
+ * the HWC output buffer. When HWC composition is complete, the scratch buffer
+ * is released and the output buffer is queued to the sink."
+      classrelation 149378 // <generalisation>
+	relation 149378 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 149378 // <generalisation>
+	  b parent class_ref 146306 // DisplaySurface
+      end
+
+      classrelation 149506 // <generalisation>
+	relation 149506 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 149506 // <generalisation>
+	  b parent class_ref 155650 // typedef22
+      end
+
+      classrelation 149634 // <generalisation>
+	relation 149634 ---|>
+	  a private
+	    cpp default "${type}"
+	    classrelation_ref 149634 // <generalisation>
+	  b parent class_ref 154370 // typedef20
+      end
+
+      operation 215938 "VirtualDisplaySurface"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 6
+	  param inout name "hwc" type class_ref 146178 // HWComposer
+	  param in name "dispId" explicit_type "int32_t"
+	  param in name "sink" explicit_type "sp<IGraphicBufferProducer>"
+	  param in name "bqProducer" explicit_type "sp<IGraphicBufferProducer>"
+	  param in name "bqConsumer" explicit_type "sp<IGraphicBufferConsumer>"
+	  param in name "name" explicit_type "String8"
+	cpp_decl "    ${comment}${inline}${name}${(}${t0} & ${p0}${v0}, ${t1} ${p1}${v1}, const ${t2} & ${p2}${v2}, const ${t3} & ${p3}${v3}, const ${t4} & ${p4}${v4}, const ${t5} & ${p5}${v5}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${t0} & ${p0}, ${t1} ${p1}, const ${t2} & ${p2}, const ${t3} & ${p3}, const ${t4} & ${p4}, const ${t5} & ${p5}${)}
+:   ConsumerBase(bqConsumer),
+    mHwc(hwc),
+    mDisplayId(dispId),
+    mDisplayName(name),
+    mOutputUsage(GRALLOC_USAGE_HW_COMPOSER),
+    mProducerSlotSource(0),
+    mDbgState(DBG_STATE_IDLE),
+    mDbgLastCompositionType(COMPOSITION_UNKNOWN),
+    mMustRecompose(false)
+${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 216066 "beginFrame"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "status_t"
+	nparams 1
+	  param in name "mustRecompose" explicit_type "bool"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " DisplaySurface interface"
+      end
+
+      operation 216194 "prepareFrame"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "status_t"
+	nparams 1
+	  param in name "compositionType" explicit_type "CompositionType"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 216322 "compositionComplete"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "status_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 216450 "advanceFrame"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "status_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 216578 "onFrameCommitted"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 216706 "dump"
+	preserve_cpp_body_indent const cpp_virtual public explicit_return_type "void"
+	nparams 1
+	  param inout name "result" explicit_type "String8"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 216834 "resizeBuffers"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "void"
+	nparams 2
+	  param in name "w" explicit_type "uint32_t"
+	  param in name "h" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} ${p0}${v0}, const ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} ${p0}, const ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      class 155778 "Source"
+	visibility package stereotype "enum"
+	cpp_decl "${comment}enum ${name} {
+${items}
+};
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 184194 "SOURCE_SINK"
+	  public type class_ref 155778 // Source
+	  init_value " 0"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 184322 "SOURCE_SCRATCH"
+	  public type class_ref 155778 // Source
+	  init_value " 1"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      operation 216962 "~VirtualDisplaySurface"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 217090 "requestBuffer"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "status_t"
+	nparams 2
+	  param in name "pslot" explicit_type "int"
+	  param inout name "outBuf" explicit_type "sp<GraphicBuffer>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} * ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " IGraphicBufferProducer interface, used by the GLES driver."
+      end
+
+      operation 217218 "setBufferCount"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "status_t"
+	nparams 1
+	  param in name "bufferCount" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 217346 "dequeueBuffer"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "status_t"
+	nparams 7
+	  param inout name "pslot" explicit_type "int"
+	  param inout name "fence" explicit_type "sp<Fence>"
+	  param in name "async" explicit_type "bool"
+	  param in name "w" explicit_type "uint32_t"
+	  param in name "h" explicit_type "uint32_t"
+	  param in name "format" explicit_type "uint32_t"
+	  param in name "usage" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} * ${p0}${v0}, ${t1} * ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}, ${t4} ${p4}${v4}, ${t5} ${p5}${v5}, ${t6} ${p6}${v6}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} * ${p0}, ${t1} * ${p1}, ${t2} ${p2}, ${t3} ${p3}, ${t4} ${p4}, ${t5} ${p5}, ${t6} ${p6}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 217474 "detachBuffer"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "status_t"
+	nparams 1
+	  param in name "slot" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 217602 "detachNextBuffer"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "status_t"
+	nparams 2
+	  param inout name "outBuffer" explicit_type "sp<GraphicBuffer>"
+	  param inout name "outFence" explicit_type "sp<Fence>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} * ${p0}${v0}, ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} * ${p0}, ${t1} * ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 217730 "attachBuffer"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "status_t"
+	nparams 2
+	  param inout name "slot" explicit_type "int"
+	  param in name "buffer" explicit_type "sp<GraphicBuffer>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} * ${p0}${v0}, const ${t1} & ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} * ${p0}, const ${t1} & ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 217858 "queueBuffer"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "status_t"
+	nparams 3
+	  param in name "pslot" explicit_type "int"
+	  param in name "input" explicit_type "QueueBufferInput"
+	  param inout name "output" explicit_type "QueueBufferOutput"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, const ${t1} & ${p1}${v1}, ${t2} * ${p2}${v2}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, const ${t1} & ${p1}, ${t2} * ${p2}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 217986 "cancelBuffer"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "void"
+	nparams 2
+	  param in name "pslot" explicit_type "int"
+	  param in name "fence" explicit_type "sp<Fence>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, const ${t1} & ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, const ${t1} & ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 218114 "query"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "int"
+	nparams 2
+	  param in name "what" explicit_type "int"
+	  param inout name "value" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} * ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 218242 "connect"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "status_t"
+	nparams 4
+	  param in name "listener" explicit_type "sp<IProducerListener>"
+	  param in name "api" explicit_type "int"
+	  param in name "producerControlledByApp" explicit_type "bool"
+	  param inout name "output" explicit_type "QueueBufferOutput"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} * ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} * ${p3}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 218370 "disconnect"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "status_t"
+	nparams 1
+	  param in name "api" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 218498 "setSidebandStream"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "status_t"
+	nparams 1
+	  param in name "stream" explicit_type "sp<NativeHandle>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 218626 "allocateBuffers"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "void"
+	nparams 5
+	  param in name "async" explicit_type "bool"
+	  param in name "width" explicit_type "uint32_t"
+	  param in name "height" explicit_type "uint32_t"
+	  param in name "format" explicit_type "uint32_t"
+	  param in name "usage" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}, ${t4} ${p4}${v4}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}, ${t4} ${p4}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 218754 "fbSourceForCompositionType"
+	class_operation preserve_cpp_body_indent private return_type class_ref 155778 // Source
+	nparams 1
+	  param in name "type" explicit_type "CompositionType"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Utility methods"
+      end
+
+      operation 218882 "dequeueBuffer"
+	preserve_cpp_body_indent private explicit_return_type "status_t"
+	nparams 5
+	  param in name "source" type class_ref 155778 // Source
+	  param in name "format" explicit_type "uint32_t"
+	  param in name "usage" explicit_type "uint32_t"
+	  param inout name "sslot" explicit_type "int"
+	  param inout name "fence" explicit_type "sp<Fence>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} * ${p3}${v3}, ${t4} * ${p4}${v4}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} * ${p3}, ${t4} * ${p4}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 219010 "updateQueueBufferOutput"
+	preserve_cpp_body_indent private explicit_return_type "void"
+	nparams 1
+	  param in name "qbo" explicit_type "QueueBufferOutput"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 219138 "resetPerFrameState"
+	preserve_cpp_body_indent private explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 219266 "refreshOutputBuffer"
+	preserve_cpp_body_indent private explicit_return_type "status_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 219394 "mapSource2ProducerSlot"
+	class_operation preserve_cpp_body_indent private explicit_return_type "int"
+	nparams 2
+	  param in name "source" type class_ref 155778 // Source
+	  param in name "sslot" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "// This slot mapping function is its own inverse, so two copies are unnecessary.
+// Both are kept to make the intent clear where the function is called, and for
+// the (unlikely) chance that we switch to a different mapping function.
+
+${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Both the sink and scratch buffer pools have their own set of slots
+ (\"source slots\", or \"sslot\"). We have to merge these into the single
+ set of slots used by the GLES producer (\"producer slots\" or \"pslot\") and
+ internally in the VirtualDisplaySurface. To minimize the number of times
+ a producer slot switches which source it comes from, we map source slot
+ numbers to producer slot numbers differently for each source."
+      end
+
+      operation 219522 "mapProducer2SourceSlot"
+	class_operation preserve_cpp_body_indent private explicit_return_type "int"
+	nparams 2
+	  param in name "source" type class_ref 155778 // Source
+	  param in name "pslot" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      classrelation 149762 // mHwc (<unidirectional association>)
+	relation 149762 --->
+	  a role_name "mHwc" private
+	    comment " Immutable after construction
+"
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} & ${name}${value};
+"
+	    classrelation_ref 149762 // mHwc (<unidirectional association>)
+	  b parent class_ref 146178 // HWComposer
+      end
+
+      attribute 184450 "mDisplayId"
+	const_attribute private explicit_type "int32_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 184578 "mDisplayName"
+	const_attribute private explicit_type "String8"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 184706 "mSource"
+	private explicit_type "IGraphicBufferProducer"
+	multiplicity "[2]"
+	stereotype "sp"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${multiplicity}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " indexed by SOURCE_*"
+      end
+
+      attribute 184834 "mDefaultOutputFormat"
+	private explicit_type "uint32_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 184962 "mOutputFormat"
+	private explicit_type "uint32_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Inter-frame state
+
+ To avoid buffer reallocations, we track the buffer usage and format
+ we used on the previous frame and use it again on the new frame. If
+ the composition type changes or the GLES driver starts requesting
+ different usage/format, we'll get a new buffer."
+      end
+
+      attribute 185090 "mOutputUsage"
+	private explicit_type "uint32_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 185218 "mProducerSlotSource"
+	private explicit_type "uint64_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Since we present a single producer interface to the GLES driver, but
+ are internally muxing between the sink and scratch producers, we have
+ to keep track of which source last returned each producer slot from
+ dequeueBuffer. Each bit in mProducerSlotSource corresponds to a producer
+ slot. Both mProducerSlotSource and mProducerBuffers are indexed by a
+ \"producer slot\"; see the mapSlot*() functions."
+      end
+
+      attribute 185346 "mProducerBuffers"
+	private explicit_type "GraphicBuffer"
+	multiplicity "[BufferQueue::NUM_BUFFER_SLOTS]"
+	stereotype "sp"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${multiplicity}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 185474 "mQueueBufferOutput"
+	private explicit_type "QueueBufferOutput"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " The QueueBufferOutput with the latest info from the sink, and with the
+ transform hint cleared. Since we defer queueBuffer from the GLES driver
+ to the sink, we have to return the previous version."
+      end
+
+      attribute 185602 "mCompositionType"
+	private explicit_type "CompositionType"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Intra-frame state
+
+ Composition type and GLES buffer source for the current frame.
+ Valid after prepareFrame(), cleared in onFrameCommitted."
+      end
+
+      attribute 185730 "mFbFence"
+	private explicit_type "Fence"
+	stereotype "sp"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " mFbFence is the fence HWC should wait for before reading the framebuffer
+ target buffer."
+      end
+
+      attribute 185858 "mOutputFence"
+	private explicit_type "Fence"
+	stereotype "sp"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " mOutputFence is the fence HWC should wait for before writing to the
+ output buffer."
+      end
+
+      attribute 185986 "mFbProducerSlot"
+	private explicit_type "int"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Producer slot numbers for the buffers to use for HWC framebuffer target
+ and output."
+      end
+
+      attribute 186114 "mOutputProducerSlot"
+	private explicit_type "int"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      class 155906 "DbgState"
+	visibility package stereotype "enum"
+	cpp_decl "${comment}enum ${name} {
+${items}
+};
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 186242 "DBG_STATE_IDLE"
+	  public type class_ref 155906 // DbgState
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 186370 "DBG_STATE_BEGUN"
+	  public type class_ref 155906 // DbgState
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 186498 "DBG_STATE_PREPARED"
+	  public type class_ref 155906 // DbgState
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 186626 "DBG_STATE_GLES"
+	  public type class_ref 155906 // DbgState
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 186754 "DBG_STATE_GLES_DONE"
+	  public type class_ref 155906 // DbgState
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 186882 "DBG_STATE_HWC"
+	  public type class_ref 155906 // DbgState
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      classrelation 149890 // mDbgState (<directional composition>)
+	relation 149890 *-->
+	  a role_name "mDbgState" private
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	    classrelation_ref 149890 // mDbgState (<directional composition>)
+	  b parent class_ref 155906 // DbgState
+      end
+
+      attribute 187010 "mDbgLastCompositionType"
+	private explicit_type "CompositionType"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 219650 "dbgStateStr"
+	preserve_cpp_body_indent const private explicit_return_type "char"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}const ${type} * ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 219778 "dbgSourceStr"
+	class_operation preserve_cpp_body_indent private explicit_return_type "char"
+	nparams 1
+	  param in name "s" type class_ref 155778 // Source
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} * ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}const ${type} * ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      attribute 187138 "mMustRecompose"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 155650 "typedef22"
+      visibility package stereotype "typedef" explicit_base_type "BnGraphicBufferProducer"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 160770 "HWComposer::cb_context"
+      visibility package stereotype "struct"
+      cpp_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " ---------------------------------------------------------------------------"
+      class 160898 "callbacks"
+	visibility package stereotype "struct"
+	cpp_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 153986 // <generalisation>
+	  relation 153986 ---|>
+	    a public
+	      cpp default "${type}"
+	      classrelation_ref 153986 // <generalisation>
+	    b parent class_ref 161026 // typedef27
+	end
+
+	attribute 203010 "zero"
+	  public explicit_type "// these are here to facilitate the transition when adding // new callbacks (an implementation can check for NULL before // calling a new callback). void (*[4])(void)"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}
+        // these are here to facilitate the transition when adding
+        // new callbacks (an implementation can check for NULL before
+        // calling a new callback).
+        void (*${name}[4])(void)${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment " these are here to facilitate the transition when adding
+ new callbacks (an implementation can check for NULL before
+ calling a new callback)."
+	end
+      end
+
+      class 161026 "typedef27"
+	visibility package stereotype "typedef" explicit_base_type "hwc_procs_t"
+	cpp_decl "${comment}typedef ${type} ${name};
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+      end
+
+      classrelation 154114 // procs (<directional composition>)
+	relation 154114 *-->
+	  a role_name "procs" public
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	    classrelation_ref 154114 // procs (<directional composition>)
+	  b parent class_ref 160898 // callbacks
+      end
+
+      classrelation 154242 // hwc (<unidirectional association>)
+	relation 154242 --->
+	  a role_name "hwc" public
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	    classrelation_ref 154242 // hwc (<unidirectional association>)
+	  b parent class_ref 146178 // HWComposer
+      end
+    end
+
+    class 161154 "Iterable"
+      visibility package 
+      nformals 2
+      formal name "CONCRETE" type "typename" explicit_default_value ""
+        explicit_extends ""
+      formal name "HWCTYPE" type "typename" explicit_default_value ""
+        explicit_extends ""
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Helper template to implement a concrete HWCLayer
+ * This holds the pointer to the concrete hwc layer type
+ * and implements the \"iterable\" side of HWCLayer."
+      classrelation 154370 // <generalisation>
+	relation 154370 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 154370 // <generalisation>
+	  b parent class_ref 154626 // HWCLayer
+      end
+
+      attribute 203138 "mLayerList"
+	protected explicit_type "HWCTYPE"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * const ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 203266 "mCurrentLayer"
+	protected explicit_type "HWCTYPE"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 244866 "Iterable"
+	cpp_inline protected explicit_return_type ""
+	nparams 1
+	  param inout name "layer" explicit_type "HWCTYPE"
+	cpp_decl "    ${comment}${inline}${name}${(}${t0} * ${p0}${v0}${)}${volatile}${throw} : mLayerList(layer), mCurrentLayer(layer) { };
+"
+	
+	
+	
+	
+      end
+
+      operation 244994 "getLayer"
+	const cpp_inline protected explicit_return_type "HWCTYPE"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract} { return mCurrentLayer; };
+"
+	
+	
+	
+	
+      end
+
+      operation 245122 "getLayer"
+	cpp_inline protected explicit_return_type "HWCTYPE"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract} { return mCurrentLayer; };
+"
+	
+	
+	
+	
+      end
+
+      operation 245250 "~Iterable"
+	cpp_virtual cpp_inline protected explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw} { };
+"
+	
+	
+	
+	
+      end
+
+      operation 245378 "dup"
+	cpp_virtual cpp_inline private return_type class_ref 154626 // HWCLayer
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        return new CONCRETE( static_cast<const CONCRETE&>(*this) );
+    };
+"
+	
+	
+	
+	
+	comment " returns a copy of ourselves"
+      end
+
+      operation 245506 "setLayer"
+	cpp_virtual cpp_inline private explicit_return_type "status_t"
+	nparams 1
+	  param in name "index" explicit_type "size_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        mCurrentLayer = &mLayerList[index];
+        return NO_ERROR;
+    };
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 161282 "HWCLayerVersion1"
+      visibility package 
+      nactuals 2
+      actual class class_ref 161154 // Iterable
+        rank 0 value class_ref 161282 // HWCLayerVersion1
+      actual class class_ref 161154 // Iterable
+        rank 1 explicit_value "hwc_layer_1_t"
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Concrete implementation of HWCLayer for HWC_DEVICE_API_VERSION_1_0.
+ * This implements the HWCLayer side of HWCIterableLayer."
+      classrelation 154498 // <realization>
+	relation 154498 -_-|>
+	  stereotype "bind"
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 154498 // <realization>
+	  b parent class_ref 161154 // Iterable
+      end
+
+      attribute 203394 "mHwc"
+	private explicit_type "hwc_composer_device_1"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}struct ${type} * ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 245634 "HWCLayerVersion1"
+	cpp_inline public explicit_return_type ""
+	nparams 2
+	  param inout name "hwc" explicit_type "hwc_composer_device_1"
+	  param inout name "layer" explicit_type "hwc_layer_1_t"
+	cpp_decl "    ${comment}${inline}${name}${(}${t0} * ${p0}${v0}, ${t1} * ${p1}${v1}${)}${volatile}${throw} : Iterable<HWCLayerVersion1, hwc_layer_1_t>(layer), mHwc(hwc) { };
+"
+	
+	
+	
+	
+      end
+
+      operation 245762 "getCompositionType"
+	const cpp_virtual cpp_inline public explicit_return_type "int32_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        return getLayer()->compositionType;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 245890 "getHints"
+	const cpp_virtual cpp_inline public explicit_return_type "uint32_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        return getLayer()->hints;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 246018 "getAndResetReleaseFence"
+	cpp_virtual cpp_inline public explicit_return_type "sp<Fence>"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        int fd = getLayer()->releaseFenceFd;
+        getLayer()->releaseFenceFd = -1;
+        return fd >= 0 ? new Fence(fd) : Fence::NO_FENCE;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 246146 "setAcquireFenceFd"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "fenceFd" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        getLayer()->acquireFenceFd = fenceFd;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 246274 "setPerFrameDefaultState"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        //getLayer()->compositionType = HWC_FRAMEBUFFER;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 246402 "setPlaneAlpha"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "alpha" explicit_type "uint8_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        if (hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_2)) {
+            getLayer()->planeAlpha = alpha;
+        } else {
+            if (alpha < 0xFF) {
+                getLayer()->flags |= HWC_SKIP_LAYER;
+            }
+        }
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 246530 "setDefaultState"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        hwc_layer_1_t* const l = getLayer();
+        l->compositionType = HWC_FRAMEBUFFER;
+        l->hints = 0;
+        l->flags = HWC_SKIP_LAYER;
+        l->handle = 0;
+        l->transform = 0;
+        l->blending = HWC_BLENDING_NONE;
+        l->visibleRegionScreen.numRects = 0;
+        l->visibleRegionScreen.rects = NULL;
+        l->acquireFenceFd = -1;
+        l->releaseFenceFd = -1;
+        l->planeAlpha = 0xFF;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 246658 "setSkip"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "skip" explicit_type "bool"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        if (skip) {
+            getLayer()->flags |= HWC_SKIP_LAYER;
+        } else {
+            getLayer()->flags &= ~HWC_SKIP_LAYER;
+        }
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 246786 "setIsCursorLayerHint"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "isCursor" explicit_type "bool"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        if (hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_4)) {
+            if (isCursor) {
+                getLayer()->flags |= HWC_IS_CURSOR_LAYER;
+            }
+            else {
+                getLayer()->flags &= ~HWC_IS_CURSOR_LAYER;
+            }
+        }
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 246914 "setBlending"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "blending" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        getLayer()->blending = blending;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 247042 "setTransform"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "transform" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        getLayer()->transform = transform;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 247170 "setFrame"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "frame" explicit_type "Rect"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        getLayer()->displayFrame = reinterpret_cast<hwc_rect_t const&>(frame);
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 247298 "setCrop"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "crop" type class_ref 150658 // FloatRect
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        if (hwcHasApiVersion(mHwc, HWC_DEVICE_API_VERSION_1_3)) {
+            getLayer()->sourceCropf = reinterpret_cast<hwc_frect_t const&>(crop);
+        } else {
+            /*
+             * Since h/w composer didn't support a flot crop rect before version 1.3,
+             * using integer coordinates instead produces a different output from the GL code in
+             * Layer::drawWithOpenGL(). The difference can be large if the buffer crop to
+             * window size ratio is large and a window crop is defined
+             * (i.e.: if we scale the buffer a lot and we also crop it with a window crop).
+             */
+            hwc_rect_t& r = getLayer()->sourceCrop;
+            r.left  = int(ceilf(crop.left));
+            r.top   = int(ceilf(crop.top));
+            r.right = int(floorf(crop.right));
+            r.bottom= int(floorf(crop.bottom));
+        }
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 247426 "setVisibleRegionScreen"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "reg" explicit_type "Region"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        // Region::getSharedBuffer creates a reference to the underlying
+        // SharedBuffer of this Region, this reference is freed
+        // in onDisplayed()
+        hwc_region_t& visibleRegion = getLayer()->visibleRegionScreen;
+        SharedBuffer const* sb = reg.getSharedBuffer(&visibleRegion.numRects);
+        visibleRegion.rects = reinterpret_cast<hwc_rect_t const *>(sb->data());
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 247554 "setSidebandStream"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "stream" explicit_type "sp<NativeHandle>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        ALOG_ASSERT(stream->handle() != NULL);
+        getLayer()->compositionType = HWC_SIDEBAND;
+        getLayer()->sidebandStream = stream->handle();
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 247682 "setBuffer"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "buffer" explicit_type "sp<GraphicBuffer>"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        if (buffer == 0 || buffer->handle == 0) {
+            getLayer()->compositionType = HWC_FRAMEBUFFER;
+            getLayer()->flags |= HWC_SKIP_LAYER;
+            getLayer()->handle = 0;
+        } else {
+            if (getLayer()->compositionType == HWC_SIDEBAND) {
+                // If this was a sideband layer but the stream was removed, reset
+                // it to FRAMEBUFFER. The HWC can change it to OVERLAY in prepare.
+                getLayer()->compositionType = HWC_FRAMEBUFFER;
+            }
+            getLayer()->handle = buffer->handle;
+        }
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 247810 "onDisplayed"
+	cpp_virtual cpp_inline public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        hwc_region_t& visibleRegion = getLayer()->visibleRegionScreen;
+        SharedBuffer const* sb = SharedBuffer::bufferFromData(visibleRegion.rects);
+        if (sb) {
+            sb->release();
+            // not technically needed but safer
+            visibleRegion.numRects = 0;
+            visibleRegion.rects = NULL;
+        }
+
+        getLayer()->acquireFenceFd = -1;
+    };
+"
+	
+	
+	
+	
+      end
+    end
+  end
+
+  deploymentview 135170 "DisplayHardware"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 143874 "DisplaySurface"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 153858 // typedef18
+	class_ref 153986 // typedef19
+	class_ref 146306 // DisplaySurface
+      end
+    end
+
+    artifact 144002 "FloatRect"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 150658 // FloatRect
+      end
+    end
+
+    artifact 144130 "FramebufferSurface"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 154370 // typedef20
+	class_ref 154242 // FramebufferSurface
+      end
+    end
+
+    artifact 144258 "HWComposer"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 146178 // HWComposer
+      end
+    end
+
+    artifact 144386 "PowerHAL"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 148994 // PowerHAL
+      end
+    end
+
+    artifact 144514 "VirtualDisplaySurface"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 155650 // typedef22
+	class_ref 155522 // VirtualDisplaySurface
+      end
+    end
+
+    artifact 146946 "HWComposer::cb_context"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 160770 // HWComposer::cb_context
+      end
+    end
+
+    artifact 147074 "Iterable"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 161154 // Iterable
+      end
+    end
+
+    artifact 147202 "HWCLayerVersion1"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 161282 // HWCLayerVersion1
+      end
+    end
+  end
+end

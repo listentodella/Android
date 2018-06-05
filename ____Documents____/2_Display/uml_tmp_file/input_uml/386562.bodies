@@ -1,0 +1,3 @@
+class InvalidateUpdateListener
+!!!2390146.java!!!	onAnimationUpdate(inout animation : ValueAnimator) : void
+            RadialTimePickerView.this.invalidate();

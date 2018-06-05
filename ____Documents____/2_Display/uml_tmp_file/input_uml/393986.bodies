@@ -1,0 +1,75 @@
+class LayoutParams
+!!!2474242.java!!!	LayoutParams(inout view : View)
+            super(0, 0);
+            width = 0;
+            height = 0;
+            horizontalOffset = 0;
+            verticalOffset = 0;
+            mView = view;
+!!!2474370.java!!!	LayoutParams(inout c : Context, inout attrs : AttributeSet)
+            super(c, attrs);
+            horizontalOffset = 0;
+            verticalOffset = 0;
+            width = 0;
+            height = 0;
+!!!2474498.java!!!	invalidateGlobalRegion(inout v : View, inout r : Rect) : void
+            // We need to make a new rect here, so as not to modify the one passed
+            globalInvalidateRect.set(r);
+            globalInvalidateRect.union(0, 0, getWidth(), getHeight());
+            View p = v;
+            if (!(v.getParent() != null && v.getParent() instanceof View)) return;
+
+            boolean firstPass = true;
+            parentRect.set(0, 0, 0, 0);
+            while (p.getParent() != null && p.getParent() instanceof View
+                    && !parentRect.contains(globalInvalidateRect)) {
+                if (!firstPass) {
+                    globalInvalidateRect.offset(p.getLeft() - p.getScrollX(), p.getTop()
+                            - p.getScrollY());
+                }
+                firstPass = false;
+                p = (View) p.getParent();
+                parentRect.set(p.getScrollX(), p.getScrollY(),
+                        p.getWidth() + p.getScrollX(), p.getHeight() + p.getScrollY());
+                p.invalidate(globalInvalidateRect.left, globalInvalidateRect.top,
+                        globalInvalidateRect.right, globalInvalidateRect.bottom);
+            }
+
+            p.invalidate(globalInvalidateRect.left, globalInvalidateRect.top,
+                    globalInvalidateRect.right, globalInvalidateRect.bottom);
+!!!2474626.java!!!	getInvalidateRect() : Rect
+            return invalidateRect;
+!!!2474754.java!!!	resetInvalidateRect() : void
+            invalidateRect.set(0, 0, 0, 0);
+!!!2474882.java!!!	setVerticalOffset(in newVerticalOffset : int) : void
+            setOffsets(horizontalOffset, newVerticalOffset);
+!!!2475010.java!!!	setHorizontalOffset(in newHorizontalOffset : int) : void
+            setOffsets(newHorizontalOffset, verticalOffset);
+!!!2475138.java!!!	setOffsets(in newHorizontalOffset : int, in newVerticalOffset : int) : void
+            int horizontalOffsetDelta = newHorizontalOffset - horizontalOffset;
+            horizontalOffset = newHorizontalOffset;
+            int verticalOffsetDelta = newVerticalOffset - verticalOffset;
+            verticalOffset = newVerticalOffset;
+
+            if (mView != null) {
+                mView.requestLayout();
+                int left = Math.min(mView.getLeft() + horizontalOffsetDelta, mView.getLeft());
+                int right = Math.max(mView.getRight() + horizontalOffsetDelta, mView.getRight());
+                int top = Math.min(mView.getTop() + verticalOffsetDelta, mView.getTop());
+                int bottom = Math.max(mView.getBottom() + verticalOffsetDelta, mView.getBottom());
+
+                invalidateRectf.set(left, top, right, bottom);
+
+                float xoffset = -invalidateRectf.left;
+                float yoffset = -invalidateRectf.top;
+                invalidateRectf.offset(xoffset, yoffset);
+                mView.getMatrix().mapRect(invalidateRectf);
+                invalidateRectf.offset(-xoffset, -yoffset);
+
+                invalidateRect.set((int) Math.floor(invalidateRectf.left),
+                        (int) Math.floor(invalidateRectf.top),
+                        (int) Math.ceil(invalidateRectf.right),
+                        (int) Math.ceil(invalidateRectf.bottom));
+
+                invalidateGlobalRegion(mView, invalidateRect);
+            }

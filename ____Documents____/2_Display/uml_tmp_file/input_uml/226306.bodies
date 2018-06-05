@@ -1,0 +1,27 @@
+class InputFilter
+!!!748162.java!!!	InputFilter(inout looper : Looper)
+        mH = new H(looper);
+!!!748290.java!!!	install(inout host : IInputFilterHost) : void
+        mH.obtainMessage(MSG_INSTALL, host).sendToTarget();
+!!!748418.java!!!	uninstall() : void
+        mH.obtainMessage(MSG_UNINSTALL).sendToTarget();
+!!!748546.java!!!	filterInputEvent(inout event : InputEvent, in policyFlags : int) : void
+        mH.obtainMessage(MSG_INPUT_EVENT, policyFlags, 0, event).sendToTarget();
+!!!748674.java!!!	sendInputEvent(inout event : InputEvent, in policyFlags : int) : void
+        if (event == null) {
+            throw new IllegalArgumentException("event must not be null");
+        }
+        if (mHost == null) {
+            throw new IllegalStateException("Cannot send input event because the input filter " +
+                    "is not installed.");
+        }
+        if (mOutboundInputEventConsistencyVerifier != null) {
+            mOutboundInputEventConsistencyVerifier.onInputEvent(event, 0);
+        }
+        try {
+            mHost.sendInputEvent(event, policyFlags);
+        } catch (RemoteException re) {
+            /* ignore */
+        }
+!!!748802.java!!!	onInputEvent(inout event : InputEvent, in policyFlags : int) : void
+        sendInputEvent(event, policyFlags);

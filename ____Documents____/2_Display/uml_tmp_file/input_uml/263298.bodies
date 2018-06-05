@@ -1,0 +1,99 @@
+class LocalService
+!!!1268354.java!!!	requestTraversalFromDisplayManager() : void
+            requestTraversal();
+!!!1268482.java!!!	setMagnificationSpec(inout spec : MagnificationSpec) : void
+            synchronized (mWindowMap) {
+                if (mAccessibilityController != null) {
+                    mAccessibilityController.setMagnificationSpecLocked(spec);
+                } else {
+                    throw new IllegalStateException("Magnification callbacks not set!");
+                }
+            }
+            if (Binder.getCallingPid() != android.os.Process.myPid()) {
+                spec.recycle();
+            }
+!!!1268610.java!!!	getCompatibleMagnificationSpecForWindow(inout windowToken : IBinder) : MagnificationSpec
+            synchronized (mWindowMap) {
+                WindowState windowState = mWindowMap.get(windowToken);
+                if (windowState == null) {
+                    return null;
+                }
+                MagnificationSpec spec = null;
+                if (mAccessibilityController != null) {
+                    spec = mAccessibilityController.getMagnificationSpecForWindowLocked(windowState);
+                }
+                if ((spec == null || spec.isNop()) && windowState.mGlobalScale == 1.0f) {
+                    return null;
+                }
+                spec = (spec == null) ? MagnificationSpec.obtain() : MagnificationSpec.obtain(spec);
+                spec.scale *= windowState.mGlobalScale;
+                return spec;
+            }
+!!!1268738.java!!!	setMagnificationCallbacks(inout callbacks : WindowManagerInternal::MagnificationCallbacks) : void
+            synchronized (mWindowMap) {
+                if (mAccessibilityController == null) {
+                    mAccessibilityController = new AccessibilityController(
+                            WindowManagerService.this);
+                }
+                mAccessibilityController.setMagnificationCallbacksLocked(callbacks);
+                if (!mAccessibilityController.hasCallbacksLocked()) {
+                    mAccessibilityController = null;
+                }
+            }
+!!!1268866.java!!!	setWindowsForAccessibilityCallback(inout callback : WindowManagerInternal::WindowsForAccessibilityCallback) : void
+            synchronized (mWindowMap) {
+                if (mAccessibilityController == null) {
+                    mAccessibilityController = new AccessibilityController(
+                            WindowManagerService.this);
+                }
+                mAccessibilityController.setWindowsForAccessibilityCallback(callback);
+                if (!mAccessibilityController.hasCallbacksLocked()) {
+                    mAccessibilityController = null;
+                }
+            }
+!!!1268994.java!!!	setInputFilter(inout filter : IInputFilter) : void
+            mInputManager.setInputFilter(filter);
+!!!1269122.java!!!	getFocusedWindowToken() : IBinder
+            synchronized (mWindowMap) {
+                WindowState windowState = getFocusedWindowLocked();
+                if (windowState != null) {
+                    return windowState.mClient.asBinder();
+                }
+                return null;
+            }
+!!!1269250.java!!!	isKeyguardLocked() : boolean
+            return WindowManagerService.this.isKeyguardLocked();
+!!!1269378.java!!!	showGlobalActions() : void
+            WindowManagerService.this.showGlobalActions();
+!!!1269506.java!!!	getWindowFrame(inout token : IBinder, inout outBounds : Rect) : void
+            synchronized (mWindowMap) {
+                WindowState windowState = mWindowMap.get(token);
+                if (windowState != null) {
+                    outBounds.set(windowState.mFrame);
+                } else {
+                    outBounds.setEmpty();
+                }
+            }
+!!!1269634.java!!!	waitForAllWindowsDrawn(inout callback : Runnable, in timeout : long) : void
+            synchronized (mWindowMap) {
+                mWaitingForDrawnCallback = callback;
+                final WindowList windows = getDefaultWindowListLocked();
+                for (int winNdx = windows.size() - 1; winNdx >= 0; --winNdx) {
+                    final WindowState win = windows.get(winNdx);
+                    if (win.isVisibleLw()
+                            && (win.mAppToken != null || mPolicy.isForceHiding(win.mAttrs))) {
+                        win.mWinAnimator.mDrawState = WindowStateAnimator.DRAW_PENDING;
+                        // Force add to mResizingWindows.
+                        win.mLastContentInsets.set(-1, -1, -1, -1);
+                        mWaitingForDrawn.add(win);
+                    }
+                }
+                requestTraversalLocked();
+            }
+            mH.removeMessages(H.WAITING_FOR_DRAWN_TIMEOUT);
+            if (mWaitingForDrawn.isEmpty()) {
+                callback.run();
+            } else {
+                mH.sendEmptyMessageDelayed(H.WAITING_FOR_DRAWN_TIMEOUT, timeout);
+                checkDrawnWindowsLocked();
+            }

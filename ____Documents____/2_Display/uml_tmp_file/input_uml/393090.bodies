@@ -1,0 +1,390 @@
+class Spinner
+!!!2462082.java!!!	Spinner(inout context : Context)
+        this(context, null);
+!!!2462210.java!!!	Spinner(inout context : Context, in mode : int)
+        this(context, null, com.android.internal.R.attr.spinnerStyle, mode);
+!!!2462338.java!!!	Spinner(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, com.android.internal.R.attr.spinnerStyle);
+!!!2462466.java!!!	Spinner(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0, MODE_THEME);
+!!!2462594.java!!!	Spinner(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in mode : int)
+        this(context, attrs, defStyleAttr, 0, mode);
+!!!2462722.java!!!	Spinner(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int, in mode : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, com.android.internal.R.styleable.Spinner, defStyleAttr, defStyleRes);
+
+        if (mode == MODE_THEME) {
+            mode = a.getInt(com.android.internal.R.styleable.Spinner_spinnerMode, MODE_DIALOG);
+        }
+        
+        switch (mode) {
+        case MODE_DIALOG: {
+            mPopup = new DialogPopup();
+            break;
+        }
+
+        case MODE_DROPDOWN: {
+            final DropdownPopup popup = new DropdownPopup(context, attrs, defStyleAttr, defStyleRes);
+
+            mDropDownWidth = a.getLayoutDimension(
+                    com.android.internal.R.styleable.Spinner_dropDownWidth,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            popup.setBackgroundDrawable(a.getDrawable(
+                    com.android.internal.R.styleable.Spinner_popupBackground));
+
+            mPopup = popup;
+            mForwardingListener = new ForwardingListener(this) {
+                @Override
+                public ListPopupWindow getPopup() {
+                    return popup;
+                }
+
+                @Override
+                public boolean onForwardingStarted() {
+                    if (!mPopup.isShowing()) {
+                        mPopup.show(getTextDirection(), getTextAlignment());
+                    }
+                    return true;
+                }
+            };
+            break;
+        }
+        }
+
+        mGravity = a.getInt(com.android.internal.R.styleable.Spinner_gravity, Gravity.CENTER);
+
+        mPopup.setPromptText(a.getString(com.android.internal.R.styleable.Spinner_prompt));
+
+        mDisableChildrenWhenDisabled = a.getBoolean(
+                com.android.internal.R.styleable.Spinner_disableChildrenWhenDisabled, false);
+
+        a.recycle();
+
+        // Base constructor can call setAdapter before we initialize mPopup.
+        // Finish setting things up if this happened.
+        if (mTempAdapter != null) {
+            mPopup.setAdapter(mTempAdapter);
+            mTempAdapter = null;
+        }
+!!!2462850.java!!!	setPopupBackgroundDrawable(inout background : Drawable) : void
+        if (!(mPopup instanceof DropdownPopup)) {
+            Log.e(TAG, "setPopupBackgroundDrawable: incompatible spinner mode; ignoring...");
+            return;
+        }
+        ((DropdownPopup) mPopup).setBackgroundDrawable(background);
+!!!2462978.java!!!	setPopupBackgroundResource(in resId : int) : void
+        setPopupBackgroundDrawable(getContext().getDrawable(resId));
+!!!2463106.java!!!	getPopupBackground() : Drawable
+        return mPopup.getBackground();
+!!!2463234.java!!!	setDropDownVerticalOffset(in pixels : int) : void
+        mPopup.setVerticalOffset(pixels);
+!!!2463362.java!!!	getDropDownVerticalOffset() : int
+        return mPopup.getVerticalOffset();
+!!!2463490.java!!!	setDropDownHorizontalOffset(in pixels : int) : void
+        mPopup.setHorizontalOffset(pixels);
+!!!2463618.java!!!	getDropDownHorizontalOffset() : int
+        return mPopup.getHorizontalOffset();
+!!!2463746.java!!!	setDropDownWidth(in pixels : int) : void
+        if (!(mPopup instanceof DropdownPopup)) {
+            Log.e(TAG, "Cannot set dropdown width for MODE_DIALOG, ignoring");
+            return;
+        }
+        mDropDownWidth = pixels;
+!!!2463874.java!!!	getDropDownWidth() : int
+        return mDropDownWidth;
+!!!2464002.java!!!	setEnabled(inout enabled : boolean) : void
+        super.setEnabled(enabled);
+        if (mDisableChildrenWhenDisabled) {
+            final int count = getChildCount();
+            for (int i = 0; i < count; i++) {
+                getChildAt(i).setEnabled(enabled);
+            }
+        }
+!!!2464130.java!!!	setGravity(in gravity : int) : void
+        if (mGravity != gravity) {
+            if ((gravity & Gravity.HORIZONTAL_GRAVITY_MASK) == 0) {
+                gravity |= Gravity.START;
+            }
+            mGravity = gravity;
+            requestLayout();
+        }
+!!!2464258.java!!!	getGravity() : int
+        return mGravity;
+!!!2464386.java!!!	setAdapter(inout adapter : SpinnerAdapter) : void
+        super.setAdapter(adapter);
+
+        mRecycler.clear();
+
+        final int targetSdkVersion = mContext.getApplicationInfo().targetSdkVersion;
+        if (targetSdkVersion >= Build.VERSION_CODES.LOLLIPOP
+                && adapter != null && adapter.getViewTypeCount() != 1) {
+            throw new IllegalArgumentException("Spinner adapter view type count must be 1");
+        }
+
+        if (mPopup != null) {
+            mPopup.setAdapter(new DropDownAdapter(adapter));
+        } else {
+            mTempAdapter = new DropDownAdapter(adapter);
+        }
+!!!2464514.java!!!	getBaseline() : int
+        View child = null;
+
+        if (getChildCount() > 0) {
+            child = getChildAt(0);
+        } else if (mAdapter != null && mAdapter.getCount() > 0) {
+            child = makeView(0, false);
+            mRecycler.put(0, child);
+        }
+
+        if (child != null) {
+            final int childBaseline = child.getBaseline();
+            return childBaseline >= 0 ? child.getTop() + childBaseline : -1;
+        } else {
+            return -1;
+        }
+!!!2464642.java!!!	onDetachedFromWindow() : void
+        super.onDetachedFromWindow();
+        
+        if (mPopup != null && mPopup.isShowing()) {
+            mPopup.dismiss();
+        }
+!!!2464770.java!!!	setOnItemClickListener(inout l : AdapterView::OnItemClickListener) : void
+        throw new RuntimeException("setOnItemClickListener cannot be used with a spinner.");
+!!!2464898.java!!!	setOnItemClickListenerInt(inout l : AdapterView::OnItemClickListener) : void
+        super.setOnItemClickListener(l);
+!!!2465026.java!!!	onTouchEvent(inout event : MotionEvent) : boolean
+        if (mForwardingListener != null && mForwardingListener.onTouch(this, event)) {
+            return true;
+        }
+
+        return super.onTouchEvent(event);
+!!!2465154.java!!!	onMeasure(in widthMeasureSpec : int, in heightMeasureSpec : int) : void
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (mPopup != null && MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.AT_MOST) {
+            final int measuredWidth = getMeasuredWidth();
+            setMeasuredDimension(Math.min(Math.max(measuredWidth,
+                    measureContentWidth(getAdapter(), getBackground())),
+                    MeasureSpec.getSize(widthMeasureSpec)),
+                    getMeasuredHeight());
+        }
+!!!2465282.java!!!	onLayout(inout changed : boolean, in l : int, in t : int, in r : int, in b : int) : void
+        super.onLayout(changed, l, t, r, b);
+        mInLayout = true;
+        layout(0, false);
+        mInLayout = false;
+!!!2465410.java!!!	layout(in delta : int, inout animate : boolean) : void
+        int childrenLeft = mSpinnerPadding.left;
+        int childrenWidth = mRight - mLeft - mSpinnerPadding.left - mSpinnerPadding.right;
+
+        if (mDataChanged) {
+            handleDataChanged();
+        }
+
+        // Handle the empty set by removing all views
+        if (mItemCount == 0) {
+            resetList();
+            return;
+        }
+
+        if (mNextSelectedPosition >= 0) {
+            setSelectedPositionInt(mNextSelectedPosition);
+        }
+
+        recycleAllViews();
+
+        // Clear out old views
+        removeAllViewsInLayout();
+
+        // Make selected view and position it
+        mFirstPosition = mSelectedPosition;
+
+        if (mAdapter != null) {
+            View sel = makeView(mSelectedPosition, true);
+            int width = sel.getMeasuredWidth();
+            int selectedOffset = childrenLeft;
+            final int layoutDirection = getLayoutDirection();
+            final int absoluteGravity = Gravity.getAbsoluteGravity(mGravity, layoutDirection);
+            switch (absoluteGravity & Gravity.HORIZONTAL_GRAVITY_MASK) {
+                case Gravity.CENTER_HORIZONTAL:
+                    selectedOffset = childrenLeft + (childrenWidth / 2) - (width / 2);
+                    break;
+                case Gravity.RIGHT:
+                    selectedOffset = childrenLeft + childrenWidth - width;
+                    break;
+            }
+            sel.offsetLeftAndRight(selectedOffset);
+        }
+
+        // Flush any cached views that did not get reused above
+        mRecycler.clear();
+
+        invalidate();
+
+        checkSelectionChanged();
+
+        mDataChanged = false;
+        mNeedSync = false;
+        setNextSelectedPositionInt(mSelectedPosition);
+!!!2465538.java!!!	makeView(in position : int, inout addChild : boolean) : View
+        View child;
+
+        if (!mDataChanged) {
+            child = mRecycler.get(position);
+            if (child != null) {
+                // Position the view
+                setUpChild(child, addChild);
+
+                return child;
+            }
+        }
+
+        // Nothing found in the recycler -- ask the adapter for a view
+        child = mAdapter.getView(position, null, this);
+
+        // Position the view
+        setUpChild(child, addChild);
+
+        return child;
+!!!2465666.java!!!	setUpChild(inout child : View, inout addChild : boolean) : void
+
+        // Respect layout params that are already in the view. Otherwise
+        // make some up...
+        ViewGroup.LayoutParams lp = child.getLayoutParams();
+        if (lp == null) {
+            lp = generateDefaultLayoutParams();
+        }
+
+        if (addChild) {
+            addViewInLayout(child, 0, lp);
+        }
+
+        child.setSelected(hasFocus());
+        if (mDisableChildrenWhenDisabled) {
+            child.setEnabled(isEnabled());
+        }
+
+        // Get measure specs
+        int childHeightSpec = ViewGroup.getChildMeasureSpec(mHeightMeasureSpec,
+                mSpinnerPadding.top + mSpinnerPadding.bottom, lp.height);
+        int childWidthSpec = ViewGroup.getChildMeasureSpec(mWidthMeasureSpec,
+                mSpinnerPadding.left + mSpinnerPadding.right, lp.width);
+
+        // Measure child
+        child.measure(childWidthSpec, childHeightSpec);
+
+        int childLeft;
+        int childRight;
+
+        // Position vertically based on gravity setting
+        int childTop = mSpinnerPadding.top
+                + ((getMeasuredHeight() - mSpinnerPadding.bottom -
+                        mSpinnerPadding.top - child.getMeasuredHeight()) / 2);
+        int childBottom = childTop + child.getMeasuredHeight();
+
+        int width = child.getMeasuredWidth();
+        childLeft = 0;
+        childRight = childLeft + width;
+
+        child.layout(childLeft, childTop, childRight, childBottom);
+!!!2465794.java!!!	performClick() : boolean
+        boolean handled = super.performClick();
+        
+        if (!handled) {
+            handled = true;
+
+            if (!mPopup.isShowing()) {
+                mPopup.show(getTextDirection(), getTextAlignment());
+            }
+        }
+
+        return handled;
+!!!2465922.java!!!	onClick(inout dialog : DialogInterface, in which : int) : void
+        setSelection(which);
+        dialog.dismiss();
+!!!2466050.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(Spinner.class.getName());
+!!!2466178.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(Spinner.class.getName());
+
+        if (mAdapter != null) {
+            info.setCanOpenPopup(true);
+        }
+!!!2466306.java!!!	setPrompt(inout prompt : CharSequence) : void
+        mPopup.setPromptText(prompt);
+!!!2466434.java!!!	setPromptId(in promptId : int) : void
+        setPrompt(getContext().getText(promptId));
+!!!2466562.java!!!	getPrompt() : CharSequence
+        return mPopup.getHintText();
+!!!2466690.java!!!	measureContentWidth(inout adapter : SpinnerAdapter, inout background : Drawable) : int
+        if (adapter == null) {
+            return 0;
+        }
+
+        int width = 0;
+        View itemView = null;
+        int itemType = 0;
+        final int widthMeasureSpec =
+            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        final int heightMeasureSpec =
+            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+
+        // Make sure the number of items we'll measure is capped. If it's a huge data set
+        // with wildly varying sizes, oh well.
+        int start = Math.max(0, getSelectedItemPosition());
+        final int end = Math.min(adapter.getCount(), start + MAX_ITEMS_MEASURED);
+        final int count = end - start;
+        start = Math.max(0, start - (MAX_ITEMS_MEASURED - count));
+        for (int i = start; i < end; i++) {
+            final int positionType = adapter.getItemViewType(i);
+            if (positionType != itemType) {
+                itemType = positionType;
+                itemView = null;
+            }
+            itemView = adapter.getView(i, itemView, this);
+            if (itemView.getLayoutParams() == null) {
+                itemView.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+            }
+            itemView.measure(widthMeasureSpec, heightMeasureSpec);
+            width = Math.max(width, itemView.getMeasuredWidth());
+        }
+
+        // Add background padding to measured width
+        if (background != null) {
+            background.getPadding(mTempRect);
+            width += mTempRect.left + mTempRect.right;
+        }
+
+        return width;
+!!!2466818.java!!!	onSaveInstanceState() : Parcelable
+        final SavedState ss = new SavedState(super.onSaveInstanceState());
+        ss.showDropdown = mPopup != null && mPopup.isShowing();
+        return ss;
+!!!2466946.java!!!	onRestoreInstanceState(inout state : Parcelable) : void
+        SavedState ss = (SavedState) state;
+
+        super.onRestoreInstanceState(ss.getSuperState());
+
+        if (ss.showDropdown) {
+            ViewTreeObserver vto = getViewTreeObserver();
+            if (vto != null) {
+                final OnGlobalLayoutListener listener = new OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        if (!mPopup.isShowing()) {
+                            mPopup.show(getTextDirection(), getTextAlignment());
+                        }
+                        final ViewTreeObserver vto = getViewTreeObserver();
+                        if (vto != null) {
+                            vto.removeOnGlobalLayoutListener(this);
+                        }
+                    }
+                };
+                vto.addOnGlobalLayoutListener(listener);
+            }
+        }

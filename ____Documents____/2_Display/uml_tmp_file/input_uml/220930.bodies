@@ -1,0 +1,5 @@
+class CheckForTap
+!!!691202.java!!!	run() : void
+            mPrivateFlags &= ~PFLAG_PREPRESSED;
+            setPressed(true, x, y);
+            checkForLongClick(ViewConfiguration.getTapTimeout());

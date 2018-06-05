@@ -1,0 +1,41 @@
+class Action
+!!!1677058.java!!!	Action(inout in : Parcel)
+            icon = in.readInt();
+            title = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
+            if (in.readInt() == 1) {
+                actionIntent = PendingIntent.CREATOR.createFromParcel(in);
+            }
+            mExtras = in.readBundle();
+            mRemoteInputs = in.createTypedArray(RemoteInput.CREATOR);
+!!!1677186.java!!!	Action(in icon : int, inout title : CharSequence, inout intent : PendingIntent)
+            this(icon, title, intent, new Bundle(), null);
+!!!1677314.java!!!	Action(in icon : int, inout title : CharSequence, inout intent : PendingIntent, inout extras : Bundle, inout remoteInputs : RemoteInput)
+            this.icon = icon;
+            this.title = title;
+            this.actionIntent = intent;
+            this.mExtras = extras != null ? extras : new Bundle();
+            this.mRemoteInputs = remoteInputs;
+!!!1677442.java!!!	getExtras() : Bundle
+            return mExtras;
+!!!1677570.java!!!	getRemoteInputs() : RemoteInput
+            return mRemoteInputs;
+!!!1678722.java!!!	clone() : Notification::Action
+            return new Action(
+                    icon,
+                    title,
+                    actionIntent, // safe to alias
+                    new Bundle(mExtras),
+                    getRemoteInputs());
+!!!1678850.java!!!	describeContents() : int
+            return 0;
+!!!1678978.java!!!	writeToParcel(inout out : Parcel, in flags : int) : void
+            out.writeInt(icon);
+            TextUtils.writeToParcel(title, out, flags);
+            if (actionIntent != null) {
+                out.writeInt(1);
+                actionIntent.writeToParcel(out, flags);
+            } else {
+                out.writeInt(0);
+            }
+            out.writeBundle(mExtras);
+            out.writeTypedArray(mRemoteInputs, flags);

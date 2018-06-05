@@ -1,0 +1,44 @@
+class CheckForTap
+!!!1944322.java!!!	run() : void
+            if (mTouchMode == TOUCH_MODE_DOWN) {
+                mTouchMode = TOUCH_MODE_TAP;
+                final View child = getChildAt(mMotionPosition - mFirstPosition);
+                if (child != null && !child.hasFocusable()) {
+                    mLayoutMode = LAYOUT_NORMAL;
+
+                    if (!mDataChanged) {
+                        child.setPressed(true);
+                        setPressed(true);
+                        layoutChildren();
+                        positionSelector(mMotionPosition, child);
+                        refreshDrawableState();
+
+                        final int longPressTimeout = ViewConfiguration.getLongPressTimeout();
+                        final boolean longClickable = isLongClickable();
+
+                        if (mSelector != null) {
+                            final Drawable d = mSelector.getCurrent();
+                            if (d != null && d instanceof TransitionDrawable) {
+                                if (longClickable) {
+                                    ((TransitionDrawable) d).startTransition(longPressTimeout);
+                                } else {
+                                    ((TransitionDrawable) d).resetTransition();
+                                }
+                            }
+                            mSelector.setHotspot(x, y);
+                        }
+
+                        if (longClickable) {
+                            if (mPendingCheckForLongPress == null) {
+                                mPendingCheckForLongPress = new CheckForLongPress();
+                            }
+                            mPendingCheckForLongPress.rememberWindowAttachCount();
+                            postDelayed(mPendingCheckForLongPress, longPressTimeout);
+                        } else {
+                            mTouchMode = TOUCH_MODE_DONE_WAITING;
+                        }
+                    } else {
+                        mTouchMode = TOUCH_MODE_DONE_WAITING;
+                    }
+                }
+            }

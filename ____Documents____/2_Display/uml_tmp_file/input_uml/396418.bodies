@@ -1,0 +1,193 @@
+class TableRow
+!!!2498562.java!!!	TableRow(inout context : Context)
+        super(context);
+        initTableRow();
+!!!2498690.java!!!	TableRow(inout context : Context, inout attrs : AttributeSet)
+        super(context, attrs);
+        initTableRow();
+!!!2498818.java!!!	initTableRow() : void
+        OnHierarchyChangeListener oldListener = mOnHierarchyChangeListener;
+        mChildrenTracker = new ChildrenTracker();
+        if (oldListener != null) {
+            mChildrenTracker.setOnHierarchyChangeListener(oldListener);
+        }
+        super.setOnHierarchyChangeListener(mChildrenTracker);
+!!!2498946.java!!!	setOnHierarchyChangeListener(inout listener : ViewGroup::OnHierarchyChangeListener) : void
+        mChildrenTracker.setOnHierarchyChangeListener(listener);
+!!!2499074.java!!!	setColumnCollapsed(in columnIndex : int, inout collapsed : boolean) : void
+        View child = getVirtualChildAt(columnIndex);
+        if (child != null) {
+            child.setVisibility(collapsed ? GONE : VISIBLE);
+        }
+!!!2499202.java!!!	onMeasure(in widthMeasureSpec : int, in heightMeasureSpec : int) : void
+        // enforce horizontal layout
+        measureHorizontal(widthMeasureSpec, heightMeasureSpec);
+!!!2499330.java!!!	onLayout(inout changed : boolean, in l : int, in t : int, in r : int, in b : int) : void
+        // enforce horizontal layout
+        layoutHorizontal(l, t, r, b);
+!!!2499458.java!!!	getVirtualChildAt(in i : int) : View
+        if (mColumnToChildIndex == null) {
+            mapIndexAndColumns();
+        }
+
+        final int deflectedIndex = mColumnToChildIndex.get(i, -1);
+        if (deflectedIndex != -1) {
+            return getChildAt(deflectedIndex);
+        }
+
+        return null;
+!!!2499586.java!!!	getVirtualChildCount() : int
+        if (mColumnToChildIndex == null) {
+            mapIndexAndColumns();
+        }
+        return mNumColumns;
+!!!2499714.java!!!	mapIndexAndColumns() : void
+        if (mColumnToChildIndex == null) {
+            int virtualCount = 0;
+            final int count = getChildCount();
+
+            mColumnToChildIndex = new SparseIntArray();
+            final SparseIntArray columnToChild = mColumnToChildIndex;
+
+            for (int i = 0; i < count; i++) {
+                final View child = getChildAt(i);
+                final LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
+
+                if (layoutParams.column >= virtualCount) {
+                    virtualCount = layoutParams.column;
+                }
+
+                for (int j = 0; j < layoutParams.span; j++) {
+                    columnToChild.put(virtualCount++, i);
+                }
+            }
+
+            mNumColumns = virtualCount;
+        }
+!!!2499842.java!!!	measureNullChild(in childIndex : int) : int
+        return mConstrainedColumnWidths[childIndex];
+!!!2499970.java!!!	measureChildBeforeLayout(inout child : View, in childIndex : int, in widthMeasureSpec : int, in totalWidth : int, in heightMeasureSpec : int, in totalHeight : int) : void
+        if (mConstrainedColumnWidths != null) {
+            final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+
+            int measureMode = MeasureSpec.EXACTLY;
+            int columnWidth = 0;
+
+            final int span = lp.span;
+            final int[] constrainedColumnWidths = mConstrainedColumnWidths;
+            for (int i = 0; i < span; i++) {
+                columnWidth += constrainedColumnWidths[childIndex + i];
+            }
+
+            final int gravity = lp.gravity;
+            final boolean isHorizontalGravity = Gravity.isHorizontal(gravity);
+
+            if (isHorizontalGravity) {
+                measureMode = MeasureSpec.AT_MOST;
+            }
+
+            // no need to care about padding here,
+            // ViewGroup.getChildMeasureSpec() would get rid of it anyway
+            // because of the EXACTLY measure spec we use
+            int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
+                    Math.max(0, columnWidth - lp.leftMargin - lp.rightMargin), measureMode
+            );
+            int childHeightMeasureSpec = getChildMeasureSpec(heightMeasureSpec,
+                    mPaddingTop + mPaddingBottom + lp.topMargin +
+                    lp .bottomMargin + totalHeight, lp.height);
+
+            child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+
+            if (isHorizontalGravity) {
+                final int childWidth = child.getMeasuredWidth();
+                lp.mOffset[LayoutParams.LOCATION_NEXT] = columnWidth - childWidth;
+
+                final int layoutDirection = getLayoutDirection();
+                final int absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection);
+                switch (absoluteGravity & Gravity.HORIZONTAL_GRAVITY_MASK) {
+                    case Gravity.LEFT:
+                        // don't offset on X axis
+                        break;
+                    case Gravity.RIGHT:
+                        lp.mOffset[LayoutParams.LOCATION] = lp.mOffset[LayoutParams.LOCATION_NEXT];
+                        break;
+                    case Gravity.CENTER_HORIZONTAL:
+                        lp.mOffset[LayoutParams.LOCATION] = lp.mOffset[LayoutParams.LOCATION_NEXT] / 2;
+                        break;
+                }
+            } else {
+                lp.mOffset[LayoutParams.LOCATION] = lp.mOffset[LayoutParams.LOCATION_NEXT] = 0;
+            }
+        } else {
+            // fail silently when column widths are not available
+            super.measureChildBeforeLayout(child, childIndex, widthMeasureSpec,
+                    totalWidth, heightMeasureSpec, totalHeight);
+        }
+!!!2500098.java!!!	getChildrenSkipCount(inout child : View, in index : int) : int
+        LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
+
+        // when the span is 1 (default), we need to skip 0 child
+        return layoutParams.span - 1;
+!!!2500226.java!!!	getLocationOffset(inout child : View) : int
+        return ((TableRow.LayoutParams) child.getLayoutParams()).mOffset[LayoutParams.LOCATION];
+!!!2500354.java!!!	getNextLocationOffset(inout child : View) : int
+        return ((TableRow.LayoutParams) child.getLayoutParams()).mOffset[LayoutParams.LOCATION_NEXT];
+!!!2500482.java!!!	getColumnsWidths(in widthMeasureSpec : int) : int
+        final int numColumns = getVirtualChildCount();
+        if (mColumnWidths == null || numColumns != mColumnWidths.length) {
+            mColumnWidths = new int[numColumns];
+        }
+
+        final int[] columnWidths = mColumnWidths;
+
+        for (int i = 0; i < numColumns; i++) {
+            final View child = getVirtualChildAt(i);
+            if (child != null && child.getVisibility() != GONE) {
+                final LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
+                if (layoutParams.span == 1) {
+                    int spec;
+                    switch (layoutParams.width) {
+                        case LayoutParams.WRAP_CONTENT:
+                            spec = getChildMeasureSpec(widthMeasureSpec, 0, LayoutParams.WRAP_CONTENT);
+                            break;
+                        case LayoutParams.MATCH_PARENT:
+                            spec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+                            break;
+                        default:
+                            spec = MeasureSpec.makeMeasureSpec(layoutParams.width, MeasureSpec.EXACTLY);
+                    }
+                    child.measure(spec, spec);
+
+                    final int width = child.getMeasuredWidth() + layoutParams.leftMargin +
+                            layoutParams.rightMargin;
+                    columnWidths[i] = width;
+                } else {
+                    columnWidths[i] = 0;
+                }
+            } else {
+                columnWidths[i] = 0;
+            }
+        }
+
+        return columnWidths;
+!!!2500610.java!!!	setColumnsWidthConstraints(inout columnWidths : int) : void
+        if (columnWidths == null || columnWidths.length < getVirtualChildCount()) {
+            throw new IllegalArgumentException(
+                    "columnWidths should be >= getVirtualChildCount()");
+        }
+
+        mConstrainedColumnWidths = columnWidths;
+!!!2500738.java!!!	generateLayoutParams(inout attrs : AttributeSet) : LinearLayout::LayoutParams
+        return new TableRow.LayoutParams(getContext(), attrs);
+!!!2500866.java!!!	generateDefaultLayoutParams() : LinearLayout::LayoutParams
+        return new LayoutParams();
+!!!2500994.java!!!	checkLayoutParams(inout p : ViewGroup::LayoutParams) : boolean
+        return p instanceof TableRow.LayoutParams;
+!!!2501122.java!!!	generateLayoutParams(inout p : ViewGroup::LayoutParams) : LinearLayout::LayoutParams
+        return new LayoutParams(p);
+!!!2501250.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(TableRow.class.getName());
+!!!2501378.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(TableRow.class.getName());

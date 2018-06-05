@@ -1,0 +1,13 @@
+class RefreshData
+!!!1967746.java!!!	obtain(in id : int, in progress : float, inout fromUser : boolean, inout animate : boolean) : ProgressBar::RefreshData
+            RefreshData rd = sPool.acquire();
+            if (rd == null) {
+                rd = new RefreshData();
+            }
+            rd.id = id;
+            rd.progress = progress;
+            rd.fromUser = fromUser;
+            rd.animate = animate;
+            return rd;
+!!!1967874.java!!!	recycle() : void
+            sPool.release(this);

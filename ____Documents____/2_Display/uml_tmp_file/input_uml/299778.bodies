@@ -1,0 +1,5 @@
+class NativeContentView
+!!!1673730.java!!!	NativeContentView(inout context : Context)
+            super(context);
+!!!1673858.java!!!	NativeContentView(inout context : Context, inout attrs : AttributeSet)
+            super(context, attrs);

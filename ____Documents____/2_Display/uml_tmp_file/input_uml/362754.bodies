@@ -1,0 +1,131 @@
+class Drawables
+!!!2057858.java!!!	Drawables(inout context : Context)
+            final int targetSdkVersion = context.getApplicationInfo().targetSdkVersion;
+            mIsRtlCompatibilityMode = (targetSdkVersion < JELLY_BEAN_MR1 ||
+                !context.getApplicationInfo().hasRtlSupport());
+            mOverride = false;
+!!!2057986.java!!!	resolveWithLayoutDirection(in layoutDirection : int) : void
+            // First reset "left" and "right" drawables to their initial values
+            mDrawableLeft = mDrawableLeftInitial;
+            mDrawableRight = mDrawableRightInitial;
+
+            if (mIsRtlCompatibilityMode) {
+                // Use "start" drawable as "left" drawable if the "left" drawable was not defined
+                if (mDrawableStart != null && mDrawableLeft == null) {
+                    mDrawableLeft = mDrawableStart;
+                    mDrawableSizeLeft = mDrawableSizeStart;
+                    mDrawableHeightLeft = mDrawableHeightStart;
+                }
+                // Use "end" drawable as "right" drawable if the "right" drawable was not defined
+                if (mDrawableEnd != null && mDrawableRight == null) {
+                    mDrawableRight = mDrawableEnd;
+                    mDrawableSizeRight = mDrawableSizeEnd;
+                    mDrawableHeightRight = mDrawableHeightEnd;
+                }
+            } else {
+                // JB-MR1+ normal case: "start" / "end" drawables are overriding "left" / "right"
+                // drawable if and only if they have been defined
+                switch(layoutDirection) {
+                    case LAYOUT_DIRECTION_RTL:
+                        if (mOverride) {
+                            mDrawableRight = mDrawableStart;
+                            mDrawableSizeRight = mDrawableSizeStart;
+                            mDrawableHeightRight = mDrawableHeightStart;
+
+                            mDrawableLeft = mDrawableEnd;
+                            mDrawableSizeLeft = mDrawableSizeEnd;
+                            mDrawableHeightLeft = mDrawableHeightEnd;
+                        }
+                        break;
+
+                    case LAYOUT_DIRECTION_LTR:
+                    default:
+                        if (mOverride) {
+                            mDrawableLeft = mDrawableStart;
+                            mDrawableSizeLeft = mDrawableSizeStart;
+                            mDrawableHeightLeft = mDrawableHeightStart;
+
+                            mDrawableRight = mDrawableEnd;
+                            mDrawableSizeRight = mDrawableSizeEnd;
+                            mDrawableHeightRight = mDrawableHeightEnd;
+                        }
+                        break;
+                }
+            }
+            applyErrorDrawableIfNeeded(layoutDirection);
+            updateDrawablesLayoutDirection(layoutDirection);
+!!!2058114.java!!!	updateDrawablesLayoutDirection(in layoutDirection : int) : void
+            if (mDrawableLeft != null) {
+                mDrawableLeft.setLayoutDirection(layoutDirection);
+            }
+            if (mDrawableRight != null) {
+                mDrawableRight.setLayoutDirection(layoutDirection);
+            }
+            if (mDrawableTop != null) {
+                mDrawableTop.setLayoutDirection(layoutDirection);
+            }
+            if (mDrawableBottom != null) {
+                mDrawableBottom.setLayoutDirection(layoutDirection);
+            }
+!!!2058242.java!!!	setErrorDrawable(inout dr : Drawable, inout tv : TextView) : void
+            if (mDrawableError != dr && mDrawableError != null) {
+                mDrawableError.setCallback(null);
+            }
+            mDrawableError = dr;
+
+            final Rect compoundRect = mCompoundRect;
+            int[] state = tv.getDrawableState();
+
+            if (mDrawableError != null) {
+                mDrawableError.setState(state);
+                mDrawableError.copyBounds(compoundRect);
+                mDrawableError.setCallback(tv);
+                mDrawableSizeError = compoundRect.width();
+                mDrawableHeightError = compoundRect.height();
+            } else {
+                mDrawableSizeError = mDrawableHeightError = 0;
+            }
+!!!2058370.java!!!	applyErrorDrawableIfNeeded(in layoutDirection : int) : void
+            // first restore the initial state if needed
+            switch (mDrawableSaved) {
+                case DRAWABLE_LEFT:
+                    mDrawableLeft = mDrawableTemp;
+                    mDrawableSizeLeft = mDrawableSizeTemp;
+                    mDrawableHeightLeft = mDrawableHeightTemp;
+                    break;
+                case DRAWABLE_RIGHT:
+                    mDrawableRight = mDrawableTemp;
+                    mDrawableSizeRight = mDrawableSizeTemp;
+                    mDrawableHeightRight = mDrawableHeightTemp;
+                    break;
+                case DRAWABLE_NONE:
+                default:
+            }
+            // then, if needed, assign the Error drawable to the correct location
+            if (mDrawableError != null) {
+                switch(layoutDirection) {
+                    case LAYOUT_DIRECTION_RTL:
+                        mDrawableSaved = DRAWABLE_LEFT;
+
+                        mDrawableTemp = mDrawableLeft;
+                        mDrawableSizeTemp = mDrawableSizeLeft;
+                        mDrawableHeightTemp = mDrawableHeightLeft;
+
+                        mDrawableLeft = mDrawableError;
+                        mDrawableSizeLeft = mDrawableSizeError;
+                        mDrawableHeightLeft = mDrawableHeightError;
+                        break;
+                    case LAYOUT_DIRECTION_LTR:
+                    default:
+                        mDrawableSaved = DRAWABLE_RIGHT;
+
+                        mDrawableTemp = mDrawableRight;
+                        mDrawableSizeTemp = mDrawableSizeRight;
+                        mDrawableHeightTemp = mDrawableHeightRight;
+
+                        mDrawableRight = mDrawableError;
+                        mDrawableSizeRight = mDrawableSizeError;
+                        mDrawableHeightRight = mDrawableHeightError;
+                        break;
+                }
+            }

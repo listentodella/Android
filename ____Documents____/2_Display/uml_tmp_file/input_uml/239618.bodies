@@ -1,0 +1,14 @@
+class PendingEvent
+!!!959490.java!!!	recycle() : void
+            mEvent = null;
+            mToken = null;
+            mInputMethodId = null;
+            mCallback = null;
+            mHandler = null;
+            mHandled = false;
+!!!959618.java!!!	run() : void
+            mCallback.onFinishedInputEvent(mToken, mHandled);
+
+            synchronized (mH) {
+                recyclePendingEventLocked(this);
+            }

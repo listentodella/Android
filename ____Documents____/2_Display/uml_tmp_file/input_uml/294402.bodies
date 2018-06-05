@@ -1,0 +1,29 @@
+class IntentService
+!!!1638274.java!!!	IntentService(in name : String)
+        super();
+        mName = name;
+!!!1638402.java!!!	setIntentRedelivery(inout enabled : boolean) : void
+        mRedelivery = enabled;
+!!!1638530.java!!!	onCreate() : void
+        // TODO: It would be nice to have an option to hold a partial wakelock
+        // during processing, and to have a static startService(Context, Intent)
+        // method that would launch the service & hand off a wakelock.
+
+        super.onCreate();
+        HandlerThread thread = new HandlerThread("IntentService[" + mName + "]");
+        thread.start();
+
+        mServiceLooper = thread.getLooper();
+        mServiceHandler = new ServiceHandler(mServiceLooper);
+!!!1638658.java!!!	onStart(inout intent : Intent, in startId : int) : void
+        Message msg = mServiceHandler.obtainMessage();
+        msg.arg1 = startId;
+        msg.obj = intent;
+        mServiceHandler.sendMessage(msg);
+!!!1638786.java!!!	onStartCommand(inout intent : Intent, in flags : int, in startId : int) : int
+        onStart(intent, startId);
+        return mRedelivery ? START_REDELIVER_INTENT : START_NOT_STICKY;
+!!!1638914.java!!!	onDestroy() : void
+        mServiceLooper.quit();
+!!!1639042.java!!!	onBind(inout intent : Intent) : IBinder
+        return null;

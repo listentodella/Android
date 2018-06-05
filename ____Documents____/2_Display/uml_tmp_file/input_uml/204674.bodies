@@ -1,0 +1,31 @@
+class WakeGestureListener
+!!!494850.java!!!	WakeGestureListener(inout context : Context, inout handler : Handler)
+        mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
+        mHandler = handler;
+
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_WAKE_GESTURE);
+!!!495106.java!!!	isSupported() : boolean
+        synchronized (mLock) {
+            return mSensor != null;
+        }
+!!!495234.java!!!	requestWakeUpTrigger() : void
+        synchronized (mLock) {
+            if (mSensor != null && !mTriggerRequested) {
+                mTriggerRequested = true;
+                mSensorManager.requestTriggerSensor(mListener, mSensor);
+            }
+        }
+!!!495362.java!!!	cancelWakeUpTrigger() : void
+        synchronized (mLock) {
+            if (mSensor != null && mTriggerRequested) {
+                mTriggerRequested = false;
+                mSensorManager.cancelTriggerSensor(mListener, mSensor);
+            }
+        }
+!!!495490.java!!!	dump(inout pw : PrintWriter, in prefix : String) : void
+        synchronized (mLock) {
+            pw.println(prefix + TAG);
+            prefix += "  ";
+            pw.println(prefix + "mTriggerRequested=" + mTriggerRequested);
+            pw.println(prefix + "mSensor=" + mSensor);
+        }

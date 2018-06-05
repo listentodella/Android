@@ -1,0 +1,140 @@
+class CursorAnchorInfo
+!!!1145218.java!!!	CursorAnchorInfo(in source : Parcel)
+        mSelectionStart = source.readInt();
+        mSelectionEnd = source.readInt();
+        mComposingTextStart = source.readInt();
+        mComposingText = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(source);
+        mInsertionMarkerFlags = source.readInt();
+        mInsertionMarkerHorizontal = source.readFloat();
+        mInsertionMarkerTop = source.readFloat();
+        mInsertionMarkerBaseline = source.readFloat();
+        mInsertionMarkerBottom = source.readFloat();
+        mCharacterBoundsArray = source.readParcelable(SparseRectFArray.class.getClassLoader());
+        mMatrix = new Matrix();
+        mMatrix.setValues(source.createFloatArray());
+!!!1145346.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        dest.writeInt(mSelectionStart);
+        dest.writeInt(mSelectionEnd);
+        dest.writeInt(mComposingTextStart);
+        TextUtils.writeToParcel(mComposingText, dest, flags);
+        dest.writeInt(mInsertionMarkerFlags);
+        dest.writeFloat(mInsertionMarkerHorizontal);
+        dest.writeFloat(mInsertionMarkerTop);
+        dest.writeFloat(mInsertionMarkerBaseline);
+        dest.writeFloat(mInsertionMarkerBottom);
+        dest.writeParcelable(mCharacterBoundsArray, flags);
+        final float[] matrixArray = new float[9];
+        mMatrix.getValues(matrixArray);
+        dest.writeFloatArray(matrixArray);
+!!!1145474.java!!!	hashCode() : int
+        final float floatHash = mInsertionMarkerHorizontal + mInsertionMarkerTop
+                + mInsertionMarkerBaseline + mInsertionMarkerBottom;
+        int hash = floatHash > 0 ? (int) floatHash : (int)(-floatHash);
+        hash *= 31;
+        hash += mInsertionMarkerFlags;
+        hash *= 31;
+        hash += mSelectionStart + mSelectionEnd + mComposingTextStart;
+        hash *= 31;
+        hash += Objects.hashCode(mComposingText);
+        hash *= 31;
+        hash += Objects.hashCode(mCharacterBoundsArray);
+        hash *= 31;
+        hash += Objects.hashCode(mMatrix);
+        return hash;
+!!!1145602.java!!!	areSameFloatImpl(in a : float, in b : float) : boolean
+        if (Float.isNaN(a) && Float.isNaN(b)) {
+            return true;
+        }
+        return a == b;
+!!!1145730.java!!!	equals(inout obj : Object) : boolean
+        if (obj == null) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof CursorAnchorInfo)) {
+            return false;
+        }
+        final CursorAnchorInfo that = (CursorAnchorInfo) obj;
+        if (hashCode() != that.hashCode()) {
+            return false;
+        }
+        if (mSelectionStart != that.mSelectionStart || mSelectionEnd != that.mSelectionEnd) {
+            return false;
+        }
+        if (mComposingTextStart != that.mComposingTextStart
+                || !Objects.equals(mComposingText, that.mComposingText)) {
+            return false;
+        }
+        if (mInsertionMarkerFlags != that.mInsertionMarkerFlags
+                || !areSameFloatImpl(mInsertionMarkerHorizontal, that.mInsertionMarkerHorizontal)
+                || !areSameFloatImpl(mInsertionMarkerTop, that.mInsertionMarkerTop)
+                || !areSameFloatImpl(mInsertionMarkerBaseline, that.mInsertionMarkerBaseline)
+                || !areSameFloatImpl(mInsertionMarkerBottom, that.mInsertionMarkerBottom)) {
+            return false;
+        }
+        if (!Objects.equals(mCharacterBoundsArray, that.mCharacterBoundsArray)) {
+            return false;
+        }
+        if (!Objects.equals(mMatrix, that.mMatrix)) {
+            return false;
+        }
+        return true;
+!!!1145858.java!!!	toString() : String
+        return "SelectionInfo{mSelection=" + mSelectionStart + "," + mSelectionEnd
+                + " mComposingTextStart=" + mComposingTextStart
+                + " mComposingText=" + Objects.toString(mComposingText)
+                + " mInsertionMarkerFlags=" + mInsertionMarkerFlags
+                + " mInsertionMarkerHorizontal=" + mInsertionMarkerHorizontal
+                + " mInsertionMarkerTop=" + mInsertionMarkerTop
+                + " mInsertionMarkerBaseline=" + mInsertionMarkerBaseline
+                + " mInsertionMarkerBottom=" + mInsertionMarkerBottom
+                + " mCharacterBoundsArray=" + Objects.toString(mCharacterBoundsArray)
+                + " mMatrix=" + Objects.toString(mMatrix)
+                + "}";
+!!!1146882.java!!!	CursorAnchorInfo(in builder : CursorAnchorInfo::Builder)
+        mSelectionStart = builder.mSelectionStart;
+        mSelectionEnd = builder.mSelectionEnd;
+        mComposingTextStart = builder.mComposingTextStart;
+        mComposingText = builder.mComposingText;
+        mInsertionMarkerFlags = builder.mInsertionMarkerFlags;
+        mInsertionMarkerHorizontal = builder.mInsertionMarkerHorizontal;
+        mInsertionMarkerTop = builder.mInsertionMarkerTop;
+        mInsertionMarkerBaseline = builder.mInsertionMarkerBaseline;
+        mInsertionMarkerBottom = builder.mInsertionMarkerBottom;
+        mCharacterBoundsArray = builder.mCharacterBoundsArrayBuilder != null ?
+                builder.mCharacterBoundsArrayBuilder.build() : null;
+        mMatrix = new Matrix(builder.mMatrix);
+!!!1147010.java!!!	getSelectionStart() : int
+        return mSelectionStart;
+!!!1147138.java!!!	getSelectionEnd() : int
+        return mSelectionEnd;
+!!!1147266.java!!!	getComposingTextStart() : int
+        return mComposingTextStart;
+!!!1147394.java!!!	getComposingText() : CharSequence
+        return mComposingText;
+!!!1147522.java!!!	getInsertionMarkerFlags() : int
+        return mInsertionMarkerFlags;
+!!!1147650.java!!!	getInsertionMarkerHorizontal() : float
+        return mInsertionMarkerHorizontal;
+!!!1147778.java!!!	getInsertionMarkerTop() : float
+        return mInsertionMarkerTop;
+!!!1147906.java!!!	getInsertionMarkerBaseline() : float
+        return mInsertionMarkerBaseline;
+!!!1148034.java!!!	getInsertionMarkerBottom() : float
+        return mInsertionMarkerBottom;
+!!!1148162.java!!!	getCharacterBounds(in index : int) : RectF
+        if (mCharacterBoundsArray == null) {
+            return null;
+        }
+        return mCharacterBoundsArray.get(index);
+!!!1148290.java!!!	getCharacterBoundsFlags(in index : int) : int
+        if (mCharacterBoundsArray == null) {
+            return 0;
+        }
+        return mCharacterBoundsArray.getFlags(index, 0);
+!!!1148418.java!!!	getMatrix() : Matrix
+        return new Matrix(mMatrix);
+!!!1148546.java!!!	describeContents() : int
+        return 0;

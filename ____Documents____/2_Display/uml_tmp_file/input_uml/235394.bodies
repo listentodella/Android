@@ -1,0 +1,56 @@
+class ChildListForAccessibility
+!!!921346.java!!!	obtain(inout parent : ViewGroup, inout sort : boolean) : ViewGroup::ChildListForAccessibility
+            ChildListForAccessibility list = sPool.acquire();
+            if (list == null) {
+                list = new ChildListForAccessibility();
+            }
+            list.init(parent, sort);
+            return list;
+!!!921474.java!!!	recycle() : void
+            clear();
+            sPool.release(this);
+!!!921602.java!!!	getChildCount() : int
+            return mChildren.size();
+!!!921730.java!!!	getChildAt(in index : int) : View
+            return mChildren.get(index);
+!!!921858.java!!!	getChildIndex(inout child : View) : int
+            return mChildren.indexOf(child);
+!!!921986.java!!!	init(inout parent : ViewGroup, inout sort : boolean) : void
+            ArrayList<View> children = mChildren;
+            final int childCount = parent.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                View child = parent.getChildAt(i);
+                children.add(child);
+            }
+            if (sort) {
+                ArrayList<ViewLocationHolder> holders = mHolders;
+                for (int i = 0; i < childCount; i++) {
+                    View child = children.get(i);
+                    ViewLocationHolder holder = ViewLocationHolder.obtain(parent, child);
+                    holders.add(holder);
+                }
+                sort(holders);
+                for (int i = 0; i < childCount; i++) {
+                    ViewLocationHolder holder = holders.get(i);
+                    children.set(i, holder.mView);
+                    holder.recycle();
+                }
+                holders.clear();
+            }
+!!!922114.java!!!	sort(inout holders : ArrayList<ViewLocationHolder>) : void
+            // This is gross but the least risky solution. The current comparison
+            // strategy breaks transitivity but produces very good results. Coming
+            // up with a new strategy requires time which we do not have, so ...
+            try {
+                ViewLocationHolder.setComparisonStrategy(
+                        ViewLocationHolder.COMPARISON_STRATEGY_STRIPE);
+                Collections.sort(holders);
+            } catch (IllegalArgumentException iae) {
+                // Note that in practice this occurs extremely rarely in a couple
+                // of pathological cases.
+                ViewLocationHolder.setComparisonStrategy(
+                        ViewLocationHolder.COMPARISON_STRATEGY_LOCATION);
+                Collections.sort(holders);
+            }
+!!!922242.java!!!	clear() : void
+            mChildren.clear();

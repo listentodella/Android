@@ -1,0 +1,3 @@
+class NotifyDeviceResetArgs
+!!!204290.cpp!!!	notify(in listener : sp<InputListenerInterface>) : void
+    listener->notifyDeviceReset(this);

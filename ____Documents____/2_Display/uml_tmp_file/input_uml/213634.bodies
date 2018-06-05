@@ -1,0 +1,43 @@
+class DisplayAdjustments
+!!!567042.java!!!	DisplayAdjustments(inout token : IBinder)
+        mActivityToken = token;
+!!!567170.java!!!	DisplayAdjustments(inout daj : DisplayAdjustments)
+        this (daj.getCompatibilityInfo(), daj.getActivityToken());
+!!!567298.java!!!	DisplayAdjustments(inout compatInfo : CompatibilityInfo, inout token : IBinder)
+        setCompatibilityInfo(compatInfo);
+        mActivityToken = token;
+!!!567426.java!!!	setCompatibilityInfo(inout compatInfo : CompatibilityInfo) : void
+        if (this == DEFAULT_DISPLAY_ADJUSTMENTS) {
+            throw new IllegalArgumentException(
+                    "setCompatbilityInfo: Cannot modify DEFAULT_DISPLAY_ADJUSTMENTS");
+        }
+        if (compatInfo != null && (compatInfo.isScalingRequired()
+                || !compatInfo.supportsScreen())) {
+            mCompatInfo = compatInfo;
+        } else {
+            mCompatInfo = CompatibilityInfo.DEFAULT_COMPATIBILITY_INFO;
+        }
+!!!567554.java!!!	getCompatibilityInfo() : CompatibilityInfo
+        return mCompatInfo;
+!!!567682.java!!!	setActivityToken(inout token : IBinder) : void
+        if (this == DEFAULT_DISPLAY_ADJUSTMENTS) {
+            throw new IllegalArgumentException(
+                    "setActivityToken: Cannot modify DEFAULT_DISPLAY_ADJUSTMENTS");
+        }
+        mActivityToken = token;
+!!!567810.java!!!	getActivityToken() : IBinder
+        return mActivityToken;
+!!!567938.java!!!	hashCode() : int
+        int hash = 17;
+        hash = hash * 31 + mCompatInfo.hashCode();
+        if (DEVELOPMENT_RESOURCES_DEPEND_ON_ACTIVITY_TOKEN) {
+            hash = hash * 31 + (mActivityToken == null ? 0 : mActivityToken.hashCode());
+        }
+        return hash;
+!!!568066.java!!!	equals(inout o : Object) : boolean
+        if (!(o instanceof DisplayAdjustments)) {
+            return false;
+        }
+        DisplayAdjustments daj = (DisplayAdjustments)o;
+        return Objects.equals(daj.mCompatInfo, mCompatInfo) &&
+                Objects.equals(daj.mActivityToken, mActivityToken);

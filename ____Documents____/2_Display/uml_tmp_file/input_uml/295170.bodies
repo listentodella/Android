@@ -1,0 +1,13 @@
+class KeyguardLock
+!!!1640578.java!!!	KeyguardLock(in tag : String)
+            mTag = tag;
+!!!1640706.java!!!	disableKeyguard() : void
+            try {
+                mWM.disableKeyguard(mToken, mTag);
+            } catch (RemoteException ex) {
+            }
+!!!1640834.java!!!	reenableKeyguard() : void
+            try {
+                mWM.reenableKeyguard(mToken);
+            } catch (RemoteException ex) {
+            }

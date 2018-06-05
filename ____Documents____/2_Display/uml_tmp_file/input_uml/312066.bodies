@@ -1,0 +1,80 @@
+class WallpaperBackupHelper
+!!!1815554.java!!!	WallpaperBackupHelper(inout context : Context, inout files : String, inout keys : String)
+        super(context);
+
+        mContext = context;
+        mFiles = files;
+        mKeys = keys;
+
+        final WindowManager wm =
+                (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        final WallpaperManager wpm =
+                (WallpaperManager) context.getSystemService(Context.WALLPAPER_SERVICE);
+        final Display d = wm.getDefaultDisplay();
+        final Point size = new Point();
+        d.getSize(size);
+        mDesiredMinWidth = size.x;
+        mDesiredMinHeight = (double) wpm.getDesiredMinimumHeight();
+
+        if (mDesiredMinHeight <= 0) {
+            mDesiredMinHeight = size.y;
+        }
+
+        if (DEBUG) {
+            Slog.d(TAG, "dmW=" + mDesiredMinWidth + " dmH=" + mDesiredMinHeight);
+        }
+!!!1815682.java!!!	performBackup(inout oldState : ParcelFileDescriptor, inout data : BackupDataOutput, inout newState : ParcelFileDescriptor) : void
+        performBackup_checked(oldState, data, newState, mFiles, mKeys);
+!!!1815810.java!!!	restoreEntity(inout data : BackupDataInputStream) : void
+        final String key = data.getKey();
+        if (isKeyInList(key, mKeys)) {
+            if (key.equals(WALLPAPER_IMAGE_KEY)) {
+                // restore the file to the stage for inspection
+                File f = new File(STAGE_FILE);
+                if (writeFile(f, data)) {
+
+                    // Preflight the restored image's dimensions without loading it
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(STAGE_FILE, options);
+
+                    if (DEBUG) Slog.d(TAG, "Restoring wallpaper image w=" + options.outWidth
+                            + " h=" + options.outHeight);
+
+                    if (REJECT_OUTSIZED_RESTORE) {
+                        // We accept any wallpaper that is at least as wide as our preference
+                        // (i.e. wide enough to fill the screen), and is within a comfortable
+                        // factor of the target height, to avoid significant clipping/scaling/
+                        // letterboxing.
+                        final double heightRatio = mDesiredMinHeight / options.outHeight;
+                        if (options.outWidth < mDesiredMinWidth
+                                || heightRatio >= MAX_HEIGHT_RATIO
+                                || heightRatio <= MIN_HEIGHT_RATIO) {
+                            // Not wide enough for the screen, or too short/tall to be a good fit
+                            // for the height of the screen, broken image file, or the system's
+                            // desires for wallpaper size are in a bad state.  Probably one of the
+                            // first two.
+                            Slog.i(TAG, "Restored image dimensions (w="
+                                    + options.outWidth + ", h=" + options.outHeight
+                                    + ") too far off target (tw="
+                                    + mDesiredMinWidth + ", th=" + mDesiredMinHeight
+                                    + "); falling back to default wallpaper.");
+                            f.delete();
+                            return;
+                        }
+                    }
+
+                    // We passed the acceptable-dimensions test (if any), so we're going to
+                    // use the restored image.
+                    // TODO: spin a service to copy the restored image to sd/usb storage,
+                    // since it does not exist anywhere other than the private wallpaper
+                    // file.
+                    Slog.d(TAG, "Applying restored wallpaper image.");
+                    f.renameTo(new File(WALLPAPER_IMAGE));
+                }
+            } else if (key.equals(WALLPAPER_INFO_KEY)) {
+                // XML file containing wallpaper info
+                File f = new File(WALLPAPER_INFO);
+                writeFile(f, data);
+            }
+        }

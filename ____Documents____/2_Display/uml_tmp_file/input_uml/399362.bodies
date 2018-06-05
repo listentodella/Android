@@ -1,0 +1,79 @@
+class ExpandedActionViewMenuPresenter
+!!!2547842.java!!!	initForMenu(inout context : Context, inout menu : MenuBuilder) : void
+            // Clear the expanded action view when menus change.
+            if (mMenu != null && mCurrentExpandedItem != null) {
+                mMenu.collapseItemActionView(mCurrentExpandedItem);
+            }
+            mMenu = menu;
+!!!2547970.java!!!	getMenuView(inout root : ViewGroup) : MenuView
+            return null;
+!!!2548098.java!!!	updateMenuView(inout cleared : boolean) : void
+            // Make sure the expanded item we have is still there.
+            if (mCurrentExpandedItem != null) {
+                boolean found = false;
+
+                if (mMenu != null) {
+                    final int count = mMenu.size();
+                    for (int i = 0; i < count; i++) {
+                        final MenuItem item = mMenu.getItem(i);
+                        if (item == mCurrentExpandedItem) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!found) {
+                    // The item we had expanded disappeared. Collapse.
+                    collapseItemActionView(mMenu, mCurrentExpandedItem);
+                }
+            }
+!!!2548354.java!!!	onSubMenuSelected(inout subMenu : SubMenuBuilder) : boolean
+            return false;
+!!!2548610.java!!!	flagActionItems() : boolean
+            return false;
+!!!2548738.java!!!	expandItemActionView(inout menu : MenuBuilder, inout item : MenuItemImpl) : boolean
+            ensureCollapseButtonView();
+            if (mCollapseButtonView.getParent() != Toolbar.this) {
+                addView(mCollapseButtonView);
+            }
+            mExpandedActionView = item.getActionView();
+            mCurrentExpandedItem = item;
+            if (mExpandedActionView.getParent() != Toolbar.this) {
+                final LayoutParams lp = generateDefaultLayoutParams();
+                lp.gravity = Gravity.START | (mButtonGravity & Gravity.VERTICAL_GRAVITY_MASK);
+                lp.mViewType = LayoutParams.EXPANDED;
+                mExpandedActionView.setLayoutParams(lp);
+                addView(mExpandedActionView);
+            }
+
+            setChildVisibilityForExpandedActionView(true);
+            requestLayout();
+            item.setActionViewExpanded(true);
+
+            if (mExpandedActionView instanceof CollapsibleActionView) {
+                ((CollapsibleActionView) mExpandedActionView).onActionViewExpanded();
+            }
+
+            return true;
+!!!2548866.java!!!	collapseItemActionView(inout menu : MenuBuilder, inout item : MenuItemImpl) : boolean
+            // Do this before detaching the actionview from the hierarchy, in case
+            // it needs to dismiss the soft keyboard, etc.
+            if (mExpandedActionView instanceof CollapsibleActionView) {
+                ((CollapsibleActionView) mExpandedActionView).onActionViewCollapsed();
+            }
+
+            removeView(mExpandedActionView);
+            removeView(mCollapseButtonView);
+            mExpandedActionView = null;
+
+            setChildVisibilityForExpandedActionView(false);
+            mCurrentExpandedItem = null;
+            requestLayout();
+            item.setActionViewExpanded(false);
+
+            return true;
+!!!2548994.java!!!	getId() : int
+            return 0;
+!!!2549122.java!!!	onSaveInstanceState() : Parcelable
+            return null;

@@ -1,0 +1,136 @@
+class TextClock
+!!!2505986.java!!!	TextClock(inout context : Context)
+        super(context);
+        init();
+!!!2506114.java!!!	TextClock(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!2506242.java!!!	TextClock(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2506370.java!!!	TextClock(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, R.styleable.TextClock, defStyleAttr, defStyleRes);
+        try {
+            mFormat12 = a.getText(R.styleable.TextClock_format12Hour);
+            mFormat24 = a.getText(R.styleable.TextClock_format24Hour);
+            mTimeZone = a.getString(R.styleable.TextClock_timeZone);
+        } finally {
+            a.recycle();
+        }
+
+        init();
+!!!2506498.java!!!	init() : void
+        if (mFormat12 == null || mFormat24 == null) {
+            LocaleData ld = LocaleData.get(getContext().getResources().getConfiguration().locale);
+            if (mFormat12 == null) {
+                mFormat12 = ld.timeFormat12;
+            }
+            if (mFormat24 == null) {
+                mFormat24 = ld.timeFormat24;
+            }
+        }
+
+        createTime(mTimeZone);
+        // Wait until onAttachedToWindow() to handle the ticker
+        chooseFormat(false);
+!!!2506626.java!!!	createTime(in timeZone : String) : void
+        if (timeZone != null) {
+            mTime = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+        } else {
+            mTime = Calendar.getInstance();
+        }
+!!!2506754.java!!!	getFormat12Hour() : CharSequence
+        return mFormat12;
+!!!2506882.java!!!	setFormat12Hour(inout format : CharSequence) : void
+        mFormat12 = format;
+
+        chooseFormat();
+        onTimeChanged();
+!!!2507010.java!!!	getFormat24Hour() : CharSequence
+        return mFormat24;
+!!!2507138.java!!!	setFormat24Hour(inout format : CharSequence) : void
+        mFormat24 = format;
+
+        chooseFormat();
+        onTimeChanged();
+!!!2507266.java!!!	is24HourModeEnabled() : boolean
+        return DateFormat.is24HourFormat(getContext());
+!!!2507394.java!!!	getTimeZone() : String
+        return mTimeZone;
+!!!2507522.java!!!	setTimeZone(in timeZone : String) : void
+        mTimeZone = timeZone;
+
+        createTime(timeZone);
+        onTimeChanged();
+!!!2507650.java!!!	chooseFormat() : void
+        chooseFormat(true);
+!!!2507778.java!!!	getFormat() : CharSequence
+        return mFormat;
+!!!2507906.java!!!	chooseFormat(inout handleTicker : boolean) : void
+        final boolean format24Requested = is24HourModeEnabled();
+
+        LocaleData ld = LocaleData.get(getContext().getResources().getConfiguration().locale);
+
+        if (format24Requested) {
+            mFormat = abc(mFormat24, mFormat12, ld.timeFormat24);
+        } else {
+            mFormat = abc(mFormat12, mFormat24, ld.timeFormat12);
+        }
+
+        boolean hadSeconds = mHasSeconds;
+        mHasSeconds = DateFormat.hasSeconds(mFormat);
+
+        if (handleTicker && mAttached && hadSeconds != mHasSeconds) {
+            if (hadSeconds) getHandler().removeCallbacks(mTicker);
+            else mTicker.run();
+        }
+!!!2508034.java!!!	abc(inout a : CharSequence, inout b : CharSequence, inout c : CharSequence) : CharSequence
+        return a == null ? (b == null ? c : b) : a;
+!!!2508162.java!!!	onAttachedToWindow() : void
+        super.onAttachedToWindow();
+
+        if (!mAttached) {
+            mAttached = true;
+
+            registerReceiver();
+            registerObserver();
+
+            createTime(mTimeZone);
+
+            if (mHasSeconds) {
+                mTicker.run();
+            } else {
+                onTimeChanged();
+            }
+        }
+!!!2508290.java!!!	onDetachedFromWindow() : void
+        super.onDetachedFromWindow();
+
+        if (mAttached) {
+            unregisterReceiver();
+            unregisterObserver();
+
+            getHandler().removeCallbacks(mTicker);
+
+            mAttached = false;
+        }
+!!!2508418.java!!!	registerReceiver() : void
+        final IntentFilter filter = new IntentFilter();
+
+        filter.addAction(Intent.ACTION_TIME_TICK);
+        filter.addAction(Intent.ACTION_TIME_CHANGED);
+        filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+
+        getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
+!!!2508546.java!!!	registerObserver() : void
+        final ContentResolver resolver = getContext().getContentResolver();
+        resolver.registerContentObserver(Settings.System.CONTENT_URI, true, mFormatChangeObserver);
+!!!2508674.java!!!	unregisterReceiver() : void
+        getContext().unregisterReceiver(mIntentReceiver);
+!!!2508802.java!!!	unregisterObserver() : void
+        final ContentResolver resolver = getContext().getContentResolver();
+        resolver.unregisterContentObserver(mFormatChangeObserver);
+!!!2508930.java!!!	onTimeChanged() : void
+        mTime.setTimeInMillis(System.currentTimeMillis());
+        setText(DateFormat.format(mFormat, mTime));

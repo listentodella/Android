@@ -1,0 +1,8 @@
+class ActivityResult
+!!!1631874.java!!!	ActivityResult(in resultCode : int, inout resultData : Intent)
+            mResultCode = resultCode;
+            mResultData = resultData;
+!!!1632002.java!!!	getResultCode() : int
+            return mResultCode;
+!!!1632130.java!!!	getResultData() : Intent
+            return mResultData;

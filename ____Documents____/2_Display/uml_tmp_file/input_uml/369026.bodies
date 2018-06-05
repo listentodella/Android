@@ -1,0 +1,11 @@
+class MyContentObserver
+!!!2170114.java!!!	MyContentObserver()
+                super(mHandler);
+!!!2170242.java!!!	deliverSelfNotifications() : boolean
+                return true;
+!!!2170370.java!!!	onChange(inout selfChange : boolean) : void
+                if (mAutoRequery && mCursor != null && !mCursor.isClosed()) {
+                    if (false) Log.v("Cursor", "Auto requerying " + mCursor +
+                            " due to update");
+                    mDataValid = mCursor.requery();
+                }

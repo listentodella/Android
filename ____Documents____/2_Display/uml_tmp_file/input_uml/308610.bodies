@@ -1,0 +1,18 @@
+class BackupDataInputStream
+!!!1799682.java!!!	BackupDataInputStream(inout data : BackupDataInput)
+        mData = data;
+!!!1799810.java!!!	read() : int
+        byte[] one = mOneByte;
+        if (mOneByte == null) {
+            one = mOneByte = new byte[1];
+        }
+        mData.readEntityData(one, 0, 1);
+        return one[0];
+!!!1799938.java!!!	read(inout b : byte, in offset : int, in size : int) : int
+        return mData.readEntityData(b, offset, size);
+!!!1800066.java!!!	read(inout b : byte) : int
+        return mData.readEntityData(b, 0, b.length);
+!!!1800194.java!!!	getKey() : String
+        return this.key;
+!!!1800322.java!!!	size() : int
+        return this.dataSize;

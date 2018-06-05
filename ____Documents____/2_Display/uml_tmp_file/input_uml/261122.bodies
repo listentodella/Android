@@ -1,0 +1,41 @@
+class PointerEventDispatcher
+!!!1214082.java!!!	PointerEventDispatcher(inout inputChannel : InputChannel)
+        super(inputChannel, UiThread.getHandler().getLooper());
+!!!1214210.java!!!	onInputEvent(inout event : InputEvent) : void
+        try {
+            if (event instanceof MotionEvent
+                    && (event.getSource() & InputDevice.SOURCE_CLASS_POINTER) != 0) {
+                final MotionEvent motionEvent = (MotionEvent)event;
+                PointerEventListener[] listeners;
+                synchronized (mListeners) {
+                    if (mListenersArray == null) {
+                        mListenersArray = new PointerEventListener[mListeners.size()];
+                        mListeners.toArray(mListenersArray);
+                    }
+                    listeners = mListenersArray;
+                }
+                for (int i = 0; i < listeners.length; ++i) {
+                    listeners[i].onPointerEvent(motionEvent);
+                }
+            }
+        } finally {
+            finishInputEvent(event, false);
+        }
+!!!1214338.java!!!	registerInputEventListener(inout listener : WindowManagerPolicy::PointerEventListener) : void
+        synchronized (mListeners) {
+            if (mListeners.contains(listener)) {
+                throw new IllegalStateException("registerInputEventListener: trying to register" +
+                        listener + " twice.");
+            }
+            mListeners.add(listener);
+            mListenersArray = null;
+        }
+!!!1214466.java!!!	unregisterInputEventListener(inout listener : WindowManagerPolicy::PointerEventListener) : void
+        synchronized (mListeners) {
+            if (!mListeners.contains(listener)) {
+                throw new IllegalStateException("registerInputEventListener: " + listener +
+                        " not registered.");
+            }
+            mListeners.remove(listener);
+            mListenersArray = null;
+        }

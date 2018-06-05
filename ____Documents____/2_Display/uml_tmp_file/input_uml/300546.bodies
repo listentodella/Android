@@ -1,0 +1,842 @@
+class Builder
+!!!1682178.java!!!	Builder(inout context : Context)
+            /*
+             * Important compatibility note!
+             * Some apps out in the wild create a Notification.Builder in their Activity subclass
+             * constructor for later use. At this point Activities - themselves subclasses of
+             * ContextWrapper - do not have their inner Context populated yet. This means that
+             * any calls to Context methods from within this constructor can cause NPEs in existing
+             * apps. Any data populated from mContext should therefore be populated lazily to
+             * preserve compatibility.
+             */
+            mContext = context;
+
+            // Set defaults to match the defaults of a Notification
+            mWhen = System.currentTimeMillis();
+            mAudioStreamType = STREAM_DEFAULT;
+            mAudioAttributes = AUDIO_ATTRIBUTES_DEFAULT;
+            mPriority = PRIORITY_DEFAULT;
+            mPeople = new ArrayList<String>();
+
+            mColorUtil = context.getApplicationInfo().targetSdkVersion < Build.VERSION_CODES.LOLLIPOP ?
+                    NotificationColorUtil.getInstance(mContext) : null;
+!!!1682306.java!!!	Builder(inout context : Context, inout n : Notification)
+            this(context);
+            mRebuildNotification = n;
+            restoreFromNotification(n);
+
+            Style style = null;
+            Bundle extras = n.extras;
+            String templateClass = extras.getString(EXTRA_TEMPLATE);
+            if (!TextUtils.isEmpty(templateClass)) {
+                Class<? extends Style> styleClass = getNotificationStyleClass(templateClass);
+                if (styleClass == null) {
+                    Log.d(TAG, "Unknown style class: " + styleClass);
+                    return;
+                }
+
+                try {
+                    Constructor<? extends Style> constructor = styleClass.getConstructor();
+                    style = constructor.newInstance();
+                    style.restoreFromExtras(extras);
+                } catch (Throwable t) {
+                    Log.e(TAG, "Could not create Style", t);
+                    return;
+                }
+            }
+            if (style != null) {
+                setStyle(style);
+            }
+!!!1682434.java!!!	setWhen(in when : long) : Notification::Builder
+            mWhen = when;
+            return this;
+!!!1682562.java!!!	setShowWhen(inout show : boolean) : Notification::Builder
+            mShowWhen = show;
+            return this;
+!!!1682690.java!!!	setUsesChronometer(inout b : boolean) : Notification::Builder
+            mUseChronometer = b;
+            return this;
+!!!1682818.java!!!	setSmallIcon(in icon : int) : Notification::Builder
+            mSmallIcon = icon;
+            return this;
+!!!1682946.java!!!	setSmallIcon(in icon : int, in level : int) : Notification::Builder
+            mSmallIcon = icon;
+            mSmallIconLevel = level;
+            return this;
+!!!1683074.java!!!	setContentTitle(inout title : CharSequence) : Notification::Builder
+            mContentTitle = safeCharSequence(title);
+            return this;
+!!!1683202.java!!!	setContentText(inout text : CharSequence) : Notification::Builder
+            mContentText = safeCharSequence(text);
+            return this;
+!!!1683330.java!!!	setSubText(inout text : CharSequence) : Notification::Builder
+            mSubText = safeCharSequence(text);
+            return this;
+!!!1683458.java!!!	setNumber(in number : int) : Notification::Builder
+            mNumber = number;
+            return this;
+!!!1683586.java!!!	setContentInfo(inout info : CharSequence) : Notification::Builder
+            mContentInfo = safeCharSequence(info);
+            return this;
+!!!1683714.java!!!	setProgress(in max : int, in progress : int, inout indeterminate : boolean) : Notification::Builder
+            mProgressMax = max;
+            mProgress = progress;
+            mProgressIndeterminate = indeterminate;
+            return this;
+!!!1683842.java!!!	setContent(inout views : RemoteViews) : Notification::Builder
+            mContentView = views;
+            return this;
+!!!1683970.java!!!	setContentIntent(inout intent : PendingIntent) : Notification::Builder
+            mContentIntent = intent;
+            return this;
+!!!1684098.java!!!	setDeleteIntent(inout intent : PendingIntent) : Notification::Builder
+            mDeleteIntent = intent;
+            return this;
+!!!1684226.java!!!	setFullScreenIntent(inout intent : PendingIntent, inout highPriority : boolean) : Notification::Builder
+            mFullScreenIntent = intent;
+            setFlag(FLAG_HIGH_PRIORITY, highPriority);
+            return this;
+!!!1684354.java!!!	setTicker(inout tickerText : CharSequence) : Notification::Builder
+            mTickerText = safeCharSequence(tickerText);
+            return this;
+!!!1684482.java!!!	setTicker(inout tickerText : CharSequence, inout views : RemoteViews) : Notification::Builder
+            mTickerText = safeCharSequence(tickerText);
+            mTickerView = views; // we'll save it for you anyway
+            return this;
+!!!1684610.java!!!	setLargeIcon(inout icon : Bitmap) : Notification::Builder
+            mLargeIcon = icon;
+            return this;
+!!!1684738.java!!!	setSound(inout sound : Uri) : Notification::Builder
+            mSound = sound;
+            mAudioAttributes = AUDIO_ATTRIBUTES_DEFAULT;
+            return this;
+!!!1684866.java!!!	setSound(inout sound : Uri, in streamType : int) : Notification::Builder
+            mSound = sound;
+            mAudioStreamType = streamType;
+            return this;
+!!!1684994.java!!!	setSound(inout sound : Uri, inout audioAttributes : AudioAttributes) : Notification::Builder
+            mSound = sound;
+            mAudioAttributes = audioAttributes;
+            return this;
+!!!1685122.java!!!	setVibrate(inout pattern : long) : Notification::Builder
+            mVibrate = pattern;
+            return this;
+!!!1685250.java!!!	setLights(in argb : int, in onMs : int, in offMs : int) : Notification::Builder
+            mLedArgb = argb;
+            mLedOnMs = onMs;
+            mLedOffMs = offMs;
+            return this;
+!!!1685378.java!!!	setOngoing(inout ongoing : boolean) : Notification::Builder
+            setFlag(FLAG_ONGOING_EVENT, ongoing);
+            return this;
+!!!1685506.java!!!	setOnlyAlertOnce(inout onlyAlertOnce : boolean) : Notification::Builder
+            setFlag(FLAG_ONLY_ALERT_ONCE, onlyAlertOnce);
+            return this;
+!!!1685634.java!!!	setAutoCancel(inout autoCancel : boolean) : Notification::Builder
+            setFlag(FLAG_AUTO_CANCEL, autoCancel);
+            return this;
+!!!1685762.java!!!	setLocalOnly(inout localOnly : boolean) : Notification::Builder
+            setFlag(FLAG_LOCAL_ONLY, localOnly);
+            return this;
+!!!1685890.java!!!	setDefaults(in defaults : int) : Notification::Builder
+            mDefaults = defaults;
+            return this;
+!!!1686018.java!!!	setPriority(in pri : int) : Notification::Builder
+            mPriority = pri;
+            return this;
+!!!1686146.java!!!	setCategory(in category : String) : Notification::Builder
+            mCategory = category;
+            return this;
+!!!1686274.java!!!	addPerson(in uri : String) : Notification::Builder
+            mPeople.add(uri);
+            return this;
+!!!1686402.java!!!	setGroup(in groupKey : String) : Notification::Builder
+            mGroupKey = groupKey;
+            return this;
+!!!1686530.java!!!	setGroupSummary(inout isGroupSummary : boolean) : Notification::Builder
+            setFlag(FLAG_GROUP_SUMMARY, isGroupSummary);
+            return this;
+!!!1686658.java!!!	setSortKey(in sortKey : String) : Notification::Builder
+            mSortKey = sortKey;
+            return this;
+!!!1686786.java!!!	addExtras(inout extras : Bundle) : Notification::Builder
+            if (extras != null) {
+                if (mExtras == null) {
+                    mExtras = new Bundle(extras);
+                } else {
+                    mExtras.putAll(extras);
+                }
+            }
+            return this;
+!!!1686914.java!!!	setExtras(inout extras : Bundle) : Notification::Builder
+            mExtras = extras;
+            return this;
+!!!1687042.java!!!	getExtras() : Bundle
+            if (mExtras == null) {
+                mExtras = new Bundle();
+            }
+            return mExtras;
+!!!1687170.java!!!	addAction(in icon : int, inout title : CharSequence, inout intent : PendingIntent) : Notification::Builder
+            mActions.add(new Action(icon, safeCharSequence(title), intent));
+            return this;
+!!!1687298.java!!!	addAction(inout action : Notification::Action) : Notification::Builder
+            mActions.add(action);
+            return this;
+!!!1687426.java!!!	setStyle(inout style : Notification::Style) : Notification::Builder
+            if (mStyle != style) {
+                mStyle = style;
+                if (mStyle != null) {
+                    mStyle.setBuilder(this);
+                }
+            }
+            return this;
+!!!1687554.java!!!	setVisibility(in visibility : int) : Notification::Builder
+            mVisibility = visibility;
+            return this;
+!!!1687682.java!!!	setPublicVersion(inout n : Notification) : Notification::Builder
+            mPublicVersion = n;
+            return this;
+!!!1687810.java!!!	extend(inout extender : Notification::Extender) : Notification::Builder
+            extender.extend(this);
+            return this;
+!!!1687938.java!!!	setFlag(in mask : int, inout value : boolean) : void
+            if (value) {
+                mFlags |= mask;
+            } else {
+                mFlags &= ~mask;
+            }
+!!!1688066.java!!!	setColor(in argb : int) : Notification::Builder
+            mColor = argb;
+            return this;
+!!!1688194.java!!!	getProfileBadgeDrawable() : Drawable
+            // Note: This assumes that the current user can read the profile badge of the
+            // originating user.
+            return mContext.getPackageManager().getUserBadgeForDensity(
+                    new UserHandle(mOriginatingUserId), 0);
+!!!1688322.java!!!	getProfileBadge() : Bitmap
+            Drawable badge = getProfileBadgeDrawable();
+            if (badge == null) {
+                return null;
+            }
+            final int size = mContext.getResources().getDimensionPixelSize(
+                    R.dimen.notification_badge_size);
+            Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            badge.setBounds(0, 0, size, size);
+            badge.draw(canvas);
+            return bitmap;
+!!!1688450.java!!!	addProfileBadge(inout contentView : RemoteViews, in resId : int) : boolean
+            Bitmap profileBadge = getProfileBadge();
+
+            contentView.setViewVisibility(R.id.profile_badge_large_template, View.GONE);
+            contentView.setViewVisibility(R.id.profile_badge_line2, View.GONE);
+            contentView.setViewVisibility(R.id.profile_badge_line3, View.GONE);
+
+            if (profileBadge != null) {
+                contentView.setImageViewBitmap(resId, profileBadge);
+                contentView.setViewVisibility(resId, View.VISIBLE);
+
+                // Make sure Line 3 is visible. As badge will be here if there
+                // is no text to display.
+                if (resId == R.id.profile_badge_line3) {
+                    contentView.setViewVisibility(R.id.line3, View.VISIBLE);
+                }
+                return true;
+            }
+            return false;
+!!!1688578.java!!!	shrinkLine3Text(inout contentView : RemoteViews) : void
+            float subTextSize = mContext.getResources().getDimensionPixelSize(
+                    R.dimen.notification_subtext_size);
+            contentView.setTextViewTextSize(R.id.text, TypedValue.COMPLEX_UNIT_PX, subTextSize);
+!!!1688706.java!!!	unshrinkLine3Text(inout contentView : RemoteViews) : void
+            float regularTextSize = mContext.getResources().getDimensionPixelSize(
+                    com.android.internal.R.dimen.notification_text_size);
+            contentView.setTextViewTextSize(R.id.text, TypedValue.COMPLEX_UNIT_PX, regularTextSize);
+!!!1688834.java!!!	resetStandardTemplate(inout contentView : RemoteViews) : void
+            removeLargeIconBackground(contentView);
+            contentView.setViewPadding(R.id.icon, 0, 0, 0, 0);
+            contentView.setImageViewResource(R.id.icon, 0);
+            contentView.setInt(R.id.icon, "setBackgroundResource", 0);
+            contentView.setViewVisibility(R.id.right_icon, View.GONE);
+            contentView.setInt(R.id.right_icon, "setBackgroundResource", 0);
+            contentView.setImageViewResource(R.id.right_icon, 0);
+            contentView.setImageViewResource(R.id.icon, 0);
+            contentView.setTextViewText(R.id.title, null);
+            contentView.setTextViewText(R.id.text, null);
+            unshrinkLine3Text(contentView);
+            contentView.setTextViewText(R.id.text2, null);
+            contentView.setViewVisibility(R.id.text2, View.GONE);
+            contentView.setViewVisibility(R.id.info, View.GONE);
+            contentView.setViewVisibility(R.id.time, View.GONE);
+            contentView.setViewVisibility(R.id.line3, View.GONE);
+            contentView.setViewVisibility(R.id.overflow_divider, View.GONE);
+            contentView.setViewVisibility(R.id.progress, View.GONE);
+            contentView.setViewVisibility(R.id.chronometer, View.GONE);
+            contentView.setViewVisibility(R.id.time, View.GONE);
+!!!1688962.java!!!	applyStandardTemplate(in resId : int) : RemoteViews
+            return applyStandardTemplate(resId, true /* hasProgress */);
+!!!1689090.java!!!	applyStandardTemplate(in resId : int, inout hasProgress : boolean) : RemoteViews
+            RemoteViews contentView = new BuilderRemoteViews(mContext.getApplicationInfo(), resId);
+
+            resetStandardTemplate(contentView);
+
+            boolean showLine3 = false;
+            boolean showLine2 = false;
+            boolean contentTextInLine2 = false;
+
+            if (mLargeIcon != null) {
+                contentView.setImageViewBitmap(R.id.icon, mLargeIcon);
+                processLargeLegacyIcon(mLargeIcon, contentView);
+                contentView.setImageViewResource(R.id.right_icon, mSmallIcon);
+                contentView.setViewVisibility(R.id.right_icon, View.VISIBLE);
+                processSmallRightIcon(mSmallIcon, contentView);
+            } else { // small icon at left
+                contentView.setImageViewResource(R.id.icon, mSmallIcon);
+                contentView.setViewVisibility(R.id.icon, View.VISIBLE);
+                processSmallIconAsLarge(mSmallIcon, contentView);
+            }
+            if (mContentTitle != null) {
+                contentView.setTextViewText(R.id.title, processLegacyText(mContentTitle));
+            }
+            if (mContentText != null) {
+                contentView.setTextViewText(R.id.text, processLegacyText(mContentText));
+                showLine3 = true;
+            }
+            if (mContentInfo != null) {
+                contentView.setTextViewText(R.id.info, processLegacyText(mContentInfo));
+                contentView.setViewVisibility(R.id.info, View.VISIBLE);
+                showLine3 = true;
+            } else if (mNumber > 0) {
+                final int tooBig = mContext.getResources().getInteger(
+                        R.integer.status_bar_notification_info_maxnum);
+                if (mNumber > tooBig) {
+                    contentView.setTextViewText(R.id.info, processLegacyText(
+                            mContext.getResources().getString(
+                                    R.string.status_bar_notification_info_overflow)));
+                } else {
+                    NumberFormat f = NumberFormat.getIntegerInstance();
+                    contentView.setTextViewText(R.id.info, processLegacyText(f.format(mNumber)));
+                }
+                contentView.setViewVisibility(R.id.info, View.VISIBLE);
+                showLine3 = true;
+            } else {
+                contentView.setViewVisibility(R.id.info, View.GONE);
+            }
+
+            // Need to show three lines?
+            if (mSubText != null) {
+                contentView.setTextViewText(R.id.text, processLegacyText(mSubText));
+                if (mContentText != null) {
+                    contentView.setTextViewText(R.id.text2, processLegacyText(mContentText));
+                    contentView.setViewVisibility(R.id.text2, View.VISIBLE);
+                    showLine2 = true;
+                    contentTextInLine2 = true;
+                } else {
+                    contentView.setViewVisibility(R.id.text2, View.GONE);
+                }
+            } else {
+                contentView.setViewVisibility(R.id.text2, View.GONE);
+                if (hasProgress && (mProgressMax != 0 || mProgressIndeterminate)) {
+                    contentView.setViewVisibility(R.id.progress, View.VISIBLE);
+                    contentView.setProgressBar(
+                            R.id.progress, mProgressMax, mProgress, mProgressIndeterminate);
+                    showLine2 = true;
+                } else {
+                    contentView.setViewVisibility(R.id.progress, View.GONE);
+                }
+            }
+            if (showLine2) {
+
+                // need to shrink all the type to make sure everything fits
+                shrinkLine3Text(contentView);
+            }
+
+            if (showsTimeOrChronometer()) {
+                if (mUseChronometer) {
+                    contentView.setViewVisibility(R.id.chronometer, View.VISIBLE);
+                    contentView.setLong(R.id.chronometer, "setBase",
+                            mWhen + (SystemClock.elapsedRealtime() - System.currentTimeMillis()));
+                    contentView.setBoolean(R.id.chronometer, "setStarted", true);
+                } else {
+                    contentView.setViewVisibility(R.id.time, View.VISIBLE);
+                    contentView.setLong(R.id.time, "setTime", mWhen);
+                }
+            }
+
+            // Adjust padding depending on line count and font size.
+            contentView.setViewPadding(R.id.line1, 0, calculateTopPadding(mContext,
+                    mHasThreeLines, mContext.getResources().getConfiguration().fontScale),
+                    0, 0);
+
+            // We want to add badge to first line of text.
+            boolean addedBadge = addProfileBadge(contentView,
+                    contentTextInLine2 ? R.id.profile_badge_line2 : R.id.profile_badge_line3);
+            // If we added the badge to line 3 then we should show line 3.
+            if (addedBadge && !contentTextInLine2) {
+                showLine3 = true;
+            }
+
+            // Note getStandardView may hide line 3 again.
+            contentView.setViewVisibility(R.id.line3, showLine3 ? View.VISIBLE : View.GONE);
+            contentView.setViewVisibility(R.id.overflow_divider, showLine3 ? View.VISIBLE : View.GONE);
+            return contentView;
+!!!1689218.java!!!	showsTimeOrChronometer() : boolean
+            return mWhen != 0 && mShowWhen;
+!!!1689346.java!!!	hasThreeLines() : boolean
+            boolean contentTextInLine2 = mSubText != null && mContentText != null;
+            boolean hasProgress = mStyle == null || mStyle.hasProgress();
+            // If we have content text in line 2, badge goes into line 2, or line 3 otherwise
+            boolean badgeInLine3 = getProfileBadgeDrawable() != null && !contentTextInLine2;
+            boolean hasLine3 = mContentText != null || mContentInfo != null || mNumber > 0
+                    || badgeInLine3;
+            boolean hasLine2 = (mSubText != null && mContentText != null) ||
+                    (hasProgress && mSubText == null
+                            && (mProgressMax != 0 || mProgressIndeterminate));
+            return hasLine2 && hasLine3;
+!!!1689474.java!!!	calculateTopPadding(inout ctx : Context, inout hasThreeLines : boolean, in fontScale : float) : int
+            int padding = ctx.getResources().getDimensionPixelSize(hasThreeLines
+                    ? R.dimen.notification_top_pad_narrow
+                    : R.dimen.notification_top_pad);
+            int largePadding = ctx.getResources().getDimensionPixelSize(hasThreeLines
+                    ? R.dimen.notification_top_pad_large_text_narrow
+                    : R.dimen.notification_top_pad_large_text);
+            float largeFactor = (MathUtils.constrain(fontScale, 1.0f, LARGE_TEXT_SCALE) - 1f)
+                    / (LARGE_TEXT_SCALE - 1f);
+
+            // Linearly interpolate the padding between large and normal with the font scale ranging
+            // from 1f to LARGE_TEXT_SCALE
+            return Math.round((1 - largeFactor) * padding + largeFactor * largePadding);
+!!!1689602.java!!!	resetStandardTemplateWithActions(inout big : RemoteViews) : void
+            big.setViewVisibility(R.id.actions, View.GONE);
+            big.setViewVisibility(R.id.action_divider, View.GONE);
+            big.removeAllViews(R.id.actions);
+!!!1689730.java!!!	applyStandardTemplateWithActions(in layoutId : int) : RemoteViews
+            RemoteViews big = applyStandardTemplate(layoutId);
+
+            resetStandardTemplateWithActions(big);
+
+            int N = mActions.size();
+            if (N > 0) {
+                big.setViewVisibility(R.id.actions, View.VISIBLE);
+                big.setViewVisibility(R.id.action_divider, View.VISIBLE);
+                if (N>MAX_ACTION_BUTTONS) N=MAX_ACTION_BUTTONS;
+                for (int i=0; i<N; i++) {
+                    final RemoteViews button = generateActionButton(mActions.get(i));
+                    big.addView(R.id.actions, button);
+                }
+            }
+            return big;
+!!!1689858.java!!!	makeContentView() : RemoteViews
+            if (mContentView != null) {
+                return mContentView;
+            } else {
+                return applyStandardTemplate(getBaseLayoutResource());
+            }
+!!!1689986.java!!!	makeTickerView() : RemoteViews
+            if (mTickerView != null) {
+                return mTickerView;
+            }
+            return null; // tickers are not created by default anymore
+!!!1690114.java!!!	makeBigContentView() : RemoteViews
+            if (mActions.size() == 0) return null;
+
+            return applyStandardTemplateWithActions(getBigBaseLayoutResource());
+!!!1690242.java!!!	makeHeadsUpContentView() : RemoteViews
+            if (mActions.size() == 0) return null;
+
+            return applyStandardTemplateWithActions(getBigBaseLayoutResource());
+!!!1690370.java!!!	generateActionButton(inout action : Notification::Action) : RemoteViews
+            final boolean tombstone = (action.actionIntent == null);
+            RemoteViews button = new RemoteViews(mContext.getPackageName(),
+                    tombstone ? getActionTombstoneLayoutResource()
+                              : getActionLayoutResource());
+            button.setTextViewCompoundDrawablesRelative(R.id.action0, action.icon, 0, 0, 0);
+            button.setTextViewText(R.id.action0, processLegacyText(action.title));
+            if (!tombstone) {
+                button.setOnClickPendingIntent(R.id.action0, action.actionIntent);
+            }
+            button.setContentDescription(R.id.action0, action.title);
+            processLegacyAction(action, button);
+            return button;
+!!!1690498.java!!!	isLegacy() : boolean
+            return mColorUtil != null;
+!!!1690626.java!!!	processLegacyAction(inout action : Notification::Action, inout button : RemoteViews) : void
+            if (!isLegacy() || mColorUtil.isGrayscaleIcon(mContext, action.icon)) {
+                button.setTextViewCompoundDrawablesRelativeColorFilter(R.id.action0, 0,
+                        mContext.getResources().getColor(R.color.notification_action_color_filter),
+                        PorterDuff.Mode.MULTIPLY);
+            }
+!!!1690754.java!!!	processLegacyText(inout charSequence : CharSequence) : CharSequence
+            if (isLegacy()) {
+                return mColorUtil.invertCharSequenceColors(charSequence);
+            } else {
+                return charSequence;
+            }
+!!!1690882.java!!!	processSmallIconAsLarge(in largeIconId : int, inout contentView : RemoteViews) : void
+            if (!isLegacy() || mColorUtil.isGrayscaleIcon(mContext, largeIconId)) {
+                applyLargeIconBackground(contentView);
+            }
+!!!1691010.java!!!	processLargeLegacyIcon(inout largeIcon : Bitmap, inout contentView : RemoteViews) : void
+            if (isLegacy() && mColorUtil.isGrayscaleIcon(largeIcon)) {
+                applyLargeIconBackground(contentView);
+            } else {
+                removeLargeIconBackground(contentView);
+            }
+!!!1691138.java!!!	applyLargeIconBackground(inout contentView : RemoteViews) : void
+            contentView.setInt(R.id.icon, "setBackgroundResource",
+                    R.drawable.notification_icon_legacy_bg);
+
+            contentView.setDrawableParameters(
+                    R.id.icon,
+                    true,
+                    -1,
+                    resolveColor(),
+                    PorterDuff.Mode.SRC_ATOP,
+                    -1);
+
+            int padding = mContext.getResources().getDimensionPixelSize(
+                    R.dimen.notification_large_icon_circle_padding);
+            contentView.setViewPadding(R.id.icon, padding, padding, padding, padding);
+!!!1691266.java!!!	removeLargeIconBackground(inout contentView : RemoteViews) : void
+            contentView.setInt(R.id.icon, "setBackgroundResource", 0);
+!!!1691394.java!!!	processSmallRightIcon(in smallIconDrawableId : int, inout contentView : RemoteViews) : void
+            if (!isLegacy() || mColorUtil.isGrayscaleIcon(mContext, smallIconDrawableId)) {
+                contentView.setDrawableParameters(R.id.right_icon, false, -1,
+                        0xFFFFFFFF,
+                        PorterDuff.Mode.SRC_ATOP, -1);
+
+                contentView.setInt(R.id.right_icon,
+                        "setBackgroundResource",
+                        R.drawable.notification_icon_legacy_bg);
+
+                contentView.setDrawableParameters(
+                        R.id.right_icon,
+                        true,
+                        -1,
+                        resolveColor(),
+                        PorterDuff.Mode.SRC_ATOP,
+                        -1);
+            }
+!!!1691522.java!!!	sanitizeColor() : int
+            if (mColor != COLOR_DEFAULT) {
+                mColor |= 0xFF000000; // no alpha for custom colors
+            }
+            return mColor;
+!!!1691650.java!!!	resolveColor() : int
+            if (mColor == COLOR_DEFAULT) {
+                return mContext.getResources().getColor(R.color.notification_icon_bg_color);
+            }
+            return mColor;
+!!!1691778.java!!!	buildUnstyled() : Notification
+            Notification n = new Notification();
+            n.when = mWhen;
+            n.icon = mSmallIcon;
+            n.iconLevel = mSmallIconLevel;
+            n.number = mNumber;
+
+            n.color = sanitizeColor();
+
+            setBuilderContentView(n, makeContentView());
+            n.contentIntent = mContentIntent;
+            n.deleteIntent = mDeleteIntent;
+            n.fullScreenIntent = mFullScreenIntent;
+            n.tickerText = mTickerText;
+            n.tickerView = makeTickerView();
+            n.largeIcon = mLargeIcon;
+            n.sound = mSound;
+            n.audioStreamType = mAudioStreamType;
+            n.audioAttributes = mAudioAttributes;
+            n.vibrate = mVibrate;
+            n.ledARGB = mLedArgb;
+            n.ledOnMS = mLedOnMs;
+            n.ledOffMS = mLedOffMs;
+            n.defaults = mDefaults;
+            n.flags = mFlags;
+            setBuilderBigContentView(n, makeBigContentView());
+            setBuilderHeadsUpContentView(n, makeHeadsUpContentView());
+            if (mLedOnMs != 0 || mLedOffMs != 0) {
+                n.flags |= FLAG_SHOW_LIGHTS;
+            }
+            if ((mDefaults & DEFAULT_LIGHTS) != 0) {
+                n.flags |= FLAG_SHOW_LIGHTS;
+            }
+            n.category = mCategory;
+            n.mGroupKey = mGroupKey;
+            n.mSortKey = mSortKey;
+            n.priority = mPriority;
+            if (mActions.size() > 0) {
+                n.actions = new Action[mActions.size()];
+                mActions.toArray(n.actions);
+            }
+            n.visibility = mVisibility;
+
+            if (mPublicVersion != null) {
+                n.publicVersion = new Notification();
+                mPublicVersion.cloneInto(n.publicVersion, true);
+            }
+            // Note: If you're adding new fields, also update restoreFromNotitification().
+            return n;
+!!!1691906.java!!!	populateExtras(inout extras : Bundle) : void
+            // Store original information used in the construction of this object
+            extras.putInt(EXTRA_ORIGINATING_USERID, mOriginatingUserId);
+            extras.putParcelable(EXTRA_REBUILD_CONTEXT_APPLICATION_INFO,
+                    mContext.getApplicationInfo());
+            extras.putCharSequence(EXTRA_TITLE, mContentTitle);
+            extras.putCharSequence(EXTRA_TEXT, mContentText);
+            extras.putCharSequence(EXTRA_SUB_TEXT, mSubText);
+            extras.putCharSequence(EXTRA_INFO_TEXT, mContentInfo);
+            extras.putInt(EXTRA_SMALL_ICON, mSmallIcon);
+            extras.putInt(EXTRA_PROGRESS, mProgress);
+            extras.putInt(EXTRA_PROGRESS_MAX, mProgressMax);
+            extras.putBoolean(EXTRA_PROGRESS_INDETERMINATE, mProgressIndeterminate);
+            extras.putBoolean(EXTRA_SHOW_CHRONOMETER, mUseChronometer);
+            extras.putBoolean(EXTRA_SHOW_WHEN, mShowWhen);
+            if (mLargeIcon != null) {
+                extras.putParcelable(EXTRA_LARGE_ICON, mLargeIcon);
+            }
+            if (!mPeople.isEmpty()) {
+                extras.putStringArray(EXTRA_PEOPLE, mPeople.toArray(new String[mPeople.size()]));
+            }
+            // NOTE: If you're adding new extras also update restoreFromNotification().
+!!!1692034.java!!!	stripForDelivery(inout n : Notification) : void
+            if (!STRIP_AND_REBUILD) {
+                return;
+            }
+
+            String templateClass = n.extras.getString(EXTRA_TEMPLATE);
+            // Only strip views for known Styles because we won't know how to
+            // re-create them otherwise.
+            boolean stripViews = TextUtils.isEmpty(templateClass) ||
+                    getNotificationStyleClass(templateClass) != null;
+
+            boolean isStripped = false;
+
+            if (n.largeIcon != null && n.extras.containsKey(EXTRA_LARGE_ICON)) {
+                // TODO: Would like to check for equality here, but if the notification
+                // has been cloned, we can't.
+                n.largeIcon = null;
+                n.extras.putBoolean(EXTRA_REBUILD_LARGE_ICON, true);
+                isStripped = true;
+            }
+            // Get rid of unmodified BuilderRemoteViews.
+
+            if (stripViews &&
+                    n.contentView instanceof BuilderRemoteViews &&
+                    n.extras.getInt(EXTRA_REBUILD_CONTENT_VIEW_ACTION_COUNT, -1) ==
+                            n.contentView.getSequenceNumber()) {
+                n.contentView = null;
+                n.extras.putBoolean(EXTRA_REBUILD_CONTENT_VIEW, true);
+                n.extras.remove(EXTRA_REBUILD_CONTENT_VIEW_ACTION_COUNT);
+                isStripped = true;
+            }
+            if (stripViews &&
+                    n.bigContentView instanceof BuilderRemoteViews &&
+                    n.extras.getInt(EXTRA_REBUILD_BIG_CONTENT_VIEW_ACTION_COUNT, -1) ==
+                            n.bigContentView.getSequenceNumber()) {
+                n.bigContentView = null;
+                n.extras.putBoolean(EXTRA_REBUILD_BIG_CONTENT_VIEW, true);
+                n.extras.remove(EXTRA_REBUILD_BIG_CONTENT_VIEW_ACTION_COUNT);
+                isStripped = true;
+            }
+            if (stripViews &&
+                    n.headsUpContentView instanceof BuilderRemoteViews &&
+                    n.extras.getInt(EXTRA_REBUILD_HEADS_UP_CONTENT_VIEW_ACTION_COUNT, -1) ==
+                            n.headsUpContentView.getSequenceNumber()) {
+                n.headsUpContentView = null;
+                n.extras.putBoolean(EXTRA_REBUILD_HEADS_UP_CONTENT_VIEW, true);
+                n.extras.remove(EXTRA_REBUILD_HEADS_UP_CONTENT_VIEW_ACTION_COUNT);
+                isStripped = true;
+            }
+
+            if (isStripped) {
+                n.extras.putBoolean(EXTRA_NEEDS_REBUILD, true);
+            }
+!!!1692162.java!!!	rebuild(inout context : Context, inout n : Notification) : Notification
+            Bundle extras = n.extras;
+            if (!extras.getBoolean(EXTRA_NEEDS_REBUILD)) return n;
+            extras.remove(EXTRA_NEEDS_REBUILD);
+
+            // Re-create notification context so we can access app resources.
+            ApplicationInfo applicationInfo = extras.getParcelable(
+                    EXTRA_REBUILD_CONTEXT_APPLICATION_INFO);
+            Context builderContext;
+            try {
+                builderContext = context.createApplicationContext(applicationInfo,
+                        Context.CONTEXT_RESTRICTED);
+            } catch (NameNotFoundException e) {
+                Log.e(TAG, "ApplicationInfo " + applicationInfo + " not found");
+                builderContext = context;  // try with our context
+            }
+
+            Builder b = new Builder(builderContext, n);
+            return b.rebuild();
+!!!1692290.java!!!	rebuild() : Notification
+            if (mRebuildNotification == null) {
+                throw new IllegalStateException("rebuild() only valid when in 'rebuild' mode.");
+            }
+            mHasThreeLines = hasThreeLines();
+
+            Bundle extras = mRebuildNotification.extras;
+
+            if (extras.getBoolean(EXTRA_REBUILD_LARGE_ICON)) {
+                mRebuildNotification.largeIcon = extras.getParcelable(EXTRA_LARGE_ICON);
+            }
+            extras.remove(EXTRA_REBUILD_LARGE_ICON);
+
+            if (extras.getBoolean(EXTRA_REBUILD_CONTENT_VIEW)) {
+                setBuilderContentView(mRebuildNotification, makeContentView());
+                if (mStyle != null) {
+                    mStyle.populateContentView(mRebuildNotification);
+                }
+            }
+            extras.remove(EXTRA_REBUILD_CONTENT_VIEW);
+
+            if (extras.getBoolean(EXTRA_REBUILD_BIG_CONTENT_VIEW)) {
+                setBuilderBigContentView(mRebuildNotification, makeBigContentView());
+                if (mStyle != null) {
+                    mStyle.populateBigContentView(mRebuildNotification);
+                }
+            }
+            extras.remove(EXTRA_REBUILD_BIG_CONTENT_VIEW);
+
+            if (extras.getBoolean(EXTRA_REBUILD_HEADS_UP_CONTENT_VIEW)) {
+                setBuilderHeadsUpContentView(mRebuildNotification, makeHeadsUpContentView());
+                if (mStyle != null) {
+                    mStyle.populateHeadsUpContentView(mRebuildNotification);
+                }
+            }
+            extras.remove(EXTRA_REBUILD_HEADS_UP_CONTENT_VIEW);
+
+            mHasThreeLines = false;
+            return mRebuildNotification;
+!!!1692418.java!!!	getNotificationStyleClass(in templateClass : String) : Class<? extends Style>
+            Class<? extends Style>[] classes = new Class[]{
+                    BigTextStyle.class, BigPictureStyle.class, InboxStyle.class, MediaStyle.class};
+            for (Class<? extends Style> innerClass : classes) {
+                if (templateClass.equals(innerClass.getName())) {
+                    return innerClass;
+                }
+            }
+            return null;
+!!!1692546.java!!!	setBuilderContentView(inout n : Notification, inout contentView : RemoteViews) : void
+            n.contentView = contentView;
+            if (contentView instanceof BuilderRemoteViews) {
+                mRebuildBundle.putInt(Builder.EXTRA_REBUILD_CONTENT_VIEW_ACTION_COUNT,
+                        contentView.getSequenceNumber());
+            }
+!!!1692674.java!!!	setBuilderBigContentView(inout n : Notification, inout bigContentView : RemoteViews) : void
+            n.bigContentView = bigContentView;
+            if (bigContentView instanceof BuilderRemoteViews) {
+                mRebuildBundle.putInt(Builder.EXTRA_REBUILD_BIG_CONTENT_VIEW_ACTION_COUNT,
+                        bigContentView.getSequenceNumber());
+            }
+!!!1692802.java!!!	setBuilderHeadsUpContentView(inout n : Notification, inout headsUpContentView : RemoteViews) : void
+            n.headsUpContentView = headsUpContentView;
+            if (headsUpContentView instanceof BuilderRemoteViews) {
+                mRebuildBundle.putInt(Builder.EXTRA_REBUILD_HEADS_UP_CONTENT_VIEW_ACTION_COUNT,
+                        headsUpContentView.getSequenceNumber());
+            }
+!!!1692930.java!!!	restoreFromNotification(inout n : Notification) : void
+
+            // Notification fields.
+            mWhen = n.when;
+            mSmallIcon = n.icon;
+            mSmallIconLevel = n.iconLevel;
+            mNumber = n.number;
+
+            mColor = n.color;
+
+            mContentView = n.contentView;
+            mDeleteIntent = n.deleteIntent;
+            mFullScreenIntent = n.fullScreenIntent;
+            mTickerText = n.tickerText;
+            mTickerView = n.tickerView;
+            mLargeIcon = n.largeIcon;
+            mSound = n.sound;
+            mAudioStreamType = n.audioStreamType;
+            mAudioAttributes = n.audioAttributes;
+
+            mVibrate = n.vibrate;
+            mLedArgb = n.ledARGB;
+            mLedOnMs = n.ledOnMS;
+            mLedOffMs = n.ledOffMS;
+            mDefaults = n.defaults;
+            mFlags = n.flags;
+
+            mCategory = n.category;
+            mGroupKey = n.mGroupKey;
+            mSortKey = n.mSortKey;
+            mPriority = n.priority;
+            mActions.clear();
+            if (n.actions != null) {
+                Collections.addAll(mActions, n.actions);
+            }
+            mVisibility = n.visibility;
+
+            mPublicVersion = n.publicVersion;
+
+            // Extras.
+            Bundle extras = n.extras;
+            mOriginatingUserId = extras.getInt(EXTRA_ORIGINATING_USERID);
+            mContentTitle = extras.getCharSequence(EXTRA_TITLE);
+            mContentText = extras.getCharSequence(EXTRA_TEXT);
+            mSubText = extras.getCharSequence(EXTRA_SUB_TEXT);
+            mContentInfo = extras.getCharSequence(EXTRA_INFO_TEXT);
+            mSmallIcon = extras.getInt(EXTRA_SMALL_ICON);
+            mProgress = extras.getInt(EXTRA_PROGRESS);
+            mProgressMax = extras.getInt(EXTRA_PROGRESS_MAX);
+            mProgressIndeterminate = extras.getBoolean(EXTRA_PROGRESS_INDETERMINATE);
+            mUseChronometer = extras.getBoolean(EXTRA_SHOW_CHRONOMETER);
+            mShowWhen = extras.getBoolean(EXTRA_SHOW_WHEN);
+            if (extras.containsKey(EXTRA_LARGE_ICON)) {
+                mLargeIcon = extras.getParcelable(EXTRA_LARGE_ICON);
+            }
+            if (extras.containsKey(EXTRA_PEOPLE)) {
+                mPeople.clear();
+                Collections.addAll(mPeople, extras.getStringArray(EXTRA_PEOPLE));
+            }
+!!!1693058.java!!!	getNotification() : Notification
+            return build();
+!!!1693186.java!!!	build() : Notification
+            mOriginatingUserId = mContext.getUserId();
+            mHasThreeLines = hasThreeLines();
+
+            Notification n = buildUnstyled();
+
+            if (mStyle != null) {
+                n = mStyle.buildStyled(n);
+            }
+
+            if (mExtras != null) {
+                n.extras.putAll(mExtras);
+            }
+
+            if (mRebuildBundle.size() > 0) {
+                n.extras.putAll(mRebuildBundle);
+                mRebuildBundle.clear();
+            }
+
+            populateExtras(n.extras);
+            if (mStyle != null) {
+                mStyle.addExtras(n.extras);
+            }
+
+            mHasThreeLines = false;
+            return n;
+!!!1693314.java!!!	buildInto(inout n : Notification) : Notification
+            build().cloneInto(n, true);
+            return n;
+!!!1693442.java!!!	getBaseLayoutResource() : int
+            return R.layout.notification_template_material_base;
+!!!1693570.java!!!	getBigBaseLayoutResource() : int
+            return R.layout.notification_template_material_big_base;
+!!!1693698.java!!!	getBigPictureLayoutResource() : int
+            return R.layout.notification_template_material_big_picture;
+!!!1693826.java!!!	getBigTextLayoutResource() : int
+            return R.layout.notification_template_material_big_text;
+!!!1693954.java!!!	getInboxLayoutResource() : int
+            return R.layout.notification_template_material_inbox;
+!!!1694082.java!!!	getActionLayoutResource() : int
+            return R.layout.notification_material_action;
+!!!1694210.java!!!	getActionTombstoneLayoutResource() : int
+            return R.layout.notification_material_action_tombstone;

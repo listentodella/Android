@@ -1,0 +1,11 @@
+class OrientationListener
+!!!792322.java!!!	OrientationListener(inout context : Context)
+        mOrientationEventLis = new OrientationEventListenerInternal(context);
+!!!792450.java!!!	OrientationListener(inout context : Context, in rate : int)
+        mOrientationEventLis = new OrientationEventListenerInternal(context, rate);
+!!!792962.java!!!	enable() : void
+        mOrientationEventLis.enable();
+!!!793090.java!!!	disable() : void
+        mOrientationEventLis.disable();
+!!!793346.java!!!	onSensorChanged(in sensor : int, inout values : float) : void
+        // just ignore the call here onOrientationChanged is invoked anyway

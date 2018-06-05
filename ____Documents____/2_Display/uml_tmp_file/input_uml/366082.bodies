@@ -1,0 +1,12 @@
+class AbstractCalendarViewDelegate
+!!!2138242.java!!!	AbstractCalendarViewDelegate(inout delegator : CalendarView, inout context : Context)
+            mDelegator = delegator;
+            mContext = context;
+
+            // Initialization based on locale
+            setCurrentLocale(Locale.getDefault());
+!!!2138370.java!!!	setCurrentLocale(inout locale : Locale) : void
+            if (locale.equals(mCurrentLocale)) {
+                return;
+            }
+            mCurrentLocale = locale;

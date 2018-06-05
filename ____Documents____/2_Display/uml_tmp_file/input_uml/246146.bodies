@@ -1,0 +1,20 @@
+class WindowManagerImpl
+!!!1036546.java!!!	WindowManagerImpl(inout display : Display)
+        this(display, null);
+!!!1036674.java!!!	WindowManagerImpl(inout display : Display, inout parentWindow : Window)
+        mDisplay = display;
+        mParentWindow = parentWindow;
+!!!1036802.java!!!	createLocalWindowManager(inout parentWindow : Window) : WindowManagerImpl
+        return new WindowManagerImpl(mDisplay, parentWindow);
+!!!1036930.java!!!	createPresentationWindowManager(inout display : Display) : WindowManagerImpl
+        return new WindowManagerImpl(display, mParentWindow);
+!!!1037058.java!!!	addView(inout view : View, inout params : ViewGroup::LayoutParams) : void
+        mGlobal.addView(view, params, mDisplay, mParentWindow);
+!!!1037186.java!!!	updateViewLayout(inout view : View, inout params : ViewGroup::LayoutParams) : void
+        mGlobal.updateViewLayout(view, params);
+!!!1037314.java!!!	removeView(inout view : View) : void
+        mGlobal.removeView(view, false);
+!!!1037442.java!!!	removeViewImmediate(inout view : View) : void
+        mGlobal.removeView(view, true);
+!!!1037570.java!!!	getDefaultDisplay() : Display
+        return mDisplay;

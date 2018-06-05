@@ -1,0 +1,228 @@
+class CheckedTextView
+!!!2153602.java!!!	CheckedTextView(inout context : Context)
+        this(context, null);
+!!!2153730.java!!!	CheckedTextView(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, R.attr.checkedTextViewStyle);
+!!!2153858.java!!!	CheckedTextView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2153986.java!!!	CheckedTextView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, R.styleable.CheckedTextView, defStyleAttr, defStyleRes);
+
+        final Drawable d = a.getDrawable(R.styleable.CheckedTextView_checkMark);
+        if (d != null) {
+            setCheckMarkDrawable(d);
+        }
+
+        if (a.hasValue(R.styleable.CheckedTextView_checkMarkTintMode)) {
+            mCheckMarkTintMode = Drawable.parseTintMode(a.getInt(
+                    R.styleable.CheckedTextView_checkMarkTintMode, -1), mCheckMarkTintMode);
+            mHasCheckMarkTintMode = true;
+        }
+
+        if (a.hasValue(R.styleable.CheckedTextView_checkMarkTint)) {
+            mCheckMarkTintList = a.getColorStateList(R.styleable.CheckedTextView_checkMarkTint);
+            mHasCheckMarkTint = true;
+        }
+
+        mCheckMarkGravity = a.getInt(R.styleable.CheckedTextView_checkMarkGravity, Gravity.END);
+
+        final boolean checked = a.getBoolean(R.styleable.CheckedTextView_checked, false);
+        setChecked(checked);
+
+        a.recycle();
+
+        applyCheckMarkTint();
+!!!2154114.java!!!	toggle() : void
+        setChecked(!mChecked);
+!!!2154242.java!!!	isChecked() : boolean
+        return mChecked;
+!!!2154370.java!!!	setChecked(inout checked : boolean) : void
+        if (mChecked != checked) {
+            mChecked = checked;
+            refreshDrawableState();
+            notifyViewAccessibilityStateChangedIfNeeded(
+                    AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED);
+        }
+!!!2154498.java!!!	setCheckMarkDrawable(in resid : int) : void
+        if (resid != 0 && resid == mCheckMarkResource) {
+            return;
+        }
+
+        mCheckMarkResource = resid;
+
+        Drawable d = null;
+        if (mCheckMarkResource != 0) {
+            d = getContext().getDrawable(mCheckMarkResource);
+        }
+        setCheckMarkDrawable(d);
+!!!2154626.java!!!	setCheckMarkDrawable(inout d : Drawable) : void
+        if (mCheckMarkDrawable != null) {
+            mCheckMarkDrawable.setCallback(null);
+            unscheduleDrawable(mCheckMarkDrawable);
+        }
+        mNeedRequestlayout = (d != mCheckMarkDrawable);
+        if (d != null) {
+            d.setCallback(this);
+            d.setVisible(getVisibility() == VISIBLE, false);
+            d.setState(CHECKED_STATE_SET);
+            setMinHeight(d.getIntrinsicHeight());
+
+            mCheckMarkWidth = d.getIntrinsicWidth();
+            d.setState(getDrawableState());
+            applyCheckMarkTint();
+        } else {
+            mCheckMarkWidth = 0;
+        }
+        mCheckMarkDrawable = d;
+
+        // Do padding resolution. This will call internalSetPadding() and do a
+        // requestLayout() if needed.
+        resolvePadding();
+!!!2154754.java!!!	setCheckMarkTintList(inout tint : ColorStateList) : void
+        mCheckMarkTintList = tint;
+        mHasCheckMarkTint = true;
+
+        applyCheckMarkTint();
+!!!2154882.java!!!	getCheckMarkTintList() : ColorStateList
+        return mCheckMarkTintList;
+!!!2155010.java!!!	setCheckMarkTintMode(inout tintMode : PorterDuff.Mode) : void
+        mCheckMarkTintMode = tintMode;
+        mHasCheckMarkTintMode = true;
+
+        applyCheckMarkTint();
+!!!2155138.java!!!	getCheckMarkTintMode() : PorterDuff.Mode
+        return mCheckMarkTintMode;
+!!!2155266.java!!!	applyCheckMarkTint() : void
+        if (mCheckMarkDrawable != null && (mHasCheckMarkTint || mHasCheckMarkTintMode)) {
+            mCheckMarkDrawable = mCheckMarkDrawable.mutate();
+
+            if (mHasCheckMarkTint) {
+                mCheckMarkDrawable.setTintList(mCheckMarkTintList);
+            }
+
+            if (mHasCheckMarkTintMode) {
+                mCheckMarkDrawable.setTintMode(mCheckMarkTintMode);
+            }
+        }
+!!!2155394.java!!!	setVisibility(in visibility : int) : void
+        super.setVisibility(visibility);
+
+        if (mCheckMarkDrawable != null) {
+            mCheckMarkDrawable.setVisible(visibility == VISIBLE, false);
+        }
+!!!2155522.java!!!	jumpDrawablesToCurrentState() : void
+        super.jumpDrawablesToCurrentState();
+
+        if (mCheckMarkDrawable != null) {
+            mCheckMarkDrawable.jumpToCurrentState();
+        }
+!!!2155650.java!!!	verifyDrawable(inout who : Drawable) : boolean
+        return who == mCheckMarkDrawable || super.verifyDrawable(who);
+!!!2155778.java!!!	getCheckMarkDrawable() : Drawable
+        return mCheckMarkDrawable;
+!!!2155906.java!!!	internalSetPadding(in left : int, in top : int, in right : int, in bottom : int) : void
+        super.internalSetPadding(left, top, right, bottom);
+        setBasePadding(isCheckMarkAtStart());
+!!!2156034.java!!!	onRtlPropertiesChanged(in layoutDirection : int) : void
+        super.onRtlPropertiesChanged(layoutDirection);
+        updatePadding();
+!!!2156162.java!!!	updatePadding() : void
+        resetPaddingToInitialValues();
+        int newPadding = (mCheckMarkDrawable != null) ?
+                mCheckMarkWidth + mBasePadding : mBasePadding;
+        if (isCheckMarkAtStart()) {
+            mNeedRequestlayout |= (mPaddingLeft != newPadding);
+            mPaddingLeft = newPadding;
+        } else {
+            mNeedRequestlayout |= (mPaddingRight != newPadding);
+            mPaddingRight = newPadding;
+        }
+        if (mNeedRequestlayout) {
+            requestLayout();
+            mNeedRequestlayout = false;
+        }
+!!!2156290.java!!!	setBasePadding(inout checkmarkAtStart : boolean) : void
+        if (checkmarkAtStart) {
+            mBasePadding = mPaddingLeft;
+        } else {
+            mBasePadding = mPaddingRight;
+        }
+!!!2156418.java!!!	isCheckMarkAtStart() : boolean
+        final int gravity = Gravity.getAbsoluteGravity(mCheckMarkGravity, getLayoutDirection());
+        final int hgrav = gravity & Gravity.HORIZONTAL_GRAVITY_MASK;
+        return hgrav == Gravity.LEFT;
+!!!2156546.java!!!	onDraw(inout canvas : Canvas) : void
+        super.onDraw(canvas);
+
+        final Drawable checkMarkDrawable = mCheckMarkDrawable;
+        if (checkMarkDrawable != null) {
+            final int verticalGravity = getGravity() & Gravity.VERTICAL_GRAVITY_MASK;
+            final int height = checkMarkDrawable.getIntrinsicHeight();
+
+            int y = 0;
+
+            switch (verticalGravity) {
+                case Gravity.BOTTOM:
+                    y = getHeight() - height;
+                    break;
+                case Gravity.CENTER_VERTICAL:
+                    y = (getHeight() - height) / 2;
+                    break;
+            }
+            
+            final boolean checkMarkAtStart = isCheckMarkAtStart();
+            final int width = getWidth();
+            final int top = y;
+            final int bottom = top + height;
+            final int left;
+            final int right;
+            if (checkMarkAtStart) {
+                left = mBasePadding;
+                right = left + mCheckMarkWidth;
+            } else {
+                right = width - mBasePadding;
+                left = right - mCheckMarkWidth;
+            }
+            checkMarkDrawable.setBounds(mScrollX + left, top, mScrollX + right, bottom);
+            checkMarkDrawable.draw(canvas);
+
+            final Drawable background = getBackground();
+            if (background != null) {
+                background.setHotspotBounds(mScrollX + left, top, mScrollX + right, bottom);
+            }
+        }
+!!!2156674.java!!!	onCreateDrawableState(in extraSpace : int) : int
+        final int[] drawableState = super.onCreateDrawableState(extraSpace + 1);
+        if (isChecked()) {
+            mergeDrawableStates(drawableState, CHECKED_STATE_SET);
+        }
+        return drawableState;
+!!!2156802.java!!!	drawableStateChanged() : void
+        super.drawableStateChanged();
+        
+        if (mCheckMarkDrawable != null) {
+            int[] myDrawableState = getDrawableState();
+            
+            // Set the state of the Drawable
+            mCheckMarkDrawable.setState(myDrawableState);
+            
+            invalidate();
+        }
+!!!2156930.java!!!	drawableHotspotChanged(in x : float, in y : float) : void
+        super.drawableHotspotChanged(x, y);
+
+        if (mCheckMarkDrawable != null) {
+            mCheckMarkDrawable.setHotspot(x, y);
+        }
+!!!2157058.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(CheckedTextView.class.getName());
+        event.setChecked(mChecked);
+!!!2157186.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(CheckedTextView.class.getName());
+        info.setCheckable(true);
+        info.setChecked(mChecked);

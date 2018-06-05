@@ -1,0 +1,10 @@
+class OverflowPopup
+!!!2013314.java!!!	OverflowPopup(inout context : Context, inout menu : MenuBuilder, inout anchorView : View, inout overflowOnly : boolean)
+            super(context, menu, anchorView, overflowOnly,
+                    com.android.internal.R.attr.actionOverflowMenuStyle);
+            setGravity(Gravity.END);
+            setCallback(mPopupPresenterCallback);
+!!!2013442.java!!!	onDismiss() : void
+            super.onDismiss();
+            mMenu.close();
+            mOverflowPopup = null;

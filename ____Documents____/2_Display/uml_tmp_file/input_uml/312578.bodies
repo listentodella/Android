@@ -1,0 +1,70 @@
+class JobHandler
+!!!1821058.java!!!	JobHandler(inout looper : Looper)
+            super(looper);
+!!!1821186.java!!!	handleMessage(inout msg : Message) : void
+            final JobParameters params = (JobParameters) msg.obj;
+            switch (msg.what) {
+                case MSG_EXECUTE_JOB:
+                    try {
+                        boolean workOngoing = JobService.this.onStartJob(params);
+                        ackStartMessage(params, workOngoing);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error while executing job: " + params.getJobId());
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case MSG_STOP_JOB:
+                    try {
+                        boolean ret = JobService.this.onStopJob(params);
+                        ackStopMessage(params, ret);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Application unable to handle onStopJob.", e);
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case MSG_JOB_FINISHED:
+                    final boolean needsReschedule = (msg.arg2 == 1);
+                    IJobCallback callback = params.getCallback();
+                    if (callback != null) {
+                        try {
+                            callback.jobFinished(params.getJobId(), needsReschedule);
+                        } catch (RemoteException e) {
+                            Log.e(TAG, "Error reporting job finish to system: binder has gone" +
+                                    "away.");
+                        }
+                    } else {
+                        Log.e(TAG, "finishJob() called for a nonexistent job id.");
+                    }
+                    break;
+                default:
+                    Log.e(TAG, "Unrecognised message received.");
+                    break;
+            }
+!!!1821314.java!!!	ackStartMessage(inout params : JobParameters, inout workOngoing : boolean) : void
+            final IJobCallback callback = params.getCallback();
+            final int jobId = params.getJobId();
+            if (callback != null) {
+                try {
+                     callback.acknowledgeStartMessage(jobId, workOngoing);
+                } catch(RemoteException e) {
+                    Log.e(TAG, "System unreachable for starting job.");
+                }
+            } else {
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, "Attempting to ack a job that has already been processed.");
+                }
+            }
+!!!1821442.java!!!	ackStopMessage(inout params : JobParameters, inout reschedule : boolean) : void
+            final IJobCallback callback = params.getCallback();
+            final int jobId = params.getJobId();
+            if (callback != null) {
+                try {
+                    callback.acknowledgeStopMessage(jobId, reschedule);
+                } catch(RemoteException e) {
+                    Log.e(TAG, "System unreachable for stopping job.");
+                }
+            } else {
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, "Attempting to ack a job that has already been processed.");
+                }
+            }

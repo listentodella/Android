@@ -1,0 +1,27 @@
+class ResourceName
+!!!1518594.java!!!	ResourceName(in _packageName : String, in _iconId : int)
+            packageName = _packageName;
+            iconId = _iconId;
+!!!1518722.java!!!	ResourceName(inout aInfo : ApplicationInfo, in _iconId : int)
+            this(aInfo.packageName, _iconId);
+!!!1518850.java!!!	ResourceName(inout cInfo : ComponentInfo, in _iconId : int)
+            this(cInfo.applicationInfo.packageName, _iconId);
+!!!1518978.java!!!	ResourceName(inout rInfo : ResolveInfo, in _iconId : int)
+            this(rInfo.activityInfo.applicationInfo.packageName, _iconId);
+!!!1519106.java!!!	equals(inout o : Object) : boolean
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            ResourceName that = (ResourceName) o;
+
+            if (iconId != that.iconId) return false;
+            return !(packageName != null ?
+                     !packageName.equals(that.packageName) : that.packageName != null);
+
+!!!1519234.java!!!	hashCode() : int
+            int result;
+            result = packageName.hashCode();
+            result = 31 * result + iconId;
+            return result;
+!!!1519362.java!!!	toString() : String
+            return "{ResourceName " + packageName + " / " + iconId + "}";

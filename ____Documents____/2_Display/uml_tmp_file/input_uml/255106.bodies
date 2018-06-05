@@ -1,0 +1,45 @@
+class TextInfo
+!!!1177986.java!!!	TextInfo(in text : String)
+        this(text, 0, getStringLengthOrZero(text), DEFAULT_COOKIE, DEFAULT_SEQUENCE_NUMBER);
+!!!1178114.java!!!	TextInfo(in text : String, in cookie : int, in sequenceNumber : int)
+        this(text, 0, getStringLengthOrZero(text), cookie, sequenceNumber);
+!!!1178242.java!!!	getStringLengthOrZero(in text : String) : int
+        return TextUtils.isEmpty(text) ? 0 : text.length();
+!!!1178370.java!!!	TextInfo(inout charSequence : CharSequence, in start : int, in end : int, in cookie : int, in sequenceNumber : int)
+        if (TextUtils.isEmpty(charSequence)) {
+            throw new IllegalArgumentException("charSequence is empty");
+        }
+        // Create a snapshot of the text including spans in case they are updated outside later.
+        final SpannableStringBuilder spannableString =
+                new SpannableStringBuilder(charSequence, start, end);
+        // SpellCheckSpan is for internal use. We do not want to marshal this for TextService.
+        final SpellCheckSpan[] spans = spannableString.getSpans(0, spannableString.length(),
+                SpellCheckSpan.class);
+        for (int i = 0; i < spans.length; ++i) {
+            spannableString.removeSpan(spans[i]);
+        }
+
+        mCharSequence = spannableString;
+        mCookie = cookie;
+        mSequenceNumber = sequenceNumber;
+!!!1178498.java!!!	TextInfo(inout source : Parcel)
+        mCharSequence = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(source);
+        mCookie = source.readInt();
+        mSequenceNumber = source.readInt();
+!!!1178626.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        TextUtils.writeToParcel(mCharSequence, dest, flags);
+        dest.writeInt(mCookie);
+        dest.writeInt(mSequenceNumber);
+!!!1178754.java!!!	getText() : String
+        if (mCharSequence == null) {
+            return null;
+        }
+        return mCharSequence.toString();
+!!!1178882.java!!!	getCharSequence() : CharSequence
+        return mCharSequence;
+!!!1179010.java!!!	getCookie() : int
+        return mCookie;
+!!!1179138.java!!!	getSequence() : int
+        return mSequenceNumber;
+!!!1179266.java!!!	describeContents() : int
+        return 0;

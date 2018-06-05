@@ -1,0 +1,33 @@
+class InputBinding
+!!!1149698.java!!!	InputBinding(inout conn : InputConnection, inout connToken : IBinder, in uid : int, in pid : int)
+        mConnection = conn;
+        mConnectionToken = connToken;
+        mUid = uid;
+        mPid = pid;
+!!!1149826.java!!!	InputBinding(inout conn : InputConnection, inout binding : InputBinding)
+        mConnection = conn;
+        mConnectionToken = binding.getConnectionToken();
+        mUid = binding.getUid();
+        mPid = binding.getPid();
+!!!1149954.java!!!	InputBinding(inout source : Parcel)
+        mConnection = null;
+        mConnectionToken = source.readStrongBinder();
+        mUid = source.readInt();
+        mPid = source.readInt();
+!!!1150082.java!!!	getConnection() : InputConnection
+        return mConnection;
+!!!1150210.java!!!	getConnectionToken() : IBinder
+        return mConnectionToken;
+!!!1150338.java!!!	getUid() : int
+        return mUid;
+!!!1150466.java!!!	getPid() : int
+        return mPid;
+!!!1150594.java!!!	toString() : String
+        return "InputBinding{" + mConnectionToken
+                + " / uid " + mUid + " / pid " + mPid + "}";
+!!!1150722.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        dest.writeStrongBinder(mConnectionToken);
+        dest.writeInt(mUid);
+        dest.writeInt(mPid);
+!!!1150850.java!!!	describeContents() : int
+        return 0;

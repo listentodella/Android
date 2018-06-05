@@ -1,0 +1,20 @@
+class LayoutParams
+!!!1961602.java!!!	LayoutParams(in width : int, in height : int, in x : int, in y : int)
+            super(width, height);
+            this.x = x;
+            this.y = y;
+!!!1961730.java!!!	LayoutParams(inout c : Context, inout attrs : AttributeSet)
+            super(c, attrs);
+            TypedArray a = c.obtainStyledAttributes(attrs,
+                    com.android.internal.R.styleable.AbsoluteLayout_Layout);
+            x = a.getDimensionPixelOffset(
+                    com.android.internal.R.styleable.AbsoluteLayout_Layout_layout_x, 0);
+            y = a.getDimensionPixelOffset(
+                    com.android.internal.R.styleable.AbsoluteLayout_Layout_layout_y, 0);
+            a.recycle();
+!!!1961858.java!!!	LayoutParams(inout source : ViewGroup::LayoutParams)
+            super(source);
+!!!1961986.java!!!	debug(in output : String) : String
+            return output + "Absolute.LayoutParams={width="
+                    + sizeToString(width) + ", height=" + sizeToString(height)
+                    + " x=" + x + " y=" + y + "}";

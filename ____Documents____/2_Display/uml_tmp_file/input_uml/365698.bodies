@@ -1,0 +1,86 @@
+class CalendarView
+!!!2128514.java!!!	CalendarView(inout context : Context)
+        this(context, null);
+!!!2128642.java!!!	CalendarView(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, R.attr.calendarViewStyle);
+!!!2128770.java!!!	CalendarView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2128898.java!!!	CalendarView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        mDelegate = new LegacyCalendarViewDelegate(this, context, attrs, defStyleAttr, defStyleRes);
+!!!2129026.java!!!	setShownWeekCount(in count : int) : void
+        mDelegate.setShownWeekCount(count);
+!!!2129154.java!!!	getShownWeekCount() : int
+        return mDelegate.getShownWeekCount();
+!!!2129282.java!!!	setSelectedWeekBackgroundColor(in color : int) : void
+        mDelegate.setSelectedWeekBackgroundColor(color);
+!!!2129410.java!!!	getSelectedWeekBackgroundColor() : int
+        return mDelegate.getSelectedWeekBackgroundColor();
+!!!2129538.java!!!	setFocusedMonthDateColor(in color : int) : void
+        mDelegate.setFocusedMonthDateColor(color);
+!!!2129666.java!!!	getFocusedMonthDateColor() : int
+        return mDelegate.getFocusedMonthDateColor();
+!!!2129794.java!!!	setUnfocusedMonthDateColor(in color : int) : void
+        mDelegate.setUnfocusedMonthDateColor(color);
+!!!2129922.java!!!	getUnfocusedMonthDateColor() : int
+        return mDelegate.getUnfocusedMonthDateColor();
+!!!2130050.java!!!	setWeekNumberColor(in color : int) : void
+        mDelegate.setWeekNumberColor(color);
+!!!2130178.java!!!	getWeekNumberColor() : int
+        return mDelegate.getWeekNumberColor();
+!!!2130306.java!!!	setWeekSeparatorLineColor(in color : int) : void
+        mDelegate.setWeekSeparatorLineColor(color);
+!!!2130434.java!!!	getWeekSeparatorLineColor() : int
+        return mDelegate.getWeekSeparatorLineColor();
+!!!2130562.java!!!	setSelectedDateVerticalBar(in resourceId : int) : void
+        mDelegate.setSelectedDateVerticalBar(resourceId);
+!!!2130690.java!!!	setSelectedDateVerticalBar(inout drawable : Drawable) : void
+        mDelegate.setSelectedDateVerticalBar(drawable);
+!!!2130818.java!!!	getSelectedDateVerticalBar() : Drawable
+        return mDelegate.getSelectedDateVerticalBar();
+!!!2130946.java!!!	setWeekDayTextAppearance(in resourceId : int) : void
+        mDelegate.setWeekDayTextAppearance(resourceId);
+!!!2131074.java!!!	getWeekDayTextAppearance() : int
+        return mDelegate.getWeekDayTextAppearance();
+!!!2131202.java!!!	setDateTextAppearance(in resourceId : int) : void
+        mDelegate.setDateTextAppearance(resourceId);
+!!!2131330.java!!!	getDateTextAppearance() : int
+        return mDelegate.getDateTextAppearance();
+!!!2131458.java!!!	setEnabled(inout enabled : boolean) : void
+        mDelegate.setEnabled(enabled);
+!!!2131586.java!!!	isEnabled() : boolean
+        return mDelegate.isEnabled();
+!!!2131714.java!!!	getMinDate() : long
+        return mDelegate.getMinDate();
+!!!2131842.java!!!	setMinDate(in minDate : long) : void
+        mDelegate.setMinDate(minDate);
+!!!2131970.java!!!	getMaxDate() : long
+        return mDelegate.getMaxDate();
+!!!2132098.java!!!	setMaxDate(in maxDate : long) : void
+        mDelegate.setMaxDate(maxDate);
+!!!2132226.java!!!	setShowWeekNumber(inout showWeekNumber : boolean) : void
+        mDelegate.setShowWeekNumber(showWeekNumber);
+!!!2132354.java!!!	getShowWeekNumber() : boolean
+        return mDelegate.getShowWeekNumber();
+!!!2132482.java!!!	getFirstDayOfWeek() : int
+        return mDelegate.getFirstDayOfWeek();
+!!!2132610.java!!!	setFirstDayOfWeek(in firstDayOfWeek : int) : void
+        mDelegate.setFirstDayOfWeek(firstDayOfWeek);
+!!!2132738.java!!!	setOnDateChangeListener(inout listener : CalendarView::OnDateChangeListener) : void
+        mDelegate.setOnDateChangeListener(listener);
+!!!2132866.java!!!	getDate() : long
+        return mDelegate.getDate();
+!!!2132994.java!!!	setDate(in date : long) : void
+        mDelegate.setDate(date);
+!!!2133122.java!!!	setDate(in date : long, inout animate : boolean, inout center : boolean) : void
+        mDelegate.setDate(date, animate, center);
+!!!2133250.java!!!	onConfigurationChanged(inout newConfig : Configuration) : void
+        super.onConfigurationChanged(newConfig);
+        mDelegate.onConfigurationChanged(newConfig);
+!!!2133378.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        mDelegate.onInitializeAccessibilityEvent(event);
+!!!2133506.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        mDelegate.onInitializeAccessibilityNodeInfo(info);

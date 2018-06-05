@@ -1,0 +1,26 @@
+class OvershootInterpolator
+!!!1128834.java!!!	OvershootInterpolator()
+        mTension = 2.0f;
+!!!1128962.java!!!	OvershootInterpolator(in tension : float)
+        mTension = tension;
+!!!1129090.java!!!	OvershootInterpolator(inout context : Context, inout attrs : AttributeSet)
+        this(context.getResources(), context.getTheme(), attrs);
+!!!1129218.java!!!	OvershootInterpolator(inout res : Resources, inout theme : Theme, inout attrs : AttributeSet)
+        TypedArray a;
+        if (theme != null) {
+            a = theme.obtainStyledAttributes(attrs, R.styleable.OvershootInterpolator, 0, 0);
+        } else {
+            a = res.obtainAttributes(attrs, R.styleable.OvershootInterpolator);
+        }
+
+        mTension =
+                a.getFloat(R.styleable.OvershootInterpolator_tension, 2.0f);
+
+        a.recycle();
+!!!1129346.java!!!	getInterpolation(in t : float) : float
+        // _o(t) = t * t * ((tension + 1) * t + tension)
+        // o(t) = _o(t - 1) + 1
+        t -= 1.0f;
+        return t * t * ((mTension + 1) * t + mTension) + 1.0f;
+!!!1129474.java!!!	createNativeInterpolator() : long
+        return NativeInterpolatorFactoryHelper.createOvershootInterpolator(mTension);

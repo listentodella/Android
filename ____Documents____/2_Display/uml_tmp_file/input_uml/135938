@@ -1,0 +1,666 @@
+format 76
+"input" // input
+  revision 1
+  modified_by 2 "thisway_diy"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  cpp_h_dir "l:/android_projects/uml_tmp_file/include/input/"
+  cpp_src_dir "l:/android_projects/uml_tmp_file/include/input/"
+  classview 136066 "input"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 159746 "anonymous1"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Additional private constants not defined in ndk/ui/input.h."
+      attribute 258178 "AKEY_EVENT_FLAG_PREDISPATCH"
+	public type class_ref 159746 // anonymous1
+	init_value " 0x20000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 258306 "AKEY_EVENT_FLAG_START_TRACKING"
+	public type class_ref 159746 // anonymous1
+	init_value " 0x40000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 258434 "AKEY_EVENT_FLAG_TAINTED"
+	public type class_ref 159746 // anonymous1
+	init_value " 0x80000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 159874 "anonymous2"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " Signifies that the key is being predispatched 
+ Private control to determine when an app is tracking a key sequence. 
+ Key event is inconsistent with previously sent key events. "
+      attribute 258562 "AMOTION_EVENT_FLAG_TAINTED"
+	public type class_ref 159874 // anonymous2
+	init_value " 0x80000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 160002 "anonymous3"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " Motion event is inconsistent with previously sent motion events. "
+      attribute 258690 "ADISPLAY_ID_NONE"
+	public type class_ref 160002 // anonymous3
+	init_value " -1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 258818 "ADISPLAY_ID_DEFAULT"
+	public type class_ref 160002 // anonymous3
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 160130 "anonymous4"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " Used when a motion event is not associated with any display.
+     * Typically used for non-pointer events. 
+ The default display id. "
+      attribute 258946 "AINPUT_SOURCE_SWITCH"
+	public type class_ref 160130 // anonymous4
+	init_value " 0x80000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 160258 "anonymous5"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "     * Indicates that an input device has switches.
+     * This input source flag is hidden from the API because switches are only used by the system
+     * and applications have no way to interact with them."
+      attribute 259074 "ALED_NUM_LOCK"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x00"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 259202 "ALED_CAPS_LOCK"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x01"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 259330 "ALED_SCROLL_LOCK"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x02"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 259458 "ALED_COMPOSE"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x03"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 259586 "ALED_KANA"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x04"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 259714 "ALED_SLEEP"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x05"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 259842 "ALED_SUSPEND"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x06"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 259970 "ALED_MUTE"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x07"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 260098 "ALED_MISC"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x08"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 260226 "ALED_MAIL"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x09"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 260354 "ALED_CHARGING"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x0a"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 260482 "ALED_CONTROLLER_1"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x10"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 260610 "ALED_CONTROLLER_2"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x11"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 260738 "ALED_CONTROLLER_3"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x12"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 260866 "ALED_CONTROLLER_4"
+	public type class_ref 160258 // anonymous5
+	init_value " 0x13"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 160386 "anonymous6"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * SystemUiVisibility constants from View."
+      attribute 260994 "ASYSTEM_UI_VISIBILITY_STATUS_BAR_VISIBLE"
+	public type class_ref 160386 // anonymous6
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 261122 "ASYSTEM_UI_VISIBILITY_STATUS_BAR_HIDDEN"
+	public type class_ref 160386 // anonymous6
+	init_value " 0x00000001"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 160514 "AInputEvent"
+      visibility package stereotype "struct"
+      cpp_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Declare a concrete type for the NDK's input event forward declaration."
+      operation 292994 "~AInputEvent"
+	cpp_virtual cpp_inline public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw} { };
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 160642 "AInputDevice"
+      visibility package stereotype "struct"
+      cpp_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Declare a concrete type for the NDK's input device forward declaration."
+      operation 293122 "~AInputDevice"
+	cpp_virtual cpp_inline public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw} { };
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 160770 "anonymous7"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Flags that flow alongside events in the input dispatch system to help with certain
+ * policy decisions such as waking from device sleep.
+ *
+ * These flags are also defined in frameworks/base/core/java/android/view/WindowManagerPolicy.java."
+      attribute 261250 "POLICY_FLAG_WAKE"
+	public type class_ref 160770 // anonymous7
+	init_value " 0x00000001"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 261378 "POLICY_FLAG_VIRTUAL"
+	public type class_ref 160770 // anonymous7
+	init_value " 0x00000002"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 261506 "POLICY_FLAG_FUNCTION"
+	public type class_ref 160770 // anonymous7
+	init_value " 0x00000004"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 261634 "POLICY_FLAG_RAW_MASK"
+	public type class_ref 160770 // anonymous7
+	init_value " 0x0000ffff"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 261762 "POLICY_FLAG_INJECTED"
+	public type class_ref 160770 // anonymous7
+	init_value " 0x01000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 261890 "POLICY_FLAG_TRUSTED"
+	public type class_ref 160770 // anonymous7
+	init_value " 0x02000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 262018 "POLICY_FLAG_FILTERED"
+	public type class_ref 160770 // anonymous7
+	init_value " 0x04000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 262146 "POLICY_FLAG_DISABLE_KEY_REPEAT"
+	public type class_ref 160770 // anonymous7
+	init_value " 0x08000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 262274 "POLICY_FLAG_INTERACTIVE"
+	public type class_ref 160770 // anonymous7
+	init_value " 0x20000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 262402 "POLICY_FLAG_PASS_TO_USER"
+	public type class_ref 160770 // anonymous7
+	init_value " 0x40000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 164866 "anonymous10"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 275074 "DEVICE_ID_BUILT_IN_KEYBOARD"
+	public type class_ref 164866 // anonymous10
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 275202 "DEVICE_ID_VIRTUAL_KEYBOARD"
+	public type class_ref 164866 // anonymous10
+	init_value " -1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+  end
+
+  deploymentview 135426 "input"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 141314 "Input"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 159746 // anonymous1
+	class_ref 159874 // anonymous2
+	class_ref 160002 // anonymous3
+	class_ref 160130 // anonymous4
+	class_ref 160258 // anonymous5
+	class_ref 160386 // anonymous6
+	class_ref 160514 // AInputEvent
+	class_ref 160642 // AInputDevice
+	class_ref 160770 // anonymous7
+      end
+    end
+
+    artifact 141954 "Keyboard"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 164866 // anonymous10
+      end
+    end
+  end
+
+  package_ref 136066 // android
+end

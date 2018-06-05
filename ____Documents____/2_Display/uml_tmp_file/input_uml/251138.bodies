@@ -1,0 +1,5 @@
+class LinearInterpolator
+!!!1128578.java!!!	getInterpolation(in input : float) : float
+        return input;
+!!!1128706.java!!!	createNativeInterpolator() : long
+        return NativeInterpolatorFactoryHelper.createLinearInterpolator();

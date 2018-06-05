@@ -1,0 +1,14 @@
+class ViewPreImeInputStage
+!!!947970.java!!!	ViewPreImeInputStage(inout next : ViewRootImpl::InputStage)
+            super(next);
+!!!948098.java!!!	onProcess(inout q : ViewRootImpl::QueuedInputEvent) : int
+            if (q.mEvent instanceof KeyEvent) {
+                return processKeyEvent(q);
+            }
+            return FORWARD;
+!!!948226.java!!!	processKeyEvent(inout q : ViewRootImpl::QueuedInputEvent) : int
+            final KeyEvent event = (KeyEvent)q.mEvent;
+            if (mView.dispatchKeyEventPreIme(event)) {
+                return FINISH_HANDLED;
+            }
+            return FORWARD;

@@ -1,0 +1,52 @@
+class EditText
+!!!2110082.java!!!	EditText(inout context : Context)
+        this(context, null);
+!!!2110210.java!!!	EditText(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, com.android.internal.R.attr.editTextStyle);
+!!!2110338.java!!!	EditText(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2110466.java!!!	EditText(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+!!!2110594.java!!!	getDefaultEditable() : boolean
+        return true;
+!!!2110722.java!!!	getDefaultMovementMethod() : MovementMethod
+        return ArrowKeyMovementMethod.getInstance();
+!!!2110850.java!!!	getText() : Editable
+        return (Editable) super.getText();
+!!!2110978.java!!!	setText(inout text : CharSequence, inout type : TextView::BufferType) : void
+        super.setText(text, BufferType.EDITABLE);
+!!!2111106.java!!!	setSelection(in start : int, in stop : int) : void
+        Selection.setSelection(getText(), start, stop);
+!!!2111234.java!!!	setSelection(in index : int) : void
+        Selection.setSelection(getText(), index);
+!!!2111362.java!!!	selectAll() : void
+        Selection.selectAll(getText());
+!!!2111490.java!!!	extendSelection(in index : int) : void
+        Selection.extendSelection(getText(), index);
+!!!2111618.java!!!	setEllipsize(inout ellipsis : TextUtils.TruncateAt) : void
+        if (ellipsis == TextUtils.TruncateAt.MARQUEE) {
+            throw new IllegalArgumentException("EditText cannot use the ellipsize mode "
+                    + "TextUtils.TruncateAt.MARQUEE");
+        }
+        super.setEllipsize(ellipsis);
+!!!2111746.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(EditText.class.getName());
+!!!2111874.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(EditText.class.getName());
+!!!2112002.java!!!	performAccessibilityAction(in action : int, inout arguments : Bundle) : boolean
+        switch (action) {
+            case AccessibilityNodeInfo.ACTION_SET_TEXT: {
+                CharSequence text = (arguments != null) ? arguments.getCharSequence(
+                        AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE) : null;
+                setText(text);
+                if (text != null && text.length() > 0) {
+                    setSelection(text.length());
+                }
+                return true;
+            }
+            default: {
+                return super.performAccessibilityAction(action, arguments);
+            }
+        }

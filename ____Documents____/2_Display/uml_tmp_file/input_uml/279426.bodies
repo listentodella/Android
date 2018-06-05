@@ -1,0 +1,23 @@
+class ActivityClientRecord
+!!!1421570.java!!!	ActivityClientRecord()
+            parent = null;
+            embeddedID = null;
+            paused = false;
+            stopped = false;
+            hideForNow = false;
+            nextIdle = null;
+!!!1421698.java!!!	isPreHoneycomb() : boolean
+            if (activity != null) {
+                return activity.getApplicationInfo().targetSdkVersion
+                        < android.os.Build.VERSION_CODES.HONEYCOMB;
+            }
+            return false;
+!!!1421826.java!!!	isPersistable() : boolean
+            return activityInfo.persistableMode == ActivityInfo.PERSIST_ACROSS_REBOOTS;
+!!!1421954.java!!!	toString() : String
+            ComponentName componentName = intent != null ? intent.getComponent() : null;
+            return "ActivityRecord{"
+                + Integer.toHexString(System.identityHashCode(this))
+                + " token=" + token + " " + (componentName == null
+                        ? "no component name" : componentName.toShortString())
+                + "}";

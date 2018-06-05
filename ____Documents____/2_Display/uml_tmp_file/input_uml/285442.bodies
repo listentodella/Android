@@ -1,0 +1,31 @@
+class ActivityViewSurfaceTextureListener
+!!!1473026.java!!!	onSurfaceTextureAvailable(inout surfaceTexture : SurfaceTexture, in width : int, in height : int) : void
+            if (mActivityContainer == null) {
+                return;
+            }
+            if (DEBUG) Log.d(TAG, "onSurfaceTextureAvailable: width=" + width + " height="
+                    + height);
+            mWidth = width;
+            mHeight = height;
+            attachToSurfaceWhenReady();
+!!!1473154.java!!!	onSurfaceTextureSizeChanged(inout surfaceTexture : SurfaceTexture, in width : int, in height : int) : void
+            if (mActivityContainer == null) {
+                return;
+            }
+            if (DEBUG) Log.d(TAG, "onSurfaceTextureSizeChanged: w=" + width + " h=" + height);
+!!!1473282.java!!!	onSurfaceTextureDestroyed(inout surfaceTexture : SurfaceTexture) : boolean
+            if (mActivityContainer == null) {
+                return true;
+            }
+            if (DEBUG) Log.d(TAG, "onSurfaceTextureDestroyed");
+            mSurface.release();
+            mSurface = null;
+            try {
+                mActivityContainer.setSurface(null, mWidth, mHeight, mMetrics.densityDpi);
+            } catch (RemoteException e) {
+                throw new RuntimeException(
+                        "ActivityView: Unable to set surface of ActivityContainer. " + e);
+            }
+            return true;
+!!!1473410.java!!!	onSurfaceTextureUpdated(inout surfaceTexture : SurfaceTexture) : void
+//            Log.d(TAG, "onSurfaceTextureUpdated");

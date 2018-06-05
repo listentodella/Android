@@ -1,0 +1,15 @@
+class InputFilterHost
+!!!155778.java!!!	disconnectLocked() : void
+            mDisconnected = true;
+!!!155906.java!!!	sendInputEvent(inout event : InputEvent, in policyFlags : int) : void
+            if (event == null) {
+                throw new IllegalArgumentException("event must not be null");
+            }
+
+            synchronized (mInputFilterLock) {
+                if (!mDisconnected) {
+                    nativeInjectInputEvent(mPtr, event, Display.DEFAULT_DISPLAY, 0, 0,
+                            InputManager.INJECT_INPUT_EVENT_MODE_ASYNC, 0,
+                            policyFlags | WindowManagerPolicy.FLAG_FILTERED);
+                }
+            }

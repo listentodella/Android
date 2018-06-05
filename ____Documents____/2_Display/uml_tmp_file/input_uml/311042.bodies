@@ -1,0 +1,47 @@
+class TransportImpl
+!!!1807618.java!!!	name() : String
+            return BackupTransport.this.name();
+!!!1807746.java!!!	configurationIntent() : Intent
+            return BackupTransport.this.configurationIntent();
+!!!1807874.java!!!	currentDestinationString() : String
+            return BackupTransport.this.currentDestinationString();
+!!!1808002.java!!!	dataManagementIntent() : Intent
+            return BackupTransport.this.dataManagementIntent();
+!!!1808130.java!!!	dataManagementLabel() : String
+            return BackupTransport.this.dataManagementLabel();
+!!!1808258.java!!!	transportDirName() : String
+            return BackupTransport.this.transportDirName();
+!!!1808386.java!!!	requestBackupTime() : long
+            return BackupTransport.this.requestBackupTime();
+!!!1808514.java!!!	initializeDevice() : int
+            return BackupTransport.this.initializeDevice();
+!!!1808642.java!!!	performBackup(inout packageInfo : PackageInfo, inout inFd : ParcelFileDescriptor) : int
+            return BackupTransport.this.performBackup(packageInfo, inFd);
+!!!1808770.java!!!	clearBackupData(inout packageInfo : PackageInfo) : int
+            return BackupTransport.this.clearBackupData(packageInfo);
+!!!1808898.java!!!	finishBackup() : int
+            return BackupTransport.this.finishBackup();
+!!!1809026.java!!!	getAvailableRestoreSets() : RestoreSet
+            return BackupTransport.this.getAvailableRestoreSets();
+!!!1809154.java!!!	getCurrentRestoreSet() : long
+            return BackupTransport.this.getCurrentRestoreSet();
+!!!1809282.java!!!	startRestore(in token : long, inout packages : PackageInfo) : int
+            return BackupTransport.this.startRestore(token, packages);
+!!!1809410.java!!!	nextRestorePackage() : RestoreDescription
+            return BackupTransport.this.nextRestorePackage();
+!!!1809538.java!!!	getRestoreData(inout outFd : ParcelFileDescriptor) : int
+            return BackupTransport.this.getRestoreData(outFd);
+!!!1809666.java!!!	finishRestore() : void
+            BackupTransport.this.finishRestore();
+!!!1809794.java!!!	requestFullBackupTime() : long
+            return BackupTransport.this.requestFullBackupTime();
+!!!1809922.java!!!	performFullBackup(inout targetPackage : PackageInfo, inout socket : ParcelFileDescriptor) : int
+            return BackupTransport.this.performFullBackup(targetPackage, socket);
+!!!1810050.java!!!	sendBackupData(in numBytes : int) : int
+            return BackupTransport.this.sendBackupData(numBytes);
+!!!1810178.java!!!	cancelFullBackup() : void
+            BackupTransport.this.cancelFullBackup();
+!!!1810306.java!!!	getNextFullRestoreDataChunk(inout socket : ParcelFileDescriptor) : int
+            return BackupTransport.this.getNextFullRestoreDataChunk(socket);
+!!!1810434.java!!!	abortFullRestore() : int
+            return BackupTransport.this.abortFullRestore();

@@ -1,0 +1,7 @@
+class ShareActivityChooserModelPolicy
+!!!2437506.java!!!	onChooseActivity(inout host : ActivityChooserModel, inout intent : Intent) : boolean
+            if (mOnShareTargetSelectedListener != null) {
+                mOnShareTargetSelectedListener.onShareTargetSelected(
+                        ShareActionProvider.this, intent);
+            }
+            return false;

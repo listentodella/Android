@@ -1,0 +1,64 @@
+class ToggleButton
+!!!2533122.java!!!	ToggleButton(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, com.android.internal.R.styleable.ToggleButton, defStyleAttr, defStyleRes);
+        mTextOn = a.getText(com.android.internal.R.styleable.ToggleButton_textOn);
+        mTextOff = a.getText(com.android.internal.R.styleable.ToggleButton_textOff);
+        mDisabledAlpha = a.getFloat(com.android.internal.R.styleable.ToggleButton_disabledAlpha, 0.5f);
+        syncTextState();
+        a.recycle();
+!!!2533250.java!!!	ToggleButton(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2533378.java!!!	ToggleButton(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, com.android.internal.R.attr.buttonStyleToggle);
+!!!2533506.java!!!	ToggleButton(inout context : Context)
+        this(context, null);
+!!!2533634.java!!!	setChecked(inout checked : boolean) : void
+        super.setChecked(checked);
+        
+        syncTextState();
+!!!2533762.java!!!	syncTextState() : void
+        boolean checked = isChecked();
+        if (checked && mTextOn != null) {
+            setText(mTextOn);
+        } else if (!checked && mTextOff != null) {
+            setText(mTextOff);
+        }
+!!!2533890.java!!!	getTextOn() : CharSequence
+        return mTextOn;
+!!!2534018.java!!!	setTextOn(inout textOn : CharSequence) : void
+        mTextOn = textOn;
+!!!2534146.java!!!	getTextOff() : CharSequence
+        return mTextOff;
+!!!2534274.java!!!	setTextOff(inout textOff : CharSequence) : void
+        mTextOff = textOff;
+!!!2534402.java!!!	onFinishInflate() : void
+        super.onFinishInflate();
+        
+        updateReferenceToIndicatorDrawable(getBackground());
+!!!2534530.java!!!	setBackgroundDrawable(inout d : Drawable) : void
+        super.setBackgroundDrawable(d);
+        
+        updateReferenceToIndicatorDrawable(d);
+!!!2534658.java!!!	updateReferenceToIndicatorDrawable(inout backgroundDrawable : Drawable) : void
+        if (backgroundDrawable instanceof LayerDrawable) {
+            LayerDrawable layerDrawable = (LayerDrawable) backgroundDrawable;
+            mIndicatorDrawable =
+                    layerDrawable.findDrawableByLayerId(com.android.internal.R.id.toggle);
+        } else {
+            mIndicatorDrawable = null;
+        }
+!!!2534786.java!!!	drawableStateChanged() : void
+        super.drawableStateChanged();
+        
+        if (mIndicatorDrawable != null) {
+            mIndicatorDrawable.setAlpha(isEnabled() ? NO_ALPHA : (int) (NO_ALPHA * mDisabledAlpha));
+        }
+!!!2534914.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(ToggleButton.class.getName());
+!!!2535042.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(ToggleButton.class.getName());

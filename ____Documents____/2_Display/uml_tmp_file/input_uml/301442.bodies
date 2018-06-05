@@ -1,0 +1,172 @@
+class WearableExtender
+!!!1702274.java!!!	WearableExtender(inout notif : Notification)
+            Bundle wearableBundle = notif.extras.getBundle(EXTRA_WEARABLE_EXTENSIONS);
+            if (wearableBundle != null) {
+                List<Action> actions = wearableBundle.getParcelableArrayList(KEY_ACTIONS);
+                if (actions != null) {
+                    mActions.addAll(actions);
+                }
+
+                mFlags = wearableBundle.getInt(KEY_FLAGS, DEFAULT_FLAGS);
+                mDisplayIntent = wearableBundle.getParcelable(KEY_DISPLAY_INTENT);
+
+                Notification[] pages = getNotificationArrayFromBundle(
+                        wearableBundle, KEY_PAGES);
+                if (pages != null) {
+                    Collections.addAll(mPages, pages);
+                }
+
+                mBackground = wearableBundle.getParcelable(KEY_BACKGROUND);
+                mContentIcon = wearableBundle.getInt(KEY_CONTENT_ICON);
+                mContentIconGravity = wearableBundle.getInt(KEY_CONTENT_ICON_GRAVITY,
+                        DEFAULT_CONTENT_ICON_GRAVITY);
+                mContentActionIndex = wearableBundle.getInt(KEY_CONTENT_ACTION_INDEX,
+                        UNSET_ACTION_INDEX);
+                mCustomSizePreset = wearableBundle.getInt(KEY_CUSTOM_SIZE_PRESET,
+                        SIZE_DEFAULT);
+                mCustomContentHeight = wearableBundle.getInt(KEY_CUSTOM_CONTENT_HEIGHT);
+                mGravity = wearableBundle.getInt(KEY_GRAVITY, DEFAULT_GRAVITY);
+            }
+!!!1702402.java!!!	extend(inout builder : Notification::Builder) : Notification::Builder
+            Bundle wearableBundle = new Bundle();
+
+            if (!mActions.isEmpty()) {
+                wearableBundle.putParcelableArrayList(KEY_ACTIONS, mActions);
+            }
+            if (mFlags != DEFAULT_FLAGS) {
+                wearableBundle.putInt(KEY_FLAGS, mFlags);
+            }
+            if (mDisplayIntent != null) {
+                wearableBundle.putParcelable(KEY_DISPLAY_INTENT, mDisplayIntent);
+            }
+            if (!mPages.isEmpty()) {
+                wearableBundle.putParcelableArray(KEY_PAGES, mPages.toArray(
+                        new Notification[mPages.size()]));
+            }
+            if (mBackground != null) {
+                wearableBundle.putParcelable(KEY_BACKGROUND, mBackground);
+            }
+            if (mContentIcon != 0) {
+                wearableBundle.putInt(KEY_CONTENT_ICON, mContentIcon);
+            }
+            if (mContentIconGravity != DEFAULT_CONTENT_ICON_GRAVITY) {
+                wearableBundle.putInt(KEY_CONTENT_ICON_GRAVITY, mContentIconGravity);
+            }
+            if (mContentActionIndex != UNSET_ACTION_INDEX) {
+                wearableBundle.putInt(KEY_CONTENT_ACTION_INDEX,
+                        mContentActionIndex);
+            }
+            if (mCustomSizePreset != SIZE_DEFAULT) {
+                wearableBundle.putInt(KEY_CUSTOM_SIZE_PRESET, mCustomSizePreset);
+            }
+            if (mCustomContentHeight != 0) {
+                wearableBundle.putInt(KEY_CUSTOM_CONTENT_HEIGHT, mCustomContentHeight);
+            }
+            if (mGravity != DEFAULT_GRAVITY) {
+                wearableBundle.putInt(KEY_GRAVITY, mGravity);
+            }
+
+            builder.getExtras().putBundle(EXTRA_WEARABLE_EXTENSIONS, wearableBundle);
+            return builder;
+!!!1702530.java!!!	clone() : Notification::WearableExtender
+            WearableExtender that = new WearableExtender();
+            that.mActions = new ArrayList<Action>(this.mActions);
+            that.mFlags = this.mFlags;
+            that.mDisplayIntent = this.mDisplayIntent;
+            that.mPages = new ArrayList<Notification>(this.mPages);
+            that.mBackground = this.mBackground;
+            that.mContentIcon = this.mContentIcon;
+            that.mContentIconGravity = this.mContentIconGravity;
+            that.mContentActionIndex = this.mContentActionIndex;
+            that.mCustomSizePreset = this.mCustomSizePreset;
+            that.mCustomContentHeight = this.mCustomContentHeight;
+            that.mGravity = this.mGravity;
+            return that;
+!!!1702658.java!!!	addAction(inout action : Notification::Action) : Notification::WearableExtender
+            mActions.add(action);
+            return this;
+!!!1702786.java!!!	addActions(inout actions : List<Action>) : Notification::WearableExtender
+            mActions.addAll(actions);
+            return this;
+!!!1702914.java!!!	clearActions() : Notification::WearableExtender
+            mActions.clear();
+            return this;
+!!!1703042.java!!!	getActions() : Notification::Action
+            return mActions;
+!!!1703170.java!!!	setDisplayIntent(inout intent : PendingIntent) : Notification::WearableExtender
+            mDisplayIntent = intent;
+            return this;
+!!!1703298.java!!!	getDisplayIntent() : PendingIntent
+            return mDisplayIntent;
+!!!1703426.java!!!	addPage(inout page : Notification) : Notification::WearableExtender
+            mPages.add(page);
+            return this;
+!!!1703554.java!!!	addPages(inout pages : List<Notification>) : Notification::WearableExtender
+            mPages.addAll(pages);
+            return this;
+!!!1703682.java!!!	clearPages() : Notification::WearableExtender
+            mPages.clear();
+            return this;
+!!!1703810.java!!!	getPages() : Notification
+            return mPages;
+!!!1703938.java!!!	setBackground(inout background : Bitmap) : Notification::WearableExtender
+            mBackground = background;
+            return this;
+!!!1704066.java!!!	getBackground() : Bitmap
+            return mBackground;
+!!!1704194.java!!!	setContentIcon(in icon : int) : Notification::WearableExtender
+            mContentIcon = icon;
+            return this;
+!!!1704322.java!!!	getContentIcon() : int
+            return mContentIcon;
+!!!1704450.java!!!	setContentIconGravity(in contentIconGravity : int) : Notification::WearableExtender
+            mContentIconGravity = contentIconGravity;
+            return this;
+!!!1704578.java!!!	getContentIconGravity() : int
+            return mContentIconGravity;
+!!!1704706.java!!!	setContentAction(in actionIndex : int) : Notification::WearableExtender
+            mContentActionIndex = actionIndex;
+            return this;
+!!!1704834.java!!!	getContentAction() : int
+            return mContentActionIndex;
+!!!1704962.java!!!	setGravity(in gravity : int) : Notification::WearableExtender
+            mGravity = gravity;
+            return this;
+!!!1705090.java!!!	getGravity() : int
+            return mGravity;
+!!!1705218.java!!!	setCustomSizePreset(in sizePreset : int) : Notification::WearableExtender
+            mCustomSizePreset = sizePreset;
+            return this;
+!!!1705346.java!!!	getCustomSizePreset() : int
+            return mCustomSizePreset;
+!!!1705474.java!!!	setCustomContentHeight(in height : int) : Notification::WearableExtender
+            mCustomContentHeight = height;
+            return this;
+!!!1705602.java!!!	getCustomContentHeight() : int
+            return mCustomContentHeight;
+!!!1705730.java!!!	setStartScrollBottom(inout startScrollBottom : boolean) : Notification::WearableExtender
+            setFlag(FLAG_START_SCROLL_BOTTOM, startScrollBottom);
+            return this;
+!!!1705858.java!!!	getStartScrollBottom() : boolean
+            return (mFlags & FLAG_START_SCROLL_BOTTOM) != 0;
+!!!1705986.java!!!	setContentIntentAvailableOffline(inout contentIntentAvailableOffline : boolean) : Notification::WearableExtender
+            setFlag(FLAG_CONTENT_INTENT_AVAILABLE_OFFLINE, contentIntentAvailableOffline);
+            return this;
+!!!1706114.java!!!	getContentIntentAvailableOffline() : boolean
+            return (mFlags & FLAG_CONTENT_INTENT_AVAILABLE_OFFLINE) != 0;
+!!!1706242.java!!!	setHintHideIcon(inout hintHideIcon : boolean) : Notification::WearableExtender
+            setFlag(FLAG_HINT_HIDE_ICON, hintHideIcon);
+            return this;
+!!!1706370.java!!!	getHintHideIcon() : boolean
+            return (mFlags & FLAG_HINT_HIDE_ICON) != 0;
+!!!1706498.java!!!	setHintShowBackgroundOnly(inout hintShowBackgroundOnly : boolean) : Notification::WearableExtender
+            setFlag(FLAG_HINT_SHOW_BACKGROUND_ONLY, hintShowBackgroundOnly);
+            return this;
+!!!1706626.java!!!	getHintShowBackgroundOnly() : boolean
+            return (mFlags & FLAG_HINT_SHOW_BACKGROUND_ONLY) != 0;
+!!!1706754.java!!!	setFlag(in mask : int, inout value : boolean) : void
+            if (value) {
+                mFlags |= mask;
+            } else {
+                mFlags &= ~mask;
+            }

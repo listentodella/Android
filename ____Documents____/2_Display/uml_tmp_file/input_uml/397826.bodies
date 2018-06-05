@@ -1,0 +1,18 @@
+class AbstractTimePickerDelegate
+!!!2516482.java!!!	AbstractTimePickerDelegate(inout delegator : TimePicker, inout context : Context)
+            mDelegator = delegator;
+            mContext = context;
+
+            // initialization based on locale
+            setCurrentLocale(Locale.getDefault());
+!!!2516610.java!!!	setCurrentLocale(inout locale : Locale) : void
+            if (locale.equals(mCurrentLocale)) {
+                return;
+            }
+            mCurrentLocale = locale;
+!!!2516738.java!!!	setValidationCallback(inout callback : TimePicker::ValidationCallback) : void
+            mValidationCallback = callback;
+!!!2516866.java!!!	onValidationChanged(inout valid : boolean) : void
+            if (mValidationCallback != null) {
+                mValidationCallback.onValidationChanged(valid);
+            }

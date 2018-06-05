@@ -1,0 +1,15 @@
+class MyHandler
+!!!1188482.java!!!	MyHandler(inout looper : Looper)
+                super(looper, null, false);
+!!!1188610.java!!!	handleMessage(inout message : Message) : void
+                switch (message.what) {
+                    case MESSAGE_COMPUTE_CHANGED_WINDOWS: {
+                        computeChangedWindows();
+                    } break;
+
+                    case MESSAGE_NOTIFY_WINDOWS_CHANGED: {
+                        List<WindowInfo> windows = (List<WindowInfo>) message.obj;
+                        mCallback.onWindowsForAccessibilityChanged(windows);
+                        clearAndRecycleWindows(windows);
+                    } break;
+                }

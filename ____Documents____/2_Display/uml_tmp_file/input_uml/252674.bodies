@@ -1,0 +1,65 @@
+class Builder
+!!!1145986.java!!!	setSelectionRange(in newStart : int, in newEnd : int) : CursorAnchorInfo::Builder
+            mSelectionStart = newStart;
+            mSelectionEnd = newEnd;
+            return this;
+!!!1146114.java!!!	setComposingText(in composingTextStart : int, in composingText : CharSequence) : CursorAnchorInfo::Builder
+            mComposingTextStart = composingTextStart;
+            if (composingText == null) {
+                mComposingText = null;
+            } else {
+                // Make a snapshot of the given char sequence.
+                mComposingText = new SpannedString(composingText);
+            }
+            return this;
+!!!1146242.java!!!	setInsertionMarkerLocation(in horizontalPosition : float, in lineTop : float, in lineBaseline : float, in lineBottom : float, in flags : int) : CursorAnchorInfo::Builder
+            mInsertionMarkerHorizontal = horizontalPosition;
+            mInsertionMarkerTop = lineTop;
+            mInsertionMarkerBaseline = lineBaseline;
+            mInsertionMarkerBottom = lineBottom;
+            mInsertionMarkerFlags = flags;
+            return this;
+!!!1146370.java!!!	addCharacterBounds(in index : int, in left : float, in top : float, in right : float, in bottom : float, in flags : int) : CursorAnchorInfo::Builder
+            if (index < 0) {
+                throw new IllegalArgumentException("index must not be a negative integer.");
+            }
+            if (mCharacterBoundsArrayBuilder == null) {
+                mCharacterBoundsArrayBuilder = new SparseRectFArrayBuilder();
+            }
+            mCharacterBoundsArrayBuilder.append(index, left, top, right, bottom, flags);
+            return this;
+!!!1146498.java!!!	setMatrix(in matrix : Matrix) : CursorAnchorInfo::Builder
+            mMatrix.set(matrix != null ? matrix : Matrix.IDENTITY_MATRIX);
+            mMatrixInitialized = true;
+            return this;
+!!!1146626.java!!!	build() : CursorAnchorInfo
+            if (!mMatrixInitialized) {
+                // Coordinate transformation matrix is mandatory when at least one positional
+                // parameter is specified.
+                final boolean hasCharacterBounds = (mCharacterBoundsArrayBuilder != null
+                        && !mCharacterBoundsArrayBuilder.isEmpty());
+                if (hasCharacterBounds
+                        || !Float.isNaN(mInsertionMarkerHorizontal)
+                        || !Float.isNaN(mInsertionMarkerTop)
+                        || !Float.isNaN(mInsertionMarkerBaseline)
+                        || !Float.isNaN(mInsertionMarkerBottom)) {
+                    throw new IllegalArgumentException("Coordinate transformation matrix is " +
+                            "required when positional parameters are specified.");
+                }
+            }
+            return new CursorAnchorInfo(this);
+!!!1146754.java!!!	reset() : void
+            mSelectionStart = -1;
+            mSelectionEnd = -1;
+            mComposingTextStart = -1;
+            mComposingText = null;
+            mInsertionMarkerFlags = 0;
+            mInsertionMarkerHorizontal = Float.NaN;
+            mInsertionMarkerTop = Float.NaN;
+            mInsertionMarkerBaseline = Float.NaN;
+            mInsertionMarkerBottom = Float.NaN;
+            mMatrix.set(Matrix.IDENTITY_MATRIX);
+            mMatrixInitialized = false;
+            if (mCharacterBoundsArrayBuilder != null) {
+                mCharacterBoundsArrayBuilder.reset();
+            }

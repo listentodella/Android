@@ -1,0 +1,60 @@
+class Builder
+!!!1818498.java!!!	Builder(in jobId : int, inout jobService : ComponentName)
+            mJobService = jobService;
+            mJobId = jobId;
+!!!1818626.java!!!	setExtras(inout extras : PersistableBundle) : JobInfo::Builder
+            mExtras = extras;
+            return this;
+!!!1818754.java!!!	setRequiredNetworkType(in networkType : int) : JobInfo::Builder
+            mNetworkType = networkType;
+            return this;
+!!!1818882.java!!!	setRequiresCharging(inout requiresCharging : boolean) : JobInfo::Builder
+            mRequiresCharging = requiresCharging;
+            return this;
+!!!1819010.java!!!	setRequiresDeviceIdle(inout requiresDeviceIdle : boolean) : JobInfo::Builder
+            mRequiresDeviceIdle = requiresDeviceIdle;
+            return this;
+!!!1819138.java!!!	setPeriodic(in intervalMillis : long) : JobInfo::Builder
+            mIsPeriodic = true;
+            mIntervalMillis = intervalMillis;
+            mHasEarlyConstraint = mHasLateConstraint = true;
+            return this;
+!!!1819266.java!!!	setMinimumLatency(in minLatencyMillis : long) : JobInfo::Builder
+            mMinLatencyMillis = minLatencyMillis;
+            mHasEarlyConstraint = true;
+            return this;
+!!!1819394.java!!!	setOverrideDeadline(in maxExecutionDelayMillis : long) : JobInfo::Builder
+            mMaxExecutionDelayMillis = maxExecutionDelayMillis;
+            mHasLateConstraint = true;
+            return this;
+!!!1819522.java!!!	setBackoffCriteria(in initialBackoffMillis : long, in backoffPolicy : int) : JobInfo::Builder
+            mBackoffPolicySet = true;
+            mInitialBackoffMillis = initialBackoffMillis;
+            mBackoffPolicy = backoffPolicy;
+            return this;
+!!!1819650.java!!!	setPersisted(inout isPersisted : boolean) : JobInfo::Builder
+            mIsPersisted = isPersisted;
+            return this;
+!!!1819778.java!!!	build() : JobInfo
+            // Allow jobs with no constraints - What am I, a database?
+            if (!mHasEarlyConstraint && !mHasLateConstraint && !mRequiresCharging &&
+                    !mRequiresDeviceIdle && mNetworkType == NETWORK_TYPE_NONE) {
+                throw new IllegalArgumentException("You're trying to build a job with no " +
+                        "constraints, this is not allowed.");
+            }
+            mExtras = new PersistableBundle(mExtras);  // Make our own copy.
+            // Check that a deadline was not set on a periodic job.
+            if (mIsPeriodic && (mMaxExecutionDelayMillis != 0L)) {
+                throw new IllegalArgumentException("Can't call setOverrideDeadline() on a " +
+                        "periodic job.");
+            }
+            if (mIsPeriodic && (mMinLatencyMillis != 0L)) {
+                throw new IllegalArgumentException("Can't call setMinimumLatency() on a " +
+                        "periodic job");
+            }
+            if (mBackoffPolicySet && mRequiresDeviceIdle) {
+                throw new IllegalArgumentException("An idle mode job will not respect any" +
+                        " back-off policy, so calling setBackoffCriteria with" +
+                        " setRequiresDeviceIdle is an error.");
+            }
+            return new JobInfo(this);

@@ -1,0 +1,9 @@
+format 76
+
+classinstancecanvas 128002 classinstance_ref 128258 // 
+  xyz 222 113 2000
+end
+classinstancecanvas 128130 classinstance_ref 128386 // 
+  xyz 376 123 2000
+end
+end

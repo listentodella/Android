@@ -1,0 +1,1592 @@
+format 76
+"inputflinger" // inputflinger
+  revision 2
+  modified_by 2 "thisway_diy"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  cpp_h_dir "l:/android_projects/uml_tmp_file/inputflinger/"
+  cpp_src_dir "l:/android_projects/uml_tmp_file/inputflinger/"
+  classview 129282 "inputflinger"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 134274 "anonymous1"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 149506 "VIRTUAL_KEYBOARD_ID"
+	public type class_ref 134274 // anonymous1
+	init_value " -1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 149634 "BUILT_IN_KEYBOARD_ID"
+	public type class_ref 134274 // anonymous1
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 134658 "anonymous2"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Input device classes."
+      attribute 151170 "INPUT_DEVICE_CLASS_KEYBOARD"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x00000001"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 151298 "INPUT_DEVICE_CLASS_ALPHAKEY"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x00000002"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 151426 "INPUT_DEVICE_CLASS_TOUCH"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x00000004"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 151554 "INPUT_DEVICE_CLASS_CURSOR"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x00000008"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 151682 "INPUT_DEVICE_CLASS_TOUCH_MT"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x00000010"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 151810 "INPUT_DEVICE_CLASS_DPAD"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x00000020"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 151938 "INPUT_DEVICE_CLASS_GAMEPAD"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x00000040"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 152066 "INPUT_DEVICE_CLASS_SWITCH"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x00000080"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 152194 "INPUT_DEVICE_CLASS_JOYSTICK"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x00000100"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 152322 "INPUT_DEVICE_CLASS_VIBRATOR"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x00000200"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 152450 "INPUT_DEVICE_CLASS_VIRTUAL"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x40000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 152578 "INPUT_DEVICE_CLASS_EXTERNAL"
+	public type class_ref 134658 // anonymous2
+	init_value " 0x80000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 135938 "anonymous5"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Constants used to report the outcome of input event injection."
+      attribute 159234 "INPUT_EVENT_INJECTION_PENDING"
+	public type class_ref 135938 // anonymous5
+	init_value " -1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 159362 "INPUT_EVENT_INJECTION_SUCCEEDED"
+	public type class_ref 135938 // anonymous5
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 159490 "INPUT_EVENT_INJECTION_PERMISSION_DENIED"
+	public type class_ref 135938 // anonymous5
+	init_value " 1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 159618 "INPUT_EVENT_INJECTION_FAILED"
+	public type class_ref 135938 // anonymous5
+	init_value " 2"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 159746 "INPUT_EVENT_INJECTION_TIMED_OUT"
+	public type class_ref 135938 // anonymous5
+	init_value " 3
+"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 136066 "anonymous6"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " (INTERNAL USE ONLY) Specifies that injection is pending and its outcome is unknown. 
+ Injection succeeded. 
+ Injection failed because the injector did not have permission to inject
+     * into the application with input focus. 
+ Injection failed because there were no available input targets. 
+ Injection failed due to a timeout. 
+
+ * Constants used to determine the input event injection synchronization mode."
+      attribute 159874 "INPUT_EVENT_INJECTION_SYNC_NONE"
+	public type class_ref 136066 // anonymous6
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 160002 "INPUT_EVENT_INJECTION_SYNC_WAIT_FOR_RESULT"
+	public type class_ref 136066 // anonymous6
+	init_value " 1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 160130 "INPUT_EVENT_INJECTION_SYNC_WAIT_FOR_FINISHED"
+	public type class_ref 136066 // anonymous6
+	init_value " 2"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 263938 "anonymous3"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 906242 "VIRTUAL_KEYBOARD_ID"
+	public type class_ref 263938 // anonymous3
+	init_value " -1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 906370 "BUILT_IN_KEYBOARD_ID"
+	public type class_ref 263938 // anonymous3
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 264066 "anonymous4"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Input device classes."
+      attribute 906498 "INPUT_DEVICE_CLASS_KEYBOARD"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x00000001"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 906626 "INPUT_DEVICE_CLASS_ALPHAKEY"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x00000002"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 906754 "INPUT_DEVICE_CLASS_TOUCH"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x00000004"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 906882 "INPUT_DEVICE_CLASS_CURSOR"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x00000008"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 907010 "INPUT_DEVICE_CLASS_TOUCH_MT"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x00000010"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 907138 "INPUT_DEVICE_CLASS_DPAD"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x00000020"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 907266 "INPUT_DEVICE_CLASS_GAMEPAD"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x00000040"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 907394 "INPUT_DEVICE_CLASS_SWITCH"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x00000080"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 907522 "INPUT_DEVICE_CLASS_JOYSTICK"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x00000100"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 907650 "INPUT_DEVICE_CLASS_VIBRATOR"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x00000200"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 907778 "INPUT_DEVICE_CLASS_VIRTUAL"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x40000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 907906 "INPUT_DEVICE_CLASS_EXTERNAL"
+	public type class_ref 264066 // anonymous4
+	init_value " 0x80000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 264194 "anonymous7"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Constants used to report the outcome of input event injection."
+      attribute 908034 "INPUT_EVENT_INJECTION_PENDING"
+	public type class_ref 264194 // anonymous7
+	init_value " -1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 908162 "INPUT_EVENT_INJECTION_SUCCEEDED"
+	public type class_ref 264194 // anonymous7
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 908290 "INPUT_EVENT_INJECTION_PERMISSION_DENIED"
+	public type class_ref 264194 // anonymous7
+	init_value " 1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 908418 "INPUT_EVENT_INJECTION_FAILED"
+	public type class_ref 264194 // anonymous7
+	init_value " 2"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 908546 "INPUT_EVENT_INJECTION_TIMED_OUT"
+	public type class_ref 264194 // anonymous7
+	init_value " 3
+"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 264322 "anonymous8"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " (INTERNAL USE ONLY) Specifies that injection is pending and its outcome is unknown. 
+ Injection succeeded. 
+ Injection failed because the injector did not have permission to inject
+     * into the application with input focus. 
+ Injection failed because there were no available input targets. 
+ Injection failed due to a timeout. 
+
+ * Constants used to determine the input event injection synchronization mode."
+      attribute 908674 "INPUT_EVENT_INJECTION_SYNC_NONE"
+	public type class_ref 264322 // anonymous8
+	init_value " 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 908802 "INPUT_EVENT_INJECTION_SYNC_WAIT_FOR_RESULT"
+	public type class_ref 264322 // anonymous8
+	init_value " 1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 908930 "INPUT_EVENT_INJECTION_SYNC_WAIT_FOR_FINISHED"
+	public type class_ref 264322 // anonymous8
+	init_value " 2"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 264450 "anonymous9"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 909058 "FLAG_FOREGROUND"
+	public type class_ref 264450 // anonymous9
+	init_value " 1 << 0"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 909186 "FLAG_WINDOW_IS_OBSCURED"
+	public type class_ref 264450 // anonymous9
+	init_value " 1 << 1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 909314 "FLAG_SPLIT"
+	public type class_ref 264450 // anonymous9
+	init_value " 1 << 2"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 909442 "FLAG_ZERO_COORDS"
+	public type class_ref 264450 // anonymous9
+	init_value " 1 << 3"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 909570 "FLAG_DISPATCH_AS_IS"
+	public type class_ref 264450 // anonymous9
+	init_value " 1 << 8"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 909698 "FLAG_DISPATCH_AS_OUTSIDE"
+	public type class_ref 264450 // anonymous9
+	init_value " 1 << 9"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 909826 "FLAG_DISPATCH_AS_HOVER_ENTER"
+	public type class_ref 264450 // anonymous9
+	init_value " 1 << 10"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 909954 "FLAG_DISPATCH_AS_HOVER_EXIT"
+	public type class_ref 264450 // anonymous9
+	init_value " 1 << 11"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 910082 "FLAG_DISPATCH_AS_SLIPPERY_EXIT"
+	public type class_ref 264450 // anonymous9
+	init_value " 1 << 12"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 910210 "FLAG_DISPATCH_AS_SLIPPERY_ENTER"
+	public type class_ref 264450 // anonymous9
+	init_value " 1 << 13"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 910338 "FLAG_DISPATCH_MASK"
+	public type class_ref 264450 // anonymous9
+	init_value " FLAG_DISPATCH_AS_IS
+                | FLAG_DISPATCH_AS_OUTSIDE
+                | FLAG_DISPATCH_AS_HOVER_ENTER
+                | FLAG_DISPATCH_AS_HOVER_EXIT
+                | FLAG_DISPATCH_AS_SLIPPERY_EXIT
+                | FLAG_DISPATCH_AS_SLIPPERY_ENTER"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 264578 "anonymous10"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " Window flags from WindowManager.LayoutParams"
+      attribute 910466 "FLAG_ALLOW_LOCK_WHILE_SCREEN_ON"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000001"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 910594 "FLAG_DIM_BEHIND"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000002"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 910722 "FLAG_BLUR_BEHIND"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000004"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 910850 "FLAG_NOT_FOCUSABLE"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000008"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 910978 "FLAG_NOT_TOUCHABLE"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000010"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 911106 "FLAG_NOT_TOUCH_MODAL"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000020"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 911234 "FLAG_TOUCHABLE_WHEN_WAKING"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000040"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 911362 "FLAG_KEEP_SCREEN_ON"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000080"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 911490 "FLAG_LAYOUT_IN_SCREEN"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000100"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 911618 "FLAG_LAYOUT_NO_LIMITS"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000200"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 911746 "FLAG_FULLSCREEN"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000400"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 911874 "FLAG_FORCE_NOT_FULLSCREEN"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00000800"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 912002 "FLAG_DITHER"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00001000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 912130 "FLAG_SECURE"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00002000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 912258 "FLAG_SCALED"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00004000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 912386 "FLAG_IGNORE_CHEEK_PRESSES"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00008000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 912514 "FLAG_LAYOUT_INSET_DECOR"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00010000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 912642 "FLAG_ALT_FOCUSABLE_IM"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00020000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 912770 "FLAG_WATCH_OUTSIDE_TOUCH"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00040000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 912898 "FLAG_SHOW_WHEN_LOCKED"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00080000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 913026 "FLAG_SHOW_WALLPAPER"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00100000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 913154 "FLAG_TURN_SCREEN_ON"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00200000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 913282 "FLAG_DISMISS_KEYGUARD"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00400000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 913410 "FLAG_SPLIT_TOUCH"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x00800000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 913538 "FLAG_SLIPPERY"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x20000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 913666 "FLAG_NEEDS_MENU_KEY"
+	public type class_ref 264578 // anonymous10
+	init_value " 0x40000000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 264706 "anonymous11"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " Private Window flags from WindowManager.LayoutParams"
+      attribute 913794 "PRIVATE_FLAG_SYSTEM_ERROR"
+	public type class_ref 264706 // anonymous11
+	init_value " 0x00000100"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 264834 "anonymous12"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " Window types from WindowManager.LayoutParams"
+      attribute 913922 "FIRST_APPLICATION_WINDOW"
+	public type class_ref 264834 // anonymous12
+	init_value " 1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 914050 "TYPE_BASE_APPLICATION"
+	public type class_ref 264834 // anonymous12
+	init_value " 1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 914178 "TYPE_APPLICATION"
+	public type class_ref 264834 // anonymous12
+	init_value " 2"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 914306 "TYPE_APPLICATION_STARTING"
+	public type class_ref 264834 // anonymous12
+	init_value " 3"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 914434 "LAST_APPLICATION_WINDOW"
+	public type class_ref 264834 // anonymous12
+	init_value " 99"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 914562 "FIRST_SUB_WINDOW"
+	public type class_ref 264834 // anonymous12
+	init_value " 1000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 914690 "TYPE_APPLICATION_PANEL"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SUB_WINDOW"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 914818 "TYPE_APPLICATION_MEDIA"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SUB_WINDOW+1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 914946 "TYPE_APPLICATION_SUB_PANEL"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SUB_WINDOW+2"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 915074 "TYPE_APPLICATION_ATTACHED_DIALOG"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SUB_WINDOW+3"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 915202 "TYPE_APPLICATION_MEDIA_OVERLAY"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SUB_WINDOW+4"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 915330 "LAST_SUB_WINDOW"
+	public type class_ref 264834 // anonymous12
+	init_value " 1999"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 915458 "FIRST_SYSTEM_WINDOW"
+	public type class_ref 264834 // anonymous12
+	init_value " 2000"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 915586 "TYPE_STATUS_BAR"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 915714 "TYPE_SEARCH_BAR"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+1"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 915842 "TYPE_PHONE"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+2"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 915970 "TYPE_SYSTEM_ALERT"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+3"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 916098 "TYPE_KEYGUARD"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+4"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 916226 "TYPE_TOAST"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+5"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 916354 "TYPE_SYSTEM_OVERLAY"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+6"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 916482 "TYPE_PRIORITY_PHONE"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+7"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 916610 "TYPE_SYSTEM_DIALOG"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+8"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 916738 "TYPE_KEYGUARD_DIALOG"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+9"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 916866 "TYPE_SYSTEM_ERROR"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+10"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 916994 "TYPE_INPUT_METHOD"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+11"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 917122 "TYPE_INPUT_METHOD_DIALOG"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+12"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 917250 "TYPE_WALLPAPER"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+13"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 917378 "TYPE_STATUS_BAR_PANEL"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+14"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 917506 "TYPE_SECURE_SYSTEM_OVERLAY"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+15"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 917634 "TYPE_DRAG"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+16"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 917762 "TYPE_STATUS_BAR_SUB_PANEL"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+17"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 917890 "TYPE_POINTER"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+18"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 918018 "TYPE_NAVIGATION_BAR"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+19"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 918146 "TYPE_VOLUME_OVERLAY"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+20"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 918274 "TYPE_BOOT_PROGRESS"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+21"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 918402 "TYPE_MAGNIFICATION_OVERLAY"
+	public type class_ref 264834 // anonymous12
+	init_value " FIRST_SYSTEM_WINDOW+22"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 918530 "LAST_SYSTEM_WINDOW"
+	public type class_ref 264834 // anonymous12
+	init_value " 2999"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 264962 "anonymous13"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 918658 "INPUT_FEATURE_DISABLE_TOUCH_PAD_GESTURES"
+	public type class_ref 264962 // anonymous13
+	init_value " 0x00000001"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 918786 "INPUT_FEATURE_NO_INPUT_CHANNEL"
+	public type class_ref 264962 // anonymous13
+	init_value " 0x00000002"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 918914 "INPUT_FEATURE_DISABLE_USER_ACTIVITY"
+	public type class_ref 264962 // anonymous13
+	init_value " 0x00000004"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+  end
+
+  deploymentview 128642 "inputflinger"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 131202 "EventHub"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 134274 // anonymous1
+	class_ref 134658 // anonymous2
+	class_ref 263938 // anonymous3
+	class_ref 264066 // anonymous4
+      end
+    end
+
+    artifact 131586 "InputDispatcher"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 135938 // anonymous5
+	class_ref 136066 // anonymous6
+	class_ref 264194 // anonymous7
+	class_ref 264322 // anonymous8
+	class_ref 264450 // anonymous9
+      end
+    end
+
+    artifact 180226 "InputWindow"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 264578 // anonymous10
+	class_ref 264706 // anonymous11
+	class_ref 264834 // anonymous12
+	class_ref 264962 // anonymous13
+      end
+    end
+  end
+
+  package_ref 129282 // android
+
+  package_ref 129410 // tests
+end

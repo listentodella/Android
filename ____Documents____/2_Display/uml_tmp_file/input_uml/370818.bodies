@@ -1,0 +1,86 @@
+class YearPickerView
+!!!2558466.java!!!	YearPickerView(inout context : Context)
+        this(context, null);
+!!!2558594.java!!!	YearPickerView(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, R.attr.listViewStyle);
+!!!2558722.java!!!	YearPickerView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2558850.java!!!	YearPickerView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final LayoutParams frame = new LayoutParams(
+                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        setLayoutParams(frame);
+
+        final Resources res = context.getResources();
+        mViewSize = res.getDimensionPixelOffset(R.dimen.datepicker_view_animator_height);
+        mChildSize = res.getDimensionPixelOffset(R.dimen.datepicker_year_label_height);
+
+        setVerticalFadingEdgeEnabled(true);
+        setFadingEdgeLength(mChildSize / 3);
+
+        final int paddingTop = res.getDimensionPixelSize(
+                R.dimen.datepicker_year_picker_padding_top);
+        setPadding(0, paddingTop, 0, 0);
+
+        setOnItemClickListener(this);
+        setDividerHeight(0);
+!!!2558978.java!!!	init(inout controller : DatePickerController) : void
+        mController = controller;
+        mController.registerOnDateChangedListener(this);
+
+        mAdapter = new YearAdapter(getContext(), R.layout.year_label_text_view);
+        updateAdapterData();
+        setAdapter(mAdapter);
+
+        onDateChanged();
+!!!2559106.java!!!	setYearSelectedCircleColor(in color : int) : void
+        if (color != mYearSelectedCircleColor) {
+            mYearSelectedCircleColor = color;
+        }
+        requestLayout();
+!!!2559234.java!!!	getYearSelectedCircleColor() : int
+        return mYearSelectedCircleColor;
+!!!2559362.java!!!	updateAdapterData() : void
+        mAdapter.clear();
+        final int maxYear = mController.getMaxYear();
+        for (int year = mController.getMinYear(); year <= maxYear; year++) {
+            mAdapter.add(year);
+        }
+!!!2559490.java!!!	onItemClick(inout parent : AdapterView, inout view : View, in position : int, in id : long) : void
+        mController.tryVibrate();
+        if (position != mSelectedPosition) {
+            mSelectedPosition = position;
+            mAdapter.notifyDataSetChanged();
+        }
+        mController.onYearSelected(mAdapter.getItem(position));
+!!!2559618.java!!!	setItemTextAppearance(in resId : int) : void
+        mAdapter.setItemTextAppearance(resId);
+!!!2560130.java!!!	postSetSelectionCentered(in position : int) : void
+        postSetSelectionFromTop(position, mViewSize / 2 - mChildSize / 2);
+!!!2560258.java!!!	postSetSelectionFromTop(in position : int, in offset : int) : void
+        post(new Runnable() {
+
+            @Override
+            public void run() {
+                setSelectionFromTop(position, offset);
+                requestLayout();
+            }
+        });
+!!!2560386.java!!!	getFirstPositionOffset() : int
+        final View firstChild = getChildAt(0);
+        if (firstChild == null) {
+            return 0;
+        }
+        return firstChild.getTop();
+!!!2560514.java!!!	onDateChanged() : void
+        updateAdapterData();
+        mAdapter.notifyDataSetChanged();
+        postSetSelectionCentered(
+                mController.getSelectedDay().get(Calendar.YEAR) - mController.getMinYear());
+!!!2560642.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
+            event.setFromIndex(0);
+            event.setToIndex(0);
+        }

@@ -1,0 +1,439 @@
+class Notification
+!!!1676802.java!!!	getGroup() : String
+        return mGroupKey;
+!!!1676930.java!!!	getSortKey() : String
+        return mSortKey;
+!!!1680130.java!!!	Notification()
+        this.when = System.currentTimeMillis();
+        this.priority = PRIORITY_DEFAULT;
+!!!1680258.java!!!	Notification(inout context : Context, in icon : int, inout tickerText : CharSequence, in when : long, inout contentTitle : CharSequence, inout contentText : CharSequence, inout contentIntent : Intent)
+        this.when = when;
+        this.icon = icon;
+        this.tickerText = tickerText;
+        setLatestEventInfo(context, contentTitle, contentText,
+                PendingIntent.getActivity(context, 0, contentIntent, 0));
+!!!1680386.java!!!	Notification(in icon : int, inout tickerText : CharSequence, in when : long)
+        this.icon = icon;
+        this.tickerText = tickerText;
+        this.when = when;
+!!!1680514.java!!!	Notification(inout parcel : Parcel)
+        int version = parcel.readInt();
+
+        when = parcel.readLong();
+        icon = parcel.readInt();
+        number = parcel.readInt();
+        if (parcel.readInt() != 0) {
+            contentIntent = PendingIntent.CREATOR.createFromParcel(parcel);
+        }
+        if (parcel.readInt() != 0) {
+            deleteIntent = PendingIntent.CREATOR.createFromParcel(parcel);
+        }
+        if (parcel.readInt() != 0) {
+            tickerText = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
+        }
+        if (parcel.readInt() != 0) {
+            tickerView = RemoteViews.CREATOR.createFromParcel(parcel);
+        }
+        if (parcel.readInt() != 0) {
+            contentView = RemoteViews.CREATOR.createFromParcel(parcel);
+        }
+        if (parcel.readInt() != 0) {
+            largeIcon = Bitmap.CREATOR.createFromParcel(parcel);
+        }
+        defaults = parcel.readInt();
+        flags = parcel.readInt();
+        if (parcel.readInt() != 0) {
+            sound = Uri.CREATOR.createFromParcel(parcel);
+        }
+
+        audioStreamType = parcel.readInt();
+        if (parcel.readInt() != 0) {
+            audioAttributes = AudioAttributes.CREATOR.createFromParcel(parcel);
+        }
+        vibrate = parcel.createLongArray();
+        ledARGB = parcel.readInt();
+        ledOnMS = parcel.readInt();
+        ledOffMS = parcel.readInt();
+        iconLevel = parcel.readInt();
+
+        if (parcel.readInt() != 0) {
+            fullScreenIntent = PendingIntent.CREATOR.createFromParcel(parcel);
+        }
+
+        priority = parcel.readInt();
+
+        category = parcel.readString();
+
+        mGroupKey = parcel.readString();
+
+        mSortKey = parcel.readString();
+
+        extras = parcel.readBundle(); // may be null
+
+        actions = parcel.createTypedArray(Action.CREATOR); // may be null
+
+        if (parcel.readInt() != 0) {
+            bigContentView = RemoteViews.CREATOR.createFromParcel(parcel);
+        }
+
+        if (parcel.readInt() != 0) {
+            headsUpContentView = RemoteViews.CREATOR.createFromParcel(parcel);
+        }
+
+        visibility = parcel.readInt();
+
+        if (parcel.readInt() != 0) {
+            publicVersion = Notification.CREATOR.createFromParcel(parcel);
+        }
+
+        color = parcel.readInt();
+!!!1680642.java!!!	clone() : Notification
+        Notification that = new Notification();
+        cloneInto(that, true);
+        return that;
+!!!1680770.java!!!	cloneInto(inout that : Notification, inout heavy : boolean) : void
+        that.when = this.when;
+        that.icon = this.icon;
+        that.number = this.number;
+
+        // PendingIntents are global, so there's no reason (or way) to clone them.
+        that.contentIntent = this.contentIntent;
+        that.deleteIntent = this.deleteIntent;
+        that.fullScreenIntent = this.fullScreenIntent;
+
+        if (this.tickerText != null) {
+            that.tickerText = this.tickerText.toString();
+        }
+        if (heavy && this.tickerView != null) {
+            that.tickerView = this.tickerView.clone();
+        }
+        if (heavy && this.contentView != null) {
+            that.contentView = this.contentView.clone();
+        }
+        if (heavy && this.largeIcon != null) {
+            that.largeIcon = Bitmap.createBitmap(this.largeIcon);
+        }
+        that.iconLevel = this.iconLevel;
+        that.sound = this.sound; // android.net.Uri is immutable
+        that.audioStreamType = this.audioStreamType;
+        if (this.audioAttributes != null) {
+            that.audioAttributes = new AudioAttributes.Builder(this.audioAttributes).build();
+        }
+
+        final long[] vibrate = this.vibrate;
+        if (vibrate != null) {
+            final int N = vibrate.length;
+            final long[] vib = that.vibrate = new long[N];
+            System.arraycopy(vibrate, 0, vib, 0, N);
+        }
+
+        that.ledARGB = this.ledARGB;
+        that.ledOnMS = this.ledOnMS;
+        that.ledOffMS = this.ledOffMS;
+        that.defaults = this.defaults;
+
+        that.flags = this.flags;
+
+        that.priority = this.priority;
+
+        that.category = this.category;
+
+        that.mGroupKey = this.mGroupKey;
+
+        that.mSortKey = this.mSortKey;
+
+        if (this.extras != null) {
+            try {
+                that.extras = new Bundle(this.extras);
+                // will unparcel
+                that.extras.size();
+            } catch (BadParcelableException e) {
+                Log.e(TAG, "could not unparcel extras from notification: " + this, e);
+                that.extras = null;
+            }
+        }
+
+        if (this.actions != null) {
+            that.actions = new Action[this.actions.length];
+            for(int i=0; i<this.actions.length; i++) {
+                that.actions[i] = this.actions[i].clone();
+            }
+        }
+
+        if (heavy && this.bigContentView != null) {
+            that.bigContentView = this.bigContentView.clone();
+        }
+
+        if (heavy && this.headsUpContentView != null) {
+            that.headsUpContentView = this.headsUpContentView.clone();
+        }
+
+        that.visibility = this.visibility;
+
+        if (this.publicVersion != null) {
+            that.publicVersion = new Notification();
+            this.publicVersion.cloneInto(that.publicVersion, heavy);
+        }
+
+        that.color = this.color;
+
+        if (!heavy) {
+            that.lightenPayload(); // will clean out extras
+        }
+!!!1680898.java!!!	lightenPayload() : void
+        tickerView = null;
+        contentView = null;
+        bigContentView = null;
+        headsUpContentView = null;
+        largeIcon = null;
+        if (extras != null) {
+            extras.remove(Notification.EXTRA_LARGE_ICON);
+            extras.remove(Notification.EXTRA_LARGE_ICON_BIG);
+            extras.remove(Notification.EXTRA_PICTURE);
+            extras.remove(Notification.EXTRA_BIG_TEXT);
+            // Prevent light notifications from being rebuilt.
+            extras.remove(Builder.EXTRA_NEEDS_REBUILD);
+        }
+!!!1681026.java!!!	safeCharSequence(inout cs : CharSequence) : CharSequence
+        if (cs == null) return cs;
+        if (cs.length() > MAX_CHARSEQUENCE_LENGTH) {
+            cs = cs.subSequence(0, MAX_CHARSEQUENCE_LENGTH);
+        }
+        if (cs instanceof Parcelable) {
+            Log.e(TAG, "warning: " + cs.getClass().getCanonicalName()
+                    + " instance is a custom Parcelable and not allowed in Notification");
+            return cs.toString();
+        }
+
+        return cs;
+!!!1681154.java!!!	describeContents() : int
+        return 0;
+!!!1681282.java!!!	writeToParcel(inout parcel : Parcel, in flags : int) : void
+        parcel.writeInt(1);
+
+        parcel.writeLong(when);
+        parcel.writeInt(icon);
+        parcel.writeInt(number);
+        if (contentIntent != null) {
+            parcel.writeInt(1);
+            contentIntent.writeToParcel(parcel, 0);
+        } else {
+            parcel.writeInt(0);
+        }
+        if (deleteIntent != null) {
+            parcel.writeInt(1);
+            deleteIntent.writeToParcel(parcel, 0);
+        } else {
+            parcel.writeInt(0);
+        }
+        if (tickerText != null) {
+            parcel.writeInt(1);
+            TextUtils.writeToParcel(tickerText, parcel, flags);
+        } else {
+            parcel.writeInt(0);
+        }
+        if (tickerView != null) {
+            parcel.writeInt(1);
+            tickerView.writeToParcel(parcel, 0);
+        } else {
+            parcel.writeInt(0);
+        }
+        if (contentView != null) {
+            parcel.writeInt(1);
+            contentView.writeToParcel(parcel, 0);
+        } else {
+            parcel.writeInt(0);
+        }
+        if (largeIcon != null) {
+            parcel.writeInt(1);
+            largeIcon.writeToParcel(parcel, 0);
+        } else {
+            parcel.writeInt(0);
+        }
+
+        parcel.writeInt(defaults);
+        parcel.writeInt(this.flags);
+
+        if (sound != null) {
+            parcel.writeInt(1);
+            sound.writeToParcel(parcel, 0);
+        } else {
+            parcel.writeInt(0);
+        }
+        parcel.writeInt(audioStreamType);
+
+        if (audioAttributes != null) {
+            parcel.writeInt(1);
+            audioAttributes.writeToParcel(parcel, 0);
+        } else {
+            parcel.writeInt(0);
+        }
+
+        parcel.writeLongArray(vibrate);
+        parcel.writeInt(ledARGB);
+        parcel.writeInt(ledOnMS);
+        parcel.writeInt(ledOffMS);
+        parcel.writeInt(iconLevel);
+
+        if (fullScreenIntent != null) {
+            parcel.writeInt(1);
+            fullScreenIntent.writeToParcel(parcel, 0);
+        } else {
+            parcel.writeInt(0);
+        }
+
+        parcel.writeInt(priority);
+
+        parcel.writeString(category);
+
+        parcel.writeString(mGroupKey);
+
+        parcel.writeString(mSortKey);
+
+        parcel.writeBundle(extras); // null ok
+
+        parcel.writeTypedArray(actions, 0); // null ok
+
+        if (bigContentView != null) {
+            parcel.writeInt(1);
+            bigContentView.writeToParcel(parcel, 0);
+        } else {
+            parcel.writeInt(0);
+        }
+
+        if (headsUpContentView != null) {
+            parcel.writeInt(1);
+            headsUpContentView.writeToParcel(parcel, 0);
+        } else {
+            parcel.writeInt(0);
+        }
+
+        parcel.writeInt(visibility);
+
+        if (publicVersion != null) {
+            parcel.writeInt(1);
+            publicVersion.writeToParcel(parcel, 0);
+        } else {
+            parcel.writeInt(0);
+        }
+
+        parcel.writeInt(color);
+!!!1681410.java!!!	setLatestEventInfo(inout context : Context, inout contentTitle : CharSequence, inout contentText : CharSequence, inout contentIntent : PendingIntent) : void
+        Notification.Builder builder = new Notification.Builder(context);
+
+        // First, ensure that key pieces of information that may have been set directly
+        // are preserved
+        builder.setWhen(this.when);
+        builder.setSmallIcon(this.icon);
+        builder.setPriority(this.priority);
+        builder.setTicker(this.tickerText);
+        builder.setNumber(this.number);
+        builder.setColor(this.color);
+        builder.mFlags = this.flags;
+        builder.setSound(this.sound, this.audioStreamType);
+        builder.setDefaults(this.defaults);
+        builder.setVibrate(this.vibrate);
+
+        // now apply the latestEventInfo fields
+        if (contentTitle != null) {
+            builder.setContentTitle(contentTitle);
+        }
+        if (contentText != null) {
+            builder.setContentText(contentText);
+        }
+        builder.setContentIntent(contentIntent);
+        builder.buildInto(this);
+!!!1681538.java!!!	toString() : String
+        StringBuilder sb = new StringBuilder();
+        sb.append("Notification(pri=");
+        sb.append(priority);
+        sb.append(" contentView=");
+        if (contentView != null) {
+            sb.append(contentView.getPackage());
+            sb.append("/0x");
+            sb.append(Integer.toHexString(contentView.getLayoutId()));
+        } else {
+            sb.append("null");
+        }
+        sb.append(" vibrate=");
+        if ((this.defaults & DEFAULT_VIBRATE) != 0) {
+            sb.append("default");
+        } else if (this.vibrate != null) {
+            int N = this.vibrate.length-1;
+            sb.append("[");
+            for (int i=0; i<N; i++) {
+                sb.append(this.vibrate[i]);
+                sb.append(',');
+            }
+            if (N != -1) {
+                sb.append(this.vibrate[N]);
+            }
+            sb.append("]");
+        } else {
+            sb.append("null");
+        }
+        sb.append(" sound=");
+        if ((this.defaults & DEFAULT_SOUND) != 0) {
+            sb.append("default");
+        } else if (this.sound != null) {
+            sb.append(this.sound.toString());
+        } else {
+            sb.append("null");
+        }
+        sb.append(" defaults=0x");
+        sb.append(Integer.toHexString(this.defaults));
+        sb.append(" flags=0x");
+        sb.append(Integer.toHexString(this.flags));
+        sb.append(String.format(" color=0x%08x", this.color));
+        if (this.category != null) {
+            sb.append(" category=");
+            sb.append(this.category);
+        }
+        if (this.mGroupKey != null) {
+            sb.append(" groupKey=");
+            sb.append(this.mGroupKey);
+        }
+        if (this.mSortKey != null) {
+            sb.append(" sortKey=");
+            sb.append(this.mSortKey);
+        }
+        if (actions != null) {
+            sb.append(" actions=");
+            sb.append(actions.length);
+        }
+        sb.append(" vis=");
+        sb.append(visibilityToString(this.visibility));
+        if (this.publicVersion != null) {
+            sb.append(" publicVersion=");
+            sb.append(publicVersion.toString());
+        }
+        sb.append(")");
+        return sb.toString();
+!!!1681666.java!!!	visibilityToString(in vis : int) : String
+        switch (vis) {
+            case VISIBILITY_PRIVATE:
+                return "PRIVATE";
+            case VISIBILITY_PUBLIC:
+                return "PUBLIC";
+            case VISIBILITY_SECRET:
+                return "SECRET";
+            default:
+                return "UNKNOWN(" + String.valueOf(vis) + ")";
+        }
+!!!1681794.java!!!	isValid() : boolean
+        // Would like to check for icon!=0 here, too, but NotificationManagerService accepts that
+        // for legacy reasons.
+        return contentView != null || extras.getBoolean(Builder.EXTRA_REBUILD_CONTENT_VIEW);
+!!!1681922.java!!!	isGroupSummary() : boolean
+        return mGroupKey != null && (flags & FLAG_GROUP_SUMMARY) != 0;
+!!!1682050.java!!!	isGroupChild() : boolean
+        return mGroupKey != null && (flags & FLAG_GROUP_SUMMARY) == 0;
+!!!1706882.java!!!	getNotificationArrayFromBundle(inout bundle : Bundle, in key : String) : Notification
+        Parcelable[] array = bundle.getParcelableArray(key);
+        if (array instanceof Notification[] || array == null) {
+            return (Notification[]) array;
+        }
+        Notification[] typedArray = Arrays.copyOf(array, array.length,
+                Notification[].class);
+        bundle.putParcelableArray(key, typedArray);
+        return typedArray;

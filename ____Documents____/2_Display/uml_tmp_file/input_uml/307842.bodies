@@ -1,0 +1,1166 @@
+class DevicePolicyManager
+!!!1773442.java!!!	DevicePolicyManager(inout context : Context, inout handler : Handler)
+        mContext = context;
+        mService = IDevicePolicyManager.Stub.asInterface(
+                ServiceManager.getService(Context.DEVICE_POLICY_SERVICE));
+!!!1773570.java!!!	create(inout context : Context, inout handler : Handler) : DevicePolicyManager
+        DevicePolicyManager me = new DevicePolicyManager(context, handler);
+        return me.mService != null ? me : null;
+!!!1773698.java!!!	isAdminActive(inout who : ComponentName) : boolean
+        return isAdminActiveAsUser(who, UserHandle.myUserId());
+!!!1773826.java!!!	isAdminActiveAsUser(inout who : ComponentName, in userId : int) : boolean
+        if (mService != null) {
+            try {
+                return mService.isAdminActive(who, userId);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1773954.java!!!	getActiveAdmins() : List<ComponentName>
+        return getActiveAdminsAsUser(UserHandle.myUserId());
+!!!1774082.java!!!	getActiveAdminsAsUser(in userId : int) : List<ComponentName>
+        if (mService != null) {
+            try {
+                return mService.getActiveAdmins(userId);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return null;
+!!!1774210.java!!!	packageHasActiveAdmins(in packageName : String) : boolean
+        if (mService != null) {
+            try {
+                return mService.packageHasActiveAdmins(packageName, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1774338.java!!!	removeActiveAdmin(inout who : ComponentName) : void
+        if (mService != null) {
+            try {
+                mService.removeActiveAdmin(who, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1774466.java!!!	hasGrantedPolicy(inout admin : ComponentName, in usesPolicy : int) : boolean
+        if (mService != null) {
+            try {
+                return mService.hasGrantedPolicy(admin, usesPolicy, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1774594.java!!!	setPasswordQuality(inout admin : ComponentName, in quality : int) : void
+        if (mService != null) {
+            try {
+                mService.setPasswordQuality(admin, quality, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1774722.java!!!	getPasswordQuality(inout admin : ComponentName) : int
+        return getPasswordQuality(admin, UserHandle.myUserId());
+!!!1774850.java!!!	getPasswordQuality(inout admin : ComponentName, in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getPasswordQuality(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return PASSWORD_QUALITY_UNSPECIFIED;
+!!!1774978.java!!!	setPasswordMinimumLength(inout admin : ComponentName, in length : int) : void
+        if (mService != null) {
+            try {
+                mService.setPasswordMinimumLength(admin, length, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1775106.java!!!	getPasswordMinimumLength(inout admin : ComponentName) : int
+        return getPasswordMinimumLength(admin, UserHandle.myUserId());
+!!!1775234.java!!!	getPasswordMinimumLength(inout admin : ComponentName, in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getPasswordMinimumLength(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1775362.java!!!	setPasswordMinimumUpperCase(inout admin : ComponentName, in length : int) : void
+        if (mService != null) {
+            try {
+                mService.setPasswordMinimumUpperCase(admin, length, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1775490.java!!!	getPasswordMinimumUpperCase(inout admin : ComponentName) : int
+        return getPasswordMinimumUpperCase(admin, UserHandle.myUserId());
+!!!1775618.java!!!	getPasswordMinimumUpperCase(inout admin : ComponentName, in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getPasswordMinimumUpperCase(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1775746.java!!!	setPasswordMinimumLowerCase(inout admin : ComponentName, in length : int) : void
+        if (mService != null) {
+            try {
+                mService.setPasswordMinimumLowerCase(admin, length, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1775874.java!!!	getPasswordMinimumLowerCase(inout admin : ComponentName) : int
+        return getPasswordMinimumLowerCase(admin, UserHandle.myUserId());
+!!!1776002.java!!!	getPasswordMinimumLowerCase(inout admin : ComponentName, in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getPasswordMinimumLowerCase(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1776130.java!!!	setPasswordMinimumLetters(inout admin : ComponentName, in length : int) : void
+        if (mService != null) {
+            try {
+                mService.setPasswordMinimumLetters(admin, length, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1776258.java!!!	getPasswordMinimumLetters(inout admin : ComponentName) : int
+        return getPasswordMinimumLetters(admin, UserHandle.myUserId());
+!!!1776386.java!!!	getPasswordMinimumLetters(inout admin : ComponentName, in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getPasswordMinimumLetters(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1776514.java!!!	setPasswordMinimumNumeric(inout admin : ComponentName, in length : int) : void
+        if (mService != null) {
+            try {
+                mService.setPasswordMinimumNumeric(admin, length, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1776642.java!!!	getPasswordMinimumNumeric(inout admin : ComponentName) : int
+        return getPasswordMinimumNumeric(admin, UserHandle.myUserId());
+!!!1776770.java!!!	getPasswordMinimumNumeric(inout admin : ComponentName, in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getPasswordMinimumNumeric(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1776898.java!!!	setPasswordMinimumSymbols(inout admin : ComponentName, in length : int) : void
+        if (mService != null) {
+            try {
+                mService.setPasswordMinimumSymbols(admin, length, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1777026.java!!!	getPasswordMinimumSymbols(inout admin : ComponentName) : int
+        return getPasswordMinimumSymbols(admin, UserHandle.myUserId());
+!!!1777154.java!!!	getPasswordMinimumSymbols(inout admin : ComponentName, in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getPasswordMinimumSymbols(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1777282.java!!!	setPasswordMinimumNonLetter(inout admin : ComponentName, in length : int) : void
+        if (mService != null) {
+            try {
+                mService.setPasswordMinimumNonLetter(admin, length, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1777410.java!!!	getPasswordMinimumNonLetter(inout admin : ComponentName) : int
+        return getPasswordMinimumNonLetter(admin, UserHandle.myUserId());
+!!!1777538.java!!!	getPasswordMinimumNonLetter(inout admin : ComponentName, in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getPasswordMinimumNonLetter(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1777666.java!!!	setPasswordHistoryLength(inout admin : ComponentName, in length : int) : void
+        if (mService != null) {
+            try {
+                mService.setPasswordHistoryLength(admin, length, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1777794.java!!!	setPasswordExpirationTimeout(inout admin : ComponentName, in timeout : long) : void
+        if (mService != null) {
+            try {
+                mService.setPasswordExpirationTimeout(admin, timeout, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1777922.java!!!	getPasswordExpirationTimeout(inout admin : ComponentName) : long
+        if (mService != null) {
+            try {
+                return mService.getPasswordExpirationTimeout(admin, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1778050.java!!!	getPasswordExpiration(inout admin : ComponentName) : long
+        if (mService != null) {
+            try {
+                return mService.getPasswordExpiration(admin, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1778178.java!!!	getPasswordHistoryLength(inout admin : ComponentName) : int
+        return getPasswordHistoryLength(admin, UserHandle.myUserId());
+!!!1778306.java!!!	getPasswordHistoryLength(inout admin : ComponentName, in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getPasswordHistoryLength(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1778434.java!!!	getPasswordMaximumLength(in quality : int) : int
+        // Kind-of arbitrary.
+        return 16;
+!!!1778562.java!!!	isActivePasswordSufficient() : boolean
+        if (mService != null) {
+            try {
+                return mService.isActivePasswordSufficient(UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1778690.java!!!	getCurrentFailedPasswordAttempts() : int
+        if (mService != null) {
+            try {
+                return mService.getCurrentFailedPasswordAttempts(UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return -1;
+!!!1778818.java!!!	setMaximumFailedPasswordsForWipe(inout admin : ComponentName, in num : int) : void
+        if (mService != null) {
+            try {
+                mService.setMaximumFailedPasswordsForWipe(admin, num, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1778946.java!!!	getMaximumFailedPasswordsForWipe(inout admin : ComponentName) : int
+        return getMaximumFailedPasswordsForWipe(admin, UserHandle.myUserId());
+!!!1779074.java!!!	getMaximumFailedPasswordsForWipe(inout admin : ComponentName, in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getMaximumFailedPasswordsForWipe(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1779202.java!!!	resetPassword(in password : String, in flags : int) : boolean
+        if (mService != null) {
+            try {
+                return mService.resetPassword(password, flags, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1779330.java!!!	setMaximumTimeToLock(inout admin : ComponentName, in timeMs : long) : void
+        if (mService != null) {
+            try {
+                mService.setMaximumTimeToLock(admin, timeMs, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1779458.java!!!	getMaximumTimeToLock(inout admin : ComponentName) : long
+        return getMaximumTimeToLock(admin, UserHandle.myUserId());
+!!!1779586.java!!!	getMaximumTimeToLock(inout admin : ComponentName, in userHandle : int) : long
+        if (mService != null) {
+            try {
+                return mService.getMaximumTimeToLock(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return 0;
+!!!1779714.java!!!	lockNow() : void
+        if (mService != null) {
+            try {
+                mService.lockNow();
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1779842.java!!!	wipeData(in flags : int) : void
+        if (mService != null) {
+            try {
+                mService.wipeData(flags, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1779970.java!!!	setGlobalProxy(inout admin : ComponentName, inout proxySpec : Proxy, inout exclusionList : List<String>) : ComponentName
+        if (proxySpec == null) {
+            throw new NullPointerException();
+        }
+        if (mService != null) {
+            try {
+                String hostSpec;
+                String exclSpec;
+                if (proxySpec.equals(Proxy.NO_PROXY)) {
+                    hostSpec = null;
+                    exclSpec = null;
+                } else {
+                    if (!proxySpec.type().equals(Proxy.Type.HTTP)) {
+                        throw new IllegalArgumentException();
+                    }
+                    InetSocketAddress sa = (InetSocketAddress)proxySpec.address();
+                    String hostName = sa.getHostName();
+                    int port = sa.getPort();
+                    StringBuilder hostBuilder = new StringBuilder();
+                    hostSpec = hostBuilder.append(hostName)
+                        .append(":").append(Integer.toString(port)).toString();
+                    if (exclusionList == null) {
+                        exclSpec = "";
+                    } else {
+                        StringBuilder listBuilder = new StringBuilder();
+                        boolean firstDomain = true;
+                        for (String exclDomain : exclusionList) {
+                            if (!firstDomain) {
+                                listBuilder = listBuilder.append(",");
+                            } else {
+                                firstDomain = false;
+                            }
+                            listBuilder = listBuilder.append(exclDomain.trim());
+                        }
+                        exclSpec = listBuilder.toString();
+                    }
+                    if (android.net.Proxy.validate(hostName, Integer.toString(port), exclSpec)
+                            != android.net.Proxy.PROXY_VALID)
+                        throw new IllegalArgumentException();
+                }
+                return mService.setGlobalProxy(admin, hostSpec, exclSpec, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return null;
+!!!1780098.java!!!	setRecommendedGlobalProxy(inout admin : ComponentName, inout proxyInfo : ProxyInfo) : void
+        if (mService != null) {
+            try {
+                mService.setRecommendedGlobalProxy(admin, proxyInfo);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1780226.java!!!	getGlobalProxyAdmin() : ComponentName
+        if (mService != null) {
+            try {
+                return mService.getGlobalProxyAdmin(UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return null;
+!!!1780354.java!!!	setStorageEncryption(inout admin : ComponentName, inout encrypt : boolean) : int
+        if (mService != null) {
+            try {
+                return mService.setStorageEncryption(admin, encrypt, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return ENCRYPTION_STATUS_UNSUPPORTED;
+!!!1780482.java!!!	getStorageEncryption(inout admin : ComponentName) : boolean
+        if (mService != null) {
+            try {
+                return mService.getStorageEncryption(admin, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1780610.java!!!	getStorageEncryptionStatus() : int
+        return getStorageEncryptionStatus(UserHandle.myUserId());
+!!!1780738.java!!!	getStorageEncryptionStatus(in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getStorageEncryptionStatus(userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return ENCRYPTION_STATUS_UNSUPPORTED;
+!!!1780866.java!!!	installCaCert(inout admin : ComponentName, inout certBuffer : byte) : boolean
+        if (mService != null) {
+            try {
+                return mService.installCaCert(admin, certBuffer);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1780994.java!!!	uninstallCaCert(inout admin : ComponentName, inout certBuffer : byte) : void
+        if (mService != null) {
+            try {
+                final String alias = getCaCertAlias(certBuffer);
+                mService.uninstallCaCert(admin, alias);
+            } catch (CertificateException e) {
+                Log.w(TAG, "Unable to parse certificate", e);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1781122.java!!!	getInstalledCaCerts(inout admin : ComponentName) : List<byte[]>
+        List<byte[]> certs = new ArrayList<byte[]>();
+        if (mService != null) {
+            try {
+                mService.enforceCanManageCaCerts(admin);
+                final TrustedCertificateStore certStore = new TrustedCertificateStore();
+                for (String alias : certStore.userAliases()) {
+                    try {
+                        certs.add(certStore.getCertificate(alias).getEncoded());
+                    } catch (CertificateException ce) {
+                        Log.w(TAG, "Could not encode certificate: " + alias, ce);
+                    }
+                }
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed talking with device policy service", re);
+            }
+        }
+        return certs;
+!!!1781250.java!!!	uninstallAllUserCaCerts(inout admin : ComponentName) : void
+        if (mService != null) {
+            for (String alias : new TrustedCertificateStore().userAliases()) {
+                try {
+                    mService.uninstallCaCert(admin, alias);
+                } catch (RemoteException re) {
+                    Log.w(TAG, "Failed talking with device policy service", re);
+                }
+            }
+        }
+!!!1781378.java!!!	hasCaCertInstalled(inout admin : ComponentName, inout certBuffer : byte) : boolean
+        if (mService != null) {
+            try {
+                mService.enforceCanManageCaCerts(admin);
+                return getCaCertAlias(certBuffer) != null;
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed talking with device policy service", re);
+            } catch (CertificateException ce) {
+                Log.w(TAG, "Could not parse certificate", ce);
+            }
+        }
+        return false;
+!!!1781506.java!!!	installKeyPair(inout who : ComponentName, inout privKey : PrivateKey, inout cert : Certificate, in alias : String) : boolean
+        try {
+            final byte[] pemCert = Credentials.convertToPem(cert);
+            return mService.installKeyPair(who, privKey.getEncoded(), pemCert, alias);
+        } catch (CertificateException e) {
+            Log.w(TAG, "Error encoding certificate", e);
+        } catch (IOException e) {
+            Log.w(TAG, "Error writing certificate", e);
+        } catch (RemoteException e) {
+            Log.w(TAG, "Failed talking with device policy service", e);
+        }
+        return false;
+!!!1781634.java!!!	getCaCertAlias(inout certBuffer : byte) : String
+        final CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+        final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(
+                              new ByteArrayInputStream(certBuffer));
+        return new TrustedCertificateStore().getCertificateAlias(cert);
+!!!1781762.java!!!	setCameraDisabled(inout admin : ComponentName, inout disabled : boolean) : void
+        if (mService != null) {
+            try {
+                mService.setCameraDisabled(admin, disabled, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1781890.java!!!	getCameraDisabled(inout admin : ComponentName) : boolean
+        return getCameraDisabled(admin, UserHandle.myUserId());
+!!!1782018.java!!!	getCameraDisabled(inout admin : ComponentName, in userHandle : int) : boolean
+        if (mService != null) {
+            try {
+                return mService.getCameraDisabled(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1782146.java!!!	setScreenCaptureDisabled(inout admin : ComponentName, inout disabled : boolean) : void
+        if (mService != null) {
+            try {
+                mService.setScreenCaptureDisabled(admin, UserHandle.myUserId(), disabled);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1782274.java!!!	getScreenCaptureDisabled(inout admin : ComponentName) : boolean
+        return getScreenCaptureDisabled(admin, UserHandle.myUserId());
+!!!1782402.java!!!	getScreenCaptureDisabled(inout admin : ComponentName, in userHandle : int) : boolean
+        if (mService != null) {
+            try {
+                return mService.getScreenCaptureDisabled(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1782530.java!!!	setAutoTimeRequired(inout admin : ComponentName, inout required : boolean) : void
+        if (mService != null) {
+            try {
+                mService.setAutoTimeRequired(admin, UserHandle.myUserId(), required);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1782658.java!!!	getAutoTimeRequired() : boolean
+        if (mService != null) {
+            try {
+                return mService.getAutoTimeRequired();
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1782786.java!!!	setKeyguardDisabledFeatures(inout admin : ComponentName, in which : int) : void
+        if (mService != null) {
+            try {
+                mService.setKeyguardDisabledFeatures(admin, which, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1782914.java!!!	getKeyguardDisabledFeatures(inout admin : ComponentName) : int
+        return getKeyguardDisabledFeatures(admin, UserHandle.myUserId());
+!!!1783042.java!!!	getKeyguardDisabledFeatures(inout admin : ComponentName, in userHandle : int) : int
+        if (mService != null) {
+            try {
+                return mService.getKeyguardDisabledFeatures(admin, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return KEYGUARD_DISABLE_FEATURES_NONE;
+!!!1783170.java!!!	setActiveAdmin(inout policyReceiver : ComponentName, inout refreshing : boolean, in userHandle : int) : void
+        if (mService != null) {
+            try {
+                mService.setActiveAdmin(policyReceiver, refreshing, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1783298.java!!!	setActiveAdmin(inout policyReceiver : ComponentName, inout refreshing : boolean) : void
+        setActiveAdmin(policyReceiver, refreshing, UserHandle.myUserId());
+!!!1783426.java!!!	getAdminInfo(inout cn : ComponentName) : DeviceAdminInfo
+        ActivityInfo ai;
+        try {
+            ai = mContext.getPackageManager().getReceiverInfo(cn,
+                    PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.w(TAG, "Unable to retrieve device policy " + cn, e);
+            return null;
+        }
+
+        ResolveInfo ri = new ResolveInfo();
+        ri.activityInfo = ai;
+
+        try {
+            return new DeviceAdminInfo(mContext, ri);
+        } catch (XmlPullParserException e) {
+            Log.w(TAG, "Unable to parse device policy " + cn, e);
+            return null;
+        } catch (IOException e) {
+            Log.w(TAG, "Unable to parse device policy " + cn, e);
+            return null;
+        }
+!!!1783554.java!!!	getRemoveWarning(inout admin : ComponentName, inout result : RemoteCallback) : void
+        if (mService != null) {
+            try {
+                mService.getRemoveWarning(admin, result, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1783682.java!!!	setActivePasswordState(in quality : int, in length : int, in letters : int, in uppercase : int, in lowercase : int, in numbers : int, in symbols : int, in nonletter : int, in userHandle : int) : void
+        if (mService != null) {
+            try {
+                mService.setActivePasswordState(quality, length, letters, uppercase, lowercase,
+                        numbers, symbols, nonletter, userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1783810.java!!!	reportFailedPasswordAttempt(in userHandle : int) : void
+        if (mService != null) {
+            try {
+                mService.reportFailedPasswordAttempt(userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1783938.java!!!	reportSuccessfulPasswordAttempt(in userHandle : int) : void
+        if (mService != null) {
+            try {
+                mService.reportSuccessfulPasswordAttempt(userHandle);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1784066.java!!!	setDeviceOwner(in packageName : String) : boolean
+        return setDeviceOwner(packageName, null);
+!!!1784194.java!!!	setDeviceOwner(in packageName : String, in ownerName : String) : boolean
+        if (mService != null) {
+            try {
+                return mService.setDeviceOwner(packageName, ownerName);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to set device owner");
+            }
+        }
+        return false;
+!!!1784322.java!!!	isDeviceOwnerApp(in packageName : String) : boolean
+        if (mService != null) {
+            try {
+                return mService.isDeviceOwner(packageName);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to check device owner");
+            }
+        }
+        return false;
+!!!1784450.java!!!	isDeviceOwner(in packageName : String) : boolean
+        return isDeviceOwnerApp(packageName);
+!!!1784578.java!!!	clearDeviceOwnerApp(in packageName : String) : void
+        if (mService != null) {
+            try {
+                mService.clearDeviceOwner(packageName);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to clear device owner");
+            }
+        }
+!!!1784706.java!!!	getDeviceOwner() : String
+        if (mService != null) {
+            try {
+                return mService.getDeviceOwner();
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to get device owner");
+            }
+        }
+        return null;
+!!!1784834.java!!!	getDeviceOwnerName() : String
+        if (mService != null) {
+            try {
+                return mService.getDeviceOwnerName();
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to get device owner");
+            }
+        }
+        return null;
+!!!1784962.java!!!	setActiveProfileOwner(inout admin : ComponentName, in ownerName : String) : boolean
+        if (mService != null) {
+            try {
+                final int myUserId = UserHandle.myUserId();
+                mService.setActiveAdmin(admin, false, myUserId);
+                return mService.setProfileOwner(admin, ownerName, myUserId);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to set profile owner " + re);
+                throw new IllegalArgumentException("Couldn't set profile owner.", re);
+            }
+        }
+        return false;
+!!!1785090.java!!!	clearProfileOwner(inout admin : ComponentName) : void
+        if (mService != null) {
+            try {
+                mService.clearProfileOwner(admin);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to clear profile owner " + admin + re);
+            }
+        }
+!!!1785218.java!!!	hasUserSetupCompleted() : boolean
+        if (mService != null) {
+            try {
+                return mService.hasUserSetupCompleted();
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to check if user setup has completed");
+            }
+        }
+        return true;
+!!!1785346.java!!!	setProfileOwner(in packageName : String, in ownerName : String, in userHandle : int) : boolean
+        if (packageName == null) {
+            throw new NullPointerException("packageName cannot be null");
+        }
+        return setProfileOwner(new ComponentName(packageName, ""), ownerName, userHandle);
+!!!1785474.java!!!	setProfileOwner(inout admin : ComponentName, in ownerName : String, in userHandle : int) : boolean
+        if (admin == null) {
+            throw new NullPointerException("admin cannot be null");
+        }
+        if (mService != null) {
+            try {
+                if (ownerName == null) {
+                    ownerName = "";
+                }
+                return mService.setProfileOwner(admin, ownerName, userHandle);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to set profile owner", re);
+                throw new IllegalArgumentException("Couldn't set profile owner.", re);
+            }
+        }
+        return false;
+!!!1785602.java!!!	setProfileEnabled(inout admin : ComponentName) : void
+        if (mService != null) {
+            try {
+                mService.setProfileEnabled(admin);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1785730.java!!!	setProfileName(inout who : ComponentName, in profileName : String) : void
+        if (mService != null) {
+            try {
+            mService.setProfileName(who, profileName);
+        } catch (RemoteException e) {
+            Log.w(TAG, "Failed talking with device policy service", e);
+        }
+    }
+!!!1785858.java!!!	isProfileOwnerApp(in packageName : String) : boolean
+        if (mService != null) {
+            try {
+                ComponentName profileOwner = mService.getProfileOwner(
+                        Process.myUserHandle().getIdentifier());
+                return profileOwner != null
+                        && profileOwner.getPackageName().equals(packageName);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to check profile owner");
+            }
+        }
+        return false;
+!!!1785986.java!!!	getProfileOwner() : ComponentName
+        return getProfileOwnerAsUser(Process.myUserHandle().getIdentifier());
+!!!1786114.java!!!	getProfileOwnerAsUser(in userId : int) : ComponentName
+        if (mService != null) {
+            try {
+                return mService.getProfileOwner(userId);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to get profile owner");
+                throw new IllegalArgumentException(
+                        "Requested profile owner for invalid userId", re);
+            }
+        }
+        return null;
+!!!1786242.java!!!	getProfileOwnerName() : String
+        if (mService != null) {
+            try {
+                return mService.getProfileOwnerName(Process.myUserHandle().getIdentifier());
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to get profile owner");
+                throw new IllegalArgumentException(
+                        "Requested profile owner for invalid userId", re);
+            }
+        }
+        return null;
+!!!1786370.java!!!	getProfileOwnerNameAsUser(in userId : int) : String
+        if (mService != null) {
+            try {
+                return mService.getProfileOwnerName(userId);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to get profile owner");
+                throw new IllegalArgumentException(
+                        "Requested profile owner for invalid userId", re);
+            }
+        }
+        return null;
+!!!1786498.java!!!	addPersistentPreferredActivity(inout admin : ComponentName, inout filter : IntentFilter, inout activity : ComponentName) : void
+        if (mService != null) {
+            try {
+                mService.addPersistentPreferredActivity(admin, filter, activity);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1786626.java!!!	clearPackagePersistentPreferredActivities(inout admin : ComponentName, in packageName : String) : void
+        if (mService != null) {
+            try {
+                mService.clearPackagePersistentPreferredActivities(admin, packageName);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1786754.java!!!	setApplicationRestrictions(inout admin : ComponentName, in packageName : String, inout settings : Bundle) : void
+        if (mService != null) {
+            try {
+                mService.setApplicationRestrictions(admin, packageName, settings);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1786882.java!!!	setTrustAgentFeaturesEnabled(inout admin : ComponentName, inout agent : ComponentName, inout features : List<String>) : void
+        if (mService != null) {
+            try {
+                mService.setTrustAgentFeaturesEnabled(admin, agent, features, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1787010.java!!!	getTrustAgentFeaturesEnabled(inout admin : ComponentName, inout agent : ComponentName) : List<String>
+        if (mService != null) {
+            try {
+                return mService.getTrustAgentFeaturesEnabled(admin, agent, UserHandle.myUserId());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return new ArrayList<String>(); // empty list
+!!!1787138.java!!!	setCrossProfileCallerIdDisabled(inout who : ComponentName, inout disabled : boolean) : void
+        if (mService != null) {
+            try {
+                mService.setCrossProfileCallerIdDisabled(who, disabled);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1787266.java!!!	getCrossProfileCallerIdDisabled(inout who : ComponentName) : boolean
+        if (mService != null) {
+            try {
+                return mService.getCrossProfileCallerIdDisabled(who);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1787394.java!!!	getCrossProfileCallerIdDisabled(inout userHandle : UserHandle) : boolean
+        if (mService != null) {
+            try {
+                return mService.getCrossProfileCallerIdDisabledForUser(userHandle.getIdentifier());
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1787522.java!!!	addCrossProfileIntentFilter(inout admin : ComponentName, inout filter : IntentFilter, in flags : int) : void
+        if (mService != null) {
+            try {
+                mService.addCrossProfileIntentFilter(admin, filter, flags);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1787650.java!!!	clearCrossProfileIntentFilters(inout admin : ComponentName) : void
+        if (mService != null) {
+            try {
+                mService.clearCrossProfileIntentFilters(admin);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1787778.java!!!	setPermittedAccessibilityServices(inout admin : ComponentName, inout packageNames : List<String>) : boolean
+        if (mService != null) {
+            try {
+                return mService.setPermittedAccessibilityServices(admin, packageNames);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1787906.java!!!	getPermittedAccessibilityServices(inout admin : ComponentName) : List<String>
+        if (mService != null) {
+            try {
+                return mService.getPermittedAccessibilityServices(admin);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return null;
+!!!1788034.java!!!	getPermittedAccessibilityServices(in userId : int) : List<String>
+        if (mService != null) {
+            try {
+                return mService.getPermittedAccessibilityServicesForUser(userId);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return null;
+!!!1788162.java!!!	setPermittedInputMethods(inout admin : ComponentName, inout packageNames : List<String>) : boolean
+        if (mService != null) {
+            try {
+                return mService.setPermittedInputMethods(admin, packageNames);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1788290.java!!!	getPermittedInputMethods(inout admin : ComponentName) : List<String>
+        if (mService != null) {
+            try {
+                return mService.getPermittedInputMethods(admin);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return null;
+!!!1788418.java!!!	getPermittedInputMethodsForCurrentUser() : List<String>
+        if (mService != null) {
+            try {
+                return mService.getPermittedInputMethodsForCurrentUser();
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return null;
+!!!1788546.java!!!	createUser(inout admin : ComponentName, in name : String) : UserHandle
+        try {
+            return mService.createUser(admin, name);
+        } catch (RemoteException re) {
+            Log.w(TAG, "Could not create a user", re);
+        }
+        return null;
+!!!1788674.java!!!	createAndInitializeUser(inout admin : ComponentName, in name : String, in ownerName : String, inout profileOwnerComponent : ComponentName, inout adminExtras : Bundle) : UserHandle
+        try {
+            return mService.createAndInitializeUser(admin, name, ownerName, profileOwnerComponent,
+                    adminExtras);
+        } catch (RemoteException re) {
+            Log.w(TAG, "Could not create a user", re);
+        }
+        return null;
+!!!1788802.java!!!	removeUser(inout admin : ComponentName, inout userHandle : UserHandle) : boolean
+        try {
+            return mService.removeUser(admin, userHandle);
+        } catch (RemoteException re) {
+            Log.w(TAG, "Could not remove user ", re);
+            return false;
+        }
+!!!1788930.java!!!	switchUser(inout admin : ComponentName, inout userHandle : UserHandle) : boolean
+        try {
+            return mService.switchUser(admin, userHandle);
+        } catch (RemoteException re) {
+            Log.w(TAG, "Could not switch user ", re);
+            return false;
+        }
+!!!1789058.java!!!	getApplicationRestrictions(inout admin : ComponentName, in packageName : String) : Bundle
+        if (mService != null) {
+            try {
+                return mService.getApplicationRestrictions(admin, packageName);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return null;
+!!!1789186.java!!!	addUserRestriction(inout admin : ComponentName, in key : String) : void
+        if (mService != null) {
+            try {
+                mService.setUserRestriction(admin, key, true);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1789314.java!!!	clearUserRestriction(inout admin : ComponentName, in key : String) : void
+        if (mService != null) {
+            try {
+                mService.setUserRestriction(admin, key, false);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1789442.java!!!	setApplicationHidden(inout admin : ComponentName, in packageName : String, inout hidden : boolean) : boolean
+        if (mService != null) {
+            try {
+                return mService.setApplicationHidden(admin, packageName, hidden);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1789570.java!!!	isApplicationHidden(inout admin : ComponentName, in packageName : String) : boolean
+        if (mService != null) {
+            try {
+                return mService.isApplicationHidden(admin, packageName);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1789698.java!!!	enableSystemApp(inout admin : ComponentName, in packageName : String) : void
+        if (mService != null) {
+            try {
+                mService.enableSystemApp(admin, packageName);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed to install package: " + packageName);
+            }
+        }
+!!!1789826.java!!!	enableSystemApp(inout admin : ComponentName, inout intent : Intent) : int
+        if (mService != null) {
+            try {
+                return mService.enableSystemAppWithIntent(admin, intent);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed to install packages matching filter: " + intent);
+            }
+        }
+        return 0;
+!!!1789954.java!!!	setAccountManagementDisabled(inout admin : ComponentName, in accountType : String, inout disabled : boolean) : void
+        if (mService != null) {
+            try {
+                mService.setAccountManagementDisabled(admin, accountType, disabled);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1790082.java!!!	getAccountTypesWithManagementDisabled() : String
+        return getAccountTypesWithManagementDisabledAsUser(UserHandle.myUserId());
+!!!1790210.java!!!	getAccountTypesWithManagementDisabledAsUser(in userId : int) : String
+        if (mService != null) {
+            try {
+                return mService.getAccountTypesWithManagementDisabledAsUser(userId);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+
+        return null;
+!!!1790338.java!!!	setLockTaskPackages(inout admin : ComponentName, inout packages : String) : void
+        if (mService != null) {
+            try {
+                mService.setLockTaskPackages(admin, packages);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1790466.java!!!	getLockTaskPackages(inout admin : ComponentName) : String
+        if (mService != null) {
+            try {
+                return mService.getLockTaskPackages(admin);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return null;
+!!!1790594.java!!!	isLockTaskPermitted(in pkg : String) : boolean
+        if (mService != null) {
+            try {
+                return mService.isLockTaskPermitted(pkg);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+        return false;
+!!!1790722.java!!!	setGlobalSetting(inout admin : ComponentName, in setting : String, in value : String) : void
+        if (mService != null) {
+            try {
+                mService.setGlobalSetting(admin, setting, value);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1790850.java!!!	setSecureSetting(inout admin : ComponentName, in setting : String, in value : String) : void
+        if (mService != null) {
+            try {
+                mService.setSecureSetting(admin, setting, value);
+            } catch (RemoteException e) {
+                Log.w(TAG, "Failed talking with device policy service", e);
+            }
+        }
+!!!1790978.java!!!	setRestrictionsProvider(inout admin : ComponentName, inout provider : ComponentName) : void
+        if (mService != null) {
+            try {
+                mService.setRestrictionsProvider(admin, provider);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to set permission provider on device policy service");
+            }
+        }
+!!!1791106.java!!!	setMasterVolumeMuted(inout admin : ComponentName, inout on : boolean) : void
+        if (mService != null) {
+            try {
+                mService.setMasterVolumeMuted(admin, on);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to setMasterMute on device policy service");
+            }
+        }
+!!!1791234.java!!!	isMasterVolumeMuted(inout admin : ComponentName) : boolean
+        if (mService != null) {
+            try {
+                return mService.isMasterVolumeMuted(admin);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to get isMasterMute on device policy service");
+            }
+        }
+        return false;
+!!!1791362.java!!!	setUninstallBlocked(inout admin : ComponentName, in packageName : String, inout uninstallBlocked : boolean) : void
+        if (mService != null) {
+            try {
+                mService.setUninstallBlocked(admin, packageName, uninstallBlocked);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to call block uninstall on device policy service");
+            }
+        }
+!!!1791490.java!!!	isUninstallBlocked(inout admin : ComponentName, in packageName : String) : boolean
+        if (mService != null) {
+            try {
+                return mService.isUninstallBlocked(admin, packageName);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Failed to call block uninstall on device policy service");
+            }
+        }
+        return false;
+!!!1791618.java!!!	addCrossProfileWidgetProvider(inout admin : ComponentName, in packageName : String) : boolean
+        if (mService != null) {
+            try {
+                return mService.addCrossProfileWidgetProvider(admin, packageName);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Error calling addCrossProfileWidgetProvider", re);
+            }
+        }
+        return false;
+!!!1791746.java!!!	removeCrossProfileWidgetProvider(inout admin : ComponentName, in packageName : String) : boolean
+        if (mService != null) {
+            try {
+                return mService.removeCrossProfileWidgetProvider(admin, packageName);
+            } catch (RemoteException re) {
+                Log.w(TAG, "Error calling removeCrossProfileWidgetProvider", re);
+            }
+        }
+        return false;
+!!!1791874.java!!!	getCrossProfileWidgetProviders(inout admin : ComponentName) : List<String>
+        if (mService != null) {
+            try {
+                List<String> providers = mService.getCrossProfileWidgetProviders(admin);
+                if (providers != null) {
+                    return providers;
+                }
+            } catch (RemoteException re) {
+                Log.w(TAG, "Error calling getCrossProfileWidgetProviders", re);
+            }
+        }
+        return Collections.emptyList();

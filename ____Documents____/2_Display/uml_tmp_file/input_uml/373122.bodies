@@ -1,0 +1,27 @@
+class InsertionPointCursorController
+!!!2256130.java!!!	show() : void
+            getHandle().show();
+!!!2256258.java!!!	showWithActionPopup() : void
+            getHandle().showWithActionPopup();
+!!!2256386.java!!!	hide() : void
+            if (mHandle != null) {
+                mHandle.hide();
+            }
+!!!2256514.java!!!	onTouchModeChanged(inout isInTouchMode : boolean) : void
+            if (!isInTouchMode) {
+                hide();
+            }
+!!!2256642.java!!!	getHandle() : Editor::InsertionHandleView
+            if (mSelectHandleCenter == null) {
+                mSelectHandleCenter = mTextView.getContext().getDrawable(
+                        mTextView.mTextSelectHandleRes);
+            }
+            if (mHandle == null) {
+                mHandle = new InsertionHandleView(mSelectHandleCenter);
+            }
+            return mHandle;
+!!!2256770.java!!!	onDetached() : void
+            final ViewTreeObserver observer = mTextView.getViewTreeObserver();
+            observer.removeOnTouchModeChangeListener(this);
+
+            if (mHandle != null) mHandle.onDetached();

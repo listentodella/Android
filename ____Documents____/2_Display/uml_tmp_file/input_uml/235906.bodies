@@ -1,0 +1,83 @@
+class ViewPropertyAnimatorRT
+!!!934402.java!!!	ViewPropertyAnimatorRT(inout view : View)
+        mView = view;
+!!!934530.java!!!	startAnimation(inout parent : ViewPropertyAnimator) : boolean
+        cancelAnimators(parent.mPendingAnimations);
+        if (!canHandleAnimator(parent)) {
+            return false;
+        }
+        doStartAnimation(parent);
+        return true;
+!!!934658.java!!!	cancelAll() : void
+        for (int i = 0; i < mAnimators.length; i++) {
+            if (mAnimators[i] != null) {
+                mAnimators[i].cancel();
+                mAnimators[i] = null;
+            }
+        }
+!!!934786.java!!!	doStartAnimation(inout parent : ViewPropertyAnimator) : void
+        int size = parent.mPendingAnimations.size();
+
+        long startDelay = parent.getStartDelay();
+        long duration = parent.getDuration();
+        TimeInterpolator interpolator = parent.getInterpolator();
+        if (interpolator == null) {
+            // Documented to be LinearInterpolator in ValueAnimator.setInterpolator
+            interpolator = sLinearInterpolator;
+        }
+        if (!RenderNodeAnimator.isNativeInterpolator(interpolator)) {
+            interpolator = new FallbackLUTInterpolator(interpolator, duration);
+        }
+        for (int i = 0; i < size; i++) {
+            NameValuesHolder holder = parent.mPendingAnimations.get(i);
+            int property = RenderNodeAnimator.mapViewPropertyToRenderProperty(holder.mNameConstant);
+
+            final float finalValue = holder.mFromValue + holder.mDeltaValue;
+            RenderNodeAnimator animator = new RenderNodeAnimator(property, finalValue);
+            animator.setStartDelay(startDelay);
+            animator.setDuration(duration);
+            animator.setInterpolator(interpolator);
+            animator.setTarget(mView);
+            animator.start();
+
+            mAnimators[property] = animator;
+        }
+
+        parent.mPendingAnimations.clear();
+!!!934914.java!!!	canHandleAnimator(inout parent : ViewPropertyAnimator) : boolean
+        // TODO: Can we eliminate this entirely?
+        // If RenderNode.animatorProperties() can be toggled to point at staging
+        // instead then RNA can be used as the animators for software as well
+        // as the updateListener fallback paths. If this can be toggled
+        // at the top level somehow, combined with requiresUiRedraw, we could
+        // ensure that RT does not self-animate, allowing for safe driving of
+        // the animators from the UI thread using the same mechanisms
+        // ViewPropertyAnimator does, just with everything sitting on a single
+        // animator subsystem instead of multiple.
+
+        if (parent.getUpdateListener() != null) {
+            return false;
+        }
+        if (parent.getListener() != null) {
+            // TODO support
+            return false;
+        }
+        if (!mView.isHardwareAccelerated()) {
+            // TODO handle this maybe?
+            return false;
+        }
+        if (parent.hasActions()) {
+            return false;
+        }
+        // Here goes nothing...
+        return true;
+!!!935042.java!!!	cancelAnimators(inout mPendingAnimations : ArrayList<NameValuesHolder>) : void
+        int size = mPendingAnimations.size();
+        for (int i = 0; i < size; i++) {
+            NameValuesHolder holder = mPendingAnimations.get(i);
+            int property = RenderNodeAnimator.mapViewPropertyToRenderProperty(holder.mNameConstant);
+            if (mAnimators[property] != null) {
+                mAnimators[property].cancel();
+                mAnimators[property] = null;
+            }
+        }

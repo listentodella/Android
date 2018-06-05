@@ -1,0 +1,15 @@
+class MediaRouterCallback
+!!!1670658.java!!!	onRouteAdded(inout router : MediaRouter, inout info : RouteInfo) : void
+            refreshRoute();
+!!!1670786.java!!!	onRouteRemoved(inout router : MediaRouter, inout info : RouteInfo) : void
+            refreshRoute();
+!!!1670914.java!!!	onRouteChanged(inout router : MediaRouter, inout info : RouteInfo) : void
+            refreshRoute();
+!!!1671042.java!!!	onRouteSelected(inout router : MediaRouter, in type : int, inout info : RouteInfo) : void
+            refreshRoute();
+!!!1671170.java!!!	onRouteUnselected(inout router : MediaRouter, in type : int, inout info : RouteInfo) : void
+            refreshRoute();
+!!!1671298.java!!!	onRouteGrouped(inout router : MediaRouter, inout info : RouteInfo, inout group : RouteGroup, in index : int) : void
+            refreshRoute();
+!!!1671426.java!!!	onRouteUngrouped(inout router : MediaRouter, inout info : RouteInfo, inout group : RouteGroup) : void
+            refreshRoute();

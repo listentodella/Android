@@ -1,0 +1,67 @@
+class CaptionStyle
+!!!1103106.java!!!	CaptionStyle(in foregroundColor : int, in backgroundColor : int, in edgeType : int, in edgeColor : int, in windowColor : int, in rawTypeface : String)
+            mHasForegroundColor = foregroundColor != COLOR_UNSPECIFIED;
+            mHasBackgroundColor = backgroundColor != COLOR_UNSPECIFIED;
+            mHasEdgeType = edgeType != EDGE_TYPE_UNSPECIFIED;
+            mHasEdgeColor = edgeColor != COLOR_UNSPECIFIED;
+            mHasWindowColor = windowColor != COLOR_UNSPECIFIED;
+
+            // Always use valid colors, even when no override is specified, to
+            // ensure backwards compatibility with apps targeting KitKat MR2.
+            this.foregroundColor = mHasForegroundColor ? foregroundColor : Color.WHITE;
+            this.backgroundColor = mHasBackgroundColor ? backgroundColor : Color.BLACK;
+            this.edgeType = mHasEdgeType ? edgeType : EDGE_TYPE_NONE;
+            this.edgeColor = mHasEdgeColor ? edgeColor : Color.BLACK;
+            this.windowColor = mHasWindowColor ? windowColor : COLOR_NONE_OPAQUE;
+
+            mRawTypeface = rawTypeface;
+!!!1103234.java!!!	applyStyle(inout overlay : CaptioningManager::CaptionStyle) : CaptioningManager::CaptionStyle
+            final int newForegroundColor = overlay.hasForegroundColor() ?
+                    overlay.foregroundColor : foregroundColor;
+            final int newBackgroundColor = overlay.hasBackgroundColor() ?
+                    overlay.backgroundColor : backgroundColor;
+            final int newEdgeType = overlay.hasEdgeType() ?
+                    overlay.edgeType : edgeType;
+            final int newEdgeColor = overlay.hasEdgeColor() ?
+                    overlay.edgeColor : edgeColor;
+            final int newWindowColor = overlay.hasWindowColor() ?
+                    overlay.windowColor : windowColor;
+            final String newRawTypeface = overlay.mRawTypeface != null ?
+                    overlay.mRawTypeface : mRawTypeface;
+            return new CaptionStyle(newForegroundColor, newBackgroundColor, newEdgeType,
+                    newEdgeColor, newWindowColor, newRawTypeface);
+!!!1103362.java!!!	hasBackgroundColor() : boolean
+            return mHasBackgroundColor;
+!!!1103490.java!!!	hasForegroundColor() : boolean
+            return mHasForegroundColor;
+!!!1103618.java!!!	hasEdgeType() : boolean
+            return mHasEdgeType;
+!!!1103746.java!!!	hasEdgeColor() : boolean
+            return mHasEdgeColor;
+!!!1103874.java!!!	hasWindowColor() : boolean
+            return mHasWindowColor;
+!!!1104002.java!!!	getTypeface() : Typeface
+            if (mParsedTypeface == null && !TextUtils.isEmpty(mRawTypeface)) {
+                mParsedTypeface = Typeface.create(mRawTypeface, Typeface.NORMAL);
+            }
+            return mParsedTypeface;
+!!!1104130.java!!!	getCustomStyle(inout cr : ContentResolver) : CaptioningManager::CaptionStyle
+            final CaptionStyle defStyle = CaptionStyle.DEFAULT_CUSTOM;
+            final int foregroundColor = Secure.getInt(
+                    cr, Secure.ACCESSIBILITY_CAPTIONING_FOREGROUND_COLOR, defStyle.foregroundColor);
+            final int backgroundColor = Secure.getInt(
+                    cr, Secure.ACCESSIBILITY_CAPTIONING_BACKGROUND_COLOR, defStyle.backgroundColor);
+            final int edgeType = Secure.getInt(
+                    cr, Secure.ACCESSIBILITY_CAPTIONING_EDGE_TYPE, defStyle.edgeType);
+            final int edgeColor = Secure.getInt(
+                    cr, Secure.ACCESSIBILITY_CAPTIONING_EDGE_COLOR, defStyle.edgeColor);
+            final int windowColor = Secure.getInt(
+                    cr, Secure.ACCESSIBILITY_CAPTIONING_WINDOW_COLOR, defStyle.windowColor);
+
+            String rawTypeface = Secure.getString(cr, Secure.ACCESSIBILITY_CAPTIONING_TYPEFACE);
+            if (rawTypeface == null) {
+                rawTypeface = defStyle.mRawTypeface;
+            }
+
+            return new CaptionStyle(foregroundColor, backgroundColor, edgeType, edgeColor,
+                    windowColor, rawTypeface);

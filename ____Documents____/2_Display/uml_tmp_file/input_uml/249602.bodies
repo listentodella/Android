@@ -1,0 +1,23 @@
+class AlphaAnimation
+!!!1113858.java!!!	AlphaAnimation(inout context : Context, inout attrs : AttributeSet)
+        super(context, attrs);
+        
+        TypedArray a =
+            context.obtainStyledAttributes(attrs, com.android.internal.R.styleable.AlphaAnimation);
+        
+        mFromAlpha = a.getFloat(com.android.internal.R.styleable.AlphaAnimation_fromAlpha, 1.0f);
+        mToAlpha = a.getFloat(com.android.internal.R.styleable.AlphaAnimation_toAlpha, 1.0f);
+        
+        a.recycle();
+!!!1113986.java!!!	AlphaAnimation(in fromAlpha : float, in toAlpha : float)
+        mFromAlpha = fromAlpha;
+        mToAlpha = toAlpha;
+!!!1114114.java!!!	applyTransformation(in interpolatedTime : float, inout t : Transformation) : void
+        final float alpha = mFromAlpha;
+        t.setAlpha(alpha + ((mToAlpha - alpha) * interpolatedTime));
+!!!1114242.java!!!	willChangeTransformationMatrix() : boolean
+        return false;
+!!!1114370.java!!!	willChangeBounds() : boolean
+        return false;
+!!!1114498.java!!!	hasAlpha() : boolean
+        return true;

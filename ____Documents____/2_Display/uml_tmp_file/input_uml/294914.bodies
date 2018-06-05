@@ -1,0 +1,83 @@
+class JobInfo
+!!!1815938.java!!!	getId() : int
+        return jobId;
+!!!1816066.java!!!	getExtras() : PersistableBundle
+        return extras;
+!!!1816194.java!!!	getService() : ComponentName
+        return service;
+!!!1816322.java!!!	isRequireCharging() : boolean
+        return requireCharging;
+!!!1816450.java!!!	isRequireDeviceIdle() : boolean
+        return requireDeviceIdle;
+!!!1816578.java!!!	getNetworkType() : int
+        return networkType;
+!!!1816706.java!!!	getMinLatencyMillis() : long
+        return minLatencyMillis;
+!!!1816834.java!!!	getMaxExecutionDelayMillis() : long
+        return maxExecutionDelayMillis;
+!!!1816962.java!!!	isPeriodic() : boolean
+        return isPeriodic;
+!!!1817090.java!!!	isPersisted() : boolean
+        return isPersisted;
+!!!1817218.java!!!	getIntervalMillis() : long
+        return intervalMillis;
+!!!1817346.java!!!	getInitialBackoffMillis() : long
+        return initialBackoffMillis;
+!!!1817474.java!!!	getBackoffPolicy() : int
+        return backoffPolicy;
+!!!1817602.java!!!	hasEarlyConstraint() : boolean
+        return hasEarlyConstraint;
+!!!1817730.java!!!	hasLateConstraint() : boolean
+        return hasLateConstraint;
+!!!1817858.java!!!	JobInfo(inout in : Parcel)
+        jobId = in.readInt();
+        extras = in.readPersistableBundle();
+        service = in.readParcelable(null);
+        requireCharging = in.readInt() == 1;
+        requireDeviceIdle = in.readInt() == 1;
+        networkType = in.readInt();
+        minLatencyMillis = in.readLong();
+        maxExecutionDelayMillis = in.readLong();
+        isPeriodic = in.readInt() == 1;
+        isPersisted = in.readInt() == 1;
+        intervalMillis = in.readLong();
+        initialBackoffMillis = in.readLong();
+        backoffPolicy = in.readInt();
+        hasEarlyConstraint = in.readInt() == 1;
+        hasLateConstraint = in.readInt() == 1;
+!!!1817986.java!!!	JobInfo(inout b : JobInfo::Builder)
+        jobId = b.mJobId;
+        extras = b.mExtras;
+        service = b.mJobService;
+        requireCharging = b.mRequiresCharging;
+        requireDeviceIdle = b.mRequiresDeviceIdle;
+        networkType = b.mNetworkType;
+        minLatencyMillis = b.mMinLatencyMillis;
+        maxExecutionDelayMillis = b.mMaxExecutionDelayMillis;
+        isPeriodic = b.mIsPeriodic;
+        isPersisted = b.mIsPersisted;
+        intervalMillis = b.mIntervalMillis;
+        initialBackoffMillis = b.mInitialBackoffMillis;
+        backoffPolicy = b.mBackoffPolicy;
+        hasEarlyConstraint = b.mHasEarlyConstraint;
+        hasLateConstraint = b.mHasLateConstraint;
+!!!1818114.java!!!	describeContents() : int
+        return 0;
+!!!1818242.java!!!	writeToParcel(inout out : Parcel, in flags : int) : void
+        out.writeInt(jobId);
+        out.writePersistableBundle(extras);
+        out.writeParcelable(service, flags);
+        out.writeInt(requireCharging ? 1 : 0);
+        out.writeInt(requireDeviceIdle ? 1 : 0);
+        out.writeInt(networkType);
+        out.writeLong(minLatencyMillis);
+        out.writeLong(maxExecutionDelayMillis);
+        out.writeInt(isPeriodic ? 1 : 0);
+        out.writeInt(isPersisted ? 1 : 0);
+        out.writeLong(intervalMillis);
+        out.writeLong(initialBackoffMillis);
+        out.writeInt(backoffPolicy);
+        out.writeInt(hasEarlyConstraint ? 1 : 0);
+        out.writeInt(hasLateConstraint ? 1 : 0);
+!!!1818370.java!!!	toString() : String
+        return "(job:" + jobId + "/" + service.flattenToShortString() + ")";

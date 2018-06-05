@@ -1,0 +1,95 @@
+class PermissionItemView
+!!!2050178.java!!!	PermissionItemView(inout context : Context, inout attrs : AttributeSet)
+            super(context, attrs);
+            setClickable(true);
+!!!2050306.java!!!	setPermission(inout grp : AppSecurityPermissions::MyPermissionGroupInfo, inout perm : AppSecurityPermissions::MyPermissionInfo, inout first : boolean, inout newPermPrefix : CharSequence, in packageName : String, inout showRevokeUI : boolean) : void
+            mGroup = grp;
+            mPerm = perm;
+            mShowRevokeUI = showRevokeUI;
+            mPackageName = packageName;
+
+            ImageView permGrpIcon = (ImageView) findViewById(R.id.perm_icon);
+            TextView permNameView = (TextView) findViewById(R.id.perm_name);
+
+            PackageManager pm = getContext().getPackageManager();
+            Drawable icon = null;
+            if (first) {
+                icon = grp.loadGroupIcon(pm);
+            }
+            CharSequence label = perm.mLabel;
+            if (perm.mNew && newPermPrefix != null) {
+                // If this is a new permission, format it appropriately.
+                SpannableStringBuilder builder = new SpannableStringBuilder();
+                Parcel parcel = Parcel.obtain();
+                TextUtils.writeToParcel(newPermPrefix, parcel, 0);
+                parcel.setDataPosition(0);
+                CharSequence newStr = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
+                parcel.recycle();
+                builder.append(newStr);
+                builder.append(label);
+                label = builder;
+            }
+
+            permGrpIcon.setImageDrawable(icon);
+            permNameView.setText(label);
+            setOnClickListener(this);
+            if (localLOGV) Log.i(TAG, "Made perm item " + perm.name
+                    + ": " + label + " in group " + grp.name);
+!!!2050434.java!!!	onClick(inout v : View) : void
+            if (mGroup != null && mPerm != null) {
+                if (mDialog != null) {
+                    mDialog.dismiss();
+                }
+                PackageManager pm = getContext().getPackageManager();
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle(mGroup.mLabel);
+                if (mPerm.descriptionRes != 0) {
+                    builder.setMessage(mPerm.loadDescription(pm));
+                } else {
+                    CharSequence appName;
+                    try {
+                        ApplicationInfo app = pm.getApplicationInfo(mPerm.packageName, 0);
+                        appName = app.loadLabel(pm);
+                    } catch (NameNotFoundException e) {
+                        appName = mPerm.packageName;
+                    }
+                    StringBuilder sbuilder = new StringBuilder(128);
+                    sbuilder.append(getContext().getString(
+                            R.string.perms_description_app, appName));
+                    sbuilder.append("\n\n");
+                    sbuilder.append(mPerm.name);
+                    builder.setMessage(sbuilder.toString());
+                }
+                builder.setCancelable(true);
+                builder.setIcon(mGroup.loadGroupIcon(pm));
+                addRevokeUIIfNecessary(builder);
+                mDialog = builder.show();
+                mDialog.setCanceledOnTouchOutside(true);
+            }
+!!!2050562.java!!!	onDetachedFromWindow() : void
+            super.onDetachedFromWindow();
+            if (mDialog != null) {
+                mDialog.dismiss();
+            }
+!!!2050690.java!!!	addRevokeUIIfNecessary(inout builder : AlertDialog::Builder) : void
+            if (!mShowRevokeUI) {
+                return;
+            }
+
+            final boolean isRequired =
+                    ((mPerm.mExistingReqFlags & PackageInfo.REQUESTED_PERMISSION_REQUIRED) != 0);
+
+            if (isRequired) {
+                return;
+            }
+
+            DialogInterface.OnClickListener ocl = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    PackageManager pm = getContext().getPackageManager();
+                    pm.revokePermission(mPackageName, mPerm.name);
+                    PermissionItemView.this.setVisibility(View.GONE);
+                }
+            };
+            builder.setNegativeButton(R.string.revoke, ocl);
+            builder.setPositiveButton(R.string.ok, null);

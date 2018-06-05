@@ -1,0 +1,30 @@
+class WearableExtender
+!!!1679362.java!!!	WearableExtender(inout action : Notification::Action)
+                Bundle wearableBundle = action.getExtras().getBundle(EXTRA_WEARABLE_EXTENSIONS);
+                if (wearableBundle != null) {
+                    mFlags = wearableBundle.getInt(KEY_FLAGS, DEFAULT_FLAGS);
+                }
+!!!1679490.java!!!	extend(inout builder : Notification::Action::Builder) : Notification::Action::Builder
+                Bundle wearableBundle = new Bundle();
+
+                if (mFlags != DEFAULT_FLAGS) {
+                    wearableBundle.putInt(KEY_FLAGS, mFlags);
+                }
+
+                builder.getExtras().putBundle(EXTRA_WEARABLE_EXTENSIONS, wearableBundle);
+                return builder;
+!!!1679618.java!!!	clone() : Notification::Action::WearableExtender
+                WearableExtender that = new WearableExtender();
+                that.mFlags = this.mFlags;
+                return that;
+!!!1679746.java!!!	setAvailableOffline(inout availableOffline : boolean) : Notification::Action::WearableExtender
+                setFlag(FLAG_AVAILABLE_OFFLINE, availableOffline);
+                return this;
+!!!1679874.java!!!	isAvailableOffline() : boolean
+                return (mFlags & FLAG_AVAILABLE_OFFLINE) != 0;
+!!!1680002.java!!!	setFlag(in mask : int, inout value : boolean) : void
+                if (value) {
+                    mFlags |= mask;
+                } else {
+                    mFlags &= ~mask;
+                }

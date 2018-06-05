@@ -1,0 +1,534 @@
+format 76
+
+classinstance 129794 class_ref 144898 // SurfaceFlinger
+  name ""   xyz 342.2 31.8 2000 life_line_z 2000
+classinstance 178306 class_ref 144770 // Layer
+  name ""   xyz 761.4 18.4 2000 life_line_z 2000
+note 178690 "Traversal of the children
+(perform the transaction for each of them if needed)
+
+compare mDrawingState and mCurrentState, 
+if they are different, flags |= eVisibleRegion;"
+  xyzwh 796.2 280.4 2050 301 99
+note 180610 "// find the displays that were removed
+// (ie: in drawing state but not in current state)
+// also handle displays that changed
+// (ie: displays that are in both lists)
+"
+  xyzwh 446 522.2 2000 269 76
+note 180994 "// find displays that were added
+// (ie: in current state but not in drawing state)"
+  xyzwh 447 643.6 2000 266 49
+note 181378 "// Walk through all the layers in currentLayers,
+// and update their transform hint.
+"
+  xyzwh 443 795 2000 279 51
+note 182146 "// layers have been added
+mVisibleRegionsDirty = true;"
+  xyzwh 438.6 965.6 2000 226 54
+note 182530 "    // some layers might have been removed, so
+    // we need to update the regions they're exposing.
+"
+  xyzwh 441 1079 2000 313 49
+note 182914 "for (size_t dpy=0 ; dpy<mDisplays.size() ; dpy++) {
+	const sp<DisplayDevice>& hw(mDisplays[dpy]);
+	if (hw->getLayerStack() == layerStack) {
+		hw->dirtyRegion.orSelf(dirty);
+	}
+}"
+  xyzwh 443.8 1168.2 2005 288 101
+note 183810 "const sp<Layer>& layer(currentLayers[i]);
+Rect cursorPos = layer->getPosition(hw);
+hwc.setCursorPositionAsync(id, cursorPos);"
+  xyzwh 438.2 1489.2 2000 264 61
+note 184450 "Vector<Layer*> layersWithQueuedFrames;
+for (size_t i = 0, count = layers.size(); i<count ; i++) {
+    const sp<Layer>& layer(layers[i]);
+    if (layer->hasQueuedFrame())
+        layersWithQueuedFrames.push_back(layer.get());
+}"
+  xyzwh 441 1865 2000 328 101
+note 185602 "for (size_t dpy=0 ; dpy<mDisplays.size() ; dpy++) {
+	const sp<DisplayDevice>& hw(mDisplays[dpy]);
+	if (hw->getLayerStack() == layerStack) {
+		hw->dirtyRegion.orSelf(dirty);
+	}
+}"
+  xyzwh 432.7 3869.5 2005 288 101
+classinstance 185730 class_ref 149634 // SurfaceFlingerConsumer
+  name ""   xyz 1027.1 25.8 2000 life_line_z 2000
+classinstance 186626 class_ref 176130 // GLConsumer
+  name ""   xyz 1252.8 26.6 2000 life_line_z 2000
+classinstance 187010 class_ref 169730 // ConsumerBase
+  name ""   xyz 1402.2 24.8 2000 life_line_z 2000
+classinstance 187394 class_ref 235650 // EglImage
+  name ""   xyz 1558.8 25.2 2000 life_line_z 2000
+classinstance 187778 class_ref 172034 // BufferQueueConsumer
+  name ""   xyz 1709 25.2 2000 life_line_z 2000
+note 188418 "// We call the rejecter here, in case the caller has a reason to
+// not accept this buffer.  This is used by SurfaceFlinger to
+// reject buffers which have the wrong size"
+  xyzwh 1131.8 2411.2 2000 363 65
+note 189826 "// Ensure we have a valid EglImageKHR for the slot, creating an EglImage
+// if nessessary, for the gralloc buffer currently in the slot in
+// ConsumerBase.
+// We may have to do this even when item.mGraphicBuffer == NULL (which
+// means the buffer was previously acquired)."
+  xyzwh 1337 2607.6 2000 437 95
+note 190466 "EGLImageKHR image = eglCreateImageKHR(...)"
+  xyzwh 1641.4 2758.2 2000 301 41
+note 194562 "// Update the GLConsumer state.
+mCurrentTexture = buf;
+mCurrentTextureImage = mEglSlots[buf].mEglImage;
+mCurrentCrop = item.mCrop;
+mCurrentTransform = item.mTransform;
+mCurrentScalingMode = item.mScalingMode;
+mCurrentTimestamp = item.mTimestamp;
+mCurrentFence = item.mFence;
+mCurrentFrameNumber = item.mFrameNumber;"
+  xyzwh 1343.6 3089 2030 323 163
+durationcanvas 176258 classinstance_ref 129794 // :SurfaceFlinger
+  xyzwh 384 118.4 2010 11 4134
+  overlappingdurationcanvas 176642
+    xyzwh 390 170 2020 11 1421
+    overlappingdurationcanvas 177794
+      xyzwh 396 195.4 2030 11 1389
+      overlappingdurationcanvas 178050
+	xyzwh 402 225 2040 11 1351
+	overlappingdurationcanvas 179074
+	  xyzwh 408 259.6 2050 11 175
+	  overlappingdurationcanvas 180098
+	    xyzwh 414 403 2060 11 25
+	  end
+	end
+	overlappingdurationcanvas 179842
+	  xyzwh 408 475 2050 11 252
+	  overlappingdurationcanvas 180354
+	    xyzwh 414 515.6 2060 11 92
+	  end
+	  overlappingdurationcanvas 180738
+	    xyzwh 414 644.4 2060 11 52
+	  end
+	end
+	overlappingdurationcanvas 181122
+	  xyzwh 408 793.8 2050 11 100
+	end
+	overlappingdurationcanvas 181762
+	  xyzwh 408 954 2050 11 64
+	end
+	overlappingdurationcanvas 182274
+	  xyzwh 408 1078.8 2050 11 211
+	  overlappingdurationcanvas 182658
+	    xyzwh 414 1163.8 2060 11 111
+	  end
+	end
+	overlappingdurationcanvas 183042
+	  xyzwh 408 1357.8 2050 11 73
+	end
+	overlappingdurationcanvas 183554
+	  xyzwh 408 1485 2050 11 72
+	end
+      end
+    end
+  end
+  overlappingdurationcanvas 176898
+    xyzwh 390 1788.4 2020 11 2193
+    overlappingdurationcanvas 183938
+      xyzwh 396 1821.2 2030 11 2154
+      overlappingdurationcanvas 184194
+	xyzwh 402 1860.8 2040 11 117
+      end
+      overlappingdurationcanvas 184578
+	xyzwh 402 2037.6 2040 11 1929
+	overlappingdurationcanvas 185346
+	  xyzwh 408 3852 2050 11 108
+	end
+      end
+    end
+  end
+  overlappingdurationcanvas 177154
+    xyzwh 390 4081.8 2020 11 145
+  end
+end
+durationcanvas 177410 classinstance_ref 129794 // :SurfaceFlinger
+  xyzwh 384 4289 2010 11 124
+end
+durationcanvas 179330 classinstance_ref 178306 // :Layer
+  xyzwh 780 271.2 2010 11 113
+end
+durationcanvas 181506 classinstance_ref 178306 // :Layer
+  xyzwh 780 856.2 2010 11 43
+end
+durationcanvas 183298 classinstance_ref 178306 // :Layer
+  xyzwh 780 1378.2 2010 11 40
+end
+durationcanvas 184834 classinstance_ref 178306 // :Layer
+  xyzwh 780 2069 2010 11 1623
+  overlappingdurationcanvas 196098
+    xyzwh 786 3635.4 2020 11 50
+  end
+end
+durationcanvas 185090 classinstance_ref 178306 // :Layer
+  xyzwh 780 3717 2010 11 28
+end
+durationcanvas 185858 classinstance_ref 185730 // :SurfaceFlingerConsumer
+  xyzwh 1098 2097.4 2010 11 1516
+  overlappingdurationcanvas 186114
+    xyzwh 1104 2117.8 2020 11 263
+    overlappingdurationcanvas 186370
+      xyzwh 1110 2148.8 2030 11 171
+    end
+  end
+  overlappingdurationcanvas 188162
+    xyzwh 1104 2399.4 2020 11 91
+  end
+  overlappingdurationcanvas 188546
+    xyzwh 1104 2530 2020 11 732
+  end
+  overlappingdurationcanvas 189058
+    xyzwh 1104 3347.6 2020 11 258
+  end
+end
+durationcanvas 186754 classinstance_ref 186626 // :GLConsumer
+  xyzwh 1291 2185.8 2010 11 146
+end
+durationcanvas 187138 classinstance_ref 187010 // :ConsumerBase
+  xyzwh 1450 2217.2 2010 11 51
+end
+durationcanvas 187522 classinstance_ref 187394 // :EglImage
+  xyzwh 1586 2294.8 2010 11 38
+end
+durationcanvas 187906 classinstance_ref 187778 // :BufferQueueConsumer
+  xyzwh 1775 2239.6 2010 11 25
+end
+durationcanvas 192258 classinstance_ref 186626 // :GLConsumer
+  xyzwh 1291 2572.2 2010 11 691
+  overlappingdurationcanvas 192514
+    xyzwh 1297 2606.8 2020 11 185
+  end
+  overlappingdurationcanvas 193282
+    xyzwh 1297 2850.8 2020 11 67
+    overlappingdurationcanvas 193538
+      xyzwh 1303 2882.4 2030 11 25
+    end
+  end
+  overlappingdurationcanvas 193794
+    xyzwh 1297 2964 2020 11 64
+    overlappingdurationcanvas 194050
+      xyzwh 1303 2998 2030 11 25
+    end
+  end
+  overlappingdurationcanvas 194306
+    xyzwh 1297 3093.4 2020 11 164
+  end
+end
+durationcanvas 192770 classinstance_ref 187394 // :EglImage
+  xyzwh 1586 2731.4 2010 11 67
+  overlappingdurationcanvas 193026
+    xyzwh 1592 2752.2 2020 11 41
+  end
+end
+durationcanvas 194690 classinstance_ref 186626 // :GLConsumer
+  xyzwh 1291 3397 2010 11 217
+  overlappingdurationcanvas 195074
+    xyzwh 1297 3419.6 2020 11 25
+  end
+end
+durationcanvas 195330 classinstance_ref 187394 // :EglImage
+  xyzwh 1586 3485.2 2010 11 25
+end
+durationcanvas 195586 classinstance_ref 187394 // :EglImage
+  xyzwh 1586 3550.4 2010 11 69
+  overlappingdurationcanvas 195842
+    xyzwh 1592 3581.8 2020 11 25
+  end
+end
+durationcanvas 196354 classinstance_ref 186626 // :GLConsumer
+  xyzwh 1291 3663.6 2010 11 27
+end
+lostfoundmsgsupport 176386 xyz 96 132.6 2015
+lostfoundmsgsupport 177538 xyz -4 4304.8 2015
+msg 176514 found_synchronous
+  from lostfoundmsgsupport_ref 176386
+  to durationcanvas_ref 176258
+  yz 129 2015 explicitmsg "onMessageReceived(MessageQueue::INVALIDATE)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 95 113
+reflexivemsg 176770 synchronous
+  to durationcanvas_ref 176642
+  yz 170 2025 explicitmsg "A1. handleMessageTransaction"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 395 152
+reflexivemsg 177026 synchronous
+  to durationcanvas_ref 176898
+  yz 1788 2025 explicitmsg "A2. handleMessageInvalidate"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 398 1766
+reflexivemsg 177282 synchronous
+  to durationcanvas_ref 177154
+  yz 4081 2025 explicitmsg "A3. signalRefresh"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 408 4065
+msg 177666 found_synchronous
+  from lostfoundmsgsupport_ref 177538
+  to durationcanvas_ref 177410
+  yz 4302 2015 explicitmsg "A4. onMessageReceived(MessageQueue::REFRESH)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 20 4285
+reflexivemsg 177922 synchronous
+  to durationcanvas_ref 177794
+  yz 195 2035 explicitmsg "B1. handleTransaction"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 411 182
+reflexivemsg 178178 synchronous
+  to durationcanvas_ref 178050
+  yz 225 2045 explicitmsg "C1. handleTransactionLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 411 214
+reflexivemsg 179202 synchronous
+  to durationcanvas_ref 179074
+  yz 259 2055 explicitmsg "D1. Traversal of the children  // if (transactionFlags & eTraversalNeeded)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 419 241
+msg 179458 synchronous
+  from durationcanvas_ref 179074
+  to durationcanvas_ref 179330
+  yz 280 2055 explicitmsg "E1. flags = layer->doTransaction(0);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 435 269
+reflexivemsg 179970 synchronous
+  to durationcanvas_ref 179842
+  yz 475 2055 explicitmsg "D2. Perform display own transactions if needed  // if (transactionFlags & eDisplayTransactionNeeded)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 411 458
+reflexivemsg 180226 synchronous
+  to durationcanvas_ref 180098
+  yz 403 2065 explicitmsg "E2. mVisibleRegionsDirty = true; // if (flags & Layer::eVisibleRegion)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 427 386
+reflexivemsg 180482 synchronous
+  to durationcanvas_ref 180354
+  yz 515 2065 explicitmsg "E1."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 432 501
+reflexivemsg 180866 synchronous
+  to durationcanvas_ref 180738
+  yz 644 2065 explicitmsg "E2."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 423 631
+reflexivemsg 181250 synchronous
+  to durationcanvas_ref 181122
+  yz 793 2055 explicitmsg "D3."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 416 781
+msg 181634 synchronous
+  from durationcanvas_ref 181122
+  to durationcanvas_ref 181506
+  yz 868 2055 explicitmsg "E1. layer->updateTransformHint(disp);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 444 856
+reflexivemsg 181890 synchronous
+  to durationcanvas_ref 181762
+  yz 954 2055 explicitmsg "D4. Perform our own transaction if needed"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 418 937
+reflexivemsg 182402 synchronous
+  to durationcanvas_ref 182274
+  yz 1078 2055 explicitmsg "D5."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 416 1062
+reflexivemsg 182786 synchronous
+  to durationcanvas_ref 182658
+  yz 1163 2065 explicitmsg "E1. invalidateLayerStack(s.layerStack, visibleReg);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 427 1148
+reflexivemsg 183170 synchronous
+  to durationcanvas_ref 183042
+  yz 1357 2055 explicitmsg "D6. commitTransaction()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 421 1341
+msg 183426 synchronous
+  from durationcanvas_ref 183042
+  to durationcanvas_ref 183298
+  yz 1388 2055 explicitmsg "E1. mLayersPendingRemoval[i]->onRemoved();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 438 1373
+reflexivemsg 183682 synchronous
+  to durationcanvas_ref 183554
+  yz 1485 2055 explicitmsg "D7. updateCursorAsync()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 421 1466
+reflexivemsg 184066 synchronous
+  to durationcanvas_ref 183938
+  yz 1821 2035 explicitmsg "B1. handlePageFlip();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 407 1805
+reflexivemsg 184322 synchronous
+  to durationcanvas_ref 184194
+  yz 1860 2045 explicitmsg "C1. Store the set of layers that need updates."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 416 1845
+reflexivemsg 184706 synchronous
+  to durationcanvas_ref 184578
+  yz 2037 2045 explicitmsg "C2. Process layers that need updates"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 414 2019
+msg 184962 synchronous
+  from durationcanvas_ref 184578
+  to durationcanvas_ref 184834
+  yz 2076 2045 explicitmsg "D1. const Region dirty(layer->latchBuffer(visibleRegions));"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 429 2066
+msg 185218 synchronous
+  from durationcanvas_ref 184578
+  to durationcanvas_ref 185090
+  yz 3724 2045 explicitmsg "D2. const Layer::State& s(layer->getDrawingState());"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 419 3712
+reflexivemsg 185474 synchronous
+  to durationcanvas_ref 185346
+  yz 3852 2055 explicitmsg "D3. invalidateLayerStack(s.layerStack, dirty);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 419 3832
+msg 185986 synchronous
+  from durationcanvas_ref 184834
+  to durationcanvas_ref 185858
+  yz 2104 2015 explicitmsg "E1. mSurfaceFlingerConsumer->updateTexImage"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 793 2090
+reflexivemsg 186242 synchronous
+  to durationcanvas_ref 186114
+  yz 2117 2025 explicitmsg "F1. // Acquire the next buffer."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1115 2100
+reflexivemsg 186498 synchronous
+  to durationcanvas_ref 186370
+  yz 2148 2035 explicitmsg "G1. err = acquireBufferLocked(&item, computeExpectedPresent(dispSync));"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1113 2133
+msg 186882 synchronous
+  from durationcanvas_ref 186370
+  to durationcanvas_ref 186754
+  yz 2189 2035 explicitmsg "H1. GLConsumer::acquireBufferLocked(item, presentWhen);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1132 2171
+msg 187266 synchronous
+  from durationcanvas_ref 186754
+  to durationcanvas_ref 187138
+  yz 2219 2015 explicitmsg "I1. ConsumerBase::acquireBufferLocked(item, presentWhen);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1311 2203
+msg 187650 synchronous
+  from durationcanvas_ref 186754
+  to durationcanvas_ref 187522
+  yz 2297 2015 explicitmsg "I2. mEglSlots[slot].mEglImage = new EglImage(item->mGraphicBuffer);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1312 2281
+msg 188034 synchronous
+  from durationcanvas_ref 187138
+  to durationcanvas_ref 187906
+  yz 2240 3005 explicitmsg "J1. mConsumer->acquireBuffer(item, presentWhen);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1472 2226
+reflexivemsg 188290 synchronous
+  to durationcanvas_ref 188162
+  yz 2399 2025 explicitmsg "F2."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1112 2384
+reflexivemsg 188674 synchronous
+  to durationcanvas_ref 188546
+  yz 2530 2025 explicitmsg "F3. Release the previous buffer."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1114 2511
+reflexivemsg 189186 synchronous
+  to durationcanvas_ref 189058
+  yz 3347 2025 explicitmsg "F4. Bind the new buffer to the GL texture."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1117 3329
+msg 192386 synchronous
+  from durationcanvas_ref 188546
+  to durationcanvas_ref 192258
+  yz 2574 3005 explicitmsg "G1. err = updateAndReleaseLocked(item);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1126 2559
+reflexivemsg 192642 synchronous
+  to durationcanvas_ref 192514
+  yz 2606 2025 explicitmsg "H1."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1309 2591
+msg 192898 synchronous
+  from durationcanvas_ref 192514
+  to durationcanvas_ref 192770
+  yz 2733 3005 explicitmsg "I1. err = mEglSlots[buf].mEglImage->createIfNeeded(mEglDisplay, item.mCrop);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1312 2718
+reflexivemsg 193154 synchronous
+  to durationcanvas_ref 193026
+  yz 2752 2025 explicitmsg "J1. mEglImage = createImage(mEglDisplay, mGraphicBuffer, mCropRect);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1610 2739
+reflexivemsg 193410 synchronous
+  to durationcanvas_ref 193282
+  yz 2850 2025 explicitmsg "H2. Do whatever sync ops we need to do before releasing the old slot."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1311 2832
+reflexivemsg 193666 synchronous
+  to durationcanvas_ref 193538
+  yz 2882 2035 explicitmsg "I1. err = syncForReleaseLocked(mEglDisplay);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1330 2867
+reflexivemsg 193922 synchronous
+  to durationcanvas_ref 193794
+  yz 2964 2025 explicitmsg "H3. release old buffer"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1313 2946
+reflexivemsg 194178 synchronous
+  to durationcanvas_ref 194050
+  yz 2998 2035 explicitmsg "I1. releaseBufferLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1328 2983
+reflexivemsg 194434 synchronous
+  to durationcanvas_ref 194306
+  yz 3093 2025 explicitmsg "H4."
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1309 3078
+msg 194818 synchronous
+  from durationcanvas_ref 189058
+  to durationcanvas_ref 194690
+  yz 3404 2025 explicitmsg "G1. err = bindTextureImageLocked()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1129 3383
+reflexivemsg 195202 synchronous
+  to durationcanvas_ref 195074
+  yz 3419 2025 explicitmsg "H1. glBindTexture(mTexTarget, mTexName);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1311 3405
+msg 195458 synchronous
+  from durationcanvas_ref 194690
+  to durationcanvas_ref 195330
+  yz 3487 2015 explicitmsg "H2. err = mCurrentTextureImage->createIfNeeded(...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1309 3470
+msg 195714 synchronous
+  from durationcanvas_ref 194690
+  to durationcanvas_ref 195586
+  yz 3554 2015 explicitmsg "H3. mCurrentTextureImage->bindToTextureTarget(mTexTarget);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1311 3537
+reflexivemsg 195970 synchronous
+  to durationcanvas_ref 195842
+  yz 3581 2025 explicitmsg "I1. glEGLImageTargetTexture2DOES"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1605 3565
+reflexivemsg 196226 synchronous
+  to durationcanvas_ref 196098
+  yz 3635 2025 explicitmsg "E2. update the active buffer"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 801 3614
+msg 196482 synchronous
+  from durationcanvas_ref 196098
+  to durationcanvas_ref 196354
+  yz 3664 2030 explicitmsg "F1. mActiveBuffer = mSurfaceFlingerConsumer->getCurrentBuffer();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 832 3647
+end

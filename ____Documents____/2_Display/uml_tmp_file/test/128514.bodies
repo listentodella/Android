@@ -1,0 +1,5 @@
+class Ext7
+!!!129026.java!!!	main(inout args : String) : void
+		Son son = new Son();
+		System.out.println(son.getName());
+		son.study();

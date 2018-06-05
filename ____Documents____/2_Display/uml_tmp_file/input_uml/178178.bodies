@@ -1,0 +1,11 @@
+class Mutex
+!!!380930.cpp!!!	Mutex()
+    pthread_mutex_init(&mMutex, NULL);
+!!!381314.cpp!!!	~Mutex()
+    pthread_mutex_destroy(&mMutex);
+!!!381442.cpp!!!	lock() : status_t
+    return -pthread_mutex_lock(&mMutex);
+!!!381570.cpp!!!	unlock() : void
+    pthread_mutex_unlock(&mMutex);
+!!!381698.cpp!!!	tryLock() : status_t
+    return -pthread_mutex_trylock(&mMutex);

@@ -1,0 +1,15 @@
+class SharedBuffer
+!!!400130.cpp!!!	data() : void
+    return this + 1;
+!!!400258.cpp!!!	data() : void
+    return this + 1;
+!!!400386.cpp!!!	size() : size_t
+    return mSize;
+!!!400514.cpp!!!	bufferFromData(inout data : void) : SharedBuffer
+    return data ? static_cast<SharedBuffer *>(data)-1 : 0;
+!!!400642.cpp!!!	bufferFromData(in data : void) : SharedBuffer
+    return data ? static_cast<const SharedBuffer *>(data)-1 : 0;
+!!!400770.cpp!!!	sizeFromData(in data : void) : size_t
+    return data ? bufferFromData(data)->mSize : 0;
+!!!401666.cpp!!!	onlyOwner() : bool
+    return (mRefs == 1);

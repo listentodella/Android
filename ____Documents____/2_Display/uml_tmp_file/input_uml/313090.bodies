@@ -1,0 +1,44 @@
+class TimeSparseArray
+!!!1824514.java!!!	TimeSparseArray()
+        super();
+!!!1824642.java!!!	TimeSparseArray(in initialCapacity : int)
+        super(initialCapacity);
+!!!1824770.java!!!	closestIndexOnOrAfter(in time : long) : int
+        // This is essentially a binary search, except that if no match is found
+        // the closest index is returned.
+        final int size = size();
+        int lo = 0;
+        int hi = size - 1;
+        int mid = -1;
+        long key = -1;
+        while (lo <= hi) {
+            mid = lo + ((hi - lo) / 2);
+            key = keyAt(mid);
+
+            if (time > key) {
+                lo = mid + 1;
+            } else if (time < key) {
+                hi = mid - 1;
+            } else {
+                return mid;
+            }
+        }
+
+        if (time < key) {
+            return mid;
+        } else if (time > key && lo < size) {
+            return lo;
+        } else {
+            return -1;
+        }
+!!!1824898.java!!!	closestIndexOnOrBefore(in time : long) : int
+        final int index = closestIndexOnOrAfter(time);
+        if (index < 0) {
+            // Everything is larger, so we use the last element, or -1 if the list is empty.
+            return size() - 1;
+        }
+
+        if (keyAt(index) == time) {
+            return index;
+        }
+        return index - 1;

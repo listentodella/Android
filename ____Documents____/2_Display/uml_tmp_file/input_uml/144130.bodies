@@ -1,0 +1,24 @@
+class CursorScrollAccumulator
+!!!225794.cpp!!!	CursorScrollAccumulator()
+    clearRelativeAxes();
+!!!225922.cpp!!!	configure(inout device : InputDevice) : void
+    mHaveRelWheel = device->getEventHub()->hasRelativeAxis(device->getId(), REL_WHEEL);
+    mHaveRelHWheel = device->getEventHub()->hasRelativeAxis(device->getId(), REL_HWHEEL);
+!!!226050.cpp!!!	reset(inout device : InputDevice) : void
+    clearRelativeAxes();
+!!!226178.cpp!!!	process(in rawEvent : RawEvent) : void
+    if (rawEvent->type == EV_REL) {
+        switch (rawEvent->code) {
+        case REL_WHEEL:
+            mRelWheel = rawEvent->value;
+            break;
+        case REL_HWHEEL:
+            mRelHWheel = rawEvent->value;
+            break;
+        }
+    }
+!!!226306.cpp!!!	finishSync() : void
+    clearRelativeAxes();
+!!!227202.cpp!!!	clearRelativeAxes() : void
+    mRelWheel = 0;
+    mRelHWheel = 0;

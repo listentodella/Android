@@ -1,0 +1,79 @@
+class LauncherActivity
+!!!1645186.java!!!	onCreate(inout icicle : Bundle) : void
+        super.onCreate(icicle);
+        
+        mPackageManager = getPackageManager();
+
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_WATCH)) {
+            requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+            setProgressBarIndeterminateVisibility(true);
+        }
+        onSetContentView();
+
+        mIconResizer = new IconResizer();
+        
+        mIntent = new Intent(getTargetIntent());
+        mIntent.setComponent(null);
+        mAdapter = new ActivityAdapter(mIconResizer);
+
+        setListAdapter(mAdapter);
+        getListView().setTextFilterEnabled(true);
+
+        updateAlertTitle();
+        updateButtonText();
+
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_WATCH)) {
+            setProgressBarIndeterminateVisibility(false);
+        }
+!!!1645314.java!!!	updateAlertTitle() : void
+        TextView alertTitle = (TextView) findViewById(com.android.internal.R.id.alertTitle);
+        if (alertTitle != null) {
+            alertTitle.setText(getTitle());
+        }
+!!!1645442.java!!!	updateButtonText() : void
+        Button cancelButton = (Button) findViewById(com.android.internal.R.id.button1);
+        if (cancelButton != null) {
+            cancelButton.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        }
+!!!1645570.java!!!	setTitle(inout title : CharSequence) : void
+        super.setTitle(title);
+        updateAlertTitle();
+!!!1645698.java!!!	setTitle(in titleId : int) : void
+        super.setTitle(titleId);
+        updateAlertTitle();
+!!!1645826.java!!!	onSetContentView() : void
+        setContentView(com.android.internal.R.layout.activity_list);
+!!!1645954.java!!!	onListItemClick(inout l : ListView, inout v : View, in position : int, in id : long) : void
+        Intent intent = intentForPosition(position);
+        startActivity(intent);
+!!!1646082.java!!!	intentForPosition(in position : int) : Intent
+        ActivityAdapter adapter = (ActivityAdapter) mAdapter;
+        return adapter.intentForPosition(position);
+!!!1646210.java!!!	itemForPosition(in position : int) : LauncherActivity::ListItem
+        ActivityAdapter adapter = (ActivityAdapter) mAdapter;
+        return adapter.itemForPosition(position);
+!!!1646338.java!!!	getTargetIntent() : Intent
+        return new Intent();
+!!!1646466.java!!!	onQueryPackageManager(inout queryIntent : Intent) : List<ResolveInfo>
+        return mPackageManager.queryIntentActivities(queryIntent, /* no flags */ 0);
+!!!1646594.java!!!	onSortResultList(inout results : List<ResolveInfo>) : void
+        Collections.sort(results, new ResolveInfo.DisplayNameComparator(mPackageManager));
+!!!1646722.java!!!	makeListItems() : LauncherActivity::ListItem
+        // Load all matching activities and sort correctly
+        List<ResolveInfo> list = onQueryPackageManager(mIntent);
+        onSortResultList(list);
+
+        ArrayList<ListItem> result = new ArrayList<ListItem>(list.size());
+        int listSize = list.size();
+        for (int i = 0; i < listSize; i++) {
+            ResolveInfo resolveInfo = list.get(i);
+            result.add(new ListItem(mPackageManager, resolveInfo, null));
+        }
+
+        return result;
+!!!1646850.java!!!	onEvaluateShowIcons() : boolean
+        return true;

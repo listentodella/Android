@@ -1,0 +1,33 @@
+class PackedMap
+!!!2308866.java!!!	PackedMap(inout keys : K, inout values : V)
+            this.index = createIndex(keys);
+
+            this.keys = compact(keys, index);
+            this.values = compact(values, index);
+!!!2308994.java!!!	getValue(in i : int) : V
+            return values[index[i]];
+!!!2309122.java!!!	createIndex(inout keys : K) : int
+            int size = keys.length;
+            int[] result = new int[size];
+
+            Map<K, Integer> keyToIndex = new HashMap<K, Integer>();
+            for (int i = 0; i < size; i++) {
+                K key = keys[i];
+                Integer index = keyToIndex.get(key);
+                if (index == null) {
+                    index = keyToIndex.size();
+                    keyToIndex.put(key, index);
+                }
+                result[i] = index;
+            }
+            return result;
+!!!2309250.java!!!	compact(inout a : K, inout index : int) : K
+            int size = a.length;
+            Class<?> componentType = a.getClass().getComponentType();
+            K[] result = (K[]) Array.newInstance(componentType, max2(index, -1) + 1);
+
+            // this overwrite duplicates, retaining the last equivalent entry
+            for (int i = 0; i < size; i++) {
+                result[index[i]] = a[i];
+            }
+            return result;

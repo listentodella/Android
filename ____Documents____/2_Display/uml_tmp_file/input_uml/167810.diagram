@@ -1,0 +1,212 @@
+format 76
+
+classinstance 128002 class_ref 136962 // InputDispatcher
+ color red  name ""   xyz 256.8 24 2000 life_line_z 2000
+note 129282 "    inputTargets.push();
+
+    const InputWindowInfo* windowInfo = windowHandle->getInfo();
+    InputTarget& target = inputTargets.editTop();
+    target.inputChannel = windowInfo->inputChannel;
+    target.flags = targetFlags; // InputTarget::FLAG_FOREGROUND | InputTarget::FLAG_DISPATCH_AS_IS
+    target.xOffset = - windowInfo->frameLeft;
+    target.yOffset = - windowInfo->frameTop;
+    target.scaleFactor = windowInfo->scaleFactor;
+    target.pointerIds = pointerIds;
+"
+  xyzwh 330.8 210.7 2000 631 171
+note 129922 "connectionIndex = mConnectionsByFd.indexOfKey(inputChannel->getFd());"
+  xyzwh 337.2 605.2 2000 435 39
+note 130818 "    enqueueDispatchEntryLocked(connection, eventEntry, inputTarget,
+            InputTarget::FLAG_DISPATCH_AS_HOVER_EXIT);
+    enqueueDispatchEntryLocked(connection, eventEntry, inputTarget,
+            InputTarget::FLAG_DISPATCH_AS_OUTSIDE);
+    enqueueDispatchEntryLocked(connection, eventEntry, inputTarget,
+            InputTarget::FLAG_DISPATCH_AS_HOVER_ENTER);
+    enqueueDispatchEntryLocked(connection, eventEntry, inputTarget,
+            InputTarget::FLAG_DISPATCH_AS_IS);
+    enqueueDispatchEntryLocked(connection, eventEntry, inputTarget,
+            InputTarget::FLAG_DISPATCH_AS_SLIPPERY_EXIT);
+    enqueueDispatchEntryLocked(connection, eventEntry, inputTarget,
+            InputTarget::FLAG_DISPATCH_AS_SLIPPERY_ENTER);
+"
+  xyzwh 750 824.8 2000 425 205
+note 131458 "Remember that we are waiting for this dispatch to complete."
+  xyzwh 364 939.6 2000 363 37
+note 131842 "Enqueue the dispatch entry."
+  xyzwh 358.2 1058 2000 183 35
+classinstance 132866 class_ref 315266 // InputDispatcher::Connection
+ color red  name ""   xyz 853 28.4 2000 life_line_z 2000
+classinstance 132994 class_ref 325762 // KeyedVector
+ color red  name ""   xyz 1063.2 28.2 2000 life_line_z 2000
+classinstance 133506 class_ref 325890 // InputDispatcher::DispatchEntry
+ color red  name ""   xyz 1195.8 29.4 2000 life_line_z 2000
+classinstance 134786 class_ref 164098 // InputPublisher
+ color red  name ""   xyz 1413.9 29.8 2000 life_line_z 2000
+classinstance 135298 class_ref 163842 // InputChannel
+ color red  name ""   xyz 1531.6 29.9 2000 life_line_z 2000
+note 135682 "nWrite = ::send(mFd, msg, msgLength, MSG_DONTWAIT | MSG_NOSIGNAL);"
+  xyzwh 1584 1319.9 2000 449 35
+note 135810 "    InputMessage msg;
+    msg.header.type = InputMessage::TYPE_KEY;
+    msg.body.key.seq = seq;
+    msg.body.key.deviceId = deviceId;
+    msg.body.key.source = source;
+    msg.body.key.action = action;
+    msg.body.key.flags = flags;
+    msg.body.key.keyCode = keyCode;
+    msg.body.key.scanCode = scanCode;
+    msg.body.key.metaState = metaState;
+    msg.body.key.repeatCount = repeatCount;
+    msg.body.key.downTime = downTime;
+    msg.body.key.eventTime = eventTime;
+"
+  xyzwh 1471.4 1026.8 2000 303 217
+note 135938 "InputDispatcher.cpp"
+  xyzwh 244 73 2005 133 36
+note 136066 "InputDispatcher.cpp"
+  xyzwh 864.7 74 2005 133 36
+note 136194 "KeyedVector.h"
+  xyzwh 1060 75.5 2000 101 36
+note 136322 "InputDispatcher.cpp"
+  xyzwh 1216 77.6 2005 133 36
+note 136450 "InputTransport.cpp"
+  xyzwh 1401.6 78.5 2005 122 35
+note 136578 "InputTransport.cpp"
+  xyzwh 1514.8 121.6 2005 122 35
+durationcanvas 128130 classinstance_ref 128002 // :InputDispatcher
+  xyzwh 295 145.3 2010 11 1214
+  overlappingdurationcanvas 128514
+    xyzwh 301 160.4 2020 11 237
+    overlappingdurationcanvas 129026
+      xyzwh 307 199.2 2030 11 191
+    end
+  end
+  overlappingdurationcanvas 128770
+    xyzwh 301 558.7 2020 11 795
+    overlappingdurationcanvas 129410
+      xyzwh 307 594 2030 11 54
+    end
+    overlappingdurationcanvas 130050
+      xyzwh 307 770.2 2030 11 577
+      overlappingdurationcanvas 130306
+	xyzwh 313 806.2 2040 11 535
+	overlappingdurationcanvas 130562
+	  xyzwh 319 842 2050 11 258
+	  overlappingdurationcanvas 131202
+	    xyzwh 325 938 2060 11 45
+	  end
+	end
+	overlappingdurationcanvas 136706
+	  xyzwh 319 1226 2050 11 109
+	end
+      end
+    end
+  end
+end
+durationcanvas 133122 classinstance_ref 132994 // :KeyedVector
+  xyzwh 1094 698.3 2010 11 27
+end
+durationcanvas 133634 classinstance_ref 133506 // :InputDispatcher::DispatchEntry
+  xyzwh 1278 885.2 2010 11 30
+end
+durationcanvas 134018 classinstance_ref 132866 // :InputDispatcher::Connection
+  xyzwh 922 1043.1 2010 11 29
+end
+durationcanvas 136962 classinstance_ref 132866 // :InputDispatcher::Connection
+  xyzwh 922 1152 2010 11 113
+end
+durationcanvas 137218 classinstance_ref 134786 // :InputPublisher
+  xyzwh 1452 1296 2010 11 68
+end
+durationcanvas 137474 classinstance_ref 135298 // :InputChannel
+  xyzwh 1567 1314 2010 11 56
+end
+lostfoundmsgsupport 128258 xyz 159.4 148 2015
+msg 128386 found_synchronous
+  from lostfoundmsgsupport_ref 128258
+  to durationcanvas_ref 128130
+  yz 146 2015 explicitmsg "dispatchKeyLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 164 131
+reflexivemsg 128642 synchronous
+  to durationcanvas_ref 128514
+  yz 160 2025 explicitmsg "A1. findFocusedWindowTargetsLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 321 144
+reflexivemsg 128898 synchronous
+  to durationcanvas_ref 128770
+  yz 558 2025 explicitmsg "A2. dispatchEventLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 311 544
+reflexivemsg 129154 synchronous
+  to durationcanvas_ref 129026
+  yz 199 2035 explicitmsg "B1. addWindowTargetLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 322 182
+reflexivemsg 129538 synchronous
+  to durationcanvas_ref 129410
+  yz 594 2035 explicitmsg "B1. connectionIndex = getConnectionIndexLocked(inputTarget.inputChannel);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 327 578
+reflexivemsg 130178 synchronous
+  to durationcanvas_ref 130050
+  yz 770 2035 explicitmsg "B3. prepareDispatchCycleLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 322 755
+reflexivemsg 130434 synchronous
+  to durationcanvas_ref 130306
+  yz 806 2045 explicitmsg "C1. enqueueDispatchEntriesLocked(currentTime, connection, eventEntry, inputTarget);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 331 790
+reflexivemsg 130690 synchronous
+  to durationcanvas_ref 130562
+  yz 842 2055 explicitmsg "D1. enqueueDispatchEntryLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 337 827
+reflexivemsg 131330 synchronous
+  to durationcanvas_ref 131202
+  yz 938 2065 explicitmsg "E2.incrementPendingForegroundDispatchesLocked(eventEntry)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 344 922
+msg 133250 synchronous
+  from durationcanvas_ref 128770
+  to durationcanvas_ref 133122
+  yz 700 2025 explicitmsg "B2. sp<Connection> connection = mConnectionsByFd.valueAt(connectionIndex);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 327 687
+msg 133762 synchronous
+  from durationcanvas_ref 130562
+  to durationcanvas_ref 133634
+  yz 887 2055 explicitmsg "E1. DispatchEntry* dispatchEntry = new DispatchEntry(eventEntry, ...)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 348 871
+msg 134146 synchronous
+  from durationcanvas_ref 130562
+  to durationcanvas_ref 134018
+  yz 1046 2055 explicitmsg "E3. connection->outboundQueue.enqueueAtTail(dispatchEntry);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 342 1033
+reflexivemsg 136834 synchronous
+  to durationcanvas_ref 136706
+  yz 1226 2055 explicitmsg "D2. startDispatchCycleLocked"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 328 1210
+msg 137090 synchronous
+  from durationcanvas_ref 136706
+  to durationcanvas_ref 136962
+  yz 1252 2060 explicitmsg "E1. DispatchEntry* dispatchEntry = connection->outboundQueue.head;"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 359 1240
+msg 137346 synchronous
+  from durationcanvas_ref 136706
+  to durationcanvas_ref 137218
+  yz 1324 2055 explicitmsg "E2. connection->inputPublisher.publishKeyEvent"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 358 1315
+msg 137602 synchronous
+  from durationcanvas_ref 137218
+  to durationcanvas_ref 137474
+  yz 1321 2015 explicitmsg "F1. mChannel->sendMessage(&msg);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1469 1297
+end

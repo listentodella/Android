@@ -1,0 +1,20 @@
+class LayoutParams
+!!!1918594.java!!!	LayoutParams(inout c : Context, inout attrs : AttributeSet)
+            super(c, attrs);
+
+            TypedArray a = c.obtainStyledAttributes(attrs, com.android.internal.R.styleable.FrameLayout_Layout);
+            gravity = a.getInt(com.android.internal.R.styleable.FrameLayout_Layout_layout_gravity, -1);
+            a.recycle();
+!!!1918722.java!!!	LayoutParams(in width : int, in height : int)
+            super(width, height);
+!!!1918850.java!!!	LayoutParams(in width : int, in height : int, in gravity : int)
+            super(width, height);
+            this.gravity = gravity;
+!!!1918978.java!!!	LayoutParams(inout source : ViewGroup::LayoutParams)
+            super(source);
+!!!1919106.java!!!	LayoutParams(inout source : ViewGroup::MarginLayoutParams)
+            super(source);
+!!!1919234.java!!!	LayoutParams(inout source : FrameLayout::LayoutParams)
+            super(source);
+
+            this.gravity = source.gravity;

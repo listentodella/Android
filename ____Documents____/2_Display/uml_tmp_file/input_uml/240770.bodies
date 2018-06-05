@@ -1,0 +1,110 @@
+class SyntheticTrackballHandler
+!!!962306.java!!!	process(inout event : MotionEvent) : void
+            // Translate the trackball event into DPAD keys and try to deliver those.
+            long curTime = SystemClock.uptimeMillis();
+            if ((mLastTime + MAX_TRACKBALL_DELAY) < curTime) {
+                // It has been too long since the last movement,
+                // so restart at the beginning.
+                mX.reset(0);
+                mY.reset(0);
+                mLastTime = curTime;
+            }
+
+            final int action = event.getAction();
+            final int metaState = event.getMetaState();
+            switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    mX.reset(2);
+                    mY.reset(2);
+                    enqueueInputEvent(new KeyEvent(curTime, curTime,
+                            KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_CENTER, 0, metaState,
+                            KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_FALLBACK,
+                            InputDevice.SOURCE_KEYBOARD));
+                    break;
+                case MotionEvent.ACTION_UP:
+                    mX.reset(2);
+                    mY.reset(2);
+                    enqueueInputEvent(new KeyEvent(curTime, curTime,
+                            KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_CENTER, 0, metaState,
+                            KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_FALLBACK,
+                            InputDevice.SOURCE_KEYBOARD));
+                    break;
+            }
+
+            if (DEBUG_TRACKBALL) Log.v(TAG, "TB X=" + mX.position + " step="
+                    + mX.step + " dir=" + mX.dir + " acc=" + mX.acceleration
+                    + " move=" + event.getX()
+                    + " / Y=" + mY.position + " step="
+                    + mY.step + " dir=" + mY.dir + " acc=" + mY.acceleration
+                    + " move=" + event.getY());
+            final float xOff = mX.collect(event.getX(), event.getEventTime(), "X");
+            final float yOff = mY.collect(event.getY(), event.getEventTime(), "Y");
+
+            // Generate DPAD events based on the trackball movement.
+            // We pick the axis that has moved the most as the direction of
+            // the DPAD.  When we generate DPAD events for one axis, then the
+            // other axis is reset -- we don't want to perform DPAD jumps due
+            // to slight movements in the trackball when making major movements
+            // along the other axis.
+            int keycode = 0;
+            int movement = 0;
+            float accel = 1;
+            if (xOff > yOff) {
+                movement = mX.generate();
+                if (movement != 0) {
+                    keycode = movement > 0 ? KeyEvent.KEYCODE_DPAD_RIGHT
+                            : KeyEvent.KEYCODE_DPAD_LEFT;
+                    accel = mX.acceleration;
+                    mY.reset(2);
+                }
+            } else if (yOff > 0) {
+                movement = mY.generate();
+                if (movement != 0) {
+                    keycode = movement > 0 ? KeyEvent.KEYCODE_DPAD_DOWN
+                            : KeyEvent.KEYCODE_DPAD_UP;
+                    accel = mY.acceleration;
+                    mX.reset(2);
+                }
+            }
+
+            if (keycode != 0) {
+                if (movement < 0) movement = -movement;
+                int accelMovement = (int)(movement * accel);
+                if (DEBUG_TRACKBALL) Log.v(TAG, "Move: movement=" + movement
+                        + " accelMovement=" + accelMovement
+                        + " accel=" + accel);
+                if (accelMovement > movement) {
+                    if (DEBUG_TRACKBALL) Log.v(TAG, "Delivering fake DPAD: "
+                            + keycode);
+                    movement--;
+                    int repeatCount = accelMovement - movement;
+                    enqueueInputEvent(new KeyEvent(curTime, curTime,
+                            KeyEvent.ACTION_MULTIPLE, keycode, repeatCount, metaState,
+                            KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_FALLBACK,
+                            InputDevice.SOURCE_KEYBOARD));
+                }
+                while (movement > 0) {
+                    if (DEBUG_TRACKBALL) Log.v(TAG, "Delivering fake DPAD: "
+                            + keycode);
+                    movement--;
+                    curTime = SystemClock.uptimeMillis();
+                    enqueueInputEvent(new KeyEvent(curTime, curTime,
+                            KeyEvent.ACTION_DOWN, keycode, 0, metaState,
+                            KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_FALLBACK,
+                            InputDevice.SOURCE_KEYBOARD));
+                    enqueueInputEvent(new KeyEvent(curTime, curTime,
+                            KeyEvent.ACTION_UP, keycode, 0, metaState,
+                            KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_FALLBACK,
+                            InputDevice.SOURCE_KEYBOARD));
+                }
+                mLastTime = curTime;
+            }
+!!!962434.java!!!	cancel(inout event : MotionEvent) : void
+            mLastTime = Integer.MIN_VALUE;
+
+            // If we reach this, we consumed a trackball event.
+            // Because we will not translate the trackball event into a key event,
+            // touch mode will not exit, so we exit touch mode here.
+            if (mView != null && mAdded) {
+                ensureTouchMode(false);
+            }

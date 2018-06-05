@@ -1,0 +1,277 @@
+class ScaleGestureDetector
+!!!820226.java!!!	ScaleGestureDetector(inout context : Context, inout listener : ScaleGestureDetector::OnScaleGestureListener)
+        this(context, listener, null);
+!!!820354.java!!!	ScaleGestureDetector(inout context : Context, inout listener : ScaleGestureDetector::OnScaleGestureListener, inout handler : Handler)
+        mContext = context;
+        mListener = listener;
+        mSpanSlop = ViewConfiguration.get(context).getScaledTouchSlop() * 2;
+
+        final Resources res = context.getResources();
+        mTouchMinMajor = res.getDimensionPixelSize(
+                com.android.internal.R.dimen.config_minScalingTouchMajor);
+        mMinSpan = res.getDimensionPixelSize(com.android.internal.R.dimen.config_minScalingSpan);
+        mHandler = handler;
+        // Quick scale is enabled by default after JB_MR2
+        if (context.getApplicationInfo().targetSdkVersion > Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            setQuickScaleEnabled(true);
+        }
+!!!820482.java!!!	addTouchHistory(inout ev : MotionEvent) : void
+        final long currentTime = SystemClock.uptimeMillis();
+        final int count = ev.getPointerCount();
+        boolean accept = currentTime - mTouchHistoryLastAcceptedTime >= TOUCH_STABILIZE_TIME;
+        float total = 0;
+        int sampleCount = 0;
+        for (int i = 0; i < count; i++) {
+            final boolean hasLastAccepted = !Float.isNaN(mTouchHistoryLastAccepted);
+            final int historySize = ev.getHistorySize();
+            final int pointerSampleCount = historySize + 1;
+            for (int h = 0; h < pointerSampleCount; h++) {
+                float major;
+                if (h < historySize) {
+                    major = ev.getHistoricalTouchMajor(i, h);
+                } else {
+                    major = ev.getTouchMajor(i);
+                }
+                if (major < mTouchMinMajor) major = mTouchMinMajor;
+                total += major;
+
+                if (Float.isNaN(mTouchUpper) || major > mTouchUpper) {
+                    mTouchUpper = major;
+                }
+                if (Float.isNaN(mTouchLower) || major < mTouchLower) {
+                    mTouchLower = major;
+                }
+
+                if (hasLastAccepted) {
+                    final int directionSig = (int) Math.signum(major - mTouchHistoryLastAccepted);
+                    if (directionSig != mTouchHistoryDirection ||
+                            (directionSig == 0 && mTouchHistoryDirection == 0)) {
+                        mTouchHistoryDirection = directionSig;
+                        final long time = h < historySize ? ev.getHistoricalEventTime(h)
+                                : ev.getEventTime();
+                        mTouchHistoryLastAcceptedTime = time;
+                        accept = false;
+                    }
+                }
+            }
+            sampleCount += pointerSampleCount;
+        }
+
+        final float avg = total / sampleCount;
+
+        if (accept) {
+            float newAccepted = (mTouchUpper + mTouchLower + avg) / 3;
+            mTouchUpper = (mTouchUpper + newAccepted) / 2;
+            mTouchLower = (mTouchLower + newAccepted) / 2;
+            mTouchHistoryLastAccepted = newAccepted;
+            mTouchHistoryDirection = 0;
+            mTouchHistoryLastAcceptedTime = ev.getEventTime();
+        }
+!!!820610.java!!!	clearTouchHistory() : void
+        mTouchUpper = Float.NaN;
+        mTouchLower = Float.NaN;
+        mTouchHistoryLastAccepted = Float.NaN;
+        mTouchHistoryDirection = 0;
+        mTouchHistoryLastAcceptedTime = 0;
+!!!820738.java!!!	onTouchEvent(inout event : MotionEvent) : boolean
+        if (mInputEventConsistencyVerifier != null) {
+            mInputEventConsistencyVerifier.onTouchEvent(event, 0);
+        }
+
+        mCurrTime = event.getEventTime();
+
+        final int action = event.getActionMasked();
+
+        // Forward the event to check for double tap gesture
+        if (mQuickScaleEnabled) {
+            mGestureDetector.onTouchEvent(event);
+        }
+
+        final boolean streamComplete = action == MotionEvent.ACTION_UP ||
+                action == MotionEvent.ACTION_CANCEL;
+
+        if (action == MotionEvent.ACTION_DOWN || streamComplete) {
+            // Reset any scale in progress with the listener.
+            // If it's an ACTION_DOWN we're beginning a new event stream.
+            // This means the app probably didn't give us all the events. Shame on it.
+            if (mInProgress) {
+                mListener.onScaleEnd(this);
+                mInProgress = false;
+                mInitialSpan = 0;
+                mDoubleTapMode = DOUBLE_TAP_MODE_NONE;
+            } else if (mDoubleTapMode == DOUBLE_TAP_MODE_IN_PROGRESS && streamComplete) {
+                mInProgress = false;
+                mInitialSpan = 0;
+                mDoubleTapMode = DOUBLE_TAP_MODE_NONE;
+            }
+
+            if (streamComplete) {
+                clearTouchHistory();
+                return true;
+            }
+        }
+
+        final boolean configChanged = action == MotionEvent.ACTION_DOWN ||
+                action == MotionEvent.ACTION_POINTER_UP ||
+                action == MotionEvent.ACTION_POINTER_DOWN;
+
+
+        final boolean pointerUp = action == MotionEvent.ACTION_POINTER_UP;
+        final int skipIndex = pointerUp ? event.getActionIndex() : -1;
+
+        // Determine focal point
+        float sumX = 0, sumY = 0;
+        final int count = event.getPointerCount();
+        final int div = pointerUp ? count - 1 : count;
+        final float focusX;
+        final float focusY;
+        if (mDoubleTapMode == DOUBLE_TAP_MODE_IN_PROGRESS) {
+            // In double tap mode, the focal pt is always where the double tap
+            // gesture started
+            focusX = mDoubleTapEvent.getX();
+            focusY = mDoubleTapEvent.getY();
+            if (event.getY() < focusY) {
+                mEventBeforeOrAboveStartingGestureEvent = true;
+            } else {
+                mEventBeforeOrAboveStartingGestureEvent = false;
+            }
+        } else {
+            for (int i = 0; i < count; i++) {
+                if (skipIndex == i) continue;
+                sumX += event.getX(i);
+                sumY += event.getY(i);
+            }
+
+            focusX = sumX / div;
+            focusY = sumY / div;
+        }
+
+        addTouchHistory(event);
+
+        // Determine average deviation from focal point
+        float devSumX = 0, devSumY = 0;
+        for (int i = 0; i < count; i++) {
+            if (skipIndex == i) continue;
+
+            // Convert the resulting diameter into a radius.
+            final float touchSize = mTouchHistoryLastAccepted / 2;
+            devSumX += Math.abs(event.getX(i) - focusX) + touchSize;
+            devSumY += Math.abs(event.getY(i) - focusY) + touchSize;
+        }
+        final float devX = devSumX / div;
+        final float devY = devSumY / div;
+
+        // Span is the average distance between touch points through the focal point;
+        // i.e. the diameter of the circle with a radius of the average deviation from
+        // the focal point.
+        final float spanX = devX * 2;
+        final float spanY = devY * 2;
+        final float span;
+        if (inDoubleTapMode()) {
+            span = spanY;
+        } else {
+            span = FloatMath.sqrt(spanX * spanX + spanY * spanY);
+        }
+
+        // Dispatch begin/end events as needed.
+        // If the configuration changes, notify the app to reset its current state by beginning
+        // a fresh scale event stream.
+        final boolean wasInProgress = mInProgress;
+        mFocusX = focusX;
+        mFocusY = focusY;
+        if (!inDoubleTapMode() && mInProgress && (span < mMinSpan || configChanged)) {
+            mListener.onScaleEnd(this);
+            mInProgress = false;
+            mInitialSpan = span;
+            mDoubleTapMode = DOUBLE_TAP_MODE_NONE;
+        }
+        if (configChanged) {
+            mPrevSpanX = mCurrSpanX = spanX;
+            mPrevSpanY = mCurrSpanY = spanY;
+            mInitialSpan = mPrevSpan = mCurrSpan = span;
+        }
+
+        final int minSpan = inDoubleTapMode() ? mSpanSlop : mMinSpan;
+        if (!mInProgress && span >=  minSpan &&
+                (wasInProgress || Math.abs(span - mInitialSpan) > mSpanSlop)) {
+            mPrevSpanX = mCurrSpanX = spanX;
+            mPrevSpanY = mCurrSpanY = spanY;
+            mPrevSpan = mCurrSpan = span;
+            mPrevTime = mCurrTime;
+            mInProgress = mListener.onScaleBegin(this);
+        }
+
+        // Handle motion; focal point and span/scale factor are changing.
+        if (action == MotionEvent.ACTION_MOVE) {
+            mCurrSpanX = spanX;
+            mCurrSpanY = spanY;
+            mCurrSpan = span;
+
+            boolean updatePrev = true;
+
+            if (mInProgress) {
+                updatePrev = mListener.onScale(this);
+            }
+
+            if (updatePrev) {
+                mPrevSpanX = mCurrSpanX;
+                mPrevSpanY = mCurrSpanY;
+                mPrevSpan = mCurrSpan;
+                mPrevTime = mCurrTime;
+            }
+        }
+
+        return true;
+!!!820866.java!!!	inDoubleTapMode() : boolean
+        return mDoubleTapMode == DOUBLE_TAP_MODE_IN_PROGRESS;
+!!!820994.java!!!	setQuickScaleEnabled(inout scales : boolean) : void
+        mQuickScaleEnabled = scales;
+        if (mQuickScaleEnabled && mGestureDetector == null) {
+            GestureDetector.SimpleOnGestureListener gestureListener =
+                    new GestureDetector.SimpleOnGestureListener() {
+                        @Override
+                        public boolean onDoubleTap(MotionEvent e) {
+                            // Double tap: start watching for a swipe
+                            mDoubleTapEvent = e;
+                            mDoubleTapMode = DOUBLE_TAP_MODE_IN_PROGRESS;
+                            return true;
+                        }
+                    };
+            mGestureDetector = new GestureDetector(mContext, gestureListener, mHandler);
+        }
+!!!821122.java!!!	isQuickScaleEnabled() : boolean
+        return mQuickScaleEnabled;
+!!!821250.java!!!	isInProgress() : boolean
+        return mInProgress;
+!!!821378.java!!!	getFocusX() : float
+        return mFocusX;
+!!!821506.java!!!	getFocusY() : float
+        return mFocusY;
+!!!821634.java!!!	getCurrentSpan() : float
+        return mCurrSpan;
+!!!821762.java!!!	getCurrentSpanX() : float
+        return mCurrSpanX;
+!!!821890.java!!!	getCurrentSpanY() : float
+        return mCurrSpanY;
+!!!822018.java!!!	getPreviousSpan() : float
+        return mPrevSpan;
+!!!822146.java!!!	getPreviousSpanX() : float
+        return mPrevSpanX;
+!!!822274.java!!!	getPreviousSpanY() : float
+        return mPrevSpanY;
+!!!822402.java!!!	getScaleFactor() : float
+        if (inDoubleTapMode()) {
+            // Drag is moving up; the further away from the gesture
+            // start, the smaller the span should be, the closer,
+            // the larger the span, and therefore the larger the scale
+            final boolean scaleUp =
+                    (mEventBeforeOrAboveStartingGestureEvent && (mCurrSpan < mPrevSpan)) ||
+                    (!mEventBeforeOrAboveStartingGestureEvent && (mCurrSpan > mPrevSpan));
+            final float spanDiff = (Math.abs(1 - (mCurrSpan / mPrevSpan)) * SCALE_FACTOR);
+            return mPrevSpan <= 0 ? 1 : scaleUp ? (1 + spanDiff) : (1 - spanDiff);
+        }
+        return mPrevSpan > 0 ? mCurrSpan / mPrevSpan : 1;
+!!!822530.java!!!	getTimeDelta() : long
+        return mCurrTime - mPrevTime;
+!!!822658.java!!!	getEventTime() : long
+        return mCurrTime;

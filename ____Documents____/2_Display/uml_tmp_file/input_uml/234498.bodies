@@ -1,0 +1,100 @@
+class LayoutAnimationController
+!!!1123970.java!!!	LayoutAnimationController(inout context : Context, inout attrs : AttributeSet)
+        TypedArray a = context.obtainStyledAttributes(attrs, com.android.internal.R.styleable.LayoutAnimation);
+
+        Animation.Description d = Animation.Description.parseValue(
+                a.peekValue(com.android.internal.R.styleable.LayoutAnimation_delay));
+        mDelay = d.value;
+
+        mOrder = a.getInt(com.android.internal.R.styleable.LayoutAnimation_animationOrder, ORDER_NORMAL);
+
+        int resource = a.getResourceId(com.android.internal.R.styleable.LayoutAnimation_animation, 0);
+        if (resource > 0) {
+            setAnimation(context, resource);
+        }
+
+        resource = a.getResourceId(com.android.internal.R.styleable.LayoutAnimation_interpolator, 0);
+        if (resource > 0) {
+            setInterpolator(context, resource);
+        }
+
+        a.recycle();
+!!!1124098.java!!!	LayoutAnimationController(inout animation : Animation)
+        this(animation, 0.5f);
+!!!1124226.java!!!	LayoutAnimationController(inout animation : Animation, in delay : float)
+        mDelay = delay;
+        setAnimation(animation);
+!!!1124354.java!!!	getOrder() : int
+        return mOrder;
+!!!1124482.java!!!	setOrder(in order : int) : void
+        mOrder = order;
+!!!1124610.java!!!	setAnimation(inout context : Context, in resourceID : int) : void
+        setAnimation(AnimationUtils.loadAnimation(context, resourceID));
+!!!1124738.java!!!	setAnimation(inout animation : Animation) : void
+        mAnimation = animation;
+        mAnimation.setFillBefore(true);
+!!!1124866.java!!!	getAnimation() : Animation
+        return mAnimation;
+!!!1124994.java!!!	setInterpolator(inout context : Context, in resourceID : int) : void
+        setInterpolator(AnimationUtils.loadInterpolator(context, resourceID));
+!!!1125122.java!!!	setInterpolator(inout interpolator : Interpolator) : void
+        mInterpolator = interpolator;
+!!!1125250.java!!!	getInterpolator() : Interpolator
+        return mInterpolator;
+!!!1125378.java!!!	getDelay() : float
+        return mDelay;
+!!!1125506.java!!!	setDelay(in delay : float) : void
+        mDelay = delay;
+!!!1125634.java!!!	willOverlap() : boolean
+        return mDelay < 1.0f;
+!!!1125762.java!!!	start() : void
+        mDuration = mAnimation.getDuration();
+        mMaxDelay = Long.MIN_VALUE;
+        mAnimation.setStartTime(-1);
+!!!1125890.java!!!	getAnimationForView(inout view : View) : Animation
+        final long delay = getDelayForView(view) + mAnimation.getStartOffset();
+        mMaxDelay = Math.max(mMaxDelay, delay);
+
+        try {
+            final Animation animation = mAnimation.clone();
+            animation.setStartOffset(delay);
+            return animation;
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+!!!1126018.java!!!	isDone() : boolean
+        return AnimationUtils.currentAnimationTimeMillis() >
+                mAnimation.getStartTime() + mMaxDelay + mDuration;
+!!!1126146.java!!!	getDelayForView(inout view : View) : long
+        ViewGroup.LayoutParams lp = view.getLayoutParams();
+        AnimationParameters params = lp.layoutAnimationParameters;
+
+        if (params == null) {
+            return 0;
+        }
+
+        final float delay = mDelay * mAnimation.getDuration();
+        final long viewDelay = (long) (getTransformedIndex(params) * delay);
+        final float totalDelay = delay * params.count;
+
+        if (mInterpolator == null) {
+            mInterpolator = new LinearInterpolator();
+        }
+
+        float normalizedDelay = viewDelay / totalDelay;
+        normalizedDelay = mInterpolator.getInterpolation(normalizedDelay);
+
+        return (long) (normalizedDelay * totalDelay);
+!!!1126274.java!!!	getTransformedIndex(inout params : LayoutAnimationController::AnimationParameters) : int
+        switch (getOrder()) {
+            case ORDER_REVERSE:
+                return params.count - 1 - params.index;
+            case ORDER_RANDOM:
+                if (mRandomizer == null) {
+                    mRandomizer = new Random();
+                }
+                return (int) (params.count * mRandomizer.nextFloat());
+            case ORDER_NORMAL:
+            default:
+                return params.index;
+        }

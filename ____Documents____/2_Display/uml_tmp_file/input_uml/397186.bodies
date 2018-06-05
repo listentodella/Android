@@ -1,0 +1,54 @@
+class TextViewWithCircularIndicator
+!!!2509954.java!!!	TextViewWithCircularIndicator(inout context : Context)
+        this(context, null);
+!!!2510082.java!!!	TextViewWithCircularIndicator(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!2510210.java!!!	TextViewWithCircularIndicator(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2510338.java!!!	TextViewWithCircularIndicator(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs);
+
+
+        // Use Theme attributes if possible
+        final TypedArray a = mContext.obtainStyledAttributes(attrs,
+                R.styleable.DatePicker, defStyleAttr, defStyleRes);
+        final int resId = a.getResourceId(R.styleable.DatePicker_yearListItemTextAppearance, -1);
+        if (resId != -1) {
+            setTextAppearance(context, resId);
+        }
+
+        final Resources res = context.getResources();
+        mItemIsSelectedText = res.getString(R.string.item_is_selected);
+
+        a.recycle();
+
+        init();
+!!!2510466.java!!!	init() : void
+        mCirclePaint.setTypeface(Typeface.create(mCirclePaint.getTypeface(), Typeface.BOLD));
+        mCirclePaint.setAntiAlias(true);
+        mCirclePaint.setTextAlign(Paint.Align.CENTER);
+        mCirclePaint.setStyle(Paint.Style.FILL);
+!!!2510594.java!!!	setCircleColor(in color : int) : void
+        if (color != mCircleColor) {
+            mCircleColor = color;
+            mCirclePaint.setColor(mCircleColor);
+            mCirclePaint.setAlpha(SELECTED_CIRCLE_ALPHA);
+            requestLayout();
+        }
+!!!2510722.java!!!	setDrawIndicator(inout drawIndicator : boolean) : void
+        mDrawIndicator = drawIndicator;
+!!!2510850.java!!!	onDraw(inout canvas : Canvas) : void
+        super.onDraw(canvas);
+        if (mDrawIndicator) {
+            final int width = getWidth();
+            final int height = getHeight();
+            int radius = Math.min(width, height) / 2;
+            canvas.drawCircle(width / 2, height / 2, radius, mCirclePaint);
+        }
+!!!2510978.java!!!	getContentDescription() : CharSequence
+        CharSequence itemText = getText();
+        if (mDrawIndicator) {
+            return String.format(mItemIsSelectedText, itemText);
+        } else {
+            return itemText;
+        }

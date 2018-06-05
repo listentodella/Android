@@ -1,0 +1,71 @@
+class GraphicBuffer
+!!!722562.java!!!	create(in width : int, in height : int, in format : int, in usage : int) : GraphicBuffer
+        long nativeObject = nCreateGraphicBuffer(width, height, format, usage);
+        if (nativeObject != 0) {
+            return new GraphicBuffer(width, height, format, usage, nativeObject);
+        }
+        return null;
+!!!722690.java!!!	GraphicBuffer(in width : int, in height : int, in format : int, in usage : int, in nativeObject : long)
+        mWidth = width;
+        mHeight = height;
+        mFormat = format;
+        mUsage = usage;
+        mNativeObject = nativeObject;
+!!!722818.java!!!	getWidth() : int
+        return mWidth;
+!!!722946.java!!!	getHeight() : int
+        return mHeight;
+!!!723074.java!!!	getFormat() : int
+        return mFormat;
+!!!723202.java!!!	getUsage() : int
+        return mUsage;
+!!!723330.java!!!	lockCanvas() : Canvas
+        return lockCanvas(null);
+!!!723458.java!!!	lockCanvas(inout dirty : Rect) : Canvas
+        if (mDestroyed) {
+            return null;
+        }
+
+        if (mCanvas == null) {
+            mCanvas = new Canvas();
+        }
+
+        if (nLockCanvas(mNativeObject, mCanvas, dirty)) {
+            mSaveCount = mCanvas.save();
+            return mCanvas;
+        }
+
+        return null;
+!!!723586.java!!!	unlockCanvasAndPost(inout canvas : Canvas) : void
+        if (!mDestroyed && mCanvas != null && canvas == mCanvas) {
+            canvas.restoreToCount(mSaveCount);
+            mSaveCount = 0;
+
+            nUnlockCanvasAndPost(mNativeObject, mCanvas);
+        }
+!!!723714.java!!!	destroy() : void
+        if (!mDestroyed) {
+            mDestroyed = true;
+            nDestroyGraphicBuffer(mNativeObject);
+        }
+!!!723842.java!!!	isDestroyed() : boolean
+        return mDestroyed;
+!!!723970.java!!!	finalize() : void
+        try {
+            if (!mDestroyed) nDestroyGraphicBuffer(mNativeObject);
+        } finally {
+            super.finalize();
+        }
+!!!724098.java!!!	describeContents() : int
+        return 0;
+!!!724226.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        if (mDestroyed) {
+            throw new IllegalStateException("This GraphicBuffer has been destroyed and cannot be "
+                    + "written to a parcel.");
+        }
+
+        dest.writeInt(mWidth);
+        dest.writeInt(mHeight);
+        dest.writeInt(mFormat);
+        dest.writeInt(mUsage);
+        nWriteGraphicBufferToParcel(mNativeObject, dest);

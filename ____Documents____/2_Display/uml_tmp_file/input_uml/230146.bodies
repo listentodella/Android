@@ -1,0 +1,34 @@
+class DelayedAnimationHelper
+!!!816898.java!!!	DelayedAnimationHelper()
+            mChoreographer = Choreographer.getInstance();
+!!!817026.java!!!	addDelayedAnimation(inout animator : RenderNodeAnimator) : void
+            mDelayedAnims.add(animator);
+            scheduleCallback();
+!!!817154.java!!!	removeDelayedAnimation(inout animator : RenderNodeAnimator) : void
+            mDelayedAnims.remove(animator);
+!!!817282.java!!!	scheduleCallback() : void
+            if (!mCallbackScheduled) {
+                mCallbackScheduled = true;
+                mChoreographer.postCallback(Choreographer.CALLBACK_ANIMATION, this, null);
+            }
+!!!817410.java!!!	run() : void
+            long frameTimeMs = mChoreographer.getFrameTime();
+            mCallbackScheduled = false;
+
+            int end = 0;
+            for (int i = 0; i < mDelayedAnims.size(); i++) {
+                RenderNodeAnimator animator = mDelayedAnims.get(i);
+                if (!animator.processDelayed(frameTimeMs)) {
+                    if (end != i) {
+                        mDelayedAnims.set(end, animator);
+                    }
+                    end++;
+                }
+            }
+            while (mDelayedAnims.size() > end) {
+                mDelayedAnims.remove(mDelayedAnims.size() - 1);
+            }
+
+            if (mDelayedAnims.size() > 0) {
+                scheduleCallback();
+            }

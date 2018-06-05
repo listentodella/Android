@@ -1,0 +1,89 @@
+class AlarmImplTimerFd
+!!!1862914.cpp!!!	~AlarmImplTimerFd()
+    for (size_t i = 0; i < N_ANDROID_TIMERFDS; i++) {
+        epoll_ctl(epollfd, EPOLL_CTL_DEL, fds[i], NULL);
+    }
+    close(epollfd);
+!!!1863042.cpp!!!	set(in type : int, inout ts : timespec) : int
+    if (type > ANDROID_ALARM_TYPE_COUNT) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if (!ts->tv_nsec && !ts->tv_sec) {
+        ts->tv_nsec = 1;
+    }
+    /* timerfd interprets 0 = disarm, so replace with a practically
+       equivalent deadline of 1 ns */
+
+    struct itimerspec spec;
+    memset(&spec, 0, sizeof(spec));
+    memcpy(&spec.it_value, ts, sizeof(spec.it_value));
+
+    return timerfd_settime(fds[type], TFD_TIMER_ABSTIME, &spec, NULL);
+!!!1863170.cpp!!!	setTime(inout tv : timeval) : int
+    struct rtc_time rtc;
+    struct tm tm, *gmtime_res;
+    int fd;
+    int res;
+
+    res = settimeofday(tv, NULL);
+    if (res < 0) {
+        ALOGV("settimeofday() failed: %s\n", strerror(errno));
+        return -1;
+    }
+
+    fd = open("/dev/rtc0", O_RDWR);
+    if (fd < 0) {
+        ALOGV("Unable to open RTC driver: %s\n", strerror(errno));
+        return res;
+    }
+
+    gmtime_res = gmtime_r(&tv->tv_sec, &tm);
+    if (!gmtime_res) {
+        ALOGV("gmtime_r() failed: %s\n", strerror(errno));
+        res = -1;
+        goto done;
+    }
+
+    memset(&rtc, 0, sizeof(rtc));
+    rtc.tm_sec = tm.tm_sec;
+    rtc.tm_min = tm.tm_min;
+    rtc.tm_hour = tm.tm_hour;
+    rtc.tm_mday = tm.tm_mday;
+    rtc.tm_mon = tm.tm_mon;
+    rtc.tm_year = tm.tm_year;
+    rtc.tm_wday = tm.tm_wday;
+    rtc.tm_yday = tm.tm_yday;
+    rtc.tm_isdst = tm.tm_isdst;
+    res = ioctl(fd, RTC_SET_TIME, &rtc);
+    if (res < 0)
+        ALOGV("RTC_SET_TIME ioctl failed: %s\n", strerror(errno));
+done:
+    close(fd);
+    return res;
+!!!1863298.cpp!!!	waitForAlarm() : int
+    epoll_event events[N_ANDROID_TIMERFDS];
+
+    int nevents = epoll_wait(epollfd, events, N_ANDROID_TIMERFDS, -1);
+    if (nevents < 0) {
+        return nevents;
+    }
+
+    int result = 0;
+    for (int i = 0; i < nevents; i++) {
+        uint32_t alarm_idx = events[i].data.u32;
+        uint64_t unused;
+        ssize_t err = read(fds[alarm_idx], &unused, sizeof(unused));
+        if (err < 0) {
+            if (alarm_idx == ANDROID_ALARM_TYPE_COUNT && errno == ECANCELED) {
+                result |= ANDROID_ALARM_TIME_CHANGE_MASK;
+            } else {
+                return err;
+            }
+        } else {
+            result |= (1 << alarm_idx);
+        }
+    }
+
+    return result;

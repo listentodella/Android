@@ -1,0 +1,91 @@
+class CaptioningManager
+!!!1101314.java!!!	CaptioningManager(inout context : Context)
+        mContentResolver = context.getContentResolver();
+!!!1101442.java!!!	isEnabled() : boolean
+        return Secure.getInt(
+                mContentResolver, Secure.ACCESSIBILITY_CAPTIONING_ENABLED, DEFAULT_ENABLED) == 1;
+!!!1101570.java!!!	getRawLocale() : String
+        return Secure.getString(mContentResolver, Secure.ACCESSIBILITY_CAPTIONING_LOCALE);
+!!!1101698.java!!!	getLocale() : Locale
+        final String rawLocale = getRawLocale();
+        if (!TextUtils.isEmpty(rawLocale)) {
+            final String[] splitLocale = rawLocale.split("_");
+            switch (splitLocale.length) {
+                case 3:
+                    return new Locale(splitLocale[0], splitLocale[1], splitLocale[2]);
+                case 2:
+                    return new Locale(splitLocale[0], splitLocale[1]);
+                case 1:
+                    return new Locale(splitLocale[0]);
+            }
+        }
+
+        return null;
+!!!1101826.java!!!	getFontScale() : float
+        return Secure.getFloat(
+                mContentResolver, Secure.ACCESSIBILITY_CAPTIONING_FONT_SCALE, DEFAULT_FONT_SCALE);
+!!!1101954.java!!!	getRawUserStyle() : int
+        return Secure.getInt(
+                mContentResolver, Secure.ACCESSIBILITY_CAPTIONING_PRESET, DEFAULT_PRESET);
+!!!1102082.java!!!	getUserStyle() : CaptioningManager::CaptionStyle
+        final int preset = getRawUserStyle();
+        if (preset == CaptionStyle.PRESET_CUSTOM) {
+            return CaptionStyle.getCustomStyle(mContentResolver);
+        }
+
+        return CaptionStyle.PRESETS[preset];
+!!!1102210.java!!!	addCaptioningChangeListener(inout listener : CaptioningManager::CaptioningChangeListener) : void
+        synchronized (mListeners) {
+            if (mListeners.isEmpty()) {
+                registerObserver(Secure.ACCESSIBILITY_CAPTIONING_ENABLED);
+                registerObserver(Secure.ACCESSIBILITY_CAPTIONING_FOREGROUND_COLOR);
+                registerObserver(Secure.ACCESSIBILITY_CAPTIONING_BACKGROUND_COLOR);
+                registerObserver(Secure.ACCESSIBILITY_CAPTIONING_WINDOW_COLOR);
+                registerObserver(Secure.ACCESSIBILITY_CAPTIONING_EDGE_TYPE);
+                registerObserver(Secure.ACCESSIBILITY_CAPTIONING_EDGE_COLOR);
+                registerObserver(Secure.ACCESSIBILITY_CAPTIONING_TYPEFACE);
+                registerObserver(Secure.ACCESSIBILITY_CAPTIONING_FONT_SCALE);
+                registerObserver(Secure.ACCESSIBILITY_CAPTIONING_LOCALE);
+                registerObserver(Secure.ACCESSIBILITY_CAPTIONING_PRESET);
+            }
+
+            mListeners.add(listener);
+        }
+!!!1102338.java!!!	registerObserver(in key : String) : void
+        mContentResolver.registerContentObserver(Secure.getUriFor(key), false, mContentObserver);
+!!!1102466.java!!!	removeCaptioningChangeListener(inout listener : CaptioningManager::CaptioningChangeListener) : void
+        synchronized (mListeners) {
+            mListeners.remove(listener);
+
+            if (mListeners.isEmpty()) {
+                mContentResolver.unregisterContentObserver(mContentObserver);
+            }
+        }
+!!!1102594.java!!!	notifyEnabledChanged() : void
+        final boolean enabled = isEnabled();
+        synchronized (mListeners) {
+            for (CaptioningChangeListener listener : mListeners) {
+                listener.onEnabledChanged(enabled);
+            }
+        }
+!!!1102722.java!!!	notifyUserStyleChanged() : void
+        final CaptionStyle userStyle = getUserStyle();
+        synchronized (mListeners) {
+            for (CaptioningChangeListener listener : mListeners) {
+                listener.onUserStyleChanged(userStyle);
+            }
+        }
+!!!1102850.java!!!	notifyLocaleChanged() : void
+        final Locale locale = getLocale();
+        synchronized (mListeners) {
+            for (CaptioningChangeListener listener : mListeners) {
+                listener.onLocaleChanged(locale);
+            }
+        }
+!!!1102978.java!!!	notifyFontScaleChanged() : void
+        final float fontScale = getFontScale();
+        synchronized (mListeners) {
+            for (CaptioningChangeListener listener : mListeners) {
+                listener.onFontScaleChanged(fontScale);
+            }
+        }

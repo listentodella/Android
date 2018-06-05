@@ -1,0 +1,39 @@
+class HardwareRenderer
+!!!729090.java!!!	disable(inout system : boolean) : void
+        sRendererDisabled = true;
+        if (system) {
+            sSystemRendererDisabled = true;
+        }
+!!!729218.java!!!	enableForegroundTrimming() : void
+        sTrimForeground = true;
+!!!729346.java!!!	isAvailable() : boolean
+        return GLES20Canvas.isAvailable();
+!!!730882.java!!!	setupDiskCache(inout cacheDir : File) : void
+        ThreadedRenderer.setupShadersDiskCache(new File(cacheDir, CACHE_PATH_SHADERS).getAbsolutePath());
+!!!732162.java!!!	initializeIfNeeded(in width : int, in height : int, inout surface : Surface, inout surfaceInsets : Rect) : boolean
+        if (isRequested()) {
+            // We lost the gl context, so recreate it.
+            if (!isEnabled()) {
+                if (initialize(surface)) {
+                    setup(width, height, surfaceInsets);
+                    return true;
+                }
+            }
+        }
+        return false;
+!!!732674.java!!!	create(inout context : Context, inout translucent : boolean) : HardwareRenderer
+        HardwareRenderer renderer = null;
+        if (GLES20Canvas.isAvailable()) {
+            renderer = new ThreadedRenderer(context, translucent);
+        }
+        return renderer;
+!!!732802.java!!!	trimMemory(in level : int) : void
+        ThreadedRenderer.trimMemory(level);
+!!!732930.java!!!	isEnabled() : boolean
+        return mEnabled;
+!!!733058.java!!!	setEnabled(inout enabled : boolean) : void
+        mEnabled = enabled;
+!!!733186.java!!!	isRequested() : boolean
+        return mRequested;
+!!!733314.java!!!	setRequested(inout requested : boolean) : void
+        mRequested = requested;

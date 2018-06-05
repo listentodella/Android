@@ -1,0 +1,35 @@
+class DefaultSorter
+!!!2019074.java!!!	sort(inout intent : Intent, inout activities : List<ActivityResolveInfo>, inout historicalRecords : List<HistoricalRecord>) : void
+            Map<ComponentName, ActivityResolveInfo> componentNameToActivityMap =
+                    mPackageNameToActivityMap;
+            componentNameToActivityMap.clear();
+
+            final int activityCount = activities.size();
+            for (int i = 0; i < activityCount; i++) {
+                ActivityResolveInfo activity = activities.get(i);
+                activity.weight = 0.0f;
+                ComponentName componentName = new ComponentName(
+                        activity.resolveInfo.activityInfo.packageName,
+                        activity.resolveInfo.activityInfo.name);
+                componentNameToActivityMap.put(componentName, activity);
+            }
+
+            final int lastShareIndex = historicalRecords.size() - 1;
+            float nextRecordWeight = 1;
+            for (int i = lastShareIndex; i >= 0; i--) {
+                HistoricalRecord historicalRecord = historicalRecords.get(i);
+                ComponentName componentName = historicalRecord.activity;
+                ActivityResolveInfo activity = componentNameToActivityMap.get(componentName);
+                if (activity != null) {
+                    activity.weight += historicalRecord.weight * nextRecordWeight;
+                    nextRecordWeight = nextRecordWeight * WEIGHT_DECAY_COEFFICIENT;
+                }
+            }
+
+            Collections.sort(activities);
+
+            if (DEBUG) {
+                for (int i = 0; i < activityCount; i++) {
+                    Log.i(LOG_TAG, "Sorted: " + activities.get(i));
+                }
+            }

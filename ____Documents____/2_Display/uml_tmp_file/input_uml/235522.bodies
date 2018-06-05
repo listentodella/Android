@@ -1,0 +1,69 @@
+class ViewLocationHolder
+!!!922370.java!!!	obtain(inout root : ViewGroup, inout view : View) : ViewGroup::ViewLocationHolder
+            ViewLocationHolder holder = sPool.acquire();
+            if (holder == null) {
+                holder = new ViewLocationHolder();
+            }
+            holder.init(root, view);
+            return holder;
+!!!922498.java!!!	setComparisonStrategy(in strategy : int) : void
+            sComparisonStrategy = strategy;
+!!!922626.java!!!	recycle() : void
+            clear();
+            sPool.release(this);
+!!!922754.java!!!	compareTo(inout another : ViewGroup::ViewLocationHolder) : int
+            // This instance is greater than an invalid argument.
+            if (another == null) {
+                return 1;
+            }
+
+            if (sComparisonStrategy == COMPARISON_STRATEGY_STRIPE) {
+                // First is above second.
+                if (mLocation.bottom - another.mLocation.top <= 0) {
+                    return -1;
+                }
+                // First is below second.
+                if (mLocation.top - another.mLocation.bottom >= 0) {
+                    return 1;
+                }
+            }
+
+            // We are ordering left-to-right, top-to-bottom.
+            if (mLayoutDirection == LAYOUT_DIRECTION_LTR) {
+                final int leftDifference = mLocation.left - another.mLocation.left;
+                if (leftDifference != 0) {
+                    return leftDifference;
+                }
+            } else { // RTL
+                final int rightDifference = mLocation.right - another.mLocation.right;
+                if (rightDifference != 0) {
+                    return -rightDifference;
+                }
+            }
+            // We are ordering left-to-right, top-to-bottom.
+            final int topDifference = mLocation.top - another.mLocation.top;
+            if (topDifference != 0) {
+                return topDifference;
+            }
+            // Break tie by height.
+            final int heightDiference = mLocation.height() - another.mLocation.height();
+            if (heightDiference != 0) {
+                return -heightDiference;
+            }
+            // Break tie by width.
+            final int widthDiference = mLocation.width() - another.mLocation.width();
+            if (widthDiference != 0) {
+                return -widthDiference;
+            }
+            // Just break the tie somehow. The accessibliity ids are unique
+            // and stable, hence this is deterministic tie breaking.
+            return mView.getAccessibilityViewId() - another.mView.getAccessibilityViewId();
+!!!922882.java!!!	init(inout root : ViewGroup, inout view : View) : void
+            Rect viewLocation = mLocation;
+            view.getDrawingRect(viewLocation);
+            root.offsetDescendantRectToMyCoords(view, viewLocation);
+            mView = view;
+            mLayoutDirection = root.getLayoutDirection();
+!!!923010.java!!!	clear() : void
+            mView = null;
+            mLocation.set(0, 0, 0, 0);

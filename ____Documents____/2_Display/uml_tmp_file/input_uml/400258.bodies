@@ -1,0 +1,83 @@
+class ViewFlipper
+!!!2556546.java!!!	ViewFlipper(inout context : Context)
+        super(context);
+!!!2556674.java!!!	ViewFlipper(inout context : Context, inout attrs : AttributeSet)
+        super(context, attrs);
+
+        TypedArray a = context.obtainStyledAttributes(attrs,
+                com.android.internal.R.styleable.ViewFlipper);
+        mFlipInterval = a.getInt(
+                com.android.internal.R.styleable.ViewFlipper_flipInterval, DEFAULT_INTERVAL);
+        mAutoStart = a.getBoolean(
+                com.android.internal.R.styleable.ViewFlipper_autoStart, false);
+        a.recycle();
+!!!2556802.java!!!	onAttachedToWindow() : void
+        super.onAttachedToWindow();
+
+        // Listen for broadcasts related to user-presence
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_USER_PRESENT);
+
+        // OK, this is gross but needed. This class is supported by the
+        // remote views machanism and as a part of that the remote views
+        // can be inflated by a context for another user without the app
+        // having interact users permission - just for loading resources.
+        // For exmaple, when adding widgets from a user profile to the
+        // home screen. Therefore, we register the receiver as the current
+        // user not the one the context is for.
+        getContext().registerReceiverAsUser(mReceiver, android.os.Process.myUserHandle(),
+                filter, null, mHandler);
+
+        if (mAutoStart) {
+            // Automatically start when requested
+            startFlipping();
+        }
+!!!2556930.java!!!	onDetachedFromWindow() : void
+        super.onDetachedFromWindow();
+        mVisible = false;
+
+        getContext().unregisterReceiver(mReceiver);
+        updateRunning();
+!!!2557058.java!!!	onWindowVisibilityChanged(in visibility : int) : void
+        super.onWindowVisibilityChanged(visibility);
+        mVisible = visibility == VISIBLE;
+        updateRunning(false);
+!!!2557186.java!!!	setFlipInterval(in milliseconds : int) : void
+        mFlipInterval = milliseconds;
+!!!2557314.java!!!	startFlipping() : void
+        mStarted = true;
+        updateRunning();
+!!!2557442.java!!!	stopFlipping() : void
+        mStarted = false;
+        updateRunning();
+!!!2557570.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(ViewFlipper.class.getName());
+!!!2557698.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(ViewFlipper.class.getName());
+!!!2557826.java!!!	updateRunning() : void
+        updateRunning(true);
+!!!2557954.java!!!	updateRunning(inout flipNow : boolean) : void
+        boolean running = mVisible && mStarted && mUserPresent;
+        if (running != mRunning) {
+            if (running) {
+                showOnly(mWhichChild, flipNow);
+                Message msg = mHandler.obtainMessage(FLIP_MSG);
+                mHandler.sendMessageDelayed(msg, mFlipInterval);
+            } else {
+                mHandler.removeMessages(FLIP_MSG);
+            }
+            mRunning = running;
+        }
+        if (LOGD) {
+            Log.d(TAG, "updateRunning() mVisible=" + mVisible + ", mStarted=" + mStarted
+                    + ", mUserPresent=" + mUserPresent + ", mRunning=" + mRunning);
+        }
+!!!2558082.java!!!	isFlipping() : boolean
+        return mStarted;
+!!!2558210.java!!!	setAutoStart(inout autoStart : boolean) : void
+        mAutoStart = autoStart;
+!!!2558338.java!!!	isAutoStart() : boolean
+        return mAutoStart;

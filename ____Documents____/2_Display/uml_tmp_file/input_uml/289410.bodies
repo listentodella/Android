@@ -1,0 +1,12 @@
+class SavedState
+!!!1584258.java!!!	SavedState(inout state : Bundle)
+            mState = state;
+!!!1584386.java!!!	SavedState(inout in : Parcel, inout loader : ClassLoader)
+            mState = in.readBundle();
+            if (loader != null && mState != null) {
+                mState.setClassLoader(loader);
+            }
+!!!1584514.java!!!	describeContents() : int
+            return 0;
+!!!1584642.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            dest.writeBundle(mState);

@@ -1,0 +1,89 @@
+class FramebufferSurface
+!!!202754.cpp!!!	FramebufferSurface(inout hwc : HWComposer, in disp : int, in consumer : sp<IGraphicBufferConsumer>)
+    mName = "FramebufferSurface";
+    mConsumer->setConsumerName(mName);
+    mConsumer->setConsumerUsageBits(GRALLOC_USAGE_HW_FB |
+                                       GRALLOC_USAGE_HW_RENDER |
+                                       GRALLOC_USAGE_HW_COMPOSER);
+    mConsumer->setDefaultBufferFormat(mHwc.getFormat(disp));
+    mConsumer->setDefaultBufferSize(mHwc.getWidth(disp),  mHwc.getHeight(disp));
+    mConsumer->setDefaultMaxBufferCount(NUM_FRAMEBUFFER_SURFACE_BUFFERS);
+!!!202882.cpp!!!	beginFrame(in mustRecompose : bool) : status_t
+    return NO_ERROR;
+!!!203010.cpp!!!	prepareFrame(in compositionType : CompositionType) : status_t
+    return NO_ERROR;
+!!!203138.cpp!!!	compositionComplete() : status_t
+    return mHwc.fbCompositionComplete();
+!!!203266.cpp!!!	advanceFrame() : status_t
+    // Once we remove FB HAL support, we can call nextBuffer() from here
+    // instead of using onFrameAvailable(). No real benefit, except it'll be
+    // more like VirtualDisplaySurface.
+    return NO_ERROR;
+!!!203394.cpp!!!	onFrameCommitted() : void
+    sp<Fence> fence = mHwc.getAndResetReleaseFence(mDisplayType);
+    if (fence->isValid() &&
+            mCurrentBufferSlot != BufferQueue::INVALID_BUFFER_SLOT) {
+        status_t err = addReleaseFence(mCurrentBufferSlot,
+                mCurrentBuffer, fence);
+        ALOGE_IF(err, "setReleaseFenceFd: failed to add the fence: %s (%d)",
+                strerror(-err), err);
+    }
+!!!203522.cpp!!!	dump(inout result : String8) : void
+    ConsumerBase::dump(result);
+!!!203906.cpp!!!	onFrameAvailable() : void
+    sp<GraphicBuffer> buf;
+    sp<Fence> acquireFence;
+    status_t err = nextBuffer(buf, acquireFence);
+    if (err != NO_ERROR) {
+        ALOGE("error latching nnext FramebufferSurface buffer: %s (%d)",
+                strerror(-err), err);
+        return;
+    }
+    err = mHwc.fbPost(mDisplayType, acquireFence, buf);
+    if (err != NO_ERROR) {
+        ALOGE("error posting framebuffer: %d", err);
+    }
+!!!204034.cpp!!!	freeBufferLocked(in slotIndex : int) : void
+    ConsumerBase::freeBufferLocked(slotIndex);
+    if (slotIndex == mCurrentBufferSlot) {
+        mCurrentBufferSlot = BufferQueue::INVALID_BUFFER_SLOT;
+    }
+!!!204162.cpp!!!	dumpLocked(inout result : String8, in prefix : char) : void
+    mHwc.fbDump(result);
+    ConsumerBase::dumpLocked(result, prefix);
+!!!204290.cpp!!!	nextBuffer(inout outBuffer : sp<GraphicBuffer>, inout outFence : sp<Fence>) : status_t
+    Mutex::Autolock lock(mMutex);
+
+    BufferQueue::BufferItem item;
+    status_t err = acquireBufferLocked(&item, 0);
+    if (err == BufferQueue::NO_BUFFER_AVAILABLE) {
+        outBuffer = mCurrentBuffer;
+        return NO_ERROR;
+    } else if (err != NO_ERROR) {
+        ALOGE("error acquiring buffer: %s (%d)", strerror(-err), err);
+        return err;
+    }
+
+    // If the BufferQueue has freed and reallocated a buffer in mCurrentSlot
+    // then we may have acquired the slot we already own.  If we had released
+    // our current buffer before we call acquireBuffer then that release call
+    // would have returned STALE_BUFFER_SLOT, and we would have called
+    // freeBufferLocked on that slot.  Because the buffer slot has already
+    // been overwritten with the new buffer all we have to do is skip the
+    // releaseBuffer call and we should be in the same state we'd be in if we
+    // had released the old buffer first.
+    if (mCurrentBufferSlot != BufferQueue::INVALID_BUFFER_SLOT &&
+        item.mBuf != mCurrentBufferSlot) {
+        // Release the previous buffer.
+        err = releaseBufferLocked(mCurrentBufferSlot, mCurrentBuffer,
+                EGL_NO_DISPLAY, EGL_NO_SYNC_KHR);
+        if (err < NO_ERROR) {
+            ALOGE("error releasing buffer: %s (%d)", strerror(-err), err);
+            return err;
+        }
+    }
+    mCurrentBufferSlot = item.mBuf;
+    mCurrentBuffer = mSlots[mCurrentBufferSlot].mGraphicBuffer;
+    outFence = item.mFence;
+    outBuffer = mCurrentBuffer;
+    return NO_ERROR;

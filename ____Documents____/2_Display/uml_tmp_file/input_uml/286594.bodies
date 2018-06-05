@@ -1,0 +1,14 @@
+class AppGlobals
+!!!1499522.java!!!	getInitialApplication() : Application
+        return ActivityThread.currentApplication();
+!!!1499650.java!!!	getInitialPackage() : String
+        return ActivityThread.currentPackageName();
+!!!1499778.java!!!	getPackageManager() : IPackageManager
+        return ActivityThread.getPackageManager();
+!!!1499906.java!!!	getIntCoreSetting(in key : String, in defaultValue : int) : int
+        ActivityThread currentActivityThread = ActivityThread.currentActivityThread();
+        if (currentActivityThread != null) {
+            return currentActivityThread.getIntCoreSetting(key, defaultValue);
+        } else {
+            return defaultValue;
+        }

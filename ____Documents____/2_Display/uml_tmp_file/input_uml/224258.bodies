@@ -1,0 +1,9 @@
+class CanvasFinalizer
+!!!702082.java!!!	CanvasFinalizer(in renderer : long)
+            mRenderer = renderer;
+!!!702210.java!!!	finalize() : void
+            try {
+                nDestroyRenderer(mRenderer);
+            } finally {
+                super.finalize();
+            }

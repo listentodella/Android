@@ -1,0 +1,16 @@
+class Connection
+!!!175106.cpp!!!	postEvent(in event : DisplayEventReceiver::Event) : status_t
+    ssize_t size = DisplayEventReceiver::sendEvents(mChannel, &event, 1);
+    return size < 0 ? status_t(size) : status_t(NO_ERROR);
+!!!175234.cpp!!!	~Connection()
+    // do nothing here -- clean-up will happen automatically
+    // when the main thread wakes up
+!!!175362.cpp!!!	onFirstRef() : void
+    // NOTE: mEventThread doesn't hold a strong reference on us
+    mEventThread->registerDisplayEventConnection(this);
+!!!175490.cpp!!!	getDataChannel() : sp<BitTube>
+    return mChannel;
+!!!175618.cpp!!!	setVsyncRate(in count : uint32_t) : void
+    mEventThread->setVsyncRate(count, this);
+!!!175746.cpp!!!	requestNextVsync() : void
+    mEventThread->requestNextVsync(this);

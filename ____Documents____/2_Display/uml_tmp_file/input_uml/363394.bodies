@@ -1,0 +1,198 @@
+class Scroller
+!!!2407938.java!!!	Scroller(inout context : Context)
+        this(context, null);
+!!!2408066.java!!!	Scroller(inout context : Context, inout interpolator : Interpolator)
+        this(context, interpolator,
+                context.getApplicationInfo().targetSdkVersion >= Build.VERSION_CODES.HONEYCOMB);
+!!!2408194.java!!!	Scroller(inout context : Context, inout interpolator : Interpolator, inout flywheel : boolean)
+        mFinished = true;
+        if (interpolator == null) {
+            mInterpolator = new ViscousFluidInterpolator();
+        } else {
+            mInterpolator = interpolator;
+        }
+        mPpi = context.getResources().getDisplayMetrics().density * 160.0f;
+        mDeceleration = computeDeceleration(ViewConfiguration.getScrollFriction());
+        mFlywheel = flywheel;
+
+        mPhysicalCoeff = computeDeceleration(0.84f); // look and feel tuning
+!!!2408322.java!!!	setFriction(in friction : float) : void
+        mDeceleration = computeDeceleration(friction);
+        mFlingFriction = friction;
+!!!2408450.java!!!	computeDeceleration(in friction : float) : float
+        return SensorManager.GRAVITY_EARTH   // g (m/s^2)
+                      * 39.37f               // inch/meter
+                      * mPpi                 // pixels per inch
+                      * friction;
+!!!2408578.java!!!	isFinished() : boolean
+        return mFinished;
+!!!2408706.java!!!	forceFinished(inout finished : boolean) : void
+        mFinished = finished;
+!!!2408834.java!!!	getDuration() : int
+        return mDuration;
+!!!2408962.java!!!	getCurrX() : int
+        return mCurrX;
+!!!2409090.java!!!	getCurrY() : int
+        return mCurrY;
+!!!2409218.java!!!	getCurrVelocity() : float
+        return mMode == FLING_MODE ?
+                mCurrVelocity : mVelocity - mDeceleration * timePassed() / 2000.0f;
+!!!2409346.java!!!	getStartX() : int
+        return mStartX;
+!!!2409474.java!!!	getStartY() : int
+        return mStartY;
+!!!2409602.java!!!	getFinalX() : int
+        return mFinalX;
+!!!2409730.java!!!	getFinalY() : int
+        return mFinalY;
+!!!2409858.java!!!	computeScrollOffset() : boolean
+        if (mFinished) {
+            return false;
+        }
+
+        int timePassed = (int)(AnimationUtils.currentAnimationTimeMillis() - mStartTime);
+    
+        if (timePassed < mDuration) {
+            switch (mMode) {
+            case SCROLL_MODE:
+                final float x = mInterpolator.getInterpolation(timePassed * mDurationReciprocal);
+                mCurrX = mStartX + Math.round(x * mDeltaX);
+                mCurrY = mStartY + Math.round(x * mDeltaY);
+                break;
+            case FLING_MODE:
+                final float t = (float) timePassed / mDuration;
+                final int index = (int) (NB_SAMPLES * t);
+                float distanceCoef = 1.f;
+                float velocityCoef = 0.f;
+                if (index < NB_SAMPLES) {
+                    final float t_inf = (float) index / NB_SAMPLES;
+                    final float t_sup = (float) (index + 1) / NB_SAMPLES;
+                    final float d_inf = SPLINE_POSITION[index];
+                    final float d_sup = SPLINE_POSITION[index + 1];
+                    velocityCoef = (d_sup - d_inf) / (t_sup - t_inf);
+                    distanceCoef = d_inf + (t - t_inf) * velocityCoef;
+                }
+
+                mCurrVelocity = velocityCoef * mDistance / mDuration * 1000.0f;
+                
+                mCurrX = mStartX + Math.round(distanceCoef * (mFinalX - mStartX));
+                // Pin to mMinX <= mCurrX <= mMaxX
+                mCurrX = Math.min(mCurrX, mMaxX);
+                mCurrX = Math.max(mCurrX, mMinX);
+                
+                mCurrY = mStartY + Math.round(distanceCoef * (mFinalY - mStartY));
+                // Pin to mMinY <= mCurrY <= mMaxY
+                mCurrY = Math.min(mCurrY, mMaxY);
+                mCurrY = Math.max(mCurrY, mMinY);
+
+                if (mCurrX == mFinalX && mCurrY == mFinalY) {
+                    mFinished = true;
+                }
+
+                break;
+            }
+        }
+        else {
+            mCurrX = mFinalX;
+            mCurrY = mFinalY;
+            mFinished = true;
+        }
+        return true;
+!!!2409986.java!!!	startScroll(in startX : int, in startY : int, in dx : int, in dy : int) : void
+        startScroll(startX, startY, dx, dy, DEFAULT_DURATION);
+!!!2410114.java!!!	startScroll(in startX : int, in startY : int, in dx : int, in dy : int, in duration : int) : void
+        mMode = SCROLL_MODE;
+        mFinished = false;
+        mDuration = duration;
+        mStartTime = AnimationUtils.currentAnimationTimeMillis();
+        mStartX = startX;
+        mStartY = startY;
+        mFinalX = startX + dx;
+        mFinalY = startY + dy;
+        mDeltaX = dx;
+        mDeltaY = dy;
+        mDurationReciprocal = 1.0f / (float) mDuration;
+!!!2410242.java!!!	fling(in startX : int, in startY : int, in velocityX : int, in velocityY : int, in minX : int, in maxX : int, in minY : int, in maxY : int) : void
+        // Continue a scroll or fling in progress
+        if (mFlywheel && !mFinished) {
+            float oldVel = getCurrVelocity();
+
+            float dx = (float) (mFinalX - mStartX);
+            float dy = (float) (mFinalY - mStartY);
+            float hyp = FloatMath.sqrt(dx * dx + dy * dy);
+
+            float ndx = dx / hyp;
+            float ndy = dy / hyp;
+
+            float oldVelocityX = ndx * oldVel;
+            float oldVelocityY = ndy * oldVel;
+            if (Math.signum(velocityX) == Math.signum(oldVelocityX) &&
+                    Math.signum(velocityY) == Math.signum(oldVelocityY)) {
+                velocityX += oldVelocityX;
+                velocityY += oldVelocityY;
+            }
+        }
+
+        mMode = FLING_MODE;
+        mFinished = false;
+
+        float velocity = FloatMath.sqrt(velocityX * velocityX + velocityY * velocityY);
+     
+        mVelocity = velocity;
+        mDuration = getSplineFlingDuration(velocity);
+        mStartTime = AnimationUtils.currentAnimationTimeMillis();
+        mStartX = startX;
+        mStartY = startY;
+
+        float coeffX = velocity == 0 ? 1.0f : velocityX / velocity;
+        float coeffY = velocity == 0 ? 1.0f : velocityY / velocity;
+
+        double totalDistance = getSplineFlingDistance(velocity);
+        mDistance = (int) (totalDistance * Math.signum(velocity));
+        
+        mMinX = minX;
+        mMaxX = maxX;
+        mMinY = minY;
+        mMaxY = maxY;
+
+        mFinalX = startX + (int) Math.round(totalDistance * coeffX);
+        // Pin to mMinX <= mFinalX <= mMaxX
+        mFinalX = Math.min(mFinalX, mMaxX);
+        mFinalX = Math.max(mFinalX, mMinX);
+        
+        mFinalY = startY + (int) Math.round(totalDistance * coeffY);
+        // Pin to mMinY <= mFinalY <= mMaxY
+        mFinalY = Math.min(mFinalY, mMaxY);
+        mFinalY = Math.max(mFinalY, mMinY);
+!!!2410370.java!!!	getSplineDeceleration(in velocity : float) : double
+        return Math.log(INFLEXION * Math.abs(velocity) / (mFlingFriction * mPhysicalCoeff));
+!!!2410498.java!!!	getSplineFlingDuration(in velocity : float) : int
+        final double l = getSplineDeceleration(velocity);
+        final double decelMinusOne = DECELERATION_RATE - 1.0;
+        return (int) (1000.0 * Math.exp(l / decelMinusOne));
+!!!2410626.java!!!	getSplineFlingDistance(in velocity : float) : double
+        final double l = getSplineDeceleration(velocity);
+        final double decelMinusOne = DECELERATION_RATE - 1.0;
+        return mFlingFriction * mPhysicalCoeff * Math.exp(DECELERATION_RATE / decelMinusOne * l);
+!!!2410754.java!!!	abortAnimation() : void
+        mCurrX = mFinalX;
+        mCurrY = mFinalY;
+        mFinished = true;
+!!!2410882.java!!!	extendDuration(in extend : int) : void
+        int passed = timePassed();
+        mDuration = passed + extend;
+        mDurationReciprocal = 1.0f / mDuration;
+        mFinished = false;
+!!!2411010.java!!!	timePassed() : int
+        return (int)(AnimationUtils.currentAnimationTimeMillis() - mStartTime);
+!!!2411138.java!!!	setFinalX(in newX : int) : void
+        mFinalX = newX;
+        mDeltaX = mFinalX - mStartX;
+        mFinished = false;
+!!!2411266.java!!!	setFinalY(in newY : int) : void
+        mFinalY = newY;
+        mDeltaY = mFinalY - mStartY;
+        mFinished = false;
+!!!2411394.java!!!	isScrollingInDirection(in xvel : float, in yvel : float) : boolean
+        return !mFinished && Math.signum(xvel) == Math.signum(mFinalX - mStartX) &&
+                Math.signum(yvel) == Math.signum(mFinalY - mStartY);

@@ -1,0 +1,23 @@
+class TabSpec
+!!!2490754.java!!!	TabSpec(in tag : String)
+            mTag = tag;
+!!!2490882.java!!!	setIndicator(inout label : CharSequence) : TabHost::TabSpec
+            mIndicatorStrategy = new LabelIndicatorStrategy(label);
+            return this;
+!!!2491010.java!!!	setIndicator(inout label : CharSequence, inout icon : Drawable) : TabHost::TabSpec
+            mIndicatorStrategy = new LabelAndIconIndicatorStrategy(label, icon);
+            return this;
+!!!2491138.java!!!	setIndicator(inout view : View) : TabHost::TabSpec
+            mIndicatorStrategy = new ViewIndicatorStrategy(view);
+            return this;
+!!!2491266.java!!!	setContent(in viewId : int) : TabHost::TabSpec
+            mContentStrategy = new ViewIdContentStrategy(viewId);
+            return this;
+!!!2491394.java!!!	setContent(inout contentFactory : TabHost::TabContentFactory) : TabHost::TabSpec
+            mContentStrategy = new FactoryContentStrategy(mTag, contentFactory);
+            return this;
+!!!2491522.java!!!	setContent(inout intent : Intent) : TabHost::TabSpec
+            mContentStrategy = new IntentContentStrategy(mTag, intent);
+            return this;
+!!!2491650.java!!!	getTag() : String
+            return mTag;

@@ -1,0 +1,849 @@
+class DecorView
+!!!476930.java!!!	DecorView(inout context : Context, in featureId : int)
+            super(context);
+            mFeatureId = featureId;
+!!!477058.java!!!	setBackgroundFallback(in resId : int) : void
+            mBackgroundFallback.setDrawable(resId != 0 ? getContext().getDrawable(resId) : null);
+            setWillNotDraw(getBackground() == null && !mBackgroundFallback.hasFallback());
+!!!477186.java!!!	onDraw(inout c : Canvas) : void
+            super.onDraw(c);
+            mBackgroundFallback.draw(mContentRoot, c, mContentParent);
+!!!477314.java!!!	dispatchKeyEvent(inout event : KeyEvent) : boolean
+            final int keyCode = event.getKeyCode();
+            final int action = event.getAction();
+            final boolean isDown = action == KeyEvent.ACTION_DOWN;
+
+            if (isDown && (event.getRepeatCount() == 0)) {
+                // First handle chording of panel key: if a panel key is held
+                // but not released, try to execute a shortcut in it.
+                if ((mPanelChordingKey > 0) && (mPanelChordingKey != keyCode)) {
+                    boolean handled = dispatchKeyShortcutEvent(event);
+                    if (handled) {
+                        return true;
+                    }
+                }
+
+                // If a panel is open, perform a shortcut on it without the
+                // chorded panel key
+                if ((mPreparedPanel != null) && mPreparedPanel.isOpen) {
+                    if (performPanelShortcut(mPreparedPanel, keyCode, event, 0)) {
+                        return true;
+                    }
+                }
+            }
+
+            if (!isDestroyed()) {
+                final Callback cb = getCallback();
+                final boolean handled = cb != null && mFeatureId < 0 ? cb.dispatchKeyEvent(event)
+                        : super.dispatchKeyEvent(event);
+                if (handled) {
+                    return true;
+                }
+            }
+
+            return isDown ? PhoneWindow.this.onKeyDown(mFeatureId, event.getKeyCode(), event)
+                    : PhoneWindow.this.onKeyUp(mFeatureId, event.getKeyCode(), event);
+!!!477442.java!!!	dispatchKeyShortcutEvent(inout ev : KeyEvent) : boolean
+            // If the panel is already prepared, then perform the shortcut using it.
+            boolean handled;
+            if (mPreparedPanel != null) {
+                handled = performPanelShortcut(mPreparedPanel, ev.getKeyCode(), ev,
+                        Menu.FLAG_PERFORM_NO_CLOSE);
+                if (handled) {
+                    if (mPreparedPanel != null) {
+                        mPreparedPanel.isHandled = true;
+                    }
+                    return true;
+                }
+            }
+
+            // Shortcut not handled by the panel.  Dispatch to the view hierarchy.
+            final Callback cb = getCallback();
+            handled = cb != null && !isDestroyed() && mFeatureId < 0
+                    ? cb.dispatchKeyShortcutEvent(ev) : super.dispatchKeyShortcutEvent(ev);
+            if (handled) {
+                return true;
+            }
+
+            // If the panel is not prepared, then we may be trying to handle a shortcut key
+            // combination such as Control+C.  Temporarily prepare the panel then mark it
+            // unprepared again when finished to ensure that the panel will again be prepared
+            // the next time it is shown for real.
+            if (mPreparedPanel == null) {
+                PanelFeatureState st = getPanelState(FEATURE_OPTIONS_PANEL, true);
+                preparePanel(st, ev);
+                handled = performPanelShortcut(st, ev.getKeyCode(), ev,
+                        Menu.FLAG_PERFORM_NO_CLOSE);
+                st.isPrepared = false;
+                if (handled) {
+                    return true;
+                }
+            }
+            return false;
+!!!477570.java!!!	dispatchTouchEvent(inout ev : MotionEvent) : boolean
+            final Callback cb = getCallback();
+            return cb != null && !isDestroyed() && mFeatureId < 0 ? cb.dispatchTouchEvent(ev)
+                    : super.dispatchTouchEvent(ev);
+!!!477698.java!!!	dispatchTrackballEvent(inout ev : MotionEvent) : boolean
+            final Callback cb = getCallback();
+            return cb != null && !isDestroyed() && mFeatureId < 0 ? cb.dispatchTrackballEvent(ev)
+                    : super.dispatchTrackballEvent(ev);
+!!!477826.java!!!	dispatchGenericMotionEvent(inout ev : MotionEvent) : boolean
+            final Callback cb = getCallback();
+            return cb != null && !isDestroyed() && mFeatureId < 0 ? cb.dispatchGenericMotionEvent(ev)
+                    : super.dispatchGenericMotionEvent(ev);
+!!!477954.java!!!	superDispatchKeyEvent(inout event : KeyEvent) : boolean
+            // Give priority to closing action modes if applicable.
+            if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+                final int action = event.getAction();
+                // Back cancels action modes first.
+                if (mActionMode != null) {
+                    if (action == KeyEvent.ACTION_UP) {
+                        mActionMode.finish();
+                    }
+                    return true;
+                }
+            }
+
+            return super.dispatchKeyEvent(event);
+!!!478082.java!!!	superDispatchKeyShortcutEvent(inout event : KeyEvent) : boolean
+            return super.dispatchKeyShortcutEvent(event);
+!!!478210.java!!!	superDispatchTouchEvent(inout event : MotionEvent) : boolean
+            return super.dispatchTouchEvent(event);
+!!!478338.java!!!	superDispatchTrackballEvent(inout event : MotionEvent) : boolean
+            return super.dispatchTrackballEvent(event);
+!!!478466.java!!!	superDispatchGenericMotionEvent(inout event : MotionEvent) : boolean
+            return super.dispatchGenericMotionEvent(event);
+!!!478594.java!!!	dispatchApplyWindowInsets(inout insets : WindowInsets) : WindowInsets
+            if (mOutsetBottom != null) {
+                final DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
+                int bottom = (int) mOutsetBottom.getDimension(metrics);
+                WindowInsets newInsets = insets.replaceSystemWindowInsets(
+                        insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
+                        insets.getSystemWindowInsetRight(), bottom);
+                return super.dispatchApplyWindowInsets(newInsets);
+            } else {
+                return super.dispatchApplyWindowInsets(insets);
+            }
+!!!478722.java!!!	onTouchEvent(inout event : MotionEvent) : boolean
+            return onInterceptTouchEvent(event);
+!!!478850.java!!!	isOutOfBounds(in x : int, in y : int) : boolean
+            return x < -5 || y < -5 || x > (getWidth() + 5)
+                    || y > (getHeight() + 5);
+!!!478978.java!!!	onInterceptTouchEvent(inout event : MotionEvent) : boolean
+            int action = event.getAction();
+            if (mFeatureId >= 0) {
+                if (action == MotionEvent.ACTION_DOWN) {
+                    int x = (int)event.getX();
+                    int y = (int)event.getY();
+                    if (isOutOfBounds(x, y)) {
+                        closePanel(mFeatureId);
+                        return true;
+                    }
+                }
+            }
+
+            if (!SWEEP_OPEN_MENU) {
+                return false;
+            }
+
+            if (mFeatureId >= 0) {
+                if (action == MotionEvent.ACTION_DOWN) {
+                    Log.i(TAG, "Watchiing!");
+                    mWatchingForMenu = true;
+                    mDownY = (int) event.getY();
+                    return false;
+                }
+
+                if (!mWatchingForMenu) {
+                    return false;
+                }
+
+                int y = (int)event.getY();
+                if (action == MotionEvent.ACTION_MOVE) {
+                    if (y > (mDownY+30)) {
+                        Log.i(TAG, "Closing!");
+                        closePanel(mFeatureId);
+                        mWatchingForMenu = false;
+                        return true;
+                    }
+                } else if (action == MotionEvent.ACTION_UP) {
+                    mWatchingForMenu = false;
+                }
+
+                return false;
+            }
+
+            //Log.i(TAG, "Intercept: action=" + action + " y=" + event.getY()
+            //        + " (in " + getHeight() + ")");
+
+            if (action == MotionEvent.ACTION_DOWN) {
+                int y = (int)event.getY();
+                if (y >= (getHeight()-5) && !hasChildren()) {
+                    Log.i(TAG, "Watchiing!");
+                    mWatchingForMenu = true;
+                }
+                return false;
+            }
+
+            if (!mWatchingForMenu) {
+                return false;
+            }
+
+            int y = (int)event.getY();
+            if (action == MotionEvent.ACTION_MOVE) {
+                if (y < (getHeight()-30)) {
+                    Log.i(TAG, "Opening!");
+                    openPanel(FEATURE_OPTIONS_PANEL, new KeyEvent(
+                            KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MENU));
+                    mWatchingForMenu = false;
+                    return true;
+                }
+            } else if (action == MotionEvent.ACTION_UP) {
+                mWatchingForMenu = false;
+            }
+
+            return false;
+!!!479106.java!!!	sendAccessibilityEvent(in eventType : int) : void
+            if (!AccessibilityManager.getInstance(mContext).isEnabled()) {
+                return;
+            }
+
+            // if we are showing a feature that should be announced and one child
+            // make this child the event source since this is the feature itself
+            // otherwise the callback will take over and announce its client
+            if ((mFeatureId == FEATURE_OPTIONS_PANEL ||
+                    mFeatureId == FEATURE_CONTEXT_MENU ||
+                    mFeatureId == FEATURE_PROGRESS ||
+                    mFeatureId == FEATURE_INDETERMINATE_PROGRESS)
+                    && getChildCount() == 1) {
+                getChildAt(0).sendAccessibilityEvent(eventType);
+            } else {
+                super.sendAccessibilityEvent(eventType);
+            }
+!!!479234.java!!!	dispatchPopulateAccessibilityEvent(inout event : AccessibilityEvent) : boolean
+            final Callback cb = getCallback();
+            if (cb != null && !isDestroyed()) {
+                if (cb.dispatchPopulateAccessibilityEvent(event)) {
+                    return true;
+                }
+            }
+            return super.dispatchPopulateAccessibilityEvent(event);
+!!!479362.java!!!	setFrame(in l : int, in t : int, in r : int, in b : int) : boolean
+            boolean changed = super.setFrame(l, t, r, b);
+            if (changed) {
+                final Rect drawingBounds = mDrawingBounds;
+                getDrawingRect(drawingBounds);
+
+                Drawable fg = getForeground();
+                if (fg != null) {
+                    final Rect frameOffsets = mFrameOffsets;
+                    drawingBounds.left += frameOffsets.left;
+                    drawingBounds.top += frameOffsets.top;
+                    drawingBounds.right -= frameOffsets.right;
+                    drawingBounds.bottom -= frameOffsets.bottom;
+                    fg.setBounds(drawingBounds);
+                    final Rect framePadding = mFramePadding;
+                    drawingBounds.left += framePadding.left - frameOffsets.left;
+                    drawingBounds.top += framePadding.top - frameOffsets.top;
+                    drawingBounds.right -= framePadding.right - frameOffsets.right;
+                    drawingBounds.bottom -= framePadding.bottom - frameOffsets.bottom;
+                }
+
+                Drawable bg = getBackground();
+                if (bg != null) {
+                    bg.setBounds(drawingBounds);
+                }
+
+                if (SWEEP_OPEN_MENU) {
+                    if (mMenuBackground == null && mFeatureId < 0
+                            && getAttributes().height
+                            == WindowManager.LayoutParams.MATCH_PARENT) {
+                        mMenuBackground = getContext().getDrawable(
+                                R.drawable.menu_background);
+                    }
+                    if (mMenuBackground != null) {
+                        mMenuBackground.setBounds(drawingBounds.left,
+                                drawingBounds.bottom-6, drawingBounds.right,
+                                drawingBounds.bottom+20);
+                    }
+                }
+            }
+            return changed;
+!!!479490.java!!!	onMeasure(in widthMeasureSpec : int, in heightMeasureSpec : int) : void
+            final DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
+            final boolean isPortrait = metrics.widthPixels < metrics.heightPixels;
+
+            final int widthMode = getMode(widthMeasureSpec);
+            final int heightMode = getMode(heightMeasureSpec);
+
+            boolean fixedWidth = false;
+            if (widthMode == AT_MOST) {
+                final TypedValue tvw = isPortrait ? mFixedWidthMinor : mFixedWidthMajor;
+                if (tvw != null && tvw.type != TypedValue.TYPE_NULL) {
+                    final int w;
+                    if (tvw.type == TypedValue.TYPE_DIMENSION) {
+                        w = (int) tvw.getDimension(metrics);
+                    } else if (tvw.type == TypedValue.TYPE_FRACTION) {
+                        w = (int) tvw.getFraction(metrics.widthPixels, metrics.widthPixels);
+                    } else {
+                        w = 0;
+                    }
+
+                    if (w > 0) {
+                        final int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+                        widthMeasureSpec = MeasureSpec.makeMeasureSpec(
+                                Math.min(w, widthSize), EXACTLY);
+                        fixedWidth = true;
+                    }
+                }
+            }
+
+            if (heightMode == AT_MOST) {
+                final TypedValue tvh = isPortrait ? mFixedHeightMajor : mFixedHeightMinor;
+                if (tvh != null && tvh.type != TypedValue.TYPE_NULL) {
+                    final int h;
+                    if (tvh.type == TypedValue.TYPE_DIMENSION) {
+                        h = (int) tvh.getDimension(metrics);
+                    } else if (tvh.type == TypedValue.TYPE_FRACTION) {
+                        h = (int) tvh.getFraction(metrics.heightPixels, metrics.heightPixels);
+                    } else {
+                        h = 0;
+                    }
+                    if (h > 0) {
+                        final int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+                        heightMeasureSpec = MeasureSpec.makeMeasureSpec(
+                                Math.min(h, heightSize), EXACTLY);
+                    }
+                }
+            }
+
+            if (mOutsetBottom != null) {
+                int mode = MeasureSpec.getMode(heightMeasureSpec);
+                if (mode != MeasureSpec.UNSPECIFIED) {
+                    int outset = (int) mOutsetBottom.getDimension(metrics);
+                    int height = MeasureSpec.getSize(heightMeasureSpec);
+                    heightMeasureSpec = MeasureSpec.makeMeasureSpec(height + outset, mode);
+                }
+            }
+
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+            int width = getMeasuredWidth();
+            boolean measure = false;
+
+            widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, EXACTLY);
+
+            if (!fixedWidth && widthMode == AT_MOST) {
+                final TypedValue tv = isPortrait ? mMinWidthMinor : mMinWidthMajor;
+                if (tv.type != TypedValue.TYPE_NULL) {
+                    final int min;
+                    if (tv.type == TypedValue.TYPE_DIMENSION) {
+                        min = (int)tv.getDimension(metrics);
+                    } else if (tv.type == TypedValue.TYPE_FRACTION) {
+                        min = (int)tv.getFraction(metrics.widthPixels, metrics.widthPixels);
+                    } else {
+                        min = 0;
+                    }
+
+                    if (width < min) {
+                        widthMeasureSpec = MeasureSpec.makeMeasureSpec(min, EXACTLY);
+                        measure = true;
+                    }
+                }
+            }
+
+            // TODO: Support height?
+
+            if (measure) {
+                super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            }
+!!!479618.java!!!	draw(inout canvas : Canvas) : void
+            super.draw(canvas);
+
+            if (mMenuBackground != null) {
+                mMenuBackground.draw(canvas);
+            }
+!!!479746.java!!!	showContextMenuForChild(inout originalView : View) : boolean
+            // Reuse the context menu builder
+            if (mContextMenu == null) {
+                mContextMenu = new ContextMenuBuilder(getContext());
+                mContextMenu.setCallback(mContextMenuCallback);
+            } else {
+                mContextMenu.clearAll();
+            }
+
+            final MenuDialogHelper helper = mContextMenu.show(originalView,
+                    originalView.getWindowToken());
+            if (helper != null) {
+                helper.setPresenterCallback(mContextMenuCallback);
+            } else if (mContextMenuHelper != null) {
+                // No menu to show, but if we have a menu currently showing it just became blank.
+                // Close it.
+                mContextMenuHelper.dismiss();
+            }
+            mContextMenuHelper = helper;
+            return helper != null;
+!!!479874.java!!!	startActionModeForChild(inout originalView : View, inout callback : ActionMode.Callback) : ActionMode
+            // originalView can be used here to be sure that we don't obscure
+            // relevant content with the context mode UI.
+            return startActionMode(callback);
+!!!480002.java!!!	startActionMode(inout callback : ActionMode.Callback) : ActionMode
+            if (mActionMode != null) {
+                mActionMode.finish();
+            }
+
+            final ActionMode.Callback wrappedCallback = new ActionModeCallbackWrapper(callback);
+            ActionMode mode = null;
+            if (getCallback() != null && !isDestroyed()) {
+                try {
+                    mode = getCallback().onWindowStartingActionMode(wrappedCallback);
+                } catch (AbstractMethodError ame) {
+                    // Older apps might not implement this callback method.
+                }
+            }
+            if (mode != null) {
+                mActionMode = mode;
+            } else {
+                if (mActionModeView == null) {
+                    if (isFloating()) {
+                        // Use the action bar theme.
+                        final TypedValue outValue = new TypedValue();
+                        final Theme baseTheme = mContext.getTheme();
+                        baseTheme.resolveAttribute(R.attr.actionBarTheme, outValue, true);
+
+                        final Context actionBarContext;
+                        if (outValue.resourceId != 0) {
+                            final Theme actionBarTheme = mContext.getResources().newTheme();
+                            actionBarTheme.setTo(baseTheme);
+                            actionBarTheme.applyStyle(outValue.resourceId, true);
+
+                            actionBarContext = new ContextThemeWrapper(mContext, 0);
+                            actionBarContext.getTheme().setTo(actionBarTheme);
+                        } else {
+                            actionBarContext = mContext;
+                        }
+
+                        mActionModeView = new ActionBarContextView(actionBarContext);
+                        mActionModePopup = new PopupWindow(actionBarContext, null,
+                                R.attr.actionModePopupWindowStyle);
+                        mActionModePopup.setWindowLayoutType(
+                                WindowManager.LayoutParams.TYPE_APPLICATION);
+                        mActionModePopup.setContentView(mActionModeView);
+                        mActionModePopup.setWidth(MATCH_PARENT);
+
+                        actionBarContext.getTheme().resolveAttribute(
+                                R.attr.actionBarSize, outValue, true);
+                        final int height = TypedValue.complexToDimensionPixelSize(outValue.data,
+                                actionBarContext.getResources().getDisplayMetrics());
+                        mActionModeView.setContentHeight(height);
+                        mActionModePopup.setHeight(WRAP_CONTENT);
+                        mShowActionModePopup = new Runnable() {
+                            public void run() {
+                                mActionModePopup.showAtLocation(
+                                        mActionModeView.getApplicationWindowToken(),
+                                        Gravity.TOP | Gravity.FILL_HORIZONTAL, 0, 0);
+                            }
+                        };
+                    } else {
+                        ViewStub stub = (ViewStub) findViewById(
+                                R.id.action_mode_bar_stub);
+                        if (stub != null) {
+                            mActionModeView = (ActionBarContextView) stub.inflate();
+                        }
+                    }
+                }
+
+                if (mActionModeView != null) {
+                    mActionModeView.killMode();
+                    mode = new StandaloneActionMode(mActionModeView.getContext(), mActionModeView,
+                            wrappedCallback, mActionModePopup == null);
+                    if (callback.onCreateActionMode(mode, mode.getMenu())) {
+                        mode.invalidate();
+                        mActionModeView.initForMode(mode);
+                        mActionModeView.setVisibility(View.VISIBLE);
+                        mActionMode = mode;
+                        if (mActionModePopup != null) {
+                            post(mShowActionModePopup);
+                        }
+                        mActionModeView.sendAccessibilityEvent(
+                                AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+                    } else {
+                        mActionMode = null;
+                    }
+                }
+            }
+            if (mActionMode != null && getCallback() != null && !isDestroyed()) {
+                try {
+                    getCallback().onActionModeStarted(mActionMode);
+                } catch (AbstractMethodError ame) {
+                    // Older apps might not implement this callback method.
+                }
+            }
+            return mActionMode;
+!!!480130.java!!!	startChanging() : void
+            mChanging = true;
+!!!480258.java!!!	finishChanging() : void
+            mChanging = false;
+            drawableChanged();
+!!!480386.java!!!	setWindowBackground(inout drawable : Drawable) : void
+            if (getBackground() != drawable) {
+                setBackgroundDrawable(drawable);
+                if (drawable != null) {
+                    drawable.getPadding(mBackgroundPadding);
+                } else {
+                    mBackgroundPadding.setEmpty();
+                }
+                drawableChanged();
+            }
+!!!480514.java!!!	setBackgroundDrawable(inout d : Drawable) : void
+            super.setBackgroundDrawable(d);
+            if (getWindowToken() != null) {
+                updateWindowResizeState();
+            }
+!!!480642.java!!!	setWindowFrame(inout drawable : Drawable) : void
+            if (getForeground() != drawable) {
+                setForeground(drawable);
+                if (drawable != null) {
+                    drawable.getPadding(mFramePadding);
+                } else {
+                    mFramePadding.setEmpty();
+                }
+                drawableChanged();
+            }
+!!!480770.java!!!	onWindowSystemUiVisibilityChanged(in visible : int) : void
+            updateColorViews(null /* insets */);
+!!!480898.java!!!	onApplyWindowInsets(inout insets : WindowInsets) : WindowInsets
+            mFrameOffsets.set(insets.getSystemWindowInsets());
+            insets = updateColorViews(insets);
+            insets = updateStatusGuard(insets);
+            updateNavigationGuard(insets);
+            if (getForeground() != null) {
+                drawableChanged();
+            }
+            return insets;
+!!!481026.java!!!	isTransitionGroup() : boolean
+            return false;
+!!!481154.java!!!	updateColorViews(inout insets : WindowInsets) : WindowInsets
+            WindowManager.LayoutParams attrs = getAttributes();
+            int sysUiVisibility = attrs.systemUiVisibility | getWindowSystemUiVisibility();
+
+            if (!mIsFloating && ActivityManager.isHighEndGfx()) {
+                if (insets != null) {
+                    mLastTopInset = Math.min(insets.getStableInsetTop(),
+                            insets.getSystemWindowInsetTop());
+                    mLastBottomInset = Math.min(insets.getStableInsetBottom(),
+                            insets.getSystemWindowInsetBottom());
+                    mLastRightInset = Math.min(insets.getStableInsetRight(),
+                            insets.getSystemWindowInsetRight());
+                }
+                mStatusColorView = updateColorViewInt(mStatusColorView, sysUiVisibility,
+                        SYSTEM_UI_FLAG_FULLSCREEN, FLAG_TRANSLUCENT_STATUS,
+                        mStatusBarColor, mLastTopInset, Gravity.TOP,
+                        STATUS_BAR_BACKGROUND_TRANSITION_NAME,
+                        com.android.internal.R.id.statusBarBackground,
+                        (getAttributes().flags & FLAG_FULLSCREEN) != 0);
+                mNavigationColorView = updateColorViewInt(mNavigationColorView, sysUiVisibility,
+                        SYSTEM_UI_FLAG_HIDE_NAVIGATION, FLAG_TRANSLUCENT_NAVIGATION,
+                        mNavigationBarColor, mLastBottomInset, Gravity.BOTTOM,
+                        NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME,
+                        com.android.internal.R.id.navigationBarBackground,
+                        false /* hiddenByWindowFlag */);
+            }
+
+            // When we expand the window with FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS, we still need
+            // to ensure that the rest of the view hierarchy doesn't notice it, unless they've
+            // explicitly asked for it.
+
+            boolean consumingNavBar =
+                    (attrs.flags & FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS) != 0
+                            && (sysUiVisibility & SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION) == 0
+                            && (sysUiVisibility & SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0;
+
+            int consumedRight = consumingNavBar ? mLastRightInset : 0;
+            int consumedBottom = consumingNavBar ? mLastBottomInset : 0;
+
+            if (mContentRoot != null
+                    && mContentRoot.getLayoutParams() instanceof MarginLayoutParams) {
+                MarginLayoutParams lp = (MarginLayoutParams) mContentRoot.getLayoutParams();
+                if (lp.rightMargin != consumedRight || lp.bottomMargin != consumedBottom) {
+                    lp.rightMargin = consumedRight;
+                    lp.bottomMargin = consumedBottom;
+                    mContentRoot.setLayoutParams(lp);
+
+                    if (insets == null) {
+                        // The insets have changed, but we're not currently in the process
+                        // of dispatching them.
+                        requestApplyInsets();
+                    }
+                }
+                if (insets != null) {
+                    insets = insets.replaceSystemWindowInsets(
+                            insets.getSystemWindowInsetLeft(),
+                            insets.getSystemWindowInsetTop(),
+                            insets.getSystemWindowInsetRight() - consumedRight,
+                            insets.getSystemWindowInsetBottom() - consumedBottom);
+                }
+            }
+
+            if (insets != null) {
+                insets = insets.consumeStableInsets();
+            }
+            return insets;
+!!!481282.java!!!	updateColorViewInt(inout view : View, in sysUiVis : int, in systemUiHideFlag : int, in translucentFlag : int, in color : int, in height : int, in verticalGravity : int, in transitionName : String, in id : int, inout hiddenByWindowFlag : boolean) : View
+            boolean show = height > 0 && (sysUiVis & systemUiHideFlag) == 0
+                    && !hiddenByWindowFlag
+                    && (getAttributes().flags & translucentFlag) == 0
+                    && (color & Color.BLACK) != 0
+                    && (getAttributes().flags & FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS) != 0;
+
+            if (view == null) {
+                if (show) {
+                    view = new View(mContext);
+                    view.setBackgroundColor(color);
+                    view.setTransitionName(transitionName);
+                    view.setId(id);
+                    addView(view, new LayoutParams(LayoutParams.MATCH_PARENT, height,
+                            Gravity.START | verticalGravity));
+                }
+            } else {
+                int vis = show ? VISIBLE : INVISIBLE;
+                view.setVisibility(vis);
+                if (show) {
+                    LayoutParams lp = (LayoutParams) view.getLayoutParams();
+                    if (lp.height != height) {
+                        lp.height = height;
+                        view.setLayoutParams(lp);
+                    }
+                    view.setBackgroundColor(color);
+                }
+            }
+            return view;
+!!!481410.java!!!	updateStatusGuard(inout insets : WindowInsets) : WindowInsets
+            boolean showStatusGuard = false;
+            // Show the status guard when the non-overlay contextual action bar is showing
+            if (mActionModeView != null) {
+                if (mActionModeView.getLayoutParams() instanceof MarginLayoutParams) {
+                    // Insets are magic!
+                    final MarginLayoutParams mlp = (MarginLayoutParams)
+                            mActionModeView.getLayoutParams();
+                    boolean mlpChanged = false;
+                    if (mActionModeView.isShown()) {
+                        if (mTempRect == null) {
+                            mTempRect = new Rect();
+                        }
+                        final Rect rect = mTempRect;
+
+                        // If the parent doesn't consume the insets, manually
+                        // apply the default system window insets.
+                        mContentParent.computeSystemWindowInsets(insets, rect);
+                        final int newMargin = rect.top == 0 ? insets.getSystemWindowInsetTop() : 0;
+                        if (mlp.topMargin != newMargin) {
+                            mlpChanged = true;
+                            mlp.topMargin = insets.getSystemWindowInsetTop();
+
+                            if (mStatusGuard == null) {
+                                mStatusGuard = new View(mContext);
+                                mStatusGuard.setBackgroundColor(mContext.getResources()
+                                        .getColor(R.color.input_method_navigation_guard));
+                                addView(mStatusGuard, indexOfChild(mStatusColorView),
+                                        new LayoutParams(LayoutParams.MATCH_PARENT,
+                                                mlp.topMargin, Gravity.START | Gravity.TOP));
+                            } else {
+                                final LayoutParams lp = (LayoutParams)
+                                        mStatusGuard.getLayoutParams();
+                                if (lp.height != mlp.topMargin) {
+                                    lp.height = mlp.topMargin;
+                                    mStatusGuard.setLayoutParams(lp);
+                                }
+                            }
+                        }
+
+                        // The action mode's theme may differ from the app, so
+                        // always show the status guard above it if we have one.
+                        showStatusGuard = mStatusGuard != null;
+
+                        // We only need to consume the insets if the action
+                        // mode is overlaid on the app content (e.g. it's
+                        // sitting in a FrameLayout, see
+                        // screen_simple_overlay_action_mode.xml).
+                        final boolean nonOverlay = (getLocalFeatures()
+                                & (1 << FEATURE_ACTION_MODE_OVERLAY)) == 0;
+                        insets = insets.consumeSystemWindowInsets(
+                                false, nonOverlay && showStatusGuard /* top */, false, false);
+                    } else {
+                        // reset top margin
+                        if (mlp.topMargin != 0) {
+                            mlpChanged = true;
+                            mlp.topMargin = 0;
+                        }
+                    }
+                    if (mlpChanged) {
+                        mActionModeView.setLayoutParams(mlp);
+                    }
+                }
+            }
+            if (mStatusGuard != null) {
+                mStatusGuard.setVisibility(showStatusGuard ? View.VISIBLE : View.GONE);
+            }
+            return insets;
+!!!481538.java!!!	updateNavigationGuard(inout insets : WindowInsets) : void
+            // IMEs lay out below the nav bar, but the content view must not (for back compat)
+            if (getAttributes().type == WindowManager.LayoutParams.TYPE_INPUT_METHOD) {
+                // prevent the content view from including the nav bar height
+                if (mContentParent != null) {
+                    if (mContentParent.getLayoutParams() instanceof MarginLayoutParams) {
+                        MarginLayoutParams mlp =
+                                (MarginLayoutParams) mContentParent.getLayoutParams();
+                        mlp.bottomMargin = insets.getSystemWindowInsetBottom();
+                        mContentParent.setLayoutParams(mlp);
+                    }
+                }
+                // position the navigation guard view, creating it if necessary
+                if (mNavigationGuard == null) {
+                    mNavigationGuard = new View(mContext);
+                    mNavigationGuard.setBackgroundColor(mContext.getResources()
+                            .getColor(R.color.input_method_navigation_guard));
+                    addView(mNavigationGuard, indexOfChild(mNavigationColorView), new LayoutParams(
+                            LayoutParams.MATCH_PARENT, insets.getSystemWindowInsetBottom(),
+                            Gravity.START | Gravity.BOTTOM));
+                } else {
+                    LayoutParams lp = (LayoutParams) mNavigationGuard.getLayoutParams();
+                    lp.height = insets.getSystemWindowInsetBottom();
+                    mNavigationGuard.setLayoutParams(lp);
+                }
+            }
+!!!481666.java!!!	drawableChanged() : void
+            if (mChanging) {
+                return;
+            }
+
+            setPadding(mFramePadding.left + mBackgroundPadding.left, mFramePadding.top
+                    + mBackgroundPadding.top, mFramePadding.right + mBackgroundPadding.right,
+                    mFramePadding.bottom + mBackgroundPadding.bottom);
+            requestLayout();
+            invalidate();
+
+            int opacity = PixelFormat.OPAQUE;
+            // Note: if there is no background, we will assume opaque. The
+            // common case seems to be that an application sets there to be
+            // no background so it can draw everything itself. For that,
+            // we would like to assume OPAQUE and let the app force it to
+            // the slower TRANSLUCENT mode if that is really what it wants.
+            Drawable bg = getBackground();
+            Drawable fg = getForeground();
+            if (bg != null) {
+                if (fg == null) {
+                    opacity = bg.getOpacity();
+                } else if (mFramePadding.left <= 0 && mFramePadding.top <= 0
+                        && mFramePadding.right <= 0 && mFramePadding.bottom <= 0) {
+                    // If the frame padding is zero, then we can be opaque
+                    // if either the frame -or- the background is opaque.
+                    int fop = fg.getOpacity();
+                    int bop = bg.getOpacity();
+                    if (false)
+                        Log.v(TAG, "Background opacity: " + bop + ", Frame opacity: " + fop);
+                    if (fop == PixelFormat.OPAQUE || bop == PixelFormat.OPAQUE) {
+                        opacity = PixelFormat.OPAQUE;
+                    } else if (fop == PixelFormat.UNKNOWN) {
+                        opacity = bop;
+                    } else if (bop == PixelFormat.UNKNOWN) {
+                        opacity = fop;
+                    } else {
+                        opacity = Drawable.resolveOpacity(fop, bop);
+                    }
+                } else {
+                    // For now we have to assume translucent if there is a
+                    // frame with padding... there is no way to tell if the
+                    // frame and background together will draw all pixels.
+                    if (false)
+                        Log.v(TAG, "Padding: " + mFramePadding);
+                    opacity = PixelFormat.TRANSLUCENT;
+                }
+            }
+
+            if (false)
+                Log.v(TAG, "Background: " + bg + ", Frame: " + fg);
+            if (false)
+                Log.v(TAG, "Selected default opacity: " + opacity);
+
+            mDefaultOpacity = opacity;
+            if (mFeatureId < 0) {
+                setDefaultWindowFormat(opacity);
+            }
+!!!481794.java!!!	onWindowFocusChanged(inout hasWindowFocus : boolean) : void
+            super.onWindowFocusChanged(hasWindowFocus);
+
+            // If the user is chording a menu shortcut, release the chord since
+            // this window lost focus
+            if (!hasWindowFocus && mPanelChordingKey != 0) {
+                closePanel(FEATURE_OPTIONS_PANEL);
+            }
+
+            final Callback cb = getCallback();
+            if (cb != null && !isDestroyed() && mFeatureId < 0) {
+                cb.onWindowFocusChanged(hasWindowFocus);
+            }
+!!!481922.java!!!	updateWindowResizeState() : void
+            Drawable bg = getBackground();
+            hackTurnOffWindowResizeAnim(bg == null || bg.getOpacity()
+                    != PixelFormat.OPAQUE);
+!!!482050.java!!!	onAttachedToWindow() : void
+            super.onAttachedToWindow();
+
+            updateWindowResizeState();
+
+            final Callback cb = getCallback();
+            if (cb != null && !isDestroyed() && mFeatureId < 0) {
+                cb.onAttachedToWindow();
+            }
+
+            if (mFeatureId == -1) {
+                /*
+                 * The main window has been attached, try to restore any panels
+                 * that may have been open before. This is called in cases where
+                 * an activity is being killed for configuration change and the
+                 * menu was open. When the activity is recreated, the menu
+                 * should be shown again.
+                 */
+                openPanelsAfterRestore();
+            }
+!!!482178.java!!!	onDetachedFromWindow() : void
+            super.onDetachedFromWindow();
+
+            final Callback cb = getCallback();
+            if (cb != null && mFeatureId < 0) {
+                cb.onDetachedFromWindow();
+            }
+
+            if (mDecorContentParent != null) {
+                mDecorContentParent.dismissPopups();
+            }
+
+            if (mActionModePopup != null) {
+                removeCallbacks(mShowActionModePopup);
+                if (mActionModePopup.isShowing()) {
+                    mActionModePopup.dismiss();
+                }
+                mActionModePopup = null;
+            }
+
+            PanelFeatureState st = getPanelState(FEATURE_OPTIONS_PANEL, false);
+            if (st != null && st.menu != null && mFeatureId < 0) {
+                st.menu.close();
+            }
+!!!482306.java!!!	onCloseSystemDialogs(in reason : String) : void
+            if (mFeatureId >= 0) {
+                closeAllPanels();
+            }
+!!!482434.java!!!	willYouTakeTheSurface() : android.view.SurfaceHolder.Callback2
+            return mFeatureId < 0 ? mTakeSurfaceCallback : null;
+!!!482562.java!!!	willYouTakeTheInputQueue() : InputQueue.Callback
+            return mFeatureId < 0 ? mTakeInputQueueCallback : null;
+!!!482690.java!!!	setSurfaceType(in type : int) : void
+            PhoneWindow.this.setType(type);
+!!!482818.java!!!	setSurfaceFormat(in format : int) : void
+            PhoneWindow.this.setFormat(format);
+!!!482946.java!!!	setSurfaceKeepScreenOn(inout keepOn : boolean) : void
+            if (keepOn) PhoneWindow.this.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            else PhoneWindow.this.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

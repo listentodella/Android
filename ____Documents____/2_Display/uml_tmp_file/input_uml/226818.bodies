@@ -1,0 +1,4 @@
+class ActiveInputEvent
+!!!751106.java!!!	recycle() : void
+            mToken = null;
+            mCallback = null;

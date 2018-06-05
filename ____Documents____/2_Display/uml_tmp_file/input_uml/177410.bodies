@@ -1,0 +1,65 @@
+class String8
+!!!414210.cpp!!!	empty() : String8
+    return String8();
+!!!414594.cpp!!!	string() : char
+    return mString;
+!!!414722.cpp!!!	size() : size_t
+    return length();
+!!!414850.cpp!!!	length() : size_t
+    return SharedBuffer::sizeFromData(mString)-1;
+!!!414978.cpp!!!	bytes() : size_t
+    return SharedBuffer::sizeFromData(mString)-1;
+!!!415106.cpp!!!	isEmpty() : bool
+    return length() == 0;
+!!!415234.cpp!!!	sharedBuffer() : SharedBuffer
+    return SharedBuffer::bufferFromData(mString);
+!!!417154.cpp!!!	operator =(in other : String8) : String8
+    setTo(other);
+    return *this;
+!!!417282.cpp!!!	operator =(in other : char) : String8
+    setTo(other);
+    return *this;
+!!!417410.cpp!!!	operator +=(in other : String8) : String8
+    append(other);
+    return *this;
+!!!417538.cpp!!!	operator +(in other : String8) : String8
+    String8 tmp(*this);
+    tmp += other;
+    return tmp;
+!!!417666.cpp!!!	operator +=(in other : char) : String8
+    append(other);
+    return *this;
+!!!417794.cpp!!!	operator +(in other : char) : String8
+    String8 tmp(*this);
+    tmp += other;
+    return tmp;
+!!!417922.cpp!!!	compare(in other : String8) : int
+    return strcmp(mString, other.mString);
+!!!418050.cpp!!!	operator <(in other : String8) : bool
+    return strcmp(mString, other.mString) < 0;
+!!!418178.cpp!!!	operator <=(in other : String8) : bool
+    return strcmp(mString, other.mString) <= 0;
+!!!418306.cpp!!!	operator ==(in other : String8) : bool
+    return strcmp(mString, other.mString) == 0;
+!!!418434.cpp!!!	operator !=(in other : String8) : bool
+    return strcmp(mString, other.mString) != 0;
+!!!418562.cpp!!!	operator >=(in other : String8) : bool
+    return strcmp(mString, other.mString) >= 0;
+!!!418690.cpp!!!	operator >(in other : String8) : bool
+    return strcmp(mString, other.mString) > 0;
+!!!418818.cpp!!!	operator <(in other : char) : bool
+    return strcmp(mString, other) < 0;
+!!!418946.cpp!!!	operator <=(in other : char) : bool
+    return strcmp(mString, other) <= 0;
+!!!419074.cpp!!!	operator ==(in other : char) : bool
+    return strcmp(mString, other) == 0;
+!!!419202.cpp!!!	operator !=(in other : char) : bool
+    return strcmp(mString, other) != 0;
+!!!419330.cpp!!!	operator >=(in other : char) : bool
+    return strcmp(mString, other) >= 0;
+!!!419458.cpp!!!	operator >(in other : char) : bool
+    return strcmp(mString, other) > 0;
+!!!419586.cpp!!!	operator constchar*()
+    return mString;
+!!!420226.cpp!!!	contains(in other : char) : bool
+    return find(other) >= 0;

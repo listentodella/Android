@@ -1,0 +1,3 @@
+class BeginSoftInputOnLongPressCommand
+!!!2370690.java!!!	run() : void
+            performLongClick();

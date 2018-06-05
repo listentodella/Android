@@ -1,0 +1,6 @@
+class DeathMonitor
+!!!1657986.java!!!	DeathMonitor(inout name : ComponentName, inout service : IBinder)
+                mName = name;
+                mService = service;
+!!!1658114.java!!!	binderDied() : void
+                death(mName, mService);

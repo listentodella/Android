@@ -1,0 +1,202 @@
+class RenderNodeAnimator
+!!!812674.java!!!	mapViewPropertyToRenderProperty(in viewProperty : int) : int
+        return sViewPropertyAnimatorMap.get(viewProperty);
+!!!812802.java!!!	RenderNodeAnimator(in property : int, in finalValue : float)
+        mRenderProperty = property;
+        mFinalValue = finalValue;
+        mUiThreadHandlesDelay = true;
+        init(nCreateAnimator(property, finalValue));
+!!!812930.java!!!	RenderNodeAnimator(inout property : CanvasProperty<Float>, in finalValue : float)
+        init(nCreateCanvasPropertyFloatAnimator(
+                property.getNativeContainer(), finalValue));
+        mUiThreadHandlesDelay = false;
+!!!813058.java!!!	RenderNodeAnimator(inout property : CanvasProperty<Paint>, in paintField : int, in finalValue : float)
+        init(nCreateCanvasPropertyPaintAnimator(
+                property.getNativeContainer(), paintField, finalValue));
+        mUiThreadHandlesDelay = false;
+!!!813186.java!!!	RenderNodeAnimator(in x : int, in y : int, in startRadius : float, in endRadius : float)
+        init(nCreateRevealAnimator(x, y, startRadius, endRadius));
+        mUiThreadHandlesDelay = true;
+!!!813314.java!!!	init(in ptr : long) : void
+        mNativePtr = new VirtualRefBasePtr(ptr);
+!!!813442.java!!!	checkMutable() : void
+        if (mState != STATE_PREPARE) {
+            throw new IllegalStateException("Animator has already started, cannot change it now!");
+        }
+!!!813570.java!!!	isNativeInterpolator(inout interpolator : TimeInterpolator) : boolean
+        return interpolator.getClass().isAnnotationPresent(HasNativeInterpolator.class);
+!!!813698.java!!!	applyInterpolator() : void
+        if (mInterpolator == null) return;
+
+        long ni;
+        if (isNativeInterpolator(mInterpolator)) {
+            ni = ((NativeInterpolatorFactory)mInterpolator).createNativeInterpolator();
+        } else {
+            long duration = nGetDuration(mNativePtr.get());
+            ni = FallbackLUTInterpolator.createNativeInterpolator(mInterpolator, duration);
+        }
+        nSetInterpolator(mNativePtr.get(), ni);
+!!!813826.java!!!	start() : void
+        if (mTarget == null) {
+            throw new IllegalStateException("Missing target!");
+        }
+
+        if (mState != STATE_PREPARE) {
+            throw new IllegalStateException("Already started!");
+        }
+
+        mState = STATE_DELAYED;
+        applyInterpolator();
+
+        if (mStartDelay <= 0 || !mUiThreadHandlesDelay) {
+            nSetStartDelay(mNativePtr.get(), mStartDelay);
+            doStart();
+        } else {
+            getHelper().addDelayedAnimation(this);
+        }
+!!!813954.java!!!	doStart() : void
+        mState = STATE_RUNNING;
+        nStart(mNativePtr.get(), this);
+
+        // Alpha is a special snowflake that has the canonical value stored
+        // in mTransformationInfo instead of in RenderNode, so we need to update
+        // it with the final value here.
+        if (mRenderProperty == RenderNodeAnimator.ALPHA) {
+            // Don't need null check because ViewPropertyAnimator's
+            // ctor calls ensureTransformationInfo()
+            mViewTarget.mTransformationInfo.mAlpha = mFinalValue;
+        }
+
+        notifyStartListeners();
+
+        if (mViewTarget != null) {
+            // Kick off a frame to start the process
+            mViewTarget.invalidateViewProperty(true, false);
+        }
+!!!814082.java!!!	notifyStartListeners() : void
+        final ArrayList<AnimatorListener> listeners = cloneListeners();
+        final int numListeners = listeners == null ? 0 : listeners.size();
+        for (int i = 0; i < numListeners; i++) {
+            listeners.get(i).onAnimationStart(this);
+        }
+!!!814210.java!!!	cancel() : void
+        if (mState != STATE_FINISHED) {
+            if (mState == STATE_DELAYED) {
+                getHelper().removeDelayedAnimation(this);
+                notifyStartListeners();
+            }
+            nEnd(mNativePtr.get());
+
+            final ArrayList<AnimatorListener> listeners = cloneListeners();
+            final int numListeners = listeners == null ? 0 : listeners.size();
+            for (int i = 0; i < numListeners; i++) {
+                listeners.get(i).onAnimationCancel(this);
+            }
+
+            if (mViewTarget != null) {
+                // Kick off a frame to flush the state change
+                mViewTarget.invalidateViewProperty(true, false);
+            }
+        }
+!!!814338.java!!!	end() : void
+        if (mState != STATE_FINISHED) {
+            nEnd(mNativePtr.get());
+        }
+!!!814466.java!!!	pause() : void
+        throw new UnsupportedOperationException();
+!!!814594.java!!!	resume() : void
+        throw new UnsupportedOperationException();
+!!!814722.java!!!	setTarget(inout view : View) : void
+        mViewTarget = view;
+        setTarget(mViewTarget.mRenderNode);
+!!!814850.java!!!	setTarget(inout canvas : Canvas) : void
+        if (!(canvas instanceof GLES20RecordingCanvas)) {
+            throw new IllegalArgumentException("Not a GLES20RecordingCanvas");
+        }
+        final GLES20RecordingCanvas recordingCanvas = (GLES20RecordingCanvas) canvas;
+        setTarget(recordingCanvas.mNode);
+!!!814978.java!!!	setTarget(inout node : RenderNode) : void
+        if (mTarget != null) {
+            throw new IllegalStateException("Target already set!");
+        }
+        mTarget = node;
+        mTarget.addAnimator(this);
+!!!815106.java!!!	setStartValue(in startValue : float) : void
+        checkMutable();
+        nSetStartValue(mNativePtr.get(), startValue);
+!!!815234.java!!!	setStartDelay(in startDelay : long) : void
+        checkMutable();
+        if (startDelay < 0) {
+            throw new IllegalArgumentException("startDelay must be positive; " + startDelay);
+        }
+        mUnscaledStartDelay = startDelay;
+        mStartDelay = (long) (ValueAnimator.getDurationScale() * startDelay);
+!!!815362.java!!!	getStartDelay() : long
+        return mUnscaledStartDelay;
+!!!815490.java!!!	setDuration(in duration : long) : RenderNodeAnimator
+        checkMutable();
+        if (duration < 0) {
+            throw new IllegalArgumentException("duration must be positive; " + duration);
+        }
+        mUnscaledDuration = duration;
+        nSetDuration(mNativePtr.get(), (long) (duration * ValueAnimator.getDurationScale()));
+        return this;
+!!!815618.java!!!	getDuration() : long
+        return mUnscaledDuration;
+!!!815746.java!!!	isRunning() : boolean
+        return mState == STATE_DELAYED || mState == STATE_RUNNING;
+!!!815874.java!!!	isStarted() : boolean
+        return mState != STATE_PREPARE;
+!!!816002.java!!!	setInterpolator(inout interpolator : TimeInterpolator) : void
+        checkMutable();
+        mInterpolator = interpolator;
+!!!816130.java!!!	getInterpolator() : TimeInterpolator
+        return mInterpolator;
+!!!816258.java!!!	onFinished() : void
+        if (mState == STATE_DELAYED) {
+            getHelper().removeDelayedAnimation(this);
+            notifyStartListeners();
+        }
+        mState = STATE_FINISHED;
+
+        final ArrayList<AnimatorListener> listeners = cloneListeners();
+        final int numListeners = listeners == null ? 0 : listeners.size();
+        for (int i = 0; i < numListeners; i++) {
+            listeners.get(i).onAnimationEnd(this);
+        }
+
+        // Release the native object, as it has a global reference to us. This
+        // breaks the cyclic reference chain, and allows this object to be
+        // GC'd
+        mNativePtr.release();
+        mNativePtr = null;
+!!!816386.java!!!	cloneListeners() : ArrayList<AnimatorListener>
+        ArrayList<AnimatorListener> listeners = getListeners();
+        if (listeners != null) {
+            listeners = (ArrayList<AnimatorListener>) listeners.clone();
+        }
+        return listeners;
+!!!816514.java!!!	getNativeAnimator() : long
+        return mNativePtr.get();
+!!!816642.java!!!	processDelayed(in frameTimeMs : long) : boolean
+        if (mStartTime == 0) {
+            mStartTime = frameTimeMs;
+        } else if ((frameTimeMs - mStartTime) >= mStartDelay) {
+            doStart();
+            return true;
+        }
+        return false;
+!!!816770.java!!!	getHelper() : RenderNodeAnimator::DelayedAnimationHelper
+        DelayedAnimationHelper helper = sAnimationHelper.get();
+        if (helper == null) {
+            helper = new DelayedAnimationHelper();
+            sAnimationHelper.set(helper);
+        }
+        return helper;
+!!!817538.java!!!	callOnFinished(inout animator : RenderNodeAnimator) : void
+        animator.onFinished();
+!!!817666.java!!!	clone() : Animator
+        throw new IllegalStateException("Cannot clone this animator");
+!!!817794.java!!!	setAllowRunningAsynchronously(inout mayRunAsync : boolean) : void
+        checkMutable();
+        nSetAllowRunningAsync(mNativePtr.get(), mayRunAsync);

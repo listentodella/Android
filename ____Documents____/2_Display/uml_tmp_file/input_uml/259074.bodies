@@ -1,0 +1,187 @@
+class DimLayer
+!!!1199746.java!!!	DimLayer(inout service : WindowManagerService, inout stack : TaskStack, inout displayContent : DisplayContent)
+        mStack = stack;
+        mDisplayContent = displayContent;
+        final int displayId = mDisplayContent.getDisplayId();
+        if (DEBUG) Slog.v(TAG, "Ctor: displayId=" + displayId);
+        SurfaceControl.openTransaction();
+        try {
+            if (WindowManagerService.DEBUG_SURFACE_TRACE) {
+                mDimSurface = new WindowStateAnimator.SurfaceTrace(service.mFxSession,
+                    "DimSurface",
+                    16, 16, PixelFormat.OPAQUE,
+                    SurfaceControl.FX_SURFACE_DIM | SurfaceControl.HIDDEN);
+            } else {
+                mDimSurface = new SurfaceControl(service.mFxSession, TAG,
+                    16, 16, PixelFormat.OPAQUE,
+                    SurfaceControl.FX_SURFACE_DIM | SurfaceControl.HIDDEN);
+            }
+            if (WindowManagerService.SHOW_TRANSACTIONS ||
+                    WindowManagerService.SHOW_SURFACE_ALLOC) Slog.i(TAG,
+                            "  DIM " + mDimSurface + ": CREATE");
+            mDimSurface.setLayerStack(displayId);
+        } catch (Exception e) {
+            Slog.e(WindowManagerService.TAG, "Exception creating Dim surface", e);
+        } finally {
+            SurfaceControl.closeTransaction();
+        }
+!!!1199874.java!!!	isDimming() : boolean
+        return mTargetAlpha != 0;
+!!!1200002.java!!!	isAnimating() : boolean
+        return mTargetAlpha != mAlpha;
+!!!1200130.java!!!	getTargetAlpha() : float
+        return mTargetAlpha;
+!!!1200258.java!!!	setLayer(in layer : int) : void
+        if (mLayer != layer) {
+            mLayer = layer;
+            mDimSurface.setLayer(layer);
+        }
+!!!1200386.java!!!	getLayer() : int
+        return mLayer;
+!!!1200514.java!!!	setAlpha(in alpha : float) : void
+        if (mAlpha != alpha) {
+            if (DEBUG) Slog.v(TAG, "setAlpha alpha=" + alpha);
+            try {
+                mDimSurface.setAlpha(alpha);
+                if (alpha == 0 && mShowing) {
+                    if (DEBUG) Slog.v(TAG, "setAlpha hiding");
+                    mDimSurface.hide();
+                    mShowing = false;
+                } else if (alpha > 0 && !mShowing) {
+                    if (DEBUG) Slog.v(TAG, "setAlpha showing");
+                    mDimSurface.show();
+                    mShowing = true;
+                }
+            } catch (RuntimeException e) {
+                Slog.w(TAG, "Failure setting alpha immediately", e);
+            }
+            mAlpha = alpha;
+        }
+!!!1200642.java!!!	adjustSurface(in layer : int, inout inTransaction : boolean) : void
+        final int dw, dh;
+        final float xPos, yPos;
+        if (!mStack.isFullscreen()) {
+            dw = mBounds.width();
+            dh = mBounds.height();
+            xPos = mBounds.left;
+            yPos = mBounds.top;
+        } else {
+            // Set surface size to screen size.
+            final DisplayInfo info = mDisplayContent.getDisplayInfo();
+            // Multiply by 1.5 so that rotating a frozen surface that includes this does not expose
+            // a corner.
+            dw = (int) (info.logicalWidth * 1.5);
+            dh = (int) (info.logicalHeight * 1.5);
+            // back off position so 1/4 of Surface is before and 1/4 is after.
+            xPos = -1 * dw / 6;
+            yPos = -1 * dh / 6;
+        }
+
+        try {
+            if (!inTransaction) {
+                SurfaceControl.openTransaction();
+            }
+            mDimSurface.setPosition(xPos, yPos);
+            mDimSurface.setSize(dw, dh);
+            mDimSurface.setLayer(layer);
+        } catch (RuntimeException e) {
+            Slog.w(TAG, "Failure setting size or layer", e);
+        } finally {
+            if (!inTransaction) {
+                SurfaceControl.closeTransaction();
+            }
+        }
+        mLastBounds.set(mBounds);
+        mLayer = layer;
+!!!1200770.java!!!	setBounds(inout bounds : Rect) : void
+        mBounds.set(bounds);
+        if (isDimming() && !mLastBounds.equals(bounds)) {
+            adjustSurface(mLayer, false);
+        }
+!!!1200898.java!!!	durationEndsEarlier(in duration : long) : boolean
+        return SystemClock.uptimeMillis() + duration < mStartTime + mDuration;
+!!!1201026.java!!!	show() : void
+        if (isAnimating()) {
+            if (DEBUG) Slog.v(TAG, "show: immediate");
+            show(mLayer, mTargetAlpha, 0);
+        }
+!!!1201154.java!!!	show(in layer : int, in alpha : float, in duration : long) : void
+        if (DEBUG) Slog.v(TAG, "show: layer=" + layer + " alpha=" + alpha
+                + " duration=" + duration);
+        if (mDimSurface == null) {
+            Slog.e(TAG, "show: no Surface");
+            // Make sure isAnimating() returns false.
+            mTargetAlpha = mAlpha = 0;
+            return;
+        }
+
+        if (!mLastBounds.equals(mBounds) || mLayer != layer) {
+            adjustSurface(layer, true);
+        }
+
+        long curTime = SystemClock.uptimeMillis();
+        final boolean animating = isAnimating();
+        if ((animating && (mTargetAlpha != alpha || durationEndsEarlier(duration)))
+                || (!animating && mAlpha != alpha)) {
+            if (duration <= 0) {
+                // No animation required, just set values.
+                setAlpha(alpha);
+            } else {
+                // Start or continue animation with new parameters.
+                mStartAlpha = mAlpha;
+                mStartTime = curTime;
+                mDuration = duration;
+            }
+        }
+        if (DEBUG) Slog.v(TAG, "show: mStartAlpha=" + mStartAlpha + " mStartTime=" + mStartTime);
+        mTargetAlpha = alpha;
+!!!1201282.java!!!	hide() : void
+        if (mShowing) {
+            if (DEBUG) Slog.v(TAG, "hide: immediate");
+            hide(0);
+        }
+!!!1201410.java!!!	hide(in duration : long) : void
+        if (mShowing && (mTargetAlpha != 0 || durationEndsEarlier(duration))) {
+            if (DEBUG) Slog.v(TAG, "hide: duration=" + duration);
+            show(mLayer, 0, duration);
+        }
+!!!1201538.java!!!	stepAnimation() : boolean
+        if (mDimSurface == null) {
+            Slog.e(TAG, "stepAnimation: null Surface");
+            // Ensure that isAnimating() returns false;
+            mTargetAlpha = mAlpha = 0;
+            return false;
+        }
+
+        if (isAnimating()) {
+            final long curTime = SystemClock.uptimeMillis();
+            final float alphaDelta = mTargetAlpha - mStartAlpha;
+            float alpha = mStartAlpha + alphaDelta * (curTime - mStartTime) / mDuration;
+            if (alphaDelta > 0 && alpha > mTargetAlpha ||
+                    alphaDelta < 0 && alpha < mTargetAlpha) {
+                // Don't exceed limits.
+                alpha = mTargetAlpha;
+            }
+            if (DEBUG) Slog.v(TAG, "stepAnimation: curTime=" + curTime + " alpha=" + alpha);
+            setAlpha(alpha);
+        }
+
+        return isAnimating();
+!!!1201666.java!!!	destroySurface() : void
+        if (DEBUG) Slog.v(TAG, "destroySurface.");
+        if (mDimSurface != null) {
+            mDimSurface.destroy();
+            mDimSurface = null;
+        }
+!!!1201794.java!!!	printTo(in prefix : String, inout pw : PrintWriter) : void
+        pw.print(prefix); pw.print("mDimSurface="); pw.print(mDimSurface);
+                pw.print(" mLayer="); pw.print(mLayer);
+                pw.print(" mAlpha="); pw.println(mAlpha);
+        pw.print(prefix); pw.print("mLastBounds="); pw.print(mLastBounds.toShortString());
+                pw.print(" mBounds="); pw.println(mBounds.toShortString());
+        pw.print(prefix); pw.print("Last animation: ");
+                pw.print(" mDuration="); pw.print(mDuration);
+                pw.print(" mStartTime="); pw.print(mStartTime);
+                pw.print(" curTime="); pw.println(SystemClock.uptimeMillis());
+        pw.print(prefix); pw.print(" mStartAlpha="); pw.print(mStartAlpha);
+                pw.print(" mTargetAlpha="); pw.println(mTargetAlpha);

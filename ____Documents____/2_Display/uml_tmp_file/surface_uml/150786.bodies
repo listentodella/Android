@@ -1,0 +1,23 @@
+class Texture
+!!!240514.cpp!!!	init(in textureTarget : Texture::Target, in textureName : uint32_t) : void
+    mTextureName = textureName;
+    mTextureTarget = textureTarget;
+!!!240642.cpp!!!	setMatrix(in matrix : float) : void
+    mTextureMatrix = mat4(matrix);
+!!!240770.cpp!!!	setFiltering(in enabled : bool) : void
+    mFiltering = enabled;
+!!!240898.cpp!!!	setDimensions(in width : size_t, in height : size_t) : void
+    mWidth = width;
+    mHeight = height;
+!!!241026.cpp!!!	getTextureName() : uint32_t
+    return mTextureName;
+!!!241154.cpp!!!	getTextureTarget() : uint32_t
+    return mTextureTarget;
+!!!241282.cpp!!!	getMatrix() : mat4
+    return mTextureMatrix;
+!!!241410.cpp!!!	getFiltering() : bool
+    return mFiltering;
+!!!241538.cpp!!!	getWidth() : size_t
+    return mWidth;
+!!!241666.cpp!!!	getHeight() : size_t
+    return mHeight;

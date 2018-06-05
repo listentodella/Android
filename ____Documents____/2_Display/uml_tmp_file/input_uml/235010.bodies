@@ -1,0 +1,7 @@
+class ViewGroupOverlay
+!!!926850.java!!!	ViewGroupOverlay(inout context : Context, inout hostView : View)
+        super(context, hostView);
+!!!926978.java!!!	add(inout view : View) : void
+        mOverlayViewGroup.add(view);
+!!!927106.java!!!	remove(inout view : View) : void
+        mOverlayViewGroup.remove(view);

@@ -1,0 +1,55 @@
+class InputQueue
+!!!749954.java!!!	InputQueue()
+        mPtr = nativeInit(new WeakReference<InputQueue>(this), Looper.myQueue());
+
+        mCloseGuard.open("dispose");
+!!!750082.java!!!	finalize() : void
+        try {
+            dispose(true);
+        } finally {
+            super.finalize();
+        }
+!!!750210.java!!!	dispose() : void
+        dispose(false);
+!!!750338.java!!!	dispose(inout finalized : boolean) : void
+        if (mCloseGuard != null) {
+            if (finalized) {
+                mCloseGuard.warnIfOpen();
+            }
+            mCloseGuard.close();
+        }
+
+        if (mPtr != 0) {
+            nativeDispose(mPtr);
+            mPtr = 0;
+        }
+!!!750466.java!!!	getNativePtr() : long
+        return mPtr;
+!!!750594.java!!!	sendInputEvent(inout e : InputEvent, inout token : Object, inout predispatch : boolean, inout callback : InputQueue::FinishedInputEventCallback) : void
+        ActiveInputEvent event = obtainActiveInputEvent(token, callback);
+        long id;
+        if (e instanceof KeyEvent) {
+            id = nativeSendKeyEvent(mPtr, (KeyEvent) e, predispatch);
+        } else {
+            id = nativeSendMotionEvent(mPtr, (MotionEvent) e);
+        }
+        mActiveEventArray.put(id, event);
+!!!750722.java!!!	finishInputEvent(in id : long, inout handled : boolean) : void
+        int index = mActiveEventArray.indexOfKey(id);
+        if (index >= 0) {
+            ActiveInputEvent e = mActiveEventArray.valueAt(index);
+            mActiveEventArray.removeAt(index);
+            e.mCallback.onFinishedInputEvent(e.mToken, handled);
+            recycleActiveInputEvent(e);
+        }
+!!!750850.java!!!	obtainActiveInputEvent(inout token : Object, inout callback : InputQueue::FinishedInputEventCallback) : InputQueue::ActiveInputEvent
+        ActiveInputEvent e = mActiveInputEventPool.acquire();
+        if (e == null) {
+            e = new ActiveInputEvent();
+        }
+        e.mToken = token;
+        e.mCallback = callback;
+        return e;
+!!!750978.java!!!	recycleActiveInputEvent(inout e : InputQueue::ActiveInputEvent) : void
+        e.recycle();
+        mActiveInputEventPool.release(e);

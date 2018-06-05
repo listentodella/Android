@@ -1,0 +1,15 @@
+class SimpleOnGestureListener
+!!!582658.java!!!	onSingleTapUp(inout e : MotionEvent) : boolean
+            return false;
+!!!582914.java!!!	onScroll(inout e1 : MotionEvent, inout e2 : MotionEvent, in distanceX : float, in distanceY : float) : boolean
+            return false;
+!!!583042.java!!!	onFling(inout e1 : MotionEvent, inout e2 : MotionEvent, in velocityX : float, in velocityY : float) : boolean
+            return false;
+!!!583298.java!!!	onDown(inout e : MotionEvent) : boolean
+            return false;
+!!!583426.java!!!	onDoubleTap(inout e : MotionEvent) : boolean
+            return false;
+!!!583554.java!!!	onDoubleTapEvent(inout e : MotionEvent) : boolean
+            return false;
+!!!583682.java!!!	onSingleTapConfirmed(inout e : MotionEvent) : boolean
+            return false;

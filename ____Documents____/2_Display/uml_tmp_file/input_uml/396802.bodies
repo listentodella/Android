@@ -1,0 +1,5 @@
+class TabClickListener
+!!!2505602.java!!!	TabClickListener(in tabIndex : int)
+            mTabIndex = tabIndex;
+!!!2505730.java!!!	onClick(inout v : View) : void
+            mSelectionChangedListener.onTabSelectionChanged(mTabIndex, true);

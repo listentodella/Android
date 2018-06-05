@@ -1,0 +1,16 @@
+class NativePreImeInputStage
+!!!947586.java!!!	NativePreImeInputStage(inout next : ViewRootImpl::InputStage, in traceCounter : String)
+            super(next, traceCounter);
+!!!947714.java!!!	onProcess(inout q : ViewRootImpl::QueuedInputEvent) : int
+            if (mInputQueue != null && q.mEvent instanceof KeyEvent) {
+                mInputQueue.sendInputEvent(q.mEvent, q, true, this);
+                return DEFER;
+            }
+            return FORWARD;
+!!!947842.java!!!	onFinishedInputEvent(inout token : Object, inout handled : boolean) : void
+            QueuedInputEvent q = (QueuedInputEvent)token;
+            if (handled) {
+                finish(q, true);
+                return;
+            }
+            forward(q);

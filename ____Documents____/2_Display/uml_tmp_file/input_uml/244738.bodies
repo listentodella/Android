@@ -1,0 +1,5 @@
+class Access
+!!!997378.java!!!	get(in index : int) : T
+                return mData.get(index);
+!!!997506.java!!!	size() : int
+                return mSize;

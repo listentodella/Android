@@ -1,0 +1,238 @@
+class DispSync
+!!!171650.cpp!!!	DispSync()
+
+    mThread->run("DispSync", PRIORITY_URGENT_DISPLAY + PRIORITY_MORE_FAVORABLE);
+
+    reset();
+    beginResync();
+
+    if (kTraceDetailedInfo) {
+        // If we're not getting present fences then the ZeroPhaseTracer
+        // would prevent HW vsync event from ever being turned off.
+        // Even if we're just ignoring the fences, the zero-phase tracing is
+        // not needed because any time there is an event registered we will
+        // turn on the HW vsync events.
+        if (!kIgnorePresentFences) {
+            addEventListener(0, new ZeroPhaseTracer());
+        }
+    }
+!!!171906.cpp!!!	reset() : void
+    Mutex::Autolock lock(mMutex);
+
+    mNumResyncSamples = 0;
+    mFirstResyncSample = 0;
+    mNumResyncSamplesSincePresent = 0;
+    resetErrorLocked();
+!!!172034.cpp!!!	addPresentFence(in fence : sp<Fence>) : bool
+    Mutex::Autolock lock(mMutex);
+
+    mPresentFences[mPresentSampleOffset] = fence;
+    mPresentTimes[mPresentSampleOffset] = 0;
+    mPresentSampleOffset = (mPresentSampleOffset + 1) % NUM_PRESENT_SAMPLES;
+    mNumResyncSamplesSincePresent = 0;
+
+    for (size_t i = 0; i < NUM_PRESENT_SAMPLES; i++) {
+        const sp<Fence>& f(mPresentFences[i]);
+        if (f != NULL) {
+            nsecs_t t = f->getSignalTime();
+            if (t < INT64_MAX) {
+                mPresentFences[i].clear();
+                mPresentTimes[i] = t + kPresentTimeOffset;
+            }
+        }
+    }
+
+    updateErrorLocked();
+
+    return mPeriod == 0 || mError > kErrorThreshold;
+!!!172162.cpp!!!	beginResync() : void
+    Mutex::Autolock lock(mMutex);
+
+    mNumResyncSamples = 0;
+!!!172290.cpp!!!	addResyncSample(in timestamp : nsecs_t) : bool
+    Mutex::Autolock lock(mMutex);
+
+    size_t idx = (mFirstResyncSample + mNumResyncSamples) % MAX_RESYNC_SAMPLES;
+    mResyncSamples[idx] = timestamp;
+
+    if (mNumResyncSamples < MAX_RESYNC_SAMPLES) {
+        mNumResyncSamples++;
+    } else {
+        mFirstResyncSample = (mFirstResyncSample + 1) % MAX_RESYNC_SAMPLES;
+    }
+
+    updateModelLocked();
+
+    if (mNumResyncSamplesSincePresent++ > MAX_RESYNC_SAMPLES_WITHOUT_PRESENT) {
+        resetErrorLocked();
+    }
+
+    if (kIgnorePresentFences) {
+        // If we don't have the sync framework we will never have
+        // addPresentFence called.  This means we have no way to know whether
+        // or not we're synchronized with the HW vsyncs, so we just request
+        // that the HW vsync events be turned on whenever we need to generate
+        // SW vsync events.
+        return mThread->hasAnyEventListeners();
+    }
+
+    return mPeriod == 0 || mError > kErrorThreshold;
+!!!172546.cpp!!!	setPeriod(in period : nsecs_t) : void
+    Mutex::Autolock lock(mMutex);
+    mPeriod = period;
+    mPhase = 0;
+    mThread->updateModel(mPeriod, mPhase);
+!!!172674.cpp!!!	getPeriod() : nsecs_t
+    // lock mutex as mPeriod changes multiple times in updateModelLocked
+    Mutex::Autolock lock(mMutex);
+    return mPeriod;
+!!!172802.cpp!!!	setRefreshSkipCount(in count : int) : void
+    Mutex::Autolock lock(mMutex);
+    ALOGD("setRefreshSkipCount(%d)", count);
+    mRefreshSkipCount = count;
+    updateModelLocked();
+!!!172930.cpp!!!	addEventListener(in phase : nsecs_t, in callback : sp<Callback>) : status_t
+
+    Mutex::Autolock lock(mMutex);
+    return mThread->addEventListener(phase, callback);
+!!!173058.cpp!!!	removeEventListener(in callback : sp<Callback>) : status_t
+    Mutex::Autolock lock(mMutex);
+    return mThread->removeEventListener(callback);
+!!!173186.cpp!!!	computeNextRefresh(in periodOffset : int) : nsecs_t
+    Mutex::Autolock lock(mMutex);
+    nsecs_t now = systemTime(SYSTEM_TIME_MONOTONIC);
+    return (((now - mPhase) / mPeriod) + periodOffset + 1) * mPeriod + mPhase;
+!!!173314.cpp!!!	dump(inout result : String8) : void
+    Mutex::Autolock lock(mMutex);
+    result.appendFormat("present fences are %s\n",
+            kIgnorePresentFences ? "ignored" : "used");
+    result.appendFormat("mPeriod: %" PRId64 " ns (%.3f fps; skipCount=%d)\n",
+            mPeriod, 1000000000.0 / mPeriod, mRefreshSkipCount);
+    result.appendFormat("mPhase: %" PRId64 " ns\n", mPhase);
+    result.appendFormat("mError: %" PRId64 " ns (sqrt=%.1f)\n",
+            mError, sqrt(mError));
+    result.appendFormat("mNumResyncSamplesSincePresent: %d (limit %d)\n",
+            mNumResyncSamplesSincePresent, MAX_RESYNC_SAMPLES_WITHOUT_PRESENT);
+    result.appendFormat("mNumResyncSamples: %zd (max %d)\n",
+            mNumResyncSamples, MAX_RESYNC_SAMPLES);
+
+    result.appendFormat("mResyncSamples:\n");
+    nsecs_t previous = -1;
+    for (size_t i = 0; i < mNumResyncSamples; i++) {
+        size_t idx = (mFirstResyncSample + i) % MAX_RESYNC_SAMPLES;
+        nsecs_t sampleTime = mResyncSamples[idx];
+        if (i == 0) {
+            result.appendFormat("  %" PRId64 "\n", sampleTime);
+        } else {
+            result.appendFormat("  %" PRId64 " (+%" PRId64 ")\n",
+                    sampleTime, sampleTime - previous);
+        }
+        previous = sampleTime;
+    }
+
+    result.appendFormat("mPresentFences / mPresentTimes [%d]:\n",
+            NUM_PRESENT_SAMPLES);
+    nsecs_t now = systemTime(SYSTEM_TIME_MONOTONIC);
+    previous = 0;
+    for (size_t i = 0; i < NUM_PRESENT_SAMPLES; i++) {
+        size_t idx = (i + mPresentSampleOffset) % NUM_PRESENT_SAMPLES;
+        bool signaled = mPresentFences[idx] == NULL;
+        nsecs_t presentTime = mPresentTimes[idx];
+        if (!signaled) {
+            result.appendFormat("  [unsignaled fence]\n");
+        } else if (presentTime == 0) {
+            result.appendFormat("  0\n");
+        } else if (previous == 0) {
+            result.appendFormat("  %" PRId64 "  (%.3f ms ago)\n", presentTime,
+                    (now - presentTime) / 1000000.0);
+        } else {
+            result.appendFormat("  %" PRId64 " (+%" PRId64 " / %.3f)  (%.3f ms ago)\n",
+                    presentTime, presentTime - previous,
+                    (presentTime - previous) / (double) mPeriod,
+                    (now - presentTime) / 1000000.0);
+        }
+        previous = presentTime;
+    }
+
+    result.appendFormat("current monotonic time: %" PRId64 "\n", now);
+!!!173442.cpp!!!	updateModelLocked() : void
+    if (mNumResyncSamples >= MIN_RESYNC_SAMPLES_FOR_UPDATE) {
+        nsecs_t durationSum = 0;
+        for (size_t i = 1; i < mNumResyncSamples; i++) {
+            size_t idx = (mFirstResyncSample + i) % MAX_RESYNC_SAMPLES;
+            size_t prev = (idx + MAX_RESYNC_SAMPLES - 1) % MAX_RESYNC_SAMPLES;
+            durationSum += mResyncSamples[idx] - mResyncSamples[prev];
+        }
+
+        mPeriod = durationSum / (mNumResyncSamples - 1);
+
+        double sampleAvgX = 0;
+        double sampleAvgY = 0;
+        double scale = 2.0 * M_PI / double(mPeriod);
+        for (size_t i = 0; i < mNumResyncSamples; i++) {
+            size_t idx = (mFirstResyncSample + i) % MAX_RESYNC_SAMPLES;
+            nsecs_t sample = mResyncSamples[idx];
+            double samplePhase = double(sample % mPeriod) * scale;
+            sampleAvgX += cos(samplePhase);
+            sampleAvgY += sin(samplePhase);
+        }
+
+        sampleAvgX /= double(mNumResyncSamples);
+        sampleAvgY /= double(mNumResyncSamples);
+
+        mPhase = nsecs_t(atan2(sampleAvgY, sampleAvgX) / scale);
+
+        if (mPhase < 0) {
+            mPhase += mPeriod;
+        }
+
+        if (kTraceDetailedInfo) {
+            ATRACE_INT64("DispSync:Period", mPeriod);
+            ATRACE_INT64("DispSync:Phase", mPhase);
+        }
+
+        // Artificially inflate the period if requested.
+        mPeriod += mPeriod * mRefreshSkipCount;
+
+        mThread->updateModel(mPeriod, mPhase);
+    }
+!!!173570.cpp!!!	updateErrorLocked() : void
+    if (mPeriod == 0) {
+        return;
+    }
+
+    // Need to compare present fences against the un-adjusted refresh period,
+    // since they might arrive between two events.
+    nsecs_t period = mPeriod / (1 + mRefreshSkipCount);
+
+    int numErrSamples = 0;
+    nsecs_t sqErrSum = 0;
+
+    for (size_t i = 0; i < NUM_PRESENT_SAMPLES; i++) {
+        nsecs_t sample = mPresentTimes[i];
+        if (sample > mPhase) {
+            nsecs_t sampleErr = (sample - mPhase) % period;
+            if (sampleErr > period / 2) {
+                sampleErr -= period;
+            }
+            sqErrSum += sampleErr * sampleErr;
+            numErrSamples++;
+        }
+    }
+
+    if (numErrSamples > 0) {
+        mError = sqErrSum / numErrSamples;
+    } else {
+        mError = 0;
+    }
+
+    if (kTraceDetailedInfo) {
+        ATRACE_INT64("DispSync:Error", mError);
+    }
+!!!173698.cpp!!!	resetErrorLocked() : void
+    mPresentSampleOffset = 0;
+    mError = 0;
+    for (size_t i = 0; i < NUM_PRESENT_SAMPLES; i++) {
+        mPresentFences[i].clear();
+        mPresentTimes[i] = 0;
+    }

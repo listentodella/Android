@@ -1,0 +1,29 @@
+class InputEvent
+!!!585986.java!!!	InputEvent()
+        mSeq = mNextSeq.getAndIncrement();
+!!!586242.java!!!	getDevice() : InputDevice
+        return InputDevice.getDevice(getDeviceId());
+!!!586626.java!!!	isFromSource(in source : int) : boolean
+        return (getSource() & source) == source;
+!!!586882.java!!!	recycle() : void
+        if (TRACK_RECYCLED_LOCATION) {
+            if (mRecycledLocation != null) {
+                throw new RuntimeException(toString() + " recycled twice!", mRecycledLocation);
+            }
+            mRecycledLocation = new RuntimeException("Last recycled here");
+        } else {
+            if (mRecycled) {
+                throw new RuntimeException(toString() + " recycled twice!");
+            }
+            mRecycled = true;
+        }
+!!!587010.java!!!	recycleIfNeededAfterDispatch() : void
+        recycle();
+!!!587138.java!!!	prepareForReuse() : void
+        mRecycled = false;
+        mRecycledLocation = null;
+        mSeq = mNextSeq.getAndIncrement();
+!!!587778.java!!!	getSequenceNumber() : int
+        return mSeq;
+!!!587906.java!!!	describeContents() : int
+        return 0;

@@ -1,0 +1,9 @@
+class Policy
+!!!522114.java!!!	makeNewWindow(inout context : Context) : Window
+        return new PhoneWindow(context);
+!!!522242.java!!!	makeNewLayoutInflater(inout context : Context) : LayoutInflater
+        return new PhoneLayoutInflater(context);
+!!!522370.java!!!	makeNewWindowManager() : WindowManagerPolicy
+        return new PhoneWindowManager();
+!!!522498.java!!!	makeNewFallbackEventHandler(inout context : Context) : FallbackEventHandler
+        return new PhoneFallbackEventHandler(context);

@@ -1,0 +1,3 @@
+class IntentReceiverLeaked
+!!!1649026.java!!!	IntentReceiverLeaked(in msg : String)
+        super(msg);

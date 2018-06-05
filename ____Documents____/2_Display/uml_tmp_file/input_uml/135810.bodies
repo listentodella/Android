@@ -1,0 +1,8 @@
+class InputApplicationHandle
+!!!174082.cpp!!!	releaseInfo() : void
+    if (mInfo) {
+        delete mInfo;
+        mInfo = NULL;
+    }
+!!!174338.cpp!!!	~InputApplicationHandle()
+    delete mInfo;

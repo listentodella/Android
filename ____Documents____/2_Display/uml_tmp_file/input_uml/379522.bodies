@@ -1,0 +1,79 @@
+class LayoutParams
+!!!2305666.java!!!	LayoutParams(in width : int, in height : int, in left : int, in top : int, in right : int, in bottom : int, inout rowSpec : GridLayout::Spec, inout columnSpec : GridLayout::Spec)
+            super(width, height);
+            setMargins(left, top, right, bottom);
+            this.rowSpec = rowSpec;
+            this.columnSpec = columnSpec;
+!!!2305794.java!!!	LayoutParams(inout rowSpec : GridLayout::Spec, inout columnSpec : GridLayout::Spec)
+            this(DEFAULT_WIDTH, DEFAULT_HEIGHT,
+                    DEFAULT_MARGIN, DEFAULT_MARGIN, DEFAULT_MARGIN, DEFAULT_MARGIN,
+                    rowSpec, columnSpec);
+!!!2305922.java!!!	LayoutParams()
+            this(Spec.UNDEFINED, Spec.UNDEFINED);
+!!!2306050.java!!!	LayoutParams(inout params : ViewGroup::LayoutParams)
+            super(params);
+!!!2306178.java!!!	LayoutParams(inout params : ViewGroup::MarginLayoutParams)
+            super(params);
+!!!2306306.java!!!	LayoutParams(inout source : GridLayout::LayoutParams)
+            super(source);
+
+            this.rowSpec = source.rowSpec;
+            this.columnSpec = source.columnSpec;
+!!!2306434.java!!!	LayoutParams(inout context : Context, inout attrs : AttributeSet)
+            super(context, attrs);
+            reInitSuper(context, attrs);
+            init(context, attrs);
+!!!2306562.java!!!	reInitSuper(inout context : Context, inout attrs : AttributeSet) : void
+            TypedArray a =
+                    context.obtainStyledAttributes(attrs, R.styleable.ViewGroup_MarginLayout);
+            try {
+                int margin = a.getDimensionPixelSize(MARGIN, DEFAULT_MARGIN);
+
+                this.leftMargin = a.getDimensionPixelSize(LEFT_MARGIN, margin);
+                this.topMargin = a.getDimensionPixelSize(TOP_MARGIN, margin);
+                this.rightMargin = a.getDimensionPixelSize(RIGHT_MARGIN, margin);
+                this.bottomMargin = a.getDimensionPixelSize(BOTTOM_MARGIN, margin);
+            } finally {
+                a.recycle();
+            }
+!!!2306690.java!!!	init(inout context : Context, inout attrs : AttributeSet) : void
+            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.GridLayout_Layout);
+            try {
+                int gravity = a.getInt(GRAVITY, Gravity.NO_GRAVITY);
+
+                int column = a.getInt(COLUMN, DEFAULT_COLUMN);
+                int colSpan = a.getInt(COLUMN_SPAN, DEFAULT_SPAN_SIZE);
+                float colWeight = a.getFloat(COLUMN_WEIGHT, Spec.DEFAULT_WEIGHT);
+                this.columnSpec = spec(column, colSpan, getAlignment(gravity, true), colWeight);
+
+                int row = a.getInt(ROW, DEFAULT_ROW);
+                int rowSpan = a.getInt(ROW_SPAN, DEFAULT_SPAN_SIZE);
+                float rowWeight = a.getFloat(ROW_WEIGHT, Spec.DEFAULT_WEIGHT);
+                this.rowSpec = spec(row, rowSpan, getAlignment(gravity, false), rowWeight);
+            } finally {
+                a.recycle();
+            }
+!!!2306818.java!!!	setGravity(in gravity : int) : void
+            rowSpec = rowSpec.copyWriteAlignment(getAlignment(gravity, false));
+            columnSpec = columnSpec.copyWriteAlignment(getAlignment(gravity, true));
+!!!2306946.java!!!	setBaseAttributes(inout attributes : TypedArray, in widthAttr : int, in heightAttr : int) : void
+            this.width = attributes.getLayoutDimension(widthAttr, DEFAULT_WIDTH);
+            this.height = attributes.getLayoutDimension(heightAttr, DEFAULT_HEIGHT);
+!!!2307074.java!!!	setRowSpecSpan(inout span : GridLayout::Interval) : void
+            rowSpec = rowSpec.copyWriteSpan(span);
+!!!2307202.java!!!	setColumnSpecSpan(inout span : GridLayout::Interval) : void
+            columnSpec = columnSpec.copyWriteSpan(span);
+!!!2307330.java!!!	equals(inout o : Object) : boolean
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            LayoutParams that = (LayoutParams) o;
+
+            if (!columnSpec.equals(that.columnSpec)) return false;
+            if (!rowSpec.equals(that.rowSpec)) return false;
+
+            return true;
+!!!2307458.java!!!	hashCode() : int
+            int result = rowSpec.hashCode();
+            result = 31 * result + columnSpec.hashCode();
+            return result;

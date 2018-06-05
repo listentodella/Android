@@ -1,0 +1,23 @@
+class CorrectionInfo
+!!!1144194.java!!!	CorrectionInfo(in offset : int, inout oldText : CharSequence, inout newText : CharSequence)
+        mOffset = offset;
+        mOldText = oldText;
+        mNewText = newText;
+!!!1144322.java!!!	CorrectionInfo(inout source : Parcel)
+        mOffset = source.readInt();
+        mOldText = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(source);
+        mNewText = TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(source);
+!!!1144450.java!!!	getOffset() : int
+        return mOffset;
+!!!1144578.java!!!	getOldText() : CharSequence
+        return mOldText;
+!!!1144706.java!!!	getNewText() : CharSequence
+        return mNewText;
+!!!1144834.java!!!	toString() : String
+        return "CorrectionInfo{#" + mOffset + " \"" + mOldText + "\" -> \"" + mNewText + "\"}";
+!!!1144962.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        dest.writeInt(mOffset);
+        TextUtils.writeToParcel(mOldText, dest, flags);
+        TextUtils.writeToParcel(mNewText, dest, flags);
+!!!1145090.java!!!	describeContents() : int
+        return 0;

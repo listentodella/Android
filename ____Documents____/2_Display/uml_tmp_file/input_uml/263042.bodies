@@ -1,0 +1,8 @@
+class SettingsObserver
+!!!1227906.java!!!	SettingsObserver()
+            super(new Handler());
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.SHOW_IME_WITH_HARD_KEYBOARD), false, this);
+!!!1228034.java!!!	onChange(inout selfChange : boolean) : void
+            updateShowImeWithHardKeyboard();

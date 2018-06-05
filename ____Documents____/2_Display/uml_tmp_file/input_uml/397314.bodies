@@ -1,0 +1,70 @@
+class TimePicker
+!!!2511234.java!!!	TimePicker(inout context : Context)
+        this(context, null);
+!!!2511362.java!!!	TimePicker(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, R.attr.timePickerStyle);
+!!!2511490.java!!!	TimePicker(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2511618.java!!!	TimePicker(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, R.styleable.TimePicker, defStyleAttr, defStyleRes);
+        final int mode = a.getInt(R.styleable.TimePicker_timePickerMode, MODE_SPINNER);
+        a.recycle();
+
+        switch (mode) {
+            case MODE_CLOCK:
+                mDelegate = new TimePickerSpinnerDelegate(
+                        this, context, attrs, defStyleAttr, defStyleRes);
+                break;
+            case MODE_SPINNER:
+            default:
+                mDelegate = new TimePickerClockDelegate(
+                        this, context, attrs, defStyleAttr, defStyleRes);
+                break;
+        }
+!!!2511746.java!!!	setCurrentHour(inout currentHour : Integer) : void
+        mDelegate.setCurrentHour(currentHour);
+!!!2511874.java!!!	getCurrentHour() : Integer
+        return mDelegate.getCurrentHour();
+!!!2512002.java!!!	setCurrentMinute(inout currentMinute : Integer) : void
+        mDelegate.setCurrentMinute(currentMinute);
+!!!2512130.java!!!	getCurrentMinute() : Integer
+        return mDelegate.getCurrentMinute();
+!!!2512258.java!!!	setIs24HourView(inout is24HourView : Boolean) : void
+        mDelegate.setIs24HourView(is24HourView);
+!!!2512386.java!!!	is24HourView() : boolean
+        return mDelegate.is24HourView();
+!!!2512514.java!!!	setOnTimeChangedListener(inout onTimeChangedListener : TimePicker::OnTimeChangedListener) : void
+        mDelegate.setOnTimeChangedListener(onTimeChangedListener);
+!!!2512642.java!!!	setValidationCallback(inout callback : TimePicker::ValidationCallback) : void
+        mDelegate.setValidationCallback(callback);
+!!!2512770.java!!!	setEnabled(inout enabled : boolean) : void
+        super.setEnabled(enabled);
+        mDelegate.setEnabled(enabled);
+!!!2512898.java!!!	isEnabled() : boolean
+        return mDelegate.isEnabled();
+!!!2513026.java!!!	getBaseline() : int
+        return mDelegate.getBaseline();
+!!!2513154.java!!!	onConfigurationChanged(inout newConfig : Configuration) : void
+        super.onConfigurationChanged(newConfig);
+        mDelegate.onConfigurationChanged(newConfig);
+!!!2513282.java!!!	onSaveInstanceState() : Parcelable
+        Parcelable superState = super.onSaveInstanceState();
+        return mDelegate.onSaveInstanceState(superState);
+!!!2513410.java!!!	onRestoreInstanceState(inout state : Parcelable) : void
+        BaseSavedState ss = (BaseSavedState) state;
+        super.onRestoreInstanceState(ss.getSuperState());
+        mDelegate.onRestoreInstanceState(ss);
+!!!2513538.java!!!	dispatchPopulateAccessibilityEvent(inout event : AccessibilityEvent) : boolean
+        return mDelegate.dispatchPopulateAccessibilityEvent(event);
+!!!2513666.java!!!	onPopulateAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onPopulateAccessibilityEvent(event);
+        mDelegate.onPopulateAccessibilityEvent(event);
+!!!2513794.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        mDelegate.onInitializeAccessibilityEvent(event);
+!!!2513922.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        mDelegate.onInitializeAccessibilityNodeInfo(info);

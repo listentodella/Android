@@ -1,0 +1,89 @@
+class SpanController
+!!!2239362.java!!!	isNonIntermediateSelectionSpan(in text : Spannable, in span : Object) : boolean
+            return (Selection.SELECTION_START == span || Selection.SELECTION_END == span)
+                    && (text.getSpanFlags(span) & Spanned.SPAN_INTERMEDIATE) == 0;
+!!!2239490.java!!!	onSpanAdded(inout text : Spannable, inout span : Object, in start : int, in end : int) : void
+            if (isNonIntermediateSelectionSpan(text, span)) {
+                sendUpdateSelection();
+            } else if (span instanceof EasyEditSpan) {
+                if (mPopupWindow == null) {
+                    mPopupWindow = new EasyEditPopupWindow();
+                    mHidePopup = new Runnable() {
+                        @Override
+                        public void run() {
+                            hide();
+                        }
+                    };
+                }
+
+                // Make sure there is only at most one EasyEditSpan in the text
+                if (mPopupWindow.mEasyEditSpan != null) {
+                    mPopupWindow.mEasyEditSpan.setDeleteEnabled(false);
+                }
+
+                mPopupWindow.setEasyEditSpan((EasyEditSpan) span);
+                mPopupWindow.setOnDeleteListener(new EasyEditDeleteListener() {
+                    @Override
+                    public void onDeleteClick(EasyEditSpan span) {
+                        Editable editable = (Editable) mTextView.getText();
+                        int start = editable.getSpanStart(span);
+                        int end = editable.getSpanEnd(span);
+                        if (start >= 0 && end >= 0) {
+                            sendEasySpanNotification(EasyEditSpan.TEXT_DELETED, span);
+                            mTextView.deleteText_internal(start, end);
+                        }
+                        editable.removeSpan(span);
+                    }
+                });
+
+                if (mTextView.getWindowVisibility() != View.VISIBLE) {
+                    // The window is not visible yet, ignore the text change.
+                    return;
+                }
+
+                if (mTextView.getLayout() == null) {
+                    // The view has not been laid out yet, ignore the text change
+                    return;
+                }
+
+                if (extractedTextModeWillBeStarted()) {
+                    // The input is in extract mode. Do not handle the easy edit in
+                    // the original TextView, as the ExtractEditText will do
+                    return;
+                }
+
+                mPopupWindow.show();
+                mTextView.removeCallbacks(mHidePopup);
+                mTextView.postDelayed(mHidePopup, DISPLAY_TIMEOUT_MS);
+            }
+!!!2239618.java!!!	onSpanRemoved(inout text : Spannable, inout span : Object, in start : int, in end : int) : void
+            if (isNonIntermediateSelectionSpan(text, span)) {
+                sendUpdateSelection();
+            } else if (mPopupWindow != null && span == mPopupWindow.mEasyEditSpan) {
+                hide();
+            }
+!!!2239746.java!!!	onSpanChanged(inout text : Spannable, inout span : Object, in previousStart : int, in previousEnd : int, in newStart : int, in newEnd : int) : void
+            if (isNonIntermediateSelectionSpan(text, span)) {
+                sendUpdateSelection();
+            } else if (mPopupWindow != null && span instanceof EasyEditSpan) {
+                EasyEditSpan easyEditSpan = (EasyEditSpan) span;
+                sendEasySpanNotification(EasyEditSpan.TEXT_MODIFIED, easyEditSpan);
+                text.removeSpan(easyEditSpan);
+            }
+!!!2239874.java!!!	hide() : void
+            if (mPopupWindow != null) {
+                mPopupWindow.hide();
+                mTextView.removeCallbacks(mHidePopup);
+            }
+!!!2240002.java!!!	sendEasySpanNotification(in textChangedType : int, inout span : EasyEditSpan) : void
+            try {
+                PendingIntent pendingIntent = span.getPendingIntent();
+                if (pendingIntent != null) {
+                    Intent intent = new Intent();
+                    intent.putExtra(EasyEditSpan.EXTRA_TEXT_CHANGED_TYPE, textChangedType);
+                    pendingIntent.send(mTextView.getContext(), 0, intent);
+                }
+            } catch (CanceledException e) {
+                // This should not happen, as we should try to send the intent only once.
+                Log.w(TAG, "PendingIntent for notification cannot be sent", e);
+            }

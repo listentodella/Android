@@ -1,0 +1,35 @@
+class ConfigurationStats
+!!!1823362.java!!!	ConfigurationStats(inout stats : ConfigurationStats)
+        mConfiguration = stats.mConfiguration;
+        mBeginTimeStamp = stats.mBeginTimeStamp;
+        mEndTimeStamp = stats.mEndTimeStamp;
+        mLastTimeActive = stats.mLastTimeActive;
+        mTotalTimeActive = stats.mTotalTimeActive;
+        mActivationCount = stats.mActivationCount;
+!!!1823490.java!!!	getConfiguration() : Configuration
+        return mConfiguration;
+!!!1823618.java!!!	getFirstTimeStamp() : long
+        return mBeginTimeStamp;
+!!!1823746.java!!!	getLastTimeStamp() : long
+        return mEndTimeStamp;
+!!!1823874.java!!!	getLastTimeActive() : long
+        return mLastTimeActive;
+!!!1824002.java!!!	getTotalTimeActive() : long
+        return mTotalTimeActive;
+!!!1824130.java!!!	getActivationCount() : int
+        return mActivationCount;
+!!!1824258.java!!!	describeContents() : int
+        return 0;
+!!!1824386.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        if (mConfiguration != null) {
+            dest.writeInt(1);
+            mConfiguration.writeToParcel(dest, flags);
+        } else {
+            dest.writeInt(0);
+        }
+
+        dest.writeLong(mBeginTimeStamp);
+        dest.writeLong(mEndTimeStamp);
+        dest.writeLong(mLastTimeActive);
+        dest.writeLong(mTotalTimeActive);
+        dest.writeInt(mActivationCount);

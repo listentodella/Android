@@ -1,0 +1,63 @@
+class ContextThemeWrapper
+!!!560514.java!!!	ContextThemeWrapper()
+        super(null);
+!!!560642.java!!!	ContextThemeWrapper(inout base : Context, in themeres : int)
+        super(base);
+        mThemeResource = themeres;
+!!!560770.java!!!	attachBaseContext(inout newBase : Context) : void
+        super.attachBaseContext(newBase);
+!!!560898.java!!!	applyOverrideConfiguration(inout overrideConfiguration : Configuration) : void
+        if (mResources != null) {
+            throw new IllegalStateException("getResources() has already been called");
+        }
+        if (mOverrideConfiguration != null) {
+            throw new IllegalStateException("Override configuration has already been set");
+        }
+        mOverrideConfiguration = new Configuration(overrideConfiguration);
+!!!561026.java!!!	getResources() : Resources
+        if (mResources != null) {
+            return mResources;
+        }
+        if (mOverrideConfiguration == null) {
+            mResources = super.getResources();
+            return mResources;
+        } else {
+            Context resc = createConfigurationContext(mOverrideConfiguration);
+            mResources = resc.getResources();
+            return mResources;
+        }
+!!!561154.java!!!	setTheme(in resid : int) : void
+        mThemeResource = resid;
+        initializeTheme();
+!!!561282.java!!!	getThemeResId() : int
+        return mThemeResource;
+!!!561410.java!!!	getTheme() : Resources.Theme
+        if (mTheme != null) {
+            return mTheme;
+        }
+
+        mThemeResource = Resources.selectDefaultTheme(mThemeResource,
+                getApplicationInfo().targetSdkVersion);
+        initializeTheme();
+
+        return mTheme;
+!!!561538.java!!!	getSystemService(in name : String) : Object
+        if (LAYOUT_INFLATER_SERVICE.equals(name)) {
+            if (mInflater == null) {
+                mInflater = LayoutInflater.from(getBaseContext()).cloneInContext(this);
+            }
+            return mInflater;
+        }
+        return getBaseContext().getSystemService(name);
+!!!561666.java!!!	onApplyThemeResource(inout theme : Resources.Theme, in resid : int, inout first : boolean) : void
+        theme.applyStyle(resid, true);
+!!!561794.java!!!	initializeTheme() : void
+        final boolean first = mTheme == null;
+        if (first) {
+            mTheme = getResources().newTheme();
+            Resources.Theme theme = getBaseContext().getTheme();
+            if (theme != null) {
+                mTheme.setTo(theme);
+            }
+        }
+        onApplyThemeResource(mTheme, mThemeResource, first);

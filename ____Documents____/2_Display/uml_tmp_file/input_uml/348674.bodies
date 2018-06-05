@@ -1,0 +1,11 @@
+class RemoteViewsFrameLayout
+!!!1919362.java!!!	RemoteViewsFrameLayout(inout context : Context)
+            super(context);
+!!!1919490.java!!!	onRemoteViewsLoaded(inout view : RemoteViews, inout handler : OnClickHandler) : void
+            try {
+                // Remove all the children of this layout first
+                removeAllViews();
+                addView(view.apply(getContext(), this, handler));
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to apply RemoteViews.");
+            }

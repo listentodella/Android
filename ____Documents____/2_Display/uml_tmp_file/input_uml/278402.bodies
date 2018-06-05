@@ -1,0 +1,70 @@
+class CrashInfo
+!!!1505666.java!!!	CrashInfo(inout tr : Throwable)
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new FastPrintWriter(sw, false, 256);
+            tr.printStackTrace(pw);
+            pw.flush();
+            stackTrace = sw.toString();
+            exceptionMessage = tr.getMessage();
+
+            // Populate fields with the "root cause" exception
+            Throwable rootTr = tr;
+            while (tr.getCause() != null) {
+                tr = tr.getCause();
+                if (tr.getStackTrace() != null && tr.getStackTrace().length > 0) {
+                    rootTr = tr;
+                }
+                String msg = tr.getMessage();
+                if (msg != null && msg.length() > 0) {
+                    exceptionMessage = msg;
+                }
+            }
+
+            exceptionClassName = rootTr.getClass().getName();
+            if (rootTr.getStackTrace().length > 0) {
+                StackTraceElement trace = rootTr.getStackTrace()[0];
+                throwFileName = trace.getFileName();
+                throwClassName = trace.getClassName();
+                throwMethodName = trace.getMethodName();
+                throwLineNumber = trace.getLineNumber();
+            } else {
+                throwFileName = "unknown";
+                throwClassName = "unknown";
+                throwMethodName = "unknown";
+                throwLineNumber = 0;
+            }
+!!!1505794.java!!!	CrashInfo(inout in : Parcel)
+            exceptionClassName = in.readString();
+            exceptionMessage = in.readString();
+            throwFileName = in.readString();
+            throwClassName = in.readString();
+            throwMethodName = in.readString();
+            throwLineNumber = in.readInt();
+            stackTrace = in.readString();
+!!!1505922.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            int start = dest.dataPosition();
+            dest.writeString(exceptionClassName);
+            dest.writeString(exceptionMessage);
+            dest.writeString(throwFileName);
+            dest.writeString(throwClassName);
+            dest.writeString(throwMethodName);
+            dest.writeInt(throwLineNumber);
+            dest.writeString(stackTrace);
+            int total = dest.dataPosition()-start;
+            if (total > 20*1024) {
+                Slog.d("Error", "ERR: exClass=" + exceptionClassName);
+                Slog.d("Error", "ERR: exMsg=" + exceptionMessage);
+                Slog.d("Error", "ERR: file=" + throwFileName);
+                Slog.d("Error", "ERR: class=" + throwClassName);
+                Slog.d("Error", "ERR: method=" + throwMethodName + " line=" + throwLineNumber);
+                Slog.d("Error", "ERR: stack=" + stackTrace);
+                Slog.d("Error", "ERR: TOTAL BYTES WRITTEN: " + (dest.dataPosition()-start));
+            }
+!!!1506050.java!!!	dump(inout pw : Printer, in prefix : String) : void
+            pw.println(prefix + "exceptionClassName: " + exceptionClassName);
+            pw.println(prefix + "exceptionMessage: " + exceptionMessage);
+            pw.println(prefix + "throwFileName: " + throwFileName);
+            pw.println(prefix + "throwClassName: " + throwClassName);
+            pw.println(prefix + "throwMethodName: " + throwMethodName);
+            pw.println(prefix + "throwLineNumber: " + throwLineNumber);
+            pw.println(prefix + "stackTrace: " + stackTrace);

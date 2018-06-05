@@ -1,0 +1,70 @@
+class WindowOrientationListener
+!!!495874.java!!!	WindowOrientationListener(inout context : Context, inout handler : Handler)
+        this(context, handler, SensorManager.SENSOR_DELAY_UI);
+!!!496002.java!!!	WindowOrientationListener(inout context : Context, inout handler : Handler, in rate : int)
+        mHandler = handler;
+        mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
+        mRate = rate;
+        mSensor = mSensorManager.getDefaultSensor(USE_GRAVITY_SENSOR
+                ? Sensor.TYPE_GRAVITY : Sensor.TYPE_ACCELEROMETER);
+        if (mSensor != null) {
+            // Create listener only if sensors do exist
+            mSensorEventListener = new SensorEventListenerImpl();
+        }
+!!!496130.java!!!	enable() : void
+        synchronized (mLock) {
+            if (mSensor == null) {
+                Log.w(TAG, "Cannot detect sensors. Not enabled");
+                return;
+            }
+            if (mEnabled == false) {
+                if (LOG) {
+                    Log.d(TAG, "WindowOrientationListener enabled");
+                }
+                mSensorEventListener.resetLocked();
+                mSensorManager.registerListener(mSensorEventListener, mSensor, mRate, mHandler);
+                mEnabled = true;
+            }
+        }
+!!!496258.java!!!	disable() : void
+        synchronized (mLock) {
+            if (mSensor == null) {
+                Log.w(TAG, "Cannot detect sensors. Invalid disable");
+                return;
+            }
+            if (mEnabled == true) {
+                if (LOG) {
+                    Log.d(TAG, "WindowOrientationListener disabled");
+                }
+                mSensorManager.unregisterListener(mSensorEventListener);
+                mEnabled = false;
+            }
+        }
+!!!496386.java!!!	setCurrentRotation(in rotation : int) : void
+        synchronized (mLock) {
+            mCurrentRotation = rotation;
+        }
+!!!496514.java!!!	getProposedRotation() : int
+        synchronized (mLock) {
+            if (mEnabled) {
+                return mSensorEventListener.getProposedRotationLocked();
+            }
+            return -1;
+        }
+!!!496642.java!!!	canDetectOrientation() : boolean
+        synchronized (mLock) {
+            return mSensor != null;
+        }
+!!!496898.java!!!	dump(inout pw : PrintWriter, in prefix : String) : void
+        synchronized (mLock) {
+            pw.println(prefix + TAG);
+            prefix += "  ";
+            pw.println(prefix + "mEnabled=" + mEnabled);
+            pw.println(prefix + "mCurrentRotation=" + mCurrentRotation);
+            pw.println(prefix + "mSensor=" + mSensor);
+            pw.println(prefix + "mRate=" + mRate);
+
+            if (mSensorEventListener != null) {
+                mSensorEventListener.dumpLocked(pw, prefix);
+            }
+        }

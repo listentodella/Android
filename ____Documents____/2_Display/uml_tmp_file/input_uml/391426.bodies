@@ -1,0 +1,70 @@
+class SimpleExpandableListAdapter
+!!!2443778.java!!!	SimpleExpandableListAdapter(inout context : Context, inout groupData : List<? extends Map<String, ?>>, in groupLayout : int, inout groupFrom : String, inout groupTo : int, inout childData : List<? extends List<? extends Map<String, ?>>>, in childLayout : int, inout childFrom : String, inout childTo : int)
+        this(context, groupData, groupLayout, groupLayout, groupFrom, groupTo, childData,
+                childLayout, childLayout, childFrom, childTo);
+!!!2443906.java!!!	SimpleExpandableListAdapter(inout context : Context, inout groupData : List<? extends Map<String, ?>>, in expandedGroupLayout : int, in collapsedGroupLayout : int, inout groupFrom : String, inout groupTo : int, inout childData : List<? extends List<? extends Map<String, ?>>>, in childLayout : int, inout childFrom : String, inout childTo : int)
+        this(context, groupData, expandedGroupLayout, collapsedGroupLayout,
+                groupFrom, groupTo, childData, childLayout, childLayout,
+                childFrom, childTo);
+!!!2444034.java!!!	SimpleExpandableListAdapter(inout context : Context, inout groupData : List<? extends Map<String, ?>>, in expandedGroupLayout : int, in collapsedGroupLayout : int, inout groupFrom : String, inout groupTo : int, inout childData : List<? extends List<? extends Map<String, ?>>>, in childLayout : int, in lastChildLayout : int, inout childFrom : String, inout childTo : int)
+        mGroupData = groupData;
+        mExpandedGroupLayout = expandedGroupLayout;
+        mCollapsedGroupLayout = collapsedGroupLayout;
+        mGroupFrom = groupFrom;
+        mGroupTo = groupTo;
+        
+        mChildData = childData;
+        mChildLayout = childLayout;
+        mLastChildLayout = lastChildLayout;
+        mChildFrom = childFrom;
+        mChildTo = childTo;
+        
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+!!!2444162.java!!!	getChild(in groupPosition : int, in childPosition : int) : Object
+        return mChildData.get(groupPosition).get(childPosition);
+!!!2444290.java!!!	getChildId(in groupPosition : int, in childPosition : int) : long
+        return childPosition;
+!!!2444418.java!!!	getChildView(in groupPosition : int, in childPosition : int, inout isLastChild : boolean, inout convertView : View, inout parent : ViewGroup) : View
+        View v;
+        if (convertView == null) {
+            v = newChildView(isLastChild, parent);
+        } else {
+            v = convertView;
+        }
+        bindView(v, mChildData.get(groupPosition).get(childPosition), mChildFrom, mChildTo);
+        return v;
+!!!2444546.java!!!	newChildView(inout isLastChild : boolean, inout parent : ViewGroup) : View
+        return mInflater.inflate((isLastChild) ? mLastChildLayout : mChildLayout, parent, false);
+!!!2444674.java!!!	bindView(inout view : View, inout data : Map<String, ?>, inout from : String, inout to : int) : void
+        int len = to.length;
+
+        for (int i = 0; i < len; i++) {
+            TextView v = (TextView)view.findViewById(to[i]);
+            if (v != null) {
+                v.setText((String)data.get(from[i]));
+            }
+        }
+!!!2444802.java!!!	getChildrenCount(in groupPosition : int) : int
+        return mChildData.get(groupPosition).size();
+!!!2444930.java!!!	getGroup(in groupPosition : int) : Object
+        return mGroupData.get(groupPosition);
+!!!2445058.java!!!	getGroupCount() : int
+        return mGroupData.size();
+!!!2445186.java!!!	getGroupId(in groupPosition : int) : long
+        return groupPosition;
+!!!2445314.java!!!	getGroupView(in groupPosition : int, inout isExpanded : boolean, inout convertView : View, inout parent : ViewGroup) : View
+        View v;
+        if (convertView == null) {
+            v = newGroupView(isExpanded, parent);
+        } else {
+            v = convertView;
+        }
+        bindView(v, mGroupData.get(groupPosition), mGroupFrom, mGroupTo);
+        return v;
+!!!2445442.java!!!	newGroupView(inout isExpanded : boolean, inout parent : ViewGroup) : View
+        return mInflater.inflate((isExpanded) ? mExpandedGroupLayout : mCollapsedGroupLayout,
+                parent, false);
+!!!2445570.java!!!	isChildSelectable(in groupPosition : int, in childPosition : int) : boolean
+        return true;
+!!!2445698.java!!!	hasStableIds() : boolean
+        return true;

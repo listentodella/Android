@@ -1,0 +1,24 @@
+class TouchInputMapperTest
+!!!282114.cpp!!!	prepareDisplay(in orientation : int32_t) : void
+    setDisplayInfoAndReconfigure(DISPLAY_ID, DISPLAY_WIDTH, DISPLAY_HEIGHT, orientation);
+!!!282242.cpp!!!	prepareVirtualKeys() : void
+    mFakeEventHub->addVirtualKeyDefinition(DEVICE_ID, VIRTUAL_KEYS[0]);
+    mFakeEventHub->addVirtualKeyDefinition(DEVICE_ID, VIRTUAL_KEYS[1]);
+    mFakeEventHub->addKey(DEVICE_ID, KEY_HOME, 0, AKEYCODE_HOME, POLICY_FLAG_WAKE);
+    mFakeEventHub->addKey(DEVICE_ID, KEY_MENU, 0, AKEYCODE_MENU, POLICY_FLAG_WAKE);
+!!!282370.cpp!!!	prepareLocationCalibration() : void
+    mFakePolicy->setTouchAffineTransformation(AFFINE_TRANSFORM);
+!!!282498.cpp!!!	toRawX(in displayX : float) : int32_t
+    return int32_t(displayX * (RAW_X_MAX - RAW_X_MIN + 1) / DISPLAY_WIDTH + RAW_X_MIN);
+!!!282626.cpp!!!	toRawY(in displayY : float) : int32_t
+    return int32_t(displayY * (RAW_Y_MAX - RAW_Y_MIN + 1) / DISPLAY_HEIGHT + RAW_Y_MIN);
+!!!282754.cpp!!!	toCookedX(in rawX : float, in rawY : float) : float
+    AFFINE_TRANSFORM.applyTo(rawX, rawY);
+    return rawX;
+!!!282882.cpp!!!	toCookedY(in rawX : float, in rawY : float) : float
+    AFFINE_TRANSFORM.applyTo(rawX, rawY);
+    return rawY;
+!!!283010.cpp!!!	toDisplayX(in rawX : int32_t) : float
+    return float(rawX - RAW_X_MIN) * DISPLAY_WIDTH / (RAW_X_MAX - RAW_X_MIN + 1);
+!!!283138.cpp!!!	toDisplayY(in rawY : int32_t) : float
+    return float(rawY - RAW_Y_MIN) * DISPLAY_HEIGHT / (RAW_Y_MAX - RAW_Y_MIN + 1);

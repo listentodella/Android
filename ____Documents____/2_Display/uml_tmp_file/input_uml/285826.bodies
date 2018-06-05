@@ -1,0 +1,62 @@
+class AlarmManager
+!!!1475330.java!!!	AlarmManager(inout service : IAlarmManager, inout ctx : Context)
+        mService = service;
+
+        final int sdkVersion = ctx.getApplicationInfo().targetSdkVersion;
+        mAlwaysExact = (sdkVersion < Build.VERSION_CODES.KITKAT);
+!!!1475458.java!!!	legacyExactLength() : long
+        return (mAlwaysExact ? WINDOW_EXACT : WINDOW_HEURISTIC);
+!!!1475586.java!!!	set(in type : int, in triggerAtMillis : long, inout operation : PendingIntent) : void
+        setImpl(type, triggerAtMillis, legacyExactLength(), 0, operation, null, null);
+!!!1475714.java!!!	setRepeating(in type : int, in triggerAtMillis : long, in intervalMillis : long, inout operation : PendingIntent) : void
+        setImpl(type, triggerAtMillis, legacyExactLength(), intervalMillis, operation, null, null);
+!!!1475842.java!!!	setWindow(in type : int, in windowStartMillis : long, in windowLengthMillis : long, inout operation : PendingIntent) : void
+        setImpl(type, windowStartMillis, windowLengthMillis, 0, operation, null, null);
+!!!1475970.java!!!	setExact(in type : int, in triggerAtMillis : long, inout operation : PendingIntent) : void
+        setImpl(type, triggerAtMillis, WINDOW_EXACT, 0, operation, null, null);
+!!!1476098.java!!!	setAlarmClock(inout info : AlarmManager::AlarmClockInfo, inout operation : PendingIntent) : void
+        setImpl(RTC_WAKEUP, info.getTriggerTime(), WINDOW_EXACT, 0, operation, null, info);
+!!!1476226.java!!!	set(in type : int, in triggerAtMillis : long, in windowMillis : long, in intervalMillis : long, inout operation : PendingIntent, inout workSource : WorkSource) : void
+        setImpl(type, triggerAtMillis, windowMillis, intervalMillis, operation, workSource, null);
+!!!1476354.java!!!	setImpl(in type : int, in triggerAtMillis : long, in windowMillis : long, in intervalMillis : long, inout operation : PendingIntent, inout workSource : WorkSource, inout alarmClock : AlarmManager::AlarmClockInfo) : void
+        if (triggerAtMillis < 0) {
+            /* NOTYET
+            if (mAlwaysExact) {
+                // Fatal error for KLP+ apps to use negative trigger times
+                throw new IllegalArgumentException("Invalid alarm trigger time "
+                        + triggerAtMillis);
+            }
+            */
+            triggerAtMillis = 0;
+        }
+
+        try {
+            mService.set(type, triggerAtMillis, windowMillis, intervalMillis, operation,
+                    workSource, alarmClock);
+        } catch (RemoteException ex) {
+        }
+!!!1476482.java!!!	setInexactRepeating(in type : int, in triggerAtMillis : long, in intervalMillis : long, inout operation : PendingIntent) : void
+        setImpl(type, triggerAtMillis, WINDOW_HEURISTIC, intervalMillis, operation, null, null);
+!!!1476610.java!!!	cancel(inout operation : PendingIntent) : void
+        try {
+            mService.remove(operation);
+        } catch (RemoteException ex) {
+        }
+!!!1476738.java!!!	setTime(in millis : long) : void
+        try {
+            mService.setTime(millis);
+        } catch (RemoteException ex) {
+        }
+!!!1476866.java!!!	setTimeZone(in timeZone : String) : void
+        try {
+            mService.setTimeZone(timeZone);
+        } catch (RemoteException ex) {
+        }
+!!!1476994.java!!!	getNextAlarmClock() : AlarmManager::AlarmClockInfo
+        return getNextAlarmClock(UserHandle.myUserId());
+!!!1477122.java!!!	getNextAlarmClock(in userId : int) : AlarmManager::AlarmClockInfo
+        try {
+            return mService.getNextAlarmClock(userId);
+        } catch (RemoteException ex) {
+            return null;
+        }

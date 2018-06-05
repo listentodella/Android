@@ -1,0 +1,460 @@
+class AdapterView
+!!!1899010.java!!!	AdapterView(inout context : Context)
+        this(context, null);
+!!!1899138.java!!!	AdapterView(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!1899266.java!!!	AdapterView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!1899394.java!!!	AdapterView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        // If not explicitly specified this view is important for accessibility.
+        if (getImportantForAccessibility() == IMPORTANT_FOR_ACCESSIBILITY_AUTO) {
+            setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
+        }
+!!!1899650.java!!!	setOnItemClickListener(inout listener : AdapterView::OnItemClickListener) : void
+        mOnItemClickListener = listener;
+!!!1899778.java!!!	getOnItemClickListener() : AdapterView::OnItemClickListener
+        return mOnItemClickListener;
+!!!1899906.java!!!	performItemClick(inout view : View, in position : int, in id : long) : boolean
+        if (mOnItemClickListener != null) {
+            playSoundEffect(SoundEffectConstants.CLICK);
+            mOnItemClickListener.onItemClick(this, view, position, id);
+            if (view != null) {
+                view.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED);
+            }
+            return true;
+        }
+
+        return false;
+!!!1900162.java!!!	setOnItemLongClickListener(inout listener : AdapterView::OnItemLongClickListener) : void
+        if (!isLongClickable()) {
+            setLongClickable(true);
+        }
+        mOnItemLongClickListener = listener;
+!!!1900290.java!!!	getOnItemLongClickListener() : AdapterView::OnItemLongClickListener
+        return mOnItemLongClickListener;
+!!!1900674.java!!!	setOnItemSelectedListener(inout listener : AdapterView::OnItemSelectedListener) : void
+        mOnItemSelectedListener = listener;
+!!!1900802.java!!!	getOnItemSelectedListener() : AdapterView::OnItemSelectedListener
+        return mOnItemSelectedListener;
+!!!1901314.java!!!	addView(inout child : View) : void
+        throw new UnsupportedOperationException("addView(View) is not supported in AdapterView");
+!!!1901442.java!!!	addView(inout child : View, in index : int) : void
+        throw new UnsupportedOperationException("addView(View, int) is not supported in AdapterView");
+!!!1901570.java!!!	addView(inout child : View, inout params : ViewGroup::LayoutParams) : void
+        throw new UnsupportedOperationException("addView(View, LayoutParams) "
+                + "is not supported in AdapterView");
+!!!1901698.java!!!	addView(inout child : View, in index : int, inout params : ViewGroup::LayoutParams) : void
+        throw new UnsupportedOperationException("addView(View, int, LayoutParams) "
+                + "is not supported in AdapterView");
+!!!1901826.java!!!	removeView(inout child : View) : void
+        throw new UnsupportedOperationException("removeView(View) is not supported in AdapterView");
+!!!1901954.java!!!	removeViewAt(in index : int) : void
+        throw new UnsupportedOperationException("removeViewAt(int) is not supported in AdapterView");
+!!!1902082.java!!!	removeAllViews() : void
+        throw new UnsupportedOperationException("removeAllViews() is not supported in AdapterView");
+!!!1902210.java!!!	onLayout(inout changed : boolean, in left : int, in top : int, in right : int, in bottom : int) : void
+        mLayoutHeight = getHeight();
+!!!1902338.java!!!	getSelectedItemPosition() : int
+        return mNextSelectedPosition;
+!!!1902466.java!!!	getSelectedItemId() : long
+        return mNextSelectedRowId;
+!!!1902722.java!!!	getSelectedItem() : Object
+        T adapter = getAdapter();
+        int selection = getSelectedItemPosition();
+        if (adapter != null && adapter.getCount() > 0 && selection >= 0) {
+            return adapter.getItem(selection);
+        } else {
+            return null;
+        }
+!!!1902850.java!!!	getCount() : int
+        return mItemCount;
+!!!1902978.java!!!	getPositionForView(inout view : View) : int
+        View listItem = view;
+        try {
+            View v;
+            while (!(v = (View) listItem.getParent()).equals(this)) {
+                listItem = v;
+            }
+        } catch (ClassCastException e) {
+            // We made it up to the window without find this list view
+            return INVALID_POSITION;
+        }
+
+        // Search the children for the list item
+        final int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            if (getChildAt(i).equals(listItem)) {
+                return mFirstPosition + i;
+            }
+        }
+
+        // Child not found!
+        return INVALID_POSITION;
+!!!1903106.java!!!	getFirstVisiblePosition() : int
+        return mFirstPosition;
+!!!1903234.java!!!	getLastVisiblePosition() : int
+        return mFirstPosition + getChildCount() - 1;
+!!!1903490.java!!!	setEmptyView(inout emptyView : View) : void
+        mEmptyView = emptyView;
+
+        // If not explicitly specified this view is important for accessibility.
+        if (emptyView != null
+                && emptyView.getImportantForAccessibility() == IMPORTANT_FOR_ACCESSIBILITY_AUTO) {
+            emptyView.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
+        }
+
+        final T adapter = getAdapter();
+        final boolean empty = ((adapter == null) || adapter.isEmpty());
+        updateEmptyStatus(empty);
+!!!1903618.java!!!	getEmptyView() : View
+        return mEmptyView;
+!!!1903746.java!!!	isInFilterMode() : boolean
+        return false;
+!!!1903874.java!!!	setFocusable(inout focusable : boolean) : void
+        final T adapter = getAdapter();
+        final boolean empty = adapter == null || adapter.getCount() == 0;
+
+        mDesiredFocusableState = focusable;
+        if (!focusable) {
+            mDesiredFocusableInTouchModeState = false;
+        }
+
+        super.setFocusable(focusable && (!empty || isInFilterMode()));
+!!!1904002.java!!!	setFocusableInTouchMode(inout focusable : boolean) : void
+        final T adapter = getAdapter();
+        final boolean empty = adapter == null || adapter.getCount() == 0;
+
+        mDesiredFocusableInTouchModeState = focusable;
+        if (focusable) {
+            mDesiredFocusableState = true;
+        }
+
+        super.setFocusableInTouchMode(focusable && (!empty || isInFilterMode()));
+!!!1904130.java!!!	checkFocus() : void
+        final T adapter = getAdapter();
+        final boolean empty = adapter == null || adapter.getCount() == 0;
+        final boolean focusable = !empty || isInFilterMode();
+        // The order in which we set focusable in touch mode/focusable may matter
+        // for the client, see View.setFocusableInTouchMode() comments for more
+        // details
+        super.setFocusableInTouchMode(focusable && mDesiredFocusableInTouchModeState);
+        super.setFocusable(focusable && mDesiredFocusableState);
+        if (mEmptyView != null) {
+            updateEmptyStatus((adapter == null) || adapter.isEmpty());
+        }
+!!!1904258.java!!!	updateEmptyStatus(inout empty : boolean) : void
+        if (isInFilterMode()) {
+            empty = false;
+        }
+
+        if (empty) {
+            if (mEmptyView != null) {
+                mEmptyView.setVisibility(View.VISIBLE);
+                setVisibility(View.GONE);
+            } else {
+                // If the caller just removed our empty view, make sure the list view is visible
+                setVisibility(View.VISIBLE);
+            }
+
+            // We are now GONE, so pending layouts will not be dispatched.
+            // Force one here to make sure that the state of the list matches
+            // the state of the adapter.
+            if (mDataChanged) {           
+                this.onLayout(false, mLeft, mTop, mRight, mBottom); 
+            }
+        } else {
+            if (mEmptyView != null) mEmptyView.setVisibility(View.GONE);
+            setVisibility(View.VISIBLE);
+        }
+!!!1904386.java!!!	getItemAtPosition(in position : int) : Object
+        T adapter = getAdapter();
+        return (adapter == null || position < 0) ? null : adapter.getItem(position);
+!!!1904514.java!!!	getItemIdAtPosition(in position : int) : long
+        T adapter = getAdapter();
+        return (adapter == null || position < 0) ? INVALID_ROW_ID : adapter.getItemId(position);
+!!!1904642.java!!!	setOnClickListener(inout l : OnClickListener) : void
+        throw new RuntimeException("Don't call setOnClickListener for an AdapterView. "
+                + "You probably want setOnItemClickListener instead");
+!!!1904770.java!!!	dispatchSaveInstanceState(inout container : SparseArray<Parcelable>) : void
+        dispatchFreezeSelfOnly(container);
+!!!1904898.java!!!	dispatchRestoreInstanceState(inout container : SparseArray<Parcelable>) : void
+        dispatchThawSelfOnly(container);
+!!!1905410.java!!!	onDetachedFromWindow() : void
+        super.onDetachedFromWindow();
+        removeCallbacks(mSelectionNotifier);
+!!!1905666.java!!!	selectionChanged() : void
+        if (mOnItemSelectedListener != null
+                || AccessibilityManager.getInstance(mContext).isEnabled()) {
+            if (mInLayout || mBlockLayoutRequests) {
+                // If we are in a layout traversal, defer notification
+                // by posting. This ensures that the view tree is
+                // in a consistent state and is able to accomodate
+                // new layout or invalidate requests.
+                if (mSelectionNotifier == null) {
+                    mSelectionNotifier = new SelectionNotifier();
+                }
+                post(mSelectionNotifier);
+            } else {
+                fireOnSelected();
+                performAccessibilityActionsOnSelected();
+            }
+        }
+!!!1905794.java!!!	fireOnSelected() : void
+        if (mOnItemSelectedListener == null) {
+            return;
+        }
+        final int selection = getSelectedItemPosition();
+        if (selection >= 0) {
+            View v = getSelectedView();
+            mOnItemSelectedListener.onItemSelected(this, v, selection,
+                    getAdapter().getItemId(selection));
+        } else {
+            mOnItemSelectedListener.onNothingSelected(this);
+        }
+!!!1905922.java!!!	performAccessibilityActionsOnSelected() : void
+        if (!AccessibilityManager.getInstance(mContext).isEnabled()) {
+            return;
+        }
+        final int position = getSelectedItemPosition();
+        if (position >= 0) {
+            // we fire selection events here not in View
+            sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
+        }
+!!!1906050.java!!!	dispatchPopulateAccessibilityEvent(inout event : AccessibilityEvent) : boolean
+        View selectedView = getSelectedView();
+        if (selectedView != null && selectedView.getVisibility() == VISIBLE
+                && selectedView.dispatchPopulateAccessibilityEvent(event)) {
+            return true;
+        }
+        return false;
+!!!1906178.java!!!	onRequestSendAccessibilityEvent(inout child : View, inout event : AccessibilityEvent) : boolean
+        if (super.onRequestSendAccessibilityEvent(child, event)) {
+            // Add a record for ourselves as well.
+            AccessibilityEvent record = AccessibilityEvent.obtain();
+            onInitializeAccessibilityEvent(record);
+            // Populate with the text of the requesting child.
+            child.dispatchPopulateAccessibilityEvent(record);
+            event.appendRecord(record);
+            return true;
+        }
+        return false;
+!!!1906306.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(AdapterView.class.getName());
+        info.setScrollable(isScrollableForAccessibility());
+        View selectedView = getSelectedView();
+        if (selectedView != null) {
+            info.setEnabled(selectedView.isEnabled());
+        }
+!!!1906434.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(AdapterView.class.getName());
+        event.setScrollable(isScrollableForAccessibility());
+        View selectedView = getSelectedView();
+        if (selectedView != null) {
+            event.setEnabled(selectedView.isEnabled());
+        }
+        event.setCurrentItemIndex(getSelectedItemPosition());
+        event.setFromIndex(getFirstVisiblePosition());
+        event.setToIndex(getLastVisiblePosition());
+        event.setItemCount(getCount());
+!!!1906562.java!!!	isScrollableForAccessibility() : boolean
+        T adapter = getAdapter();
+        if (adapter != null) {
+            final int itemCount = adapter.getCount();
+            return itemCount > 0
+                && (getFirstVisiblePosition() > 0 || getLastVisiblePosition() < itemCount - 1);
+        }
+        return false;
+!!!1906690.java!!!	canAnimate() : boolean
+        return super.canAnimate() && mItemCount > 0;
+!!!1906818.java!!!	handleDataChanged() : void
+        final int count = mItemCount;
+        boolean found = false;
+
+        if (count > 0) {
+
+            int newPos;
+
+            // Find the row we are supposed to sync to
+            if (mNeedSync) {
+                // Update this first, since setNextSelectedPositionInt inspects
+                // it
+                mNeedSync = false;
+
+                // See if we can find a position in the new data with the same
+                // id as the old selection
+                newPos = findSyncPosition();
+                if (newPos >= 0) {
+                    // Verify that new selection is selectable
+                    int selectablePos = lookForSelectablePosition(newPos, true);
+                    if (selectablePos == newPos) {
+                        // Same row id is selected
+                        setNextSelectedPositionInt(newPos);
+                        found = true;
+                    }
+                }
+            }
+            if (!found) {
+                // Try to use the same position if we can't find matching data
+                newPos = getSelectedItemPosition();
+
+                // Pin position to the available range
+                if (newPos >= count) {
+                    newPos = count - 1;
+                }
+                if (newPos < 0) {
+                    newPos = 0;
+                }
+
+                // Make sure we select something selectable -- first look down
+                int selectablePos = lookForSelectablePosition(newPos, true);
+                if (selectablePos < 0) {
+                    // Looking down didn't work -- try looking up
+                    selectablePos = lookForSelectablePosition(newPos, false);
+                }
+                if (selectablePos >= 0) {
+                    setNextSelectedPositionInt(selectablePos);
+                    checkSelectionChanged();
+                    found = true;
+                }
+            }
+        }
+        if (!found) {
+            // Nothing is selected
+            mSelectedPosition = INVALID_POSITION;
+            mSelectedRowId = INVALID_ROW_ID;
+            mNextSelectedPosition = INVALID_POSITION;
+            mNextSelectedRowId = INVALID_ROW_ID;
+            mNeedSync = false;
+            checkSelectionChanged();
+        }
+
+        notifySubtreeAccessibilityStateChangedIfNeeded();
+!!!1906946.java!!!	checkSelectionChanged() : void
+        if ((mSelectedPosition != mOldSelectedPosition) || (mSelectedRowId != mOldSelectedRowId)) {
+            selectionChanged();
+            mOldSelectedPosition = mSelectedPosition;
+            mOldSelectedRowId = mSelectedRowId;
+        }
+!!!1907074.java!!!	findSyncPosition() : int
+        int count = mItemCount;
+
+        if (count == 0) {
+            return INVALID_POSITION;
+        }
+
+        long idToMatch = mSyncRowId;
+        int seed = mSyncPosition;
+
+        // If there isn't a selection don't hunt for it
+        if (idToMatch == INVALID_ROW_ID) {
+            return INVALID_POSITION;
+        }
+
+        // Pin seed to reasonable values
+        seed = Math.max(0, seed);
+        seed = Math.min(count - 1, seed);
+
+        long endTime = SystemClock.uptimeMillis() + SYNC_MAX_DURATION_MILLIS;
+
+        long rowId;
+
+        // first position scanned so far
+        int first = seed;
+
+        // last position scanned so far
+        int last = seed;
+
+        // True if we should move down on the next iteration
+        boolean next = false;
+
+        // True when we have looked at the first item in the data
+        boolean hitFirst;
+
+        // True when we have looked at the last item in the data
+        boolean hitLast;
+
+        // Get the item ID locally (instead of getItemIdAtPosition), so
+        // we need the adapter
+        T adapter = getAdapter();
+        if (adapter == null) {
+            return INVALID_POSITION;
+        }
+
+        while (SystemClock.uptimeMillis() <= endTime) {
+            rowId = adapter.getItemId(seed);
+            if (rowId == idToMatch) {
+                // Found it!
+                return seed;
+            }
+
+            hitLast = last == count - 1;
+            hitFirst = first == 0;
+
+            if (hitLast && hitFirst) {
+                // Looked at everything
+                break;
+            }
+
+            if (hitFirst || (next && !hitLast)) {
+                // Either we hit the top, or we are trying to move down
+                last++;
+                seed = last;
+                // Try going up next time
+                next = false;
+            } else if (hitLast || (!next && !hitFirst)) {
+                // Either we hit the bottom, or we are trying to move up
+                first--;
+                seed = first;
+                // Try going down next time
+                next = true;
+            }
+
+        }
+
+        return INVALID_POSITION;
+!!!1907202.java!!!	lookForSelectablePosition(in position : int, inout lookDown : boolean) : int
+        return position;
+!!!1907330.java!!!	setSelectedPositionInt(in position : int) : void
+        mSelectedPosition = position;
+        mSelectedRowId = getItemIdAtPosition(position);
+!!!1907458.java!!!	setNextSelectedPositionInt(in position : int) : void
+        mNextSelectedPosition = position;
+        mNextSelectedRowId = getItemIdAtPosition(position);
+        // If we are trying to sync to the selection, update that too
+        if (mNeedSync && mSyncMode == SYNC_SELECTED_POSITION && position >= 0) {
+            mSyncPosition = position;
+            mSyncRowId = mNextSelectedRowId;
+        }
+!!!1907586.java!!!	rememberSyncState() : void
+        if (getChildCount() > 0) {
+            mNeedSync = true;
+            mSyncHeight = mLayoutHeight;
+            if (mSelectedPosition >= 0) {
+                // Sync the selection state
+                View v = getChildAt(mSelectedPosition - mFirstPosition);
+                mSyncRowId = mNextSelectedRowId;
+                mSyncPosition = mNextSelectedPosition;
+                if (v != null) {
+                    mSpecificTop = v.getTop();
+                }
+                mSyncMode = SYNC_SELECTED_POSITION;
+            } else {
+                // Sync the based on the offset of the first view
+                View v = getChildAt(0);
+                T adapter = getAdapter();
+                if (mFirstPosition >= 0 && mFirstPosition < adapter.getCount()) {
+                    mSyncRowId = adapter.getItemId(mFirstPosition);
+                } else {
+                    mSyncRowId = NO_ID;
+                }
+                mSyncPosition = mFirstPosition;
+                if (v != null) {
+                    mSpecificTop = v.getTop();
+                }
+                mSyncMode = SYNC_FIRST_POSITION;
+            }
+        }

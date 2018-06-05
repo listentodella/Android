@@ -1,0 +1,8 @@
+class InputWindowHandle
+!!!258434.cpp!!!	releaseInfo() : void
+    if (mInfo) {
+        delete mInfo;
+        mInfo = NULL;
+    }
+!!!258690.cpp!!!	~InputWindowHandle()
+    delete mInfo;

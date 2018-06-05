@@ -1,0 +1,14 @@
+class KeyEntry
+!!!182530.cpp!!!	appendDescription(inout msg : String8) : void
+    msg.appendFormat("KeyEvent(deviceId=%d, source=0x%08x, action=%d, "
+            "flags=0x%08x, keyCode=%d, scanCode=%d, metaState=0x%08x, "
+            "repeatCount=%d), policyFlags=0x%08x",
+            deviceId, source, action, flags, keyCode, scanCode, metaState,
+            repeatCount, policyFlags);
+!!!182658.cpp!!!	recycle() : void
+    releaseInjectionState();
+
+    dispatchInProgress = false;
+    syntheticRepeat = false;
+    interceptKeyResult = KeyEntry::INTERCEPT_KEY_RESULT_UNKNOWN;
+    interceptKeyWakeupTime = 0;

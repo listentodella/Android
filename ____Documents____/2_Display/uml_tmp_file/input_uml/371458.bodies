@@ -1,0 +1,7 @@
+class FocusSelector
+!!!2199938.java!!!	setup(in position : int, in top : int) : ListView::FocusSelector
+            mPosition = position;
+            mPositionTop = top;
+            return this;
+!!!2200066.java!!!	run() : void
+            setSelectionFromTop(mPosition, mPositionTop);

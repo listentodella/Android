@@ -1,0 +1,7 @@
+class MotionMemento
+!!!186882.cpp!!!	setPointers(in entry : InputDispatcher::MotionEntry) : void
+    pointerCount = entry->pointerCount;
+    for (uint32_t i = 0; i < entry->pointerCount; i++) {
+        pointerProperties[i].copyFrom(entry->pointerProperties[i]);
+        pointerCoords[i].copyFrom(entry->pointerCoords[i]);
+    }

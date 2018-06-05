@@ -1,0 +1,15 @@
+class Request
+!!!1757314.java!!!	cancel() : void
+            try {
+                mRequestInterface.cancel();
+            } catch (RemoteException e) {
+                Log.w(TAG, "Voice interactor has died", e);
+            }
+!!!1757442.java!!!	getContext() : Context
+            return mContext;
+!!!1757570.java!!!	getActivity() : Activity
+            return mActivity;
+!!!1758082.java!!!	clear() : void
+            mRequestInterface = null;
+            mContext = null;
+            mActivity = null;

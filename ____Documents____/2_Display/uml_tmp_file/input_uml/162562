@@ -1,0 +1,1192 @@
+format 76
+"libutils" // libutils
+  revision 1
+  modified_by 2 "thisway_diy"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  cpp_h_dir "L:/android_projects/uml_tmp_file/libutils/"
+  cpp_src_dir "L:/android_projects/uml_tmp_file/libutils/"
+  cpp_namespace "android"
+  package_ref 162690 // tests
+
+  classview 162690 "libutils"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 326402 "LinearAllocator::Page"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      operation 1876354 "next"
+	cpp_inline public explicit_return_type "Page"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract} { return mNextPage; };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1876482 "setNext"
+	cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param inout name "next" explicit_type "Page"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract} { mNextPage = next; };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1876610 "operator new"
+	cpp_inline public explicit_return_type "void"
+	nparams 2
+	  param in name "" explicit_type "size_t"
+	  param inout name "buf" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${t0} ${p0}${v0}, ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract} { return buf; };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1876738 "start"
+	cpp_inline public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        return (void*) (((size_t)this) + sizeof(Page));
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1876866 "end"
+	cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "pageSize" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        return (void*) (((size_t)start()) + pageSize);
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      attribute 1247106 "mNextPage"
+	private explicit_type "Page"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 326530 "sysprop_change_callback_info"
+      visibility package stereotype "struct"
+      cpp_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 1247234 "callback"
+	public explicit_type "sysprop_change_callback"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1247362 "priority"
+	public explicit_type "int"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 326786 "RefBase::weakref_impl"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " ---------------------------------------------------------------------------"
+      classrelation 407682 // <generalisation>
+	relation 406786 ---|>
+	  a public
+	    cpp default "${type}"
+	    java "${type}"
+	    classrelation_ref 407682 // <generalisation>
+	  b parent class_ref 326914 // typedef2
+      end
+
+      attribute 1247874 "mStrong"
+	volatile public explicit_type "int32_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1248002 "mWeak"
+	volatile public explicit_type "int32_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1248130 "mBase"
+	public explicit_type "RefBase"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * const ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1248258 "mFlags"
+	volatile public explicit_type "int32_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 1876994 "addStrongRef"
+	cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract} { };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1877122 "removeStrongRef"
+	cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract} { };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1877250 "renameStrongRefId"
+	cpp_inline public explicit_return_type "void"
+	nparams 2
+	  param in name "" explicit_type "void"
+	  param in name "" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}, const ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract} { };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1877378 "addWeakRef"
+	cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract} { };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1877506 "removeWeakRef"
+	cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract} { };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1877634 "renameWeakRefId"
+	cpp_inline public explicit_return_type "void"
+	nparams 2
+	  param in name "" explicit_type "void"
+	  param in name "" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}, const ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract} { };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1877762 "printRefs"
+	const cpp_inline public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} { };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1877890 "trackMe"
+	cpp_inline public explicit_return_type "void"
+	nparams 2
+	  param in name "" explicit_type "bool"
+	  param in name "" explicit_type "bool"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract} { };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1878018 "addStrongRef"
+	cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "id" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        //ALOGD_IF(mTrackEnabled,
+        //        \"addStrongRef: RefBase=%p, id=%p\", mBase, id);
+        addRef(&mStrongRefs, id, mStrong);
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1878146 "removeStrongRef"
+	cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "id" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        //ALOGD_IF(mTrackEnabled,
+        //        \"removeStrongRef: RefBase=%p, id=%p\", mBase, id);
+        if (!mRetain) {
+            removeRef(&mStrongRefs, id);
+        } else {
+            addRef(&mStrongRefs, id, -mStrong);
+        }
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1878274 "renameStrongRefId"
+	cpp_inline public explicit_return_type "void"
+	nparams 2
+	  param in name "old_id" explicit_type "void"
+	  param in name "new_id" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}, const ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract} {
+        //ALOGD_IF(mTrackEnabled,
+        //        \"renameStrongRefId: RefBase=%p, oid=%p, nid=%p\",
+        //        mBase, old_id, new_id);
+        renameRefsId(mStrongRefs, old_id, new_id);
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1878402 "addWeakRef"
+	cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "id" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        addRef(&mWeakRefs, id, mWeak);
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1878530 "removeWeakRef"
+	cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "id" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        if (!mRetain) {
+            removeRef(&mWeakRefs, id);
+        } else {
+            addRef(&mWeakRefs, id, -mWeak);
+        }
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1878658 "renameWeakRefId"
+	cpp_inline public explicit_return_type "void"
+	nparams 2
+	  param in name "old_id" explicit_type "void"
+	  param in name "new_id" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}, const ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract} {
+        renameRefsId(mWeakRefs, old_id, new_id);
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1878786 "trackMe"
+	cpp_inline public explicit_return_type "void"
+	nparams 2
+	  param in name "track" explicit_type "bool"
+	  param in name "retain" explicit_type "bool"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract} { 
+        mTrackEnabled = track;
+        mRetain = retain;
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1878914 "printRefs"
+	const cpp_inline public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        String8 text;
+
+        {
+            Mutex::Autolock _l(mMutex);
+            char buf[128];
+            sprintf(buf, \"Strong references on RefBase %p (weakref_type %p):\\n\", mBase, this);
+            text.append(buf);
+            printRefsLocked(&text, mStrongRefs);
+            sprintf(buf, \"Weak references on RefBase %p (weakref_type %p):\\n\", mBase, this);
+            text.append(buf);
+            printRefsLocked(&text, mWeakRefs);
+        }
+
+        {
+            char name[100];
+            snprintf(name, 100, DEBUG_REFS_CALLSTACK_PATH \"/%p.stack\", this);
+            int rc = open(name, O_RDWR | O_CREAT | O_APPEND, 644);
+            if (rc >= 0) {
+                write(rc, text.string(), text.length());
+                close(rc);
+                ALOGD(\"STACK TRACE for %p saved in %s\", this, name);
+            }
+            else ALOGE(\"FAILED TO PRINT STACK TRACE for %p in %s: %s\", this,
+                      name, strerror(errno));
+        }
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      class 327042 "ref_entry"
+	visibility package stereotype "struct"
+	cpp_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 407810 // next (<unidirectional association>)
+	  relation 406914 --->
+	    a role_name "next" public
+	      cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	      java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	      classrelation_ref 407810 // next (<unidirectional association>)
+	    b parent class_ref 327042 // ref_entry
+	end
+
+	attribute 1248386 "id"
+	  const_attribute public explicit_type "void"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1248514 "stack"
+	  public explicit_type "CallStack"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1248642 "ref"
+	  public explicit_type "int32_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      operation 1879042 "addRef"
+	cpp_inline private explicit_return_type "void"
+	nparams 3
+	  param inout name "refs" type class_ref 327042 // ref_entry
+	  param in name "id" explicit_type "void"
+	  param in name "mRef" explicit_type "int32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} * * ${p0}${v0}, const ${t1} * ${p1}${v1}, ${t2} ${p2}${v2}${)}${const}${volatile}${throw}${abstract} {
+        if (mTrackEnabled) {
+            AutoMutex _l(mMutex);
+
+            ref_entry* ref = new ref_entry;
+            // Reference count at the time of the snapshot, but before the
+            // update.  Positive value means we increment, negative--we
+            // decrement the reference count.
+            ref->ref = mRef;
+            ref->id = id;
+#if DEBUG_REFS_CALLSTACK_ENABLED
+            ref->stack.update(2);
+#endif
+            ref->next = *refs;
+            *refs = ref;
+        }
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1879170 "removeRef"
+	cpp_inline private explicit_return_type "void"
+	nparams 2
+	  param inout name "refs" type class_ref 327042 // ref_entry
+	  param in name "id" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} * * ${p0}${v0}, const ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract} {
+        if (mTrackEnabled) {
+            AutoMutex _l(mMutex);
+            
+            ref_entry* const head = *refs;
+            ref_entry* ref = head;
+            while (ref != NULL) {
+                if (ref->id == id) {
+                    *refs = ref->next;
+                    delete ref;
+                    return;
+                }
+                refs = &ref->next;
+                ref = *refs;
+            }
+
+            ALOGE(\"RefBase: removing id %p on RefBase %p\"
+                    \"(weakref_type %p) that doesn't exist!\",
+                    id, mBase, this);
+
+            ref = head;
+            while (ref) {
+                char inc = ref->ref >= 0 ? '+' : '-';
+                ALOGD(\"\\t%c ID %p (ref %d):\", inc, ref->id, ref->ref);
+                ref = ref->next;
+            }
+
+            CallStack stack(LOG_TAG);
+        }
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1879298 "renameRefsId"
+	cpp_inline private explicit_return_type "void"
+	nparams 3
+	  param inout name "r" type class_ref 327042 // ref_entry
+	  param in name "old_id" explicit_type "void"
+	  param in name "new_id" explicit_type "void"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} * ${p0}${v0}, const ${t1} * ${p1}${v1}, const ${t2} * ${p2}${v2}${)}${const}${volatile}${throw}${abstract} {
+        if (mTrackEnabled) {
+            AutoMutex _l(mMutex);
+            ref_entry* ref = r;
+            while (ref != NULL) {
+                if (ref->id == old_id) {
+                    ref->id = new_id;
+                }
+                ref = ref->next;
+            }
+        }
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1879426 "printRefsLocked"
+	const cpp_inline private explicit_return_type "void"
+	nparams 2
+	  param inout name "out" explicit_type "String8"
+	  param in name "refs" type class_ref 327042 // ref_entry
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} * ${p0}${v0}, const ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract} {
+        char buf[128];
+        while (refs) {
+            char inc = refs->ref >= 0 ? '+' : '-';
+            sprintf(buf, \"\\t%c ID %p (ref %d):\\n\", 
+                    inc, refs->id, refs->ref);
+            out->append(buf);
+#if DEBUG_REFS_CALLSTACK_ENABLED
+            out->append(refs->stack.toString(\"\\t\\t\"));
+#else
+            out->append(\"\\t\\t(call stacks disabled)\");
+#endif
+            refs = refs->next;
+        }
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      attribute 1248770 "mMutex"
+	private explicit_type "Mutex"
+	cpp_mutable cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      classrelation 407938 // mStrongRefs (<unidirectional association>)
+	relation 407042 --->
+	  a role_name "mStrongRefs" private
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 407938 // mStrongRefs (<unidirectional association>)
+	  b parent class_ref 327042 // ref_entry
+      end
+
+      classrelation 408066 // mWeakRefs (<unidirectional association>)
+	relation 407170 --->
+	  a role_name "mWeakRefs" private
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 408066 // mWeakRefs (<unidirectional association>)
+	  b parent class_ref 327042 // ref_entry
+      end
+
+      attribute 1248898 "mTrackEnabled"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1249026 "mRetain"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Collect stack traces on addref and removeref, instead of deleting the stack references
+ on removeref that match the address ones."
+      end
+    end
+
+    class 326914 "typedef2"
+      visibility package stereotype "typedef" explicit_base_type "RefBase::weakref_type"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 327170 "LibUtilsFirstStatics"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      operation 1879554 "LibUtilsFirstStatics"
+	cpp_inline public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw} {
+        initialize_string8();
+        initialize_string16();
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${synchronized}${name}${(}${)}${throws} {
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1879682 "~LibUtilsFirstStatics"
+	cpp_inline public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw} {
+        terminate_string16();
+        terminate_string8();
+    };
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 327682 "WinCondition"
+      visibility package stereotype "struct"
+      cpp_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Windows doesn't have a condition variable solution.  It's possible
+ * to create one, but it's easy to get it wrong.  For a discussion, and
+ * the origin of this implementation, see:
+ *
+ *  http://www.cs.wustl.edu/~schmidt/win32-cv-1.html
+ *
+ * The implementation shown on the page does NOT follow POSIX semantics.
+ * As an optimization they require acquiring the external mutex before
+ * calling signal() and broadcast(), whereas POSIX only requires grabbing
+ * it before calling wait().  The implementation here has been un-optimized
+ * to have the correct behavior."
+      attribute 1249922 "waitersCount"
+	public explicit_type "int"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Number of waiting threads."
+      end
+
+      attribute 1250050 "waitersCountLock"
+	public explicit_type "CRITICAL_SECTION"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Serialize access to waitersCount."
+      end
+
+      attribute 1250178 "sema"
+	public explicit_type "HANDLE"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Semaphore used to queue up threads waiting for the condition to
+ become signaled."
+      end
+
+      attribute 1250306 "waitersDone"
+	public explicit_type "HANDLE"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " An auto-reset event used by the broadcast/signal thread to wait
+ for all the waiting thread(s) to wake up and be released from
+ the semaphore."
+      end
+
+      attribute 1250434 "internalMutex"
+	public explicit_type "HANDLE"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " This mutex wouldn't be necessary if we required that the caller
+ lock the external mutex before calling signal() and broadcast().
+ I'm trying to mimic pthread semantics though."
+      end
+
+      attribute 1250562 "wasBroadcast"
+	public explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Keeps track of whether we were broadcasting or signaling.  This
+ allows us to optimize the code if we're just signaling."
+      end
+
+      operation 1879938 "wait"
+	cpp_inline public explicit_return_type "status_t"
+	nparams 3
+	  param inout name "condState" type class_ref 327682 // WinCondition
+	  param in name "hMutex" explicit_type "HANDLE"
+	  param inout name "abstime" explicit_type "nsecs_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} * ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} * ${p2}${v2}${)}${const}${volatile}${throw}${abstract} {
+        // Increment the wait count, avoiding race conditions.
+        EnterCriticalSection(&condState->waitersCountLock);
+        condState->waitersCount++;
+        //printf(\"+++ wait: incr waitersCount to %d (tid=%ld)\\n\",
+        //    condState->waitersCount, getThreadId());
+        LeaveCriticalSection(&condState->waitersCountLock);
+    
+        DWORD timeout = INFINITE;
+        if (abstime) {
+            nsecs_t reltime = *abstime - systemTime();
+            if (reltime < 0)
+                reltime = 0;
+            timeout = reltime/1000000;
+        }
+        
+        // Atomically release the external mutex and wait on the semaphore.
+        DWORD res =
+            SignalObjectAndWait(hMutex, condState->sema, timeout, FALSE);
+    
+        //printf(\"+++ wait: awake (tid=%ld)\\n\", getThreadId());
+    
+        // Reacquire lock to avoid race conditions.
+        EnterCriticalSection(&condState->waitersCountLock);
+    
+        // No longer waiting.
+        condState->waitersCount--;
+    
+        // Check to see if we're the last waiter after a broadcast.
+        bool lastWaiter = (condState->wasBroadcast && condState->waitersCount == 0);
+    
+        //printf(\"+++ wait: lastWaiter=%d (wasBc=%d wc=%d)\\n\",
+        //    lastWaiter, condState->wasBroadcast, condState->waitersCount);
+    
+        LeaveCriticalSection(&condState->waitersCountLock);
+    
+        // If we're the last waiter thread during this particular broadcast
+        // then signal broadcast() that we're all awake.  It'll drop the
+        // internal mutex.
+        if (lastWaiter) {
+            // Atomically signal the \"waitersDone\" event and wait until we
+            // can acquire the internal mutex.  We want to do this in one step
+            // because it ensures that everybody is in the mutex FIFO before
+            // any thread has a chance to run.  Without it, another thread
+            // could wake up, do work, and hop back in ahead of us.
+            SignalObjectAndWait(condState->waitersDone, condState->internalMutex,
+                INFINITE, FALSE);
+        } else {
+            // Grab the internal mutex.
+            WaitForSingleObject(condState->internalMutex, INFINITE);
+        }
+    
+        // Release the internal and grab the external.
+        ReleaseMutex(condState->internalMutex);
+        WaitForSingleObject(hMutex, INFINITE);
+    
+        return res == WAIT_OBJECT_0 ? NO_ERROR : -1;
+    };
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+    end
+  end
+
+  deploymentview 157314 "libutils"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 211330 "LinearAllocator::Page"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 326402 // LinearAllocator::Page
+      end
+    end
+
+    artifact 211458 "sysprop_change_callback_info"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 326530 // sysprop_change_callback_info
+      end
+    end
+
+    artifact 211714 "typedef2"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 326914 // typedef2
+      end
+    end
+
+    artifact 211842 "RefBase::weakref_impl"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 326786 // RefBase::weakref_impl
+      end
+    end
+
+    artifact 211970 "LibUtilsFirstStatics"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 327170 // LibUtilsFirstStatics
+      end
+    end
+
+    artifact 212482 "WinCondition"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 327682 // WinCondition
+      end
+    end
+  end
+
+  package_ref 162818 // libutils
+end

@@ -1,0 +1,50 @@
+class PrivateHandler
+!!!541442.java!!!	PrivateHandler(inout looper : Looper)
+            super(looper);
+!!!541570.java!!!	getMessageName(inout message : Message) : String
+            final int type = message.what;
+            switch (type) {
+                case MSG_PERFORM_ACCESSIBILITY_ACTION:
+                    return "MSG_PERFORM_ACCESSIBILITY_ACTION";
+                case MSG_FIND_ACCESSIBILITY_NODE_INFO_BY_ACCESSIBILITY_ID:
+                    return "MSG_FIND_ACCESSIBILITY_NODE_INFO_BY_ACCESSIBILITY_ID";
+                case MSG_FIND_ACCESSIBILITY_NODE_INFOS_BY_VIEW_ID:
+                    return "MSG_FIND_ACCESSIBILITY_NODE_INFOS_BY_VIEW_ID";
+                case MSG_FIND_ACCESSIBILITY_NODE_INFO_BY_TEXT:
+                    return "MSG_FIND_ACCESSIBILITY_NODE_INFO_BY_TEXT";
+                case MSG_FIND_FOCUS:
+                    return "MSG_FIND_FOCUS";
+                case MSG_FOCUS_SEARCH:
+                    return "MSG_FOCUS_SEARCH";
+                case MSG_COMPUTE_CLICK_POINT_IN_SCREEN:
+                    return "MSG_COMPUTE_CLICK_POINT_IN_SCREEN";
+                default:
+                    throw new IllegalArgumentException("Unknown message type: " + type);
+            }
+!!!541698.java!!!	handleMessage(inout message : Message) : void
+            final int type = message.what;
+            switch (type) {
+                case MSG_FIND_ACCESSIBILITY_NODE_INFO_BY_ACCESSIBILITY_ID: {
+                    findAccessibilityNodeInfoByAccessibilityIdUiThread(message);
+                } break;
+                case MSG_PERFORM_ACCESSIBILITY_ACTION: {
+                    perfromAccessibilityActionUiThread(message);
+                } break;
+                case MSG_FIND_ACCESSIBILITY_NODE_INFOS_BY_VIEW_ID: {
+                    findAccessibilityNodeInfosByViewIdUiThread(message);
+                } break;
+                case MSG_FIND_ACCESSIBILITY_NODE_INFO_BY_TEXT: {
+                    findAccessibilityNodeInfosByTextUiThread(message);
+                } break;
+                case MSG_FIND_FOCUS: {
+                    findFocusUiThread(message);
+                } break;
+                case MSG_FOCUS_SEARCH: {
+                    focusSearchUiThread(message);
+                } break;
+                case MSG_COMPUTE_CLICK_POINT_IN_SCREEN: {
+                    computeClickPointInScreenUiThread(message);
+                } break;
+                default:
+                    throw new IllegalArgumentException("Unknown message type: " + type);
+            }

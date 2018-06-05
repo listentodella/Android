@@ -1,0 +1,43 @@
+class ActionKeyInfo
+!!!1727874.java!!!	ActionKeyInfo(inout activityContext : Context, inout attr : AttributeSet)
+            TypedArray a = activityContext.obtainStyledAttributes(attr,
+                    com.android.internal.R.styleable.SearchableActionKey);
+
+            mKeyCode = a.getInt(
+                    com.android.internal.R.styleable.SearchableActionKey_keycode, 0);
+            mQueryActionMsg = a.getString(
+                    com.android.internal.R.styleable.SearchableActionKey_queryActionMsg);
+            mSuggestActionMsg = a.getString(
+                    com.android.internal.R.styleable.SearchableActionKey_suggestActionMsg);
+            mSuggestActionMsgColumn = a.getString(
+                    com.android.internal.R.styleable.SearchableActionKey_suggestActionMsgColumn);
+            a.recycle();
+
+            // sanity check.
+            if (mKeyCode == 0) {
+                throw new IllegalArgumentException("No keycode.");
+            } else if ((mQueryActionMsg == null) && 
+                    (mSuggestActionMsg == null) && 
+                    (mSuggestActionMsgColumn == null)) {
+                throw new IllegalArgumentException("No message information.");
+            }
+!!!1728002.java!!!	ActionKeyInfo(inout in : Parcel)
+            mKeyCode = in.readInt();
+            mQueryActionMsg = in.readString();
+            mSuggestActionMsg = in.readString();
+            mSuggestActionMsgColumn = in.readString();
+!!!1728130.java!!!	getKeyCode() : int
+            return mKeyCode;
+!!!1728258.java!!!	getQueryActionMsg() : String
+            return mQueryActionMsg;
+!!!1728386.java!!!	getSuggestActionMsg() : String
+            return mSuggestActionMsg;
+!!!1728514.java!!!	getSuggestActionMsgColumn() : String
+            return mSuggestActionMsgColumn;
+!!!1728642.java!!!	describeContents() : int
+            return 0;
+!!!1728770.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            dest.writeInt(mKeyCode);
+            dest.writeString(mQueryActionMsg);
+            dest.writeString(mSuggestActionMsg);
+            dest.writeString(mSuggestActionMsgColumn);

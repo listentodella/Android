@@ -1,0 +1,91 @@
+class CircularDisplayMask
+!!!1199234.java!!!	CircularDisplayMask(inout display : Display, inout session : SurfaceSession, in zOrder : int, in screenOffset : int)
+        mScreenSize = new Point();
+        display.getSize(mScreenSize);
+        if (mScreenSize.x != mScreenSize.y) {
+            Slog.w(TAG, "Screen dimensions of displayId = " + display.getDisplayId() +
+                    "are not equal, circularMask will not be drawn.");
+            mDimensionsUnequal = true;
+        }
+
+        SurfaceControl ctrl = null;
+        try {
+            if (WindowManagerService.DEBUG_SURFACE_TRACE) {
+                ctrl = new WindowStateAnimator.SurfaceTrace(session, "CircularDisplayMask",
+                        mScreenSize.x, mScreenSize.y, PixelFormat.TRANSLUCENT,
+                        SurfaceControl.HIDDEN);
+            } else {
+                ctrl = new SurfaceControl(session, "CircularDisplayMask", mScreenSize.x,
+                        mScreenSize.y, PixelFormat.TRANSLUCENT, SurfaceControl.HIDDEN);
+            }
+            ctrl.setLayerStack(display.getLayerStack());
+            ctrl.setLayer(zOrder);
+            ctrl.setPosition(0, 0);
+            ctrl.show();
+            mSurface.copyFrom(ctrl);
+        } catch (OutOfResourcesException e) {
+        }
+        mSurfaceControl = ctrl;
+        mDrawNeeded = true;
+        mPaint = new Paint();
+        mPaint.setAntiAlias(true);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setColor(Color.BLACK);
+        mPaint.setStrokeWidth(STROKE_WIDTH);
+        mScreenOffset = screenOffset;
+!!!1199362.java!!!	drawIfNeeded() : void
+        if (!mDrawNeeded || !mVisible || mDimensionsUnequal) {
+            return;
+        }
+        mDrawNeeded = false;
+
+        Rect dirty = new Rect(0, 0, mScreenSize.x, mScreenSize.y);
+        Canvas c = null;
+        try {
+            c = mSurface.lockCanvas(dirty);
+        } catch (IllegalArgumentException e) {
+        } catch (Surface.OutOfResourcesException e) {
+        }
+        if (c == null) {
+            return;
+        }
+        c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.SRC);
+        switch (mRotation) {
+        case Surface.ROTATION_0:
+        case Surface.ROTATION_90:
+            // chin bottom or right
+            mSurfaceControl.setPosition(0, 0);
+            break;
+        case Surface.ROTATION_180:
+            // chin top
+            mSurfaceControl.setPosition(0, -mScreenOffset);
+            break;
+        case Surface.ROTATION_270:
+            // chin left
+            mSurfaceControl.setPosition(-mScreenOffset, 0);
+            break;
+        }
+
+        int circleRadius = mScreenSize.x / 2;
+        c.drawCircle(circleRadius, circleRadius, circleRadius, mPaint);
+        mSurface.unlockCanvasAndPost(c);
+!!!1199490.java!!!	setVisibility(inout on : boolean) : void
+        if (mSurfaceControl == null) {
+            return;
+        }
+        mVisible = on;
+        drawIfNeeded();
+        if (on) {
+            mSurfaceControl.show();
+        } else {
+            mSurfaceControl.hide();
+        }
+!!!1199618.java!!!	positionSurface(in dw : int, in dh : int, in rotation : int) : void
+        if (mLastDW == dw && mLastDH == dh && mRotation == rotation) {
+            return;
+        }
+        mLastDW = dw;
+        mLastDH = dh;
+        mDrawNeeded = true;
+        mRotation = rotation;
+        drawIfNeeded();

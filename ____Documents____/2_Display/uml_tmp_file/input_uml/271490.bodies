@@ -1,0 +1,36 @@
+class ActionBar
+!!!1301506.java!!!	getThemedContext() : Context
+ return null;
+!!!1301634.java!!!	isTitleTruncated() : boolean
+ return false;
+!!!1302274.java!!!	setHideOnContentScrollEnabled(inout hideOnContentScroll : boolean) : void
+        if (hideOnContentScroll) {
+            throw new UnsupportedOperationException("Hide on content scroll is not supported in " +
+                    "this action bar configuration.");
+        }
+!!!1302402.java!!!	isHideOnContentScrollEnabled() : boolean
+        return false;
+!!!1302530.java!!!	getHideOffset() : int
+        return 0;
+!!!1302658.java!!!	setHideOffset(in offset : int) : void
+        if (offset != 0) {
+            throw new UnsupportedOperationException("Setting an explicit action bar hide offset " +
+                    "is not supported in this action bar configuration.");
+        }
+!!!1302786.java!!!	setElevation(in elevation : float) : void
+        if (elevation != 0) {
+            throw new UnsupportedOperationException("Setting a non-zero elevation is " +
+                    "not supported in this action bar configuration.");
+        }
+!!!1302914.java!!!	getElevation() : float
+        return 0;
+!!!1303554.java!!!	startActionMode(inout callback : ActionMode::Callback) : ActionMode
+        return null;
+!!!1303682.java!!!	openOptionsMenu() : boolean
+        return false;
+!!!1303810.java!!!	invalidateOptionsMenu() : boolean
+        return false;
+!!!1303938.java!!!	onMenuKeyEvent(inout event : KeyEvent) : boolean
+        return false;
+!!!1304066.java!!!	collapseActionView() : boolean
+        return false;

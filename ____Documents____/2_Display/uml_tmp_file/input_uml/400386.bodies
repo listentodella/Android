@@ -1,0 +1,17 @@
+class YearAdapter
+!!!2559746.java!!!	YearAdapter(inout context : Context, in resource : int)
+            super(context, resource);
+!!!2559874.java!!!	getView(in position : int, inout convertView : View, inout parent : ViewGroup) : View
+            TextViewWithCircularIndicator v = (TextViewWithCircularIndicator)
+                    super.getView(position, convertView, parent);
+            v.setTextAppearance(getContext(), mItemTextAppearanceResId);
+            v.requestLayout();
+            int year = getItem(position);
+            boolean selected = mController.getSelectedDay().get(Calendar.YEAR) == year;
+            v.setDrawIndicator(selected);
+            if (selected) {
+                v.setCircleColor(mYearSelectedCircleColor);
+            }
+            return v;
+!!!2560002.java!!!	setItemTextAppearance(in resId : int) : void
+            mItemTextAppearanceResId = resId;

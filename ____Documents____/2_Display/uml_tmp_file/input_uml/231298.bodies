@@ -1,0 +1,22 @@
+class WindowAnimationFrameStats
+!!!1018754.java!!!	WindowAnimationFrameStats()
+        /* do nothing */
+!!!1018882.java!!!	init(in refreshPeriodNano : long, inout framesPresentedTimeNano : long) : void
+        mRefreshPeriodNano = refreshPeriodNano;
+        mFramesPresentedTimeNano = framesPresentedTimeNano;
+!!!1019010.java!!!	WindowAnimationFrameStats(inout parcel : Parcel)
+        mRefreshPeriodNano = parcel.readLong();
+        mFramesPresentedTimeNano = parcel.createLongArray();
+!!!1019138.java!!!	describeContents() : int
+        return 0;
+!!!1019266.java!!!	writeToParcel(inout parcel : Parcel, in flags : int) : void
+        parcel.writeLong(mRefreshPeriodNano);
+        parcel.writeLongArray(mFramesPresentedTimeNano);
+!!!1019394.java!!!	toString() : String
+        StringBuilder builder = new StringBuilder();
+        builder.append("WindowAnimationFrameStats[");
+        builder.append("frameCount:" + getFrameCount());
+        builder.append(", fromTimeNano:" + getStartTimeNano());
+        builder.append(", toTimeNano:" + getEndTimeNano());
+        builder.append(']');
+        return builder.toString();

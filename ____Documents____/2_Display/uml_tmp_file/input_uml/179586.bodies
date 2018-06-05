@@ -1,0 +1,9 @@
+class Flattenable
+!!!360578.cpp!!!	getFlattenedSize() : size_t
+    return static_cast<T const*>(this)->T::getFlattenedSize();
+!!!360706.cpp!!!	getFdCount() : size_t
+    return static_cast<T const*>(this)->T::getFdCount();
+!!!360834.cpp!!!	flatten(inout buffer : void, inout size : size_t, inout fds : int, inout count : size_t) : status_t
+    return static_cast<T const*>(this)->T::flatten(buffer, size, fds, count);
+!!!360962.cpp!!!	unflatten(in buffer : void, inout size : size_t, in fds : int, inout count : size_t) : status_t
+    return static_cast<T*>(this)->T::unflatten(buffer, size, fds, count);

@@ -1,0 +1,105 @@
+class AccessibilityController
+!!!1180802.java!!!	AccessibilityController(inout service : WindowManagerService)
+        mWindowManagerService = service;
+!!!1180930.java!!!	setMagnificationCallbacksLocked(inout callbacks : WindowManagerInternal::MagnificationCallbacks) : void
+        if (callbacks != null) {
+            if (mDisplayMagnifier != null) {
+                throw new IllegalStateException("Magnification callbacks already set!");
+            }
+            mDisplayMagnifier = new DisplayMagnifier(mWindowManagerService, callbacks);
+        } else {
+            if  (mDisplayMagnifier == null) {
+                throw new IllegalStateException("Magnification callbacks already cleared!");
+            }
+            mDisplayMagnifier.destroyLocked();
+            mDisplayMagnifier = null;
+        }
+!!!1181058.java!!!	setWindowsForAccessibilityCallback(inout callback : WindowManagerInternal::WindowsForAccessibilityCallback) : void
+        if (callback != null) {
+            if (mWindowsForAccessibilityObserver != null) {
+                throw new IllegalStateException(
+                        "Windows for accessibility callback already set!");
+            }
+            mWindowsForAccessibilityObserver = new WindowsForAccessibilityObserver(
+                    mWindowManagerService, callback);
+        } else {
+            if (mWindowsForAccessibilityObserver == null) {
+                throw new IllegalStateException(
+                        "Windows for accessibility callback already cleared!");
+            }
+            mWindowsForAccessibilityObserver = null;
+        }
+!!!1181186.java!!!	setMagnificationSpecLocked(inout spec : MagnificationSpec) : void
+        if (mDisplayMagnifier != null) {
+            mDisplayMagnifier.setMagnificationSpecLocked(spec);
+        }
+        if (mWindowsForAccessibilityObserver != null) {
+            mWindowsForAccessibilityObserver.scheduleComputeChangedWindowsLocked();
+        }
+!!!1181314.java!!!	onRectangleOnScreenRequestedLocked(inout rectangle : Rect) : void
+        if (mDisplayMagnifier != null) {
+            mDisplayMagnifier.onRectangleOnScreenRequestedLocked(rectangle);
+        }
+        // Not relevant for the window observer.
+!!!1181442.java!!!	onWindowLayersChangedLocked() : void
+        if (mDisplayMagnifier != null) {
+            mDisplayMagnifier.onWindowLayersChangedLocked();
+        }
+        if (mWindowsForAccessibilityObserver != null) {
+            mWindowsForAccessibilityObserver.scheduleComputeChangedWindowsLocked();
+        }
+!!!1181570.java!!!	onRotationChangedLocked(inout displayContent : DisplayContent, in rotation : int) : void
+        if (mDisplayMagnifier != null) {
+            mDisplayMagnifier.onRotationChangedLocked(displayContent, rotation);
+        }
+        if (mWindowsForAccessibilityObserver != null) {
+            mWindowsForAccessibilityObserver.scheduleComputeChangedWindowsLocked();
+        }
+!!!1181698.java!!!	onAppWindowTransitionLocked(inout windowState : WindowState, in transition : int) : void
+        if (mDisplayMagnifier != null) {
+            mDisplayMagnifier.onAppWindowTransitionLocked(windowState, transition);
+        }
+        // Not relevant for the window observer.
+!!!1181826.java!!!	onWindowTransitionLocked(inout windowState : WindowState, in transition : int) : void
+        if (mDisplayMagnifier != null) {
+            mDisplayMagnifier.onWindowTransitionLocked(windowState, transition);
+        }
+        if (mWindowsForAccessibilityObserver != null) {
+            mWindowsForAccessibilityObserver.scheduleComputeChangedWindowsLocked();
+        }
+!!!1181954.java!!!	onWindowFocusChangedLocked() : void
+        // Not relevant for the display magnifier.
+
+        if (mWindowsForAccessibilityObserver != null) {
+            mWindowsForAccessibilityObserver.scheduleComputeChangedWindowsLocked();
+        }
+!!!1182082.java!!!	onSomeWindowResizedOrMovedLocked() : void
+        // Not relevant for the display magnifier.
+
+        if (mWindowsForAccessibilityObserver != null) {
+            mWindowsForAccessibilityObserver.scheduleComputeChangedWindowsLocked();
+        }
+!!!1182210.java!!!	drawMagnifiedRegionBorderIfNeededLocked() : void
+        if (mDisplayMagnifier != null) {
+            mDisplayMagnifier.drawMagnifiedRegionBorderIfNeededLocked();
+        }
+        // Not relevant for the window observer.
+!!!1182338.java!!!	getMagnificationSpecForWindowLocked(inout windowState : WindowState) : MagnificationSpec
+        if (mDisplayMagnifier != null) {
+            return mDisplayMagnifier.getMagnificationSpecForWindowLocked(windowState);
+        }
+        return null;
+!!!1182466.java!!!	hasCallbacksLocked() : boolean
+        return (mDisplayMagnifier != null
+                || mWindowsForAccessibilityObserver != null);
+!!!1182594.java!!!	populateTransformationMatrixLocked(inout windowState : WindowState, inout outMatrix : Matrix) : void
+        sTempFloats[Matrix.MSCALE_X] = windowState.mWinAnimator.mDsDx;
+        sTempFloats[Matrix.MSKEW_Y] = windowState.mWinAnimator.mDtDx;
+        sTempFloats[Matrix.MSKEW_X] = windowState.mWinAnimator.mDsDy;
+        sTempFloats[Matrix.MSCALE_Y] = windowState.mWinAnimator.mDtDy;
+        sTempFloats[Matrix.MTRANS_X] = windowState.mShownFrame.left;
+        sTempFloats[Matrix.MTRANS_Y] = windowState.mShownFrame.top;
+        sTempFloats[Matrix.MPERSP_0] = 0;
+        sTempFloats[Matrix.MPERSP_1] = 0;
+        sTempFloats[Matrix.MPERSP_2] = 1;
+        outMatrix.setValues(sTempFloats);

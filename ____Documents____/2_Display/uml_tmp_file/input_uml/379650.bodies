@@ -1,0 +1,33 @@
+class Interval
+!!!2310274.java!!!	Interval(in min : int, in max : int)
+            this.min = min;
+            this.max = max;
+!!!2310402.java!!!	size() : int
+            return max - min;
+!!!2310530.java!!!	inverse() : GridLayout::Interval
+            return new Interval(max, min);
+!!!2310658.java!!!	equals(inout that : Object) : boolean
+            if (this == that) {
+                return true;
+            }
+            if (that == null || getClass() != that.getClass()) {
+                return false;
+            }
+
+            Interval interval = (Interval) that;
+
+            if (max != interval.max) {
+                return false;
+            }
+            //noinspection RedundantIfStatement
+            if (min != interval.min) {
+                return false;
+            }
+
+            return true;
+!!!2310786.java!!!	hashCode() : int
+            int result = min;
+            result = 31 * result + max;
+            return result;
+!!!2310914.java!!!	toString() : String
+            return "[" + min + ", " + max + "]";

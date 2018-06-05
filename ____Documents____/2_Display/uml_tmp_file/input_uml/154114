@@ -1,0 +1,2140 @@
+format 76
+"job" // app::job
+  revision 1
+  modified_by 2 "thisway_diy"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "l:/android_projects/uml_tmp_file/app/job/"
+  java_package "android.app.job"
+  classview 154114 "job"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 294786 "JobScheduler"
+      abstract visibility public 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This is an API for scheduling various types of jobs against the framework that will be executed
+in your application's own process.
+<p>
+See {@link android.app.job.JobInfo} for more description of the types of jobs that can be run
+and how to construct them. You will construct these JobInfo objects and pass them to the
+JobScheduler with {@link #schedule(JobInfo)}. When the criteria declared are met, the
+system will execute this job on your application's {@link android.app.job.JobService}.
+You identify which JobService is meant to execute the logic for your job when you create the
+JobInfo with
+{@link android.app.job.JobInfo.Builder#JobInfo.Builder(int,android.content.ComponentName)}.
+</p>
+<p>
+The framework will be intelligent about when you receive your callbacks, and attempt to batch
+and defer them as much as possible. Typically if you don't specify a deadline on your job, it
+can be run at any moment depending on the current state of the JobScheduler's internal queue,
+however it might be deferred as long as until the next time the device is connected to a power
+source.
+</p>
+<p>You do not
+instantiate this class directly; instead, retrieve it through
+{@link android.content.Context#getSystemService
+Context.getSystemService(Context.JOB_SCHEDULER_SERVICE)}."
+      attribute 1094146 "RESULT_FAILURE"
+	class_attribute const_attribute public explicit_type "int"
+	init_value " 0"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Returned from {@link #schedule(JobInfo)} when an invalid parameter was supplied. This can occur
+if the run-time for your job is too short, or perhaps the system can't resolve the
+requisite {@link JobService} in your package.
+"
+      end
+
+      attribute 1094274 "RESULT_SUCCESS"
+	class_attribute const_attribute public explicit_type "int"
+	init_value " 1"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Returned from {@link #schedule(JobInfo)} if this application has made too many requests for
+work over too short a time.
+
+ TODO: Determine if this is necessary."
+      end
+
+      operation 1639298 "schedule"
+	abstract public explicit_return_type "int"
+	nparams 1
+	  param inout name "job" type class_ref 294914 // JobInfo
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@param job The job you wish scheduled. See
+{@link android.app.job.JobInfo.Builder JobInfo.Builder} for more detail on the sorts of jobs
+you can schedule.
+@return If >0, this int returns the jobId of the successfully scheduled job.
+Otherwise you have to compare the return value to the error codes defined in this class."
+      end
+
+      operation 1639426 "cancel"
+	abstract public explicit_return_type "void"
+	nparams 1
+	  param in name "jobId" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Cancel a job that is pending in the JobScheduler.
+@param jobId unique identifier for this job. Obtain this value from the jobs returned by
+{@link #getAllPendingJobs()}.
+@return"
+      end
+
+      operation 1639554 "cancelAll"
+	abstract public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Cancel all jobs that have been registered with the JobScheduler by this package."
+      end
+
+      operation 1639682 "getAllPendingJobs"
+	abstract public return_type class_ref 294914 // JobInfo
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}List<${type}> ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@return a list of all the jobs registered by this package that have not yet been executed."
+      end
+    end
+
+    class 294914 "JobInfo"
+      visibility public 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Container of data passed to the {@link android.app.job.JobScheduler} fully encapsulating the
+parameters required to schedule work against the calling application. These are constructed
+using the {@link JobInfo.Builder}.
+You must specify at least one sort of constraint on the JobInfo object that you are creating.
+The goal here is to provide the scheduler with high-level semantics about the work you want to
+accomplish. Doing otherwise with throw an exception in your app."
+      classrelation 395906 // <realization>
+	relation 395010 -_-|>
+	  a public
+	    cpp default "${type}"
+	    java "${type}"
+	    classrelation_ref 395906 // <realization>
+	  b parent class_ref 203266 // Parcelable
+      end
+
+      attribute 1207810 "NETWORK_TYPE_NONE"
+	class_attribute const_attribute public explicit_type "int"
+	init_value " 0"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Default. "
+      end
+
+      attribute 1207938 "NETWORK_TYPE_ANY"
+	class_attribute const_attribute public explicit_type "int"
+	init_value " 1"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " This job requires network connectivity. "
+      end
+
+      attribute 1208066 "NETWORK_TYPE_UNMETERED"
+	class_attribute const_attribute public explicit_type "int"
+	init_value " 2"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " This job requires network connectivity that is unmetered. "
+      end
+
+      attribute 1208194 "DEFAULT_INITIAL_BACKOFF_MILLIS"
+	class_attribute const_attribute public explicit_type "long"
+	init_value " 30000L"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Amount of backoff a job has initially by default, in milliseconds.
+
+ 30 seconds."
+      end
+
+      attribute 1208322 "MAX_BACKOFF_DELAY_MILLIS"
+	class_attribute const_attribute public explicit_type "long"
+	init_value " 5 * 60 * 60 * 1000"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Maximum backoff we allow for a job, in milliseconds.
+
+ 5 hours."
+      end
+
+      attribute 1208450 "BACKOFF_POLICY_LINEAR"
+	class_attribute const_attribute public explicit_type "int"
+	init_value " 0"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Linearly back-off a failed job. See
+{@link android.app.job.JobInfo.Builder#setBackoffCriteria(long, int)}
+retry_time(current_time, num_failures) =
+    current_time + initial_backoff_millis * num_failures, num_failures >= 1
+"
+      end
+
+      attribute 1208578 "BACKOFF_POLICY_EXPONENTIAL"
+	class_attribute const_attribute public explicit_type "int"
+	init_value " 1"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Exponentially back-off a failed job. See
+{@link android.app.job.JobInfo.Builder#setBackoffCriteria(long, int)}
+
+retry_time(current_time, num_failures) =
+    current_time + initial_backoff_millis * 2 ^ (num_failures - 1), num_failures >= 1
+"
+      end
+
+      attribute 1208706 "DEFAULT_BACKOFF_POLICY"
+	class_attribute const_attribute public explicit_type "int"
+	init_value " BACKOFF_POLICY_EXPONENTIAL"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Default type of backoff.
+@hide
+"
+      end
+
+      attribute 1208834 "jobId"
+	const_attribute private explicit_type "int"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1208962 "extras"
+	const_attribute private explicit_type "PersistableBundle"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1209090 "service"
+	const_attribute private explicit_type "ComponentName"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1209218 "requireCharging"
+	const_attribute private explicit_type "boolean"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1209346 "requireDeviceIdle"
+	const_attribute private explicit_type "boolean"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1209474 "hasEarlyConstraint"
+	const_attribute private explicit_type "boolean"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1209602 "hasLateConstraint"
+	const_attribute private explicit_type "boolean"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1209730 "networkType"
+	const_attribute private explicit_type "int"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1209858 "minLatencyMillis"
+	const_attribute private explicit_type "long"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1209986 "maxExecutionDelayMillis"
+	const_attribute private explicit_type "long"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1210114 "isPeriodic"
+	const_attribute private explicit_type "boolean"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1210242 "isPersisted"
+	const_attribute private explicit_type "boolean"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1210370 "intervalMillis"
+	const_attribute private explicit_type "long"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1210498 "initialBackoffMillis"
+	const_attribute private explicit_type "long"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1210626 "backoffPolicy"
+	const_attribute private explicit_type "int"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 1815938 "getId"
+	public explicit_return_type "int"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Unique job id associated with this class. This is assigned to your job by the scheduler."
+      end
+
+      operation 1816066 "getExtras"
+	public explicit_return_type "PersistableBundle"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Bundle of extras which are returned to your application at execution time."
+      end
+
+      operation 1816194 "getService"
+	public explicit_return_type "ComponentName"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Name of the service endpoint that will be called back into by the JobScheduler."
+      end
+
+      operation 1816322 "isRequireCharging"
+	public explicit_return_type "boolean"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Whether this job needs the device to be plugged in."
+      end
+
+      operation 1816450 "isRequireDeviceIdle"
+	public explicit_return_type "boolean"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Whether this job needs the device to be in an Idle maintenance window."
+      end
+
+      operation 1816578 "getNetworkType"
+	public explicit_return_type "int"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "One of {@link android.app.job.JobInfo#NETWORK_TYPE_ANY},
+{@link android.app.job.JobInfo#NETWORK_TYPE_NONE}, or
+{@link android.app.job.JobInfo#NETWORK_TYPE_UNMETERED}."
+      end
+
+      operation 1816706 "getMinLatencyMillis"
+	public explicit_return_type "long"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Set for a job that does not recur periodically, to specify a delay after which the job
+will be eligible for execution. This value is not set if the job recurs periodically."
+      end
+
+      operation 1816834 "getMaxExecutionDelayMillis"
+	public explicit_return_type "long"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "See {@link Builder#setOverrideDeadline(long)}. This value is not set if the job recurs
+periodically."
+      end
+
+      operation 1816962 "isPeriodic"
+	public explicit_return_type "boolean"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Track whether this job will repeat with a given period."
+      end
+
+      operation 1817090 "isPersisted"
+	public explicit_return_type "boolean"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@return Whether or not this job should be persisted across device reboots."
+      end
+
+      operation 1817218 "getIntervalMillis"
+	public explicit_return_type "long"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Set to the interval between occurrences of this job. This value is <b>not</b> set if the
+job does not recur periodically."
+      end
+
+      operation 1817346 "getInitialBackoffMillis"
+	public explicit_return_type "long"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "The amount of time the JobScheduler will wait before rescheduling a failed job. This value
+will be increased depending on the backoff policy specified at job creation time. Defaults
+to 5 seconds."
+      end
+
+      operation 1817474 "getBackoffPolicy"
+	public explicit_return_type "int"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "One of either {@link android.app.job.JobInfo#BACKOFF_POLICY_EXPONENTIAL}, or
+{@link android.app.job.JobInfo#BACKOFF_POLICY_LINEAR}, depending on which criteria you set
+when creating this job."
+      end
+
+      operation 1817602 "hasEarlyConstraint"
+	public explicit_return_type "boolean"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "User can specify an early constraint of 0L, which is valid, so we keep track of whether the
+function was called at all.
+@hide"
+      end
+
+      operation 1817730 "hasLateConstraint"
+	public explicit_return_type "boolean"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "User can specify a late constraint of 0L, which is valid, so we keep track of whether the
+function was called at all.
+@hide"
+      end
+
+      operation 1817858 "JobInfo"
+	private explicit_return_type ""
+	nparams 1
+	  param inout name "in" explicit_type "Parcel"
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${volatile}${throw} {
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1817986 "JobInfo"
+	private explicit_return_type ""
+	nparams 1
+	  param inout name "b" type class_ref 312194 // Builder
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${volatile}${throw} {
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      class 312194 "Builder"
+	visibility public 
+	cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+	final java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 1210754 "mJobId"
+	  private explicit_type "int"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1210882 "mExtras"
+	  private explicit_type "PersistableBundle"
+	  init_value " PersistableBundle.EMPTY"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1211010 "mJobService"
+	  private explicit_type "ComponentName"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1211138 "mRequiresCharging"
+	  private explicit_type "boolean"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment " Requirements."
+	end
+
+	attribute 1211266 "mRequiresDeviceIdle"
+	  private explicit_type "boolean"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1211394 "mNetworkType"
+	  private explicit_type "int"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1211522 "mIsPersisted"
+	  private explicit_type "boolean"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1211650 "mMinLatencyMillis"
+	  private explicit_type "long"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment " One-off parameters."
+	end
+
+	attribute 1211778 "mMaxExecutionDelayMillis"
+	  private explicit_type "long"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1211906 "mIsPeriodic"
+	  private explicit_type "boolean"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment " Periodic parameters."
+	end
+
+	attribute 1212034 "mHasEarlyConstraint"
+	  private explicit_type "boolean"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1212162 "mHasLateConstraint"
+	  private explicit_type "boolean"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1212290 "mIntervalMillis"
+	  private explicit_type "long"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1212418 "mInitialBackoffMillis"
+	  private explicit_type "long"
+	  init_value " DEFAULT_INITIAL_BACKOFF_MILLIS"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment " Back-off parameters."
+	end
+
+	attribute 1212546 "mBackoffPolicy"
+	  private explicit_type "int"
+	  init_value " DEFAULT_BACKOFF_POLICY"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 1212674 "mBackoffPolicySet"
+	  private explicit_type "boolean"
+	  init_value " false"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment " Easy way to track whether the client has tried to set a back-off policy. "
+	end
+
+	operation 1818498 "Builder"
+	  public explicit_return_type ""
+	  nparams 2
+	    param in name "jobId" explicit_type "int"
+	    param inout name "jobService" explicit_type "ComponentName"
+	  cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	  cpp_def "${comment}${inline}${class}::${name}${(}${)}${volatile}${throw} {
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  comment "@param jobId Application-provided id for this job. Subsequent calls to cancel, or
+              jobs created with the same jobId, will update the pre-existing job with
+              the same id.
+@param jobService The endpoint that you implement that will receive the callback from the
+           JobScheduler."
+	end
+
+	operation 1818626 "setExtras"
+	  public return_type class_ref 312194 // Builder
+	  nparams 1
+	    param inout name "extras" explicit_type "PersistableBundle"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  comment "Set optional extras. This is persisted, so we only allow primitive types.
+@param extras Bundle containing extras you want the scheduler to hold on to for you."
+	end
+
+	operation 1818754 "setRequiredNetworkType"
+	  public return_type class_ref 312194 // Builder
+	  nparams 1
+	    param in name "networkType" explicit_type "int"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  comment "Set some description of the kind of network type your job needs to have.
+Not calling this function means the network is not necessary, as the default is
+{@link #NETWORK_TYPE_NONE}.
+Bear in mind that calling this function defines network as a strict requirement for your
+job. If the network requested is not available your job will never run. See
+{@link #setOverrideDeadline(long)} to change this behaviour."
+	end
+
+	operation 1818882 "setRequiresCharging"
+	  public return_type class_ref 312194 // Builder
+	  nparams 1
+	    param inout name "requiresCharging" explicit_type "boolean"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  comment "Specify that to run this job, the device needs to be plugged in. This defaults to
+false.
+@param requiresCharging Whether or not the device is plugged in."
+	end
+
+	operation 1819010 "setRequiresDeviceIdle"
+	  public return_type class_ref 312194 // Builder
+	  nparams 1
+	    param inout name "requiresDeviceIdle" explicit_type "boolean"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  comment "Specify that to run, the job needs the device to be in idle mode. This defaults to
+false.
+<p>Idle mode is a loose definition provided by the system, which means that the device
+is not in use, and has not been in use for some time. As such, it is a good time to
+perform resource heavy jobs. Bear in mind that battery usage will still be attributed
+to your application, and surfaced to the user in battery stats.</p>
+@param requiresDeviceIdle Whether or not the device need be within an idle maintenance
+                          window."
+	end
+
+	operation 1819138 "setPeriodic"
+	  public return_type class_ref 312194 // Builder
+	  nparams 1
+	    param in name "intervalMillis" explicit_type "long"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  comment "Specify that this job should recur with the provided interval, not more than once per
+period. You have no control over when within this interval this job will be executed,
+only the guarantee that it will be executed at most once within this interval.
+Setting this function on the builder with {@link #setMinimumLatency(long)} or
+{@link #setOverrideDeadline(long)} will result in an error.
+@param intervalMillis Millisecond interval for which this job will repeat."
+	end
+
+	operation 1819266 "setMinimumLatency"
+	  public return_type class_ref 312194 // Builder
+	  nparams 1
+	    param in name "minLatencyMillis" explicit_type "long"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  comment "Specify that this job should be delayed by the provided amount of time.
+Because it doesn't make sense setting this property on a periodic job, doing so will
+throw an {@link java.lang.IllegalArgumentException} when
+{@link android.app.job.JobInfo.Builder#build()} is called.
+@param minLatencyMillis Milliseconds before which this job will not be considered for
+                        execution."
+	end
+
+	operation 1819394 "setOverrideDeadline"
+	  public return_type class_ref 312194 // Builder
+	  nparams 1
+	    param in name "maxExecutionDelayMillis" explicit_type "long"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  comment "Set deadline which is the maximum scheduling latency. The job will be run by this
+deadline even if other requirements are not met. Because it doesn't make sense setting
+this property on a periodic job, doing so will throw an
+{@link java.lang.IllegalArgumentException} when
+{@link android.app.job.JobInfo.Builder#build()} is called."
+	end
+
+	operation 1819522 "setBackoffCriteria"
+	  public return_type class_ref 312194 // Builder
+	  nparams 2
+	    param in name "initialBackoffMillis" explicit_type "long"
+	    param in name "backoffPolicy" explicit_type "int"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  comment "Set up the back-off/retry policy.
+This defaults to some respectable values: {30 seconds, Exponential}. We cap back-off at
+5hrs.
+Note that trying to set a backoff criteria for a job with
+{@link #setRequiresDeviceIdle(boolean)} will throw an exception when you call build().
+This is because back-off typically does not make sense for these types of jobs. See
+{@link android.app.job.JobService#jobFinished(android.app.job.JobParameters, boolean)}
+for more description of the return value for the case of a job executing while in idle
+mode.
+@param initialBackoffMillis Millisecond time interval to wait initially when job has
+                            failed.
+@param backoffPolicy is one of {@link #BACKOFF_POLICY_LINEAR} or
+{@link #BACKOFF_POLICY_EXPONENTIAL}"
+	end
+
+	operation 1819650 "setPersisted"
+	  public return_type class_ref 312194 // Builder
+	  nparams 1
+	    param inout name "isPersisted" explicit_type "boolean"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  comment "Set whether or not to persist this job across device reboots. This will only have an
+effect if your application holds the permission
+{@link android.Manifest.permission#RECEIVE_BOOT_COMPLETED}. Otherwise an exception will
+be thrown.
+@param isPersisted True to indicate that the job will be written to disk and loaded at
+                   boot."
+	end
+
+	operation 1819778 "build"
+	  public return_type class_ref 294914 // JobInfo
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  comment "@return The job object to hand to the JobScheduler. This object is immutable."
+	end
+      end
+
+      operation 1818114 "describeContents"
+	public explicit_return_type "int"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 1818242 "writeToParcel"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "out" explicit_type "Parcel"
+	  param in name "flags" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 396034 // CREATOR (<unidirectional association>)
+	relation 395138 --->
+	  stereotype "Creator"
+	  a role_name "CREATOR" init_value " new Creator<JobInfo>() {
+        @Override
+        public JobInfo createFromParcel(Parcel in) {
+            return new JobInfo(in);
+        }
+
+        @Override
+        public JobInfo[] newArray(int size) {
+            return new JobInfo[size];
+        }
+    }" class_relation const_relation public
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}> ${name}${value};
+"
+	    classrelation_ref 396034 // CREATOR (<unidirectional association>)
+	  b parent class_ref 294914 // JobInfo
+      end
+
+      operation 1818370 "toString"
+	public explicit_return_type "String"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+    end
+
+    class 312322 "JobParameters"
+      visibility public 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Contains the parameters used to configure/identify your job. You do not create this object
+yourself, instead it is handed in to your application by the System."
+      classrelation 396162 // <realization>
+	relation 395266 -_-|>
+	  a public
+	    cpp default "${type}"
+	    java "${type}"
+	    classrelation_ref 396162 // <realization>
+	  b parent class_ref 203266 // Parcelable
+      end
+
+      attribute 1212802 "jobId"
+	const_attribute private explicit_type "int"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1212930 "extras"
+	const_attribute private explicit_type "PersistableBundle"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1213058 "callback"
+	const_attribute private explicit_type "IBinder"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1213186 "overrideDeadlineExpired"
+	const_attribute private explicit_type "boolean"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 1819906 "JobParameters"
+	public explicit_return_type ""
+	nparams 4
+	  param inout name "callback" explicit_type "IBinder"
+	  param in name "jobId" explicit_type "int"
+	  param inout name "extras" explicit_type "PersistableBundle"
+	  param inout name "overrideDeadlineExpired" explicit_type "boolean"
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${volatile}${throw} {
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment " @hide "
+      end
+
+      operation 1820034 "getJobId"
+	public explicit_return_type "int"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@return The unique id of this job, specified at creation time."
+      end
+
+      operation 1820162 "getExtras"
+	public explicit_return_type "PersistableBundle"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "@return The extras you passed in when constructing this job with
+{@link android.app.job.JobInfo.Builder#setExtras(android.os.PersistableBundle)}. This will
+never be null. If you did not set any extras this will be an empty bundle."
+      end
+
+      operation 1820290 "isOverrideDeadlineExpired"
+	public explicit_return_type "boolean"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "For jobs with {@link android.app.job.JobInfo.Builder#setOverrideDeadline(long)} set, this
+provides an easy way to tell whether the job is being executed due to the deadline
+expiring. Note: If the job is running because its deadline expired, it implies that its
+constraints will not be met."
+      end
+
+      operation 1820418 "getCallback"
+	public explicit_return_type "IJobCallback"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment " @hide "
+      end
+
+      operation 1820546 "JobParameters"
+	private explicit_return_type ""
+	nparams 1
+	  param inout name "in" explicit_type "Parcel"
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${volatile}${throw} {
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 1820674 "describeContents"
+	public explicit_return_type "int"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 1820802 "writeToParcel"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "dest" explicit_type "Parcel"
+	  param in name "flags" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 396290 // CREATOR (<unidirectional association>)
+	relation 395394 --->
+	  stereotype "Creator"
+	  a role_name "CREATOR" init_value " new Creator<JobParameters>() {
+        @Override
+        public JobParameters createFromParcel(Parcel in) {
+            return new JobParameters(in);
+        }
+
+        @Override
+        public JobParameters[] newArray(int size) {
+            return new JobParameters[size];
+        }
+    }" class_relation const_relation public
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}> ${name}${value};
+"
+	    classrelation_ref 396290 // CREATOR (<unidirectional association>)
+	  b parent class_ref 312322 // JobParameters
+      end
+    end
+
+    class 312450 "JobService"
+      abstract visibility public 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "<p>Entry point for the callback from the {@link android.app.job.JobScheduler}.</p>
+<p>This is the base class that handles asynchronous requests that were previously scheduled. You
+are responsible for overriding {@link JobService#onStartJob(JobParameters)}, which is where
+you will implement your job logic.</p>
+<p>This service executes each incoming job on a {@link android.os.Handler} running on your
+application's main thread. This means that you <b>must</b> offload your execution logic to
+another thread/handler/{@link android.os.AsyncTask} of your choosing. Not doing so will result
+in blocking any future callbacks from the JobManager - specifically
+{@link #onStopJob(android.app.job.JobParameters)}, which is meant to inform you that the
+scheduling requirements are no longer being met.</p>"
+      classrelation 396418 // <generalisation>
+	relation 395522 ---|>
+	  a public
+	    cpp default "${type}"
+	    java "${type}"
+	    classrelation_ref 396418 // <generalisation>
+	  b parent class_ref 279554 // Service
+      end
+
+      attribute 1213314 "TAG"
+	class_attribute const_attribute private explicit_type "String"
+	init_value " \"JobService\""
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 1213442 "PERMISSION_BIND"
+	class_attribute const_attribute public explicit_type "String"
+	init_value "
+            \"android.permission.BIND_JOB_SERVICE\""
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Job services must be protected with this permission:
+
+<pre class=\"prettyprint\">
+    <service android:name=\"MyJobService\"
+             android:permission=\"android.permission.BIND_JOB_SERVICE\" >
+        ...
+    </service>
+</pre>
+
+<p>If a job service is declared in the manifest but not protected with this
+permission, that service will be ignored by the OS.
+"
+      end
+
+      attribute 1213570 "MSG_EXECUTE_JOB"
+	const_attribute private explicit_type "int"
+	init_value " 0"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Identifier for a message that will result in a call to
+{@link #onStartJob(android.app.job.JobParameters)}.
+"
+      end
+
+      attribute 1213698 "MSG_STOP_JOB"
+	const_attribute private explicit_type "int"
+	init_value " 1"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Message that will result in a call to {@link #onStopJob(android.app.job.JobParameters)}.
+"
+      end
+
+      attribute 1213826 "MSG_JOB_FINISHED"
+	const_attribute private explicit_type "int"
+	init_value " 2"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Message that the client has completed execution of this job.
+"
+      end
+
+      attribute 1213954 "mHandlerLock"
+	const_attribute private explicit_type "Object"
+	init_value " new Object()"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Lock object for {@link #mHandler}. "
+      end
+
+      class 312578 "JobHandler"
+	visibility package 
+	cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 396674 // <generalisation>
+	  relation 395778 ---|>
+	    a public
+	      cpp default "${type}"
+	      java "${type}"
+	      classrelation_ref 396674 // <generalisation>
+	    b parent class_ref 133378 // Handler
+	end
+
+	operation 1821058 "JobHandler"
+	  package explicit_return_type ""
+	  nparams 1
+	    param inout name "looper" explicit_type "Looper"
+	  cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	  cpp_def "${comment}${inline}${class}::${name}${(}${)}${volatile}${throw} {
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	end
+
+	operation 1821186 "handleMessage"
+	  public explicit_return_type "void"
+	  nparams 1
+	    param inout name "msg" explicit_type "Message"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  java_annotation "@Override
+"
+	  
+	  
+	  
+	end
+
+	operation 1821314 "ackStartMessage"
+	  private explicit_return_type "void"
+	  nparams 2
+	    param inout name "params" type class_ref 312322 // JobParameters
+	    param inout name "workOngoing" explicit_type "boolean"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	end
+
+	operation 1821442 "ackStopMessage"
+	  private explicit_return_type "void"
+	  nparams 2
+	    param inout name "params" type class_ref 312322 // JobParameters
+	    param inout name "reschedule" explicit_type "boolean"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	end
+      end
+
+      classrelation 396546 // mHandler (<unidirectional association>)
+	relation 395650 --->
+	  a role_name "mHandler" package
+	    comment "
+Handler we post jobs to. Responsible for calling into the client logic, and handling the
+callback to the system.
+
+"
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    java_annotation "@GuardedBy(\"mHandlerLock\")
+"
+	    classrelation_ref 396546 // mHandler (<unidirectional association>)
+	  b parent class_ref 312578 // JobHandler
+      end
+
+      attribute 1214082 "mBinder"
+	package explicit_type "IJobService"
+	init_value " new IJobService.Stub() {
+        @Override
+        public void startJob(JobParameters jobParams) {
+            ensureHandler();
+            Message m = Message.obtain(mHandler, MSG_EXECUTE_JOB, jobParams);
+            m.sendToTarget();
+        }
+        @Override
+        public void stopJob(JobParameters jobParams) {
+            ensureHandler();
+            Message m = Message.obtain(mHandler, MSG_STOP_JOB, jobParams);
+            m.sendToTarget();
+        }
+    }"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Binder for this service. "
+      end
+
+      operation 1820930 "ensureHandler"
+	package explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment " @hide "
+      end
+
+      operation 1821570 "onBind"
+	public explicit_return_type "IBinder"
+	nparams 1
+	  param inout name "intent" explicit_type "Intent"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent final java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment " @hide "
+      end
+
+      operation 1821698 "onStartJob"
+	abstract public explicit_return_type "boolean"
+	nparams 1
+	  param inout name "params" type class_ref 312322 // JobParameters
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Override this method with the callback logic for your job. Any such logic needs to be
+performed on a separate thread, as this function is executed on your application's main
+thread.
+
+@param params Parameters specifying info about this job, including the extras bundle you
+              optionally provided at job-creation time.
+@return True if your service needs to process the work (on a separate thread). False if
+there's no more work to be done for this job."
+      end
+
+      operation 1821826 "onStopJob"
+	abstract public explicit_return_type "boolean"
+	nparams 1
+	  param inout name "params" type class_ref 312322 // JobParameters
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This method is called if the system has determined that you must stop execution of your job
+even before you've had a chance to call {@link #jobFinished(JobParameters, boolean)}.
+
+<p>This will happen if the requirements specified at schedule time are no longer met. For
+example you may have requested WiFi with
+{@link android.app.job.JobInfo.Builder#setRequiredNetworkType(int)}, yet while your
+job was executing the user toggled WiFi. Another example is if you had specified
+{@link android.app.job.JobInfo.Builder#setRequiresDeviceIdle(boolean)}, and the phone left its
+idle maintenance window. You are solely responsible for the behaviour of your application
+upon receipt of this message; your app will likely start to misbehave if you ignore it. One
+immediate repercussion is that the system will cease holding a wakelock for you.</p>
+
+@param params Parameters specifying info about this job.
+@return True to indicate to the JobManager whether you'd like to reschedule this job based
+on the retry criteria provided at job creation-time. False to drop the job. Regardless of
+the value returned, your job must stop executing."
+      end
+
+      operation 1821954 "jobFinished"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "params" type class_ref 312322 // JobParameters
+	  param inout name "needsReschedule" explicit_type "boolean"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	preserve_java_body_indent final java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Callback to inform the JobManager you've finished executing. This can be called from any
+thread, as it will ultimately be run on your application's main thread. When the system
+receives this message it will release the wakelock being held.
+<p>
+    You can specify post-execution behaviour to the scheduler here with
+    <code>needsReschedule </code>. This will apply a back-off timer to your job based on
+    the default, or what was set with
+    {@link android.app.job.JobInfo.Builder#setBackoffCriteria(long, int)}. The original
+    requirements are always honoured even for a backed-off job. Note that a job running in
+    idle mode will not be backed-off. Instead what will happen is the job will be re-added
+    to the queue and re-executed within a future idle maintenance window.
+</p>
+
+@param params Parameters specifying system-provided info about this job, this was given to
+              your application in {@link #onStartJob(JobParameters)}.
+@param needsReschedule True if this job should be rescheduled according to the back-off
+                       criteria specified at schedule-time. False otherwise."
+      end
+    end
+  end
+
+  deploymentview 149890 "job"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 191874 "JobScheduler"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import android.content.Context;
+${definition}"
+      associated_classes
+	class_ref 294786 // JobScheduler
+      end
+      comment "Copyright (C) 2014 The Android Open Source Project
+
+Licensed under the Apache License, Version 2.0 (the \"License\");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an \"AS IS\" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License"
+    end
+
+    artifact 200194 "JobInfo"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+import android.content.ComponentName;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
+${definition}"
+      associated_classes
+	class_ref 294914 // JobInfo
+      end
+      comment "Copyright (C) 2014 The Android Open Source Project
+
+Licensed under the Apache License, Version 2.0 (the \"License\");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an \"AS IS\" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License"
+    end
+
+    artifact 200322 "JobParameters"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+import android.app.job.IJobCallback;
+import android.app.job.IJobCallback.Stub;
+import android.os.IBinder;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
+${definition}"
+      associated_classes
+	class_ref 312322 // JobParameters
+      end
+      comment "Copyright (C) 2014 The Android Open Source Project
+
+Licensed under the Apache License, Version 2.0 (the \"License\");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an \"AS IS\" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License"
+    end
+
+    artifact 200450 "JobService"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      java_src "${comment}
+${package}
+${imports}
+import android.app.Service;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.RemoteException;
+import android.util.Log;
+import com.android.internal.annotations.GuardedBy;
+${definition}"
+      associated_classes
+	class_ref 312450 // JobService
+      end
+      comment "Copyright (C) 2014 The Android Open Source Project
+
+Licensed under the Apache License, Version 2.0 (the \"License\");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an \"AS IS\" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License"
+    end
+  end
+end

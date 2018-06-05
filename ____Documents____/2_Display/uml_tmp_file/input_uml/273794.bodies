@@ -1,0 +1,74 @@
+class VoiceInteractor
+!!!1759874.java!!!	VoiceInteractor(inout interactor : IVoiceInteractor, inout context : Context, inout activity : Activity, inout looper : Looper)
+        mInteractor = interactor;
+        mContext = context;
+        mActivity = activity;
+        mHandlerCaller = new HandlerCaller(context, looper, mHandlerCallerCallback, true);
+!!!1760002.java!!!	pullRequest(inout request : IVoiceInteractorRequest, inout complete : boolean) : VoiceInteractor::Request
+        synchronized (mActiveRequests) {
+            Request req = mActiveRequests.get(request.asBinder());
+            if (req != null && complete) {
+                mActiveRequests.remove(request.asBinder());
+            }
+            return req;
+        }
+!!!1760130.java!!!	makeRequestList() : VoiceInteractor::Request
+        final int N = mActiveRequests.size();
+        if (N < 1) {
+            return null;
+        }
+        ArrayList<Request> list = new ArrayList<Request>(N);
+        for (int i=0; i<N; i++) {
+            list.add(mActiveRequests.valueAt(i));
+        }
+        return list;
+!!!1760258.java!!!	attachActivity(inout activity : Activity) : void
+        if (mActivity == activity) {
+            return;
+        }
+        mContext = activity;
+        mActivity = activity;
+        ArrayList<Request> reqs = makeRequestList();
+        if (reqs != null) {
+            for (int i=0; i<reqs.size(); i++) {
+                Request req = reqs.get(i);
+                req.mContext = activity;
+                req.mActivity = activity;
+                req.onAttached(activity);
+            }
+        }
+!!!1760386.java!!!	detachActivity() : void
+        ArrayList<Request> reqs = makeRequestList();
+        if (reqs != null) {
+            for (int i=0; i<reqs.size(); i++) {
+                Request req = reqs.get(i);
+                req.onDetached();
+                req.mActivity = null;
+                req.mContext = null;
+            }
+        }
+        mContext = null;
+        mActivity = null;
+!!!1760514.java!!!	submitRequest(inout request : VoiceInteractor::Request) : boolean
+        try {
+            IVoiceInteractorRequest ireq = request.submit(mInteractor,
+                    mContext.getOpPackageName(), mCallback);
+            request.mRequestInterface = ireq;
+            request.mContext = mContext;
+            request.mActivity = mActivity;
+            synchronized (mActiveRequests) {
+                mActiveRequests.put(ireq.asBinder(), request);
+            }
+            return true;
+        } catch (RemoteException e) {
+            Log.w(TAG, "Remove voice interactor service died", e);
+            return false;
+        }
+!!!1760642.java!!!	supportsCommands(inout commands : String) : boolean
+        try {
+            boolean[] res = mInteractor.supportsCommands(mContext.getOpPackageName(), commands);
+            if (DEBUG) Log.d(TAG, "supportsCommands: cmds=" + commands + " res=" + res);
+            return res;
+        } catch (RemoteException e) {
+            throw new RuntimeException("Voice interactor has died", e);
+        }

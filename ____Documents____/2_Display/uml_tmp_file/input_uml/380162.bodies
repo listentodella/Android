@@ -1,0 +1,9 @@
+class MutableInt
+!!!2307842.java!!!	MutableInt()
+            reset();
+!!!2307970.java!!!	MutableInt(in value : int)
+            this.value = value;
+!!!2308098.java!!!	reset() : void
+            value = Integer.MIN_VALUE;
+!!!2308226.java!!!	toString() : String
+            return Integer.toString(value);

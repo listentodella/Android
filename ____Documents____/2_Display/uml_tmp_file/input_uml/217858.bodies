@@ -1,0 +1,9 @@
+class AttachInfo
+!!!694530.java!!!	AttachInfo(inout session : IWindowSession, inout window : IWindow, inout display : Display, inout viewRootImpl : ViewRootImpl, inout handler : Handler, inout effectPlayer : View::AttachInfo::Callbacks)
+            mSession = session;
+            mWindow = window;
+            mWindowToken = window.asBinder();
+            mDisplay = display;
+            mViewRootImpl = viewRootImpl;
+            mHandler = handler;
+            mRootCallbacks = effectPlayer;

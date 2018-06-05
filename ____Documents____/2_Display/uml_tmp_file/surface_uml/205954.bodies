@@ -1,0 +1,21 @@
+class Region
+!!!353410.cpp!!!	operator |(in rhs : Region) : Region
+    return merge(rhs);
+!!!353538.cpp!!!	operator ^(in rhs : Region) : Region
+    return mergeExclusive(rhs);
+!!!353666.cpp!!!	operator &(in rhs : Region) : Region
+    return intersect(rhs);
+!!!353794.cpp!!!	operator -(in rhs : Region) : Region
+    return subtract(rhs);
+!!!353922.cpp!!!	operator +(in pt : Point) : Region
+    return translate(pt.x, pt.y);
+!!!354050.cpp!!!	operator |=(in rhs : Region) : Region
+    return orSelf(rhs);
+!!!354178.cpp!!!	operator ^=(in rhs : Region) : Region
+    return xorSelf(rhs);
+!!!354306.cpp!!!	operator &=(in rhs : Region) : Region
+    return andSelf(rhs);
+!!!354434.cpp!!!	operator -=(in rhs : Region) : Region
+    return subtractSelf(rhs);
+!!!354562.cpp!!!	operator +=(in pt : Point) : Region
+    return translateSelf(pt.x, pt.y);

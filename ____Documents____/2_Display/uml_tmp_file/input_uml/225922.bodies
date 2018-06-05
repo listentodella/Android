@@ -1,0 +1,72 @@
+class InputEventReceiver
+!!!745346.java!!!	InputEventReceiver(inout inputChannel : InputChannel, inout looper : Looper)
+        if (inputChannel == null) {
+            throw new IllegalArgumentException("inputChannel must not be null");
+        }
+        if (looper == null) {
+            throw new IllegalArgumentException("looper must not be null");
+        }
+
+        mInputChannel = inputChannel;
+        mMessageQueue = looper.getQueue();
+        mReceiverPtr = nativeInit(new WeakReference<InputEventReceiver>(this),
+                inputChannel, mMessageQueue);
+
+        mCloseGuard.open("dispose");
+!!!745474.java!!!	finalize() : void
+        try {
+            dispose(true);
+        } finally {
+            super.finalize();
+        }
+!!!745602.java!!!	dispose() : void
+        dispose(false);
+!!!745730.java!!!	dispose(inout finalized : boolean) : void
+        if (mCloseGuard != null) {
+            if (finalized) {
+                mCloseGuard.warnIfOpen();
+            }
+            mCloseGuard.close();
+        }
+
+        if (mReceiverPtr != 0) {
+            nativeDispose(mReceiverPtr);
+            mReceiverPtr = 0;
+        }
+        mInputChannel = null;
+        mMessageQueue = null;
+!!!745858.java!!!	onInputEvent(inout event : InputEvent) : void
+        finishInputEvent(event, false);
+!!!745986.java!!!	onBatchedInputEventPending() : void
+        consumeBatchedInputEvents(-1);
+!!!746114.java!!!	finishInputEvent(inout event : InputEvent, inout handled : boolean) : void
+        if (event == null) {
+            throw new IllegalArgumentException("event must not be null");
+        }
+        if (mReceiverPtr == 0) {
+            Log.w(TAG, "Attempted to finish an input event but the input event "
+                    + "receiver has already been disposed.");
+        } else {
+            int index = mSeqMap.indexOfKey(event.getSequenceNumber());
+            if (index < 0) {
+                Log.w(TAG, "Attempted to finish an input event that is not in progress.");
+            } else {
+                int seq = mSeqMap.valueAt(index);
+                mSeqMap.removeAt(index);
+                nativeFinishInputEvent(mReceiverPtr, seq, handled);
+            }
+        }
+        event.recycleIfNeededAfterDispatch();
+!!!746242.java!!!	consumeBatchedInputEvents(in frameTimeNanos : long) : boolean
+        if (mReceiverPtr == 0) {
+            Log.w(TAG, "Attempted to consume batched input events but the input event "
+                    + "receiver has already been disposed.");
+        } else {
+            return nativeConsumeBatchedInputEvents(mReceiverPtr, frameTimeNanos);
+        }
+        return false;
+!!!746370.java!!!	dispatchInputEvent(in seq : int, inout event : InputEvent) : void
+        mSeqMap.put(event.getSequenceNumber(), seq);
+        onInputEvent(event);
+!!!746498.java!!!	dispatchBatchedInputEventPending() : void
+        onBatchedInputEventPending();

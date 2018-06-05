@@ -1,0 +1,3 @@
+class EventLoggingReporter
+!!!1462146.java!!!	report(in code : int, inout  : Object...list) : void
+            EventLog.writeEvent(code, list);

@@ -1,0 +1,26 @@
+class Mesh
+!!!229634.cpp!!!	Mesh(in primitive : Mesh::Primitive, in vertexCount : size_t, in vertexSize : size_t, in texCoordSize : size_t = 0)
+    mVertices = new float[(vertexSize + texCoordSize) * vertexCount];
+    mStride = mVertexSize + mTexCoordsSize;
+!!!229762.cpp!!!	~Mesh()
+    delete [] mVertices;
+!!!230530.cpp!!!	getPrimitive() : Mesh::Primitive
+    return mPrimitive;
+!!!230658.cpp!!!	getPositions() : float
+    return mVertices;
+!!!230786.cpp!!!	getTexCoords() : float
+    return mVertices + mVertexSize;
+!!!230914.cpp!!!	getVertexCount() : size_t
+    return mVertexCount;
+!!!231042.cpp!!!	getVertexSize() : size_t
+    return mVertexSize;
+!!!231170.cpp!!!	getTexCoordsSize() : size_t
+    return mTexCoordsSize;
+!!!231298.cpp!!!	getByteStride() : size_t
+    return mStride*sizeof(float);
+!!!231426.cpp!!!	getStride() : size_t
+    return mStride;
+!!!231938.cpp!!!	getPositions() : float
+    return mVertices;
+!!!232066.cpp!!!	getTexCoords() : float
+    return mVertices + mVertexSize;

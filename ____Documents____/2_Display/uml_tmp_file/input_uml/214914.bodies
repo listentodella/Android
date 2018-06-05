@@ -1,0 +1,15 @@
+class FocusFinderHelper
+!!!579970.java!!!	FocusFinderHelper(inout focusFinder : FocusFinder)
+        mFocusFinder = focusFinder;
+!!!580098.java!!!	isBetterCandidate(in direction : int, inout source : Rect, inout rect1 : Rect, inout rect2 : Rect) : boolean
+        return mFocusFinder.isBetterCandidate(direction, source, rect1, rect2);
+!!!580226.java!!!	beamBeats(in direction : int, inout source : Rect, inout rect1 : Rect, inout rect2 : Rect) : boolean
+        return mFocusFinder.beamBeats(direction, source, rect1, rect2);
+!!!580354.java!!!	isCandidate(inout srcRect : Rect, inout destRect : Rect, in direction : int) : boolean
+        return mFocusFinder.isCandidate(srcRect, destRect, direction);
+!!!580482.java!!!	beamsOverlap(in direction : int, inout rect1 : Rect, inout rect2 : Rect) : boolean
+        return mFocusFinder.beamsOverlap(direction, rect1, rect2);
+!!!580610.java!!!	majorAxisDistance(in direction : int, inout source : Rect, inout dest : Rect) : int
+        return FocusFinder.majorAxisDistance(direction, source, dest);
+!!!580738.java!!!	majorAxisDistanceToFarEdge(in direction : int, inout source : Rect, inout dest : Rect) : int
+        return FocusFinder.majorAxisDistanceToFarEdge(direction, source, dest);

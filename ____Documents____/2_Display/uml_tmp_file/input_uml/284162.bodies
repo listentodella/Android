@@ -1,0 +1,5 @@
+class FixedEpicenterCallback
+!!!1468162.java!!!	setEpicenter(inout epicenter : Rect) : void
+ mEpicenter = epicenter;
+!!!1468290.java!!!	onGetEpicenter(inout transition : Transition) : Rect
+            return mEpicenter;

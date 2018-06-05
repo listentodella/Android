@@ -1,0 +1,707 @@
+class Fragment
+!!!1585026.java!!!	instantiate(inout context : Context, in fname : String) : Fragment
+        return instantiate(context, fname, null);
+!!!1585154.java!!!	instantiate(inout context : Context, in fname : String, inout args : Bundle) : Fragment
+        try {
+            Class<?> clazz = sClassMap.get(fname);
+            if (clazz == null) {
+                // Class not found in the cache, see if it's real, and try to add it
+                clazz = context.getClassLoader().loadClass(fname);
+                if (!Fragment.class.isAssignableFrom(clazz)) {
+                    throw new InstantiationException("Trying to instantiate a class " + fname
+                            + " that is not a Fragment", new ClassCastException());
+                }
+                sClassMap.put(fname, clazz);
+            }
+            Fragment f = (Fragment)clazz.newInstance();
+            if (args != null) {
+                args.setClassLoader(f.getClass().getClassLoader());
+                f.mArguments = args;
+            }
+            return f;
+        } catch (ClassNotFoundException e) {
+            throw new InstantiationException("Unable to instantiate fragment " + fname
+                    + ": make sure class name exists, is public, and has an"
+                    + " empty constructor that is public", e);
+        } catch (java.lang.InstantiationException e) {
+            throw new InstantiationException("Unable to instantiate fragment " + fname
+                    + ": make sure class name exists, is public, and has an"
+                    + " empty constructor that is public", e);
+        } catch (IllegalAccessException e) {
+            throw new InstantiationException("Unable to instantiate fragment " + fname
+                    + ": make sure class name exists, is public, and has an"
+                    + " empty constructor that is public", e);
+        }
+!!!1585282.java!!!	restoreViewState(inout savedInstanceState : Bundle) : void
+        if (mSavedViewState != null) {
+            mView.restoreHierarchyState(mSavedViewState);
+            mSavedViewState = null;
+        }
+        mCalled = false;
+        onViewStateRestored(savedInstanceState);
+        if (!mCalled) {
+            throw new SuperNotCalledException("Fragment " + this
+                    + " did not call through to super.onViewStateRestored()");
+        }
+!!!1585410.java!!!	setIndex(in index : int, inout parent : Fragment) : void
+        mIndex = index;
+        if (parent != null) {
+            mWho = parent.mWho + ":" + mIndex;
+        } else {
+            mWho = "android:fragment:" + mIndex;
+        }
+!!!1585538.java!!!	isInBackStack() : boolean
+        return mBackStackNesting > 0;
+!!!1585666.java!!!	equals(inout o : Object) : boolean
+        return super.equals(o);
+!!!1585794.java!!!	hashCode() : int
+        return super.hashCode();
+!!!1585922.java!!!	toString() : String
+        StringBuilder sb = new StringBuilder(128);
+        DebugUtils.buildShortClassTag(this, sb);
+        if (mIndex >= 0) {
+            sb.append(" #");
+            sb.append(mIndex);
+        }
+        if (mFragmentId != 0) {
+            sb.append(" id=0x");
+            sb.append(Integer.toHexString(mFragmentId));
+        }
+        if (mTag != null) {
+            sb.append(" ");
+            sb.append(mTag);
+        }
+        sb.append('}');
+        return sb.toString();
+!!!1586050.java!!!	getId() : int
+        return mFragmentId;
+!!!1586178.java!!!	getTag() : String
+        return mTag;
+!!!1586306.java!!!	setArguments(inout args : Bundle) : void
+        if (mIndex >= 0) {
+            throw new IllegalStateException("Fragment already active");
+        }
+        mArguments = args;
+!!!1586434.java!!!	getArguments() : Bundle
+        return mArguments;
+!!!1586562.java!!!	setInitialSavedState(inout state : Fragment::SavedState) : void
+        if (mIndex >= 0) {
+            throw new IllegalStateException("Fragment already active");
+        }
+        mSavedFragmentState = state != null && state.mState != null
+                ? state.mState : null;
+!!!1586690.java!!!	setTargetFragment(inout fragment : Fragment, in requestCode : int) : void
+        mTarget = fragment;
+        mTargetRequestCode = requestCode;
+!!!1586818.java!!!	getTargetFragment() : Fragment
+        return mTarget;
+!!!1586946.java!!!	getTargetRequestCode() : int
+        return mTargetRequestCode;
+!!!1587074.java!!!	getActivity() : Activity
+        return mActivity;
+!!!1587202.java!!!	getResources() : Resources
+        if (mActivity == null) {
+            throw new IllegalStateException("Fragment " + this + " not attached to Activity");
+        }
+        return mActivity.getResources();
+!!!1587330.java!!!	getText(in resId : int) : CharSequence
+        return getResources().getText(resId);
+!!!1587458.java!!!	getString(in resId : int) : String
+        return getResources().getString(resId);
+!!!1587586.java!!!	getString(in resId : int, inout  : Object...formatArgs) : String
+        return getResources().getString(resId, formatArgs);
+!!!1587714.java!!!	getFragmentManager() : FragmentManager
+        return mFragmentManager;
+!!!1587842.java!!!	getChildFragmentManager() : FragmentManager
+        if (mChildFragmentManager == null) {
+            instantiateChildFragmentManager();
+            if (mState >= RESUMED) {
+                mChildFragmentManager.dispatchResume();
+            } else if (mState >= STARTED) {
+                mChildFragmentManager.dispatchStart();
+            } else if (mState >= ACTIVITY_CREATED) {
+                mChildFragmentManager.dispatchActivityCreated();
+            } else if (mState >= CREATED) {
+                mChildFragmentManager.dispatchCreate();
+            }
+        }
+        return mChildFragmentManager;
+!!!1587970.java!!!	getParentFragment() : Fragment
+        return mParentFragment;
+!!!1588098.java!!!	isAdded() : boolean
+        return mActivity != null && mAdded;
+!!!1588226.java!!!	isDetached() : boolean
+        return mDetached;
+!!!1588354.java!!!	isRemoving() : boolean
+        return mRemoving;
+!!!1588482.java!!!	isInLayout() : boolean
+        return mInLayout;
+!!!1588610.java!!!	isResumed() : boolean
+        return mResumed;
+!!!1588738.java!!!	isVisible() : boolean
+        return isAdded() && !isHidden() && mView != null
+                && mView.getWindowToken() != null && mView.getVisibility() == View.VISIBLE;
+!!!1588866.java!!!	isHidden() : boolean
+        return mHidden;
+!!!1589122.java!!!	setRetainInstance(inout retain : boolean) : void
+        if (retain && mParentFragment != null) {
+            throw new IllegalStateException(
+                    "Can't retain fragements that are nested in other fragments");
+        }
+        mRetainInstance = retain;
+!!!1589250.java!!!	getRetainInstance() : boolean
+        return mRetainInstance;
+!!!1589378.java!!!	setHasOptionsMenu(inout hasMenu : boolean) : void
+        if (mHasMenu != hasMenu) {
+            mHasMenu = hasMenu;
+            if (isAdded() && !isHidden()) {
+                mFragmentManager.invalidateOptionsMenu();
+            }
+        }
+!!!1589506.java!!!	setMenuVisibility(inout menuVisible : boolean) : void
+        if (mMenuVisible != menuVisible) {
+            mMenuVisible = menuVisible;
+            if (mHasMenu && isAdded() && !isHidden()) {
+                mFragmentManager.invalidateOptionsMenu();
+            }
+        }
+!!!1589634.java!!!	setUserVisibleHint(inout isVisibleToUser : boolean) : void
+        if (!mUserVisibleHint && isVisibleToUser && mState < STARTED) {
+            mFragmentManager.performPendingDeferredStart(this);
+        }
+        mUserVisibleHint = isVisibleToUser;
+        mDeferStart = !isVisibleToUser;
+!!!1589762.java!!!	getUserVisibleHint() : boolean
+        return mUserVisibleHint;
+!!!1589890.java!!!	getLoaderManager() : LoaderManager
+        if (mLoaderManager != null) {
+            return mLoaderManager;
+        }
+        if (mActivity == null) {
+            throw new IllegalStateException("Fragment " + this + " not attached to Activity");
+        }
+        mCheckedForLoaderManager = true;
+        mLoaderManager = mActivity.getLoaderManager(mWho, mLoadersStarted, true);
+        return mLoaderManager;
+!!!1590018.java!!!	startActivity(inout intent : Intent) : void
+        startActivity(intent, null);
+!!!1590146.java!!!	startActivity(inout intent : Intent, inout options : Bundle) : void
+        if (mActivity == null) {
+            throw new IllegalStateException("Fragment " + this + " not attached to Activity");
+        }
+        if (options != null) {
+            mActivity.startActivityFromFragment(this, intent, -1, options);
+        } else {
+            // Note we want to go through this call for compatibility with
+            // applications that may have overridden the method.
+            mActivity.startActivityFromFragment(this, intent, -1);
+        }
+!!!1590274.java!!!	startActivityForResult(inout intent : Intent, in requestCode : int) : void
+        startActivityForResult(intent, requestCode, null);
+!!!1590402.java!!!	startActivityForResult(inout intent : Intent, in requestCode : int, inout options : Bundle) : void
+        if (mActivity == null) {
+            throw new IllegalStateException("Fragment " + this + " not attached to Activity");
+        }
+        if (options != null) {
+            mActivity.startActivityFromFragment(this, intent, requestCode, options);
+        } else {
+            // Note we want to go through this call for compatibility with
+            // applications that may have overridden the method.
+            mActivity.startActivityFromFragment(this, intent, requestCode, options);
+        }
+!!!1590658.java!!!	getLayoutInflater(inout savedInstanceState : Bundle) : LayoutInflater
+        // Newer platform versions use the child fragment manager's LayoutInflaterFactory.
+        if (mActivity.getApplicationInfo().targetSdkVersion >= Build.VERSION_CODES.LOLLIPOP) {
+            LayoutInflater result = mActivity.getLayoutInflater().cloneInContext(mActivity);
+            getChildFragmentManager(); // Init if needed; use raw implementation below.
+            result.setPrivateFactory(mChildFragmentManager.getLayoutInflaterFactory());
+            return result;
+        } else {
+            return mActivity.getLayoutInflater();
+        }
+!!!1590786.java!!!	onInflate(inout attrs : AttributeSet, inout savedInstanceState : Bundle) : void
+        mCalled = true;
+!!!1590914.java!!!	onInflate(inout activity : Activity, inout attrs : AttributeSet, inout savedInstanceState : Bundle) : void
+        onInflate(attrs, savedInstanceState);
+        mCalled = true;
+
+        TypedArray a = activity.obtainStyledAttributes(attrs,
+                com.android.internal.R.styleable.Fragment);
+        mEnterTransition = loadTransition(activity, a, mEnterTransition, null,
+                com.android.internal.R.styleable.Fragment_fragmentEnterTransition);
+        mReturnTransition = loadTransition(activity, a, mReturnTransition, USE_DEFAULT_TRANSITION,
+                com.android.internal.R.styleable.Fragment_fragmentReturnTransition);
+        mExitTransition = loadTransition(activity, a, mExitTransition, null,
+                com.android.internal.R.styleable.Fragment_fragmentExitTransition);
+        mReenterTransition = loadTransition(activity, a, mReenterTransition, USE_DEFAULT_TRANSITION,
+                com.android.internal.R.styleable.Fragment_fragmentReenterTransition);
+        mSharedElementEnterTransition = loadTransition(activity, a, mSharedElementEnterTransition,
+                null, com.android.internal.R.styleable.Fragment_fragmentSharedElementEnterTransition);
+        mSharedElementReturnTransition = loadTransition(activity, a, mSharedElementReturnTransition,
+                USE_DEFAULT_TRANSITION,
+                com.android.internal.R.styleable.Fragment_fragmentSharedElementReturnTransition);
+        if (mAllowEnterTransitionOverlap == null) {
+            mAllowEnterTransitionOverlap = a.getBoolean(
+                    com.android.internal.R.styleable.Fragment_fragmentAllowEnterTransitionOverlap, true);
+        }
+        if (mAllowReturnTransitionOverlap == null) {
+            mAllowReturnTransitionOverlap = a.getBoolean(
+                    com.android.internal.R.styleable.Fragment_fragmentAllowReturnTransitionOverlap, true);
+        }
+        a.recycle();
+!!!1591042.java!!!	onAttach(inout activity : Activity) : void
+        mCalled = true;
+!!!1591170.java!!!	onCreateAnimator(in transit : int, inout enter : boolean, in nextAnim : int) : Animator
+        return null;
+!!!1591298.java!!!	onCreate(inout savedInstanceState : Bundle) : void
+        mCalled = true;
+!!!1591426.java!!!	onCreateView(inout inflater : LayoutInflater, inout container : ViewGroup, inout savedInstanceState : Bundle) : View
+        return null;
+!!!1591682.java!!!	getView() : View
+        return mView;
+!!!1591810.java!!!	onActivityCreated(inout savedInstanceState : Bundle) : void
+        mCalled = true;
+!!!1591938.java!!!	onViewStateRestored(inout savedInstanceState : Bundle) : void
+        mCalled = true;
+!!!1592066.java!!!	onStart() : void
+        mCalled = true;
+
+        if (!mLoadersStarted) {
+            mLoadersStarted = true;
+            if (!mCheckedForLoaderManager) {
+                mCheckedForLoaderManager = true;
+                mLoaderManager = mActivity.getLoaderManager(mWho, mLoadersStarted, false);
+            }
+            if (mLoaderManager != null) {
+                mLoaderManager.doStart();
+            }
+        }
+!!!1592194.java!!!	onResume() : void
+        mCalled = true;
+!!!1592450.java!!!	onConfigurationChanged(inout newConfig : Configuration) : void
+        mCalled = true;
+!!!1592578.java!!!	onPause() : void
+        mCalled = true;
+!!!1592706.java!!!	onStop() : void
+        mCalled = true;
+!!!1592834.java!!!	onLowMemory() : void
+        mCalled = true;
+!!!1592962.java!!!	onTrimMemory(in level : int) : void
+        mCalled = true;
+!!!1593090.java!!!	onDestroyView() : void
+        mCalled = true;
+!!!1593218.java!!!	onDestroy() : void
+        mCalled = true;
+        //Log.v("foo", "onDestroy: mCheckedForLoaderManager=" + mCheckedForLoaderManager
+        //        + " mLoaderManager=" + mLoaderManager);
+        if (!mCheckedForLoaderManager) {
+            mCheckedForLoaderManager = true;
+            mLoaderManager = mActivity.getLoaderManager(mWho, mLoadersStarted, false);
+        }
+        if (mLoaderManager != null) {
+            mLoaderManager.doDestroy();
+        }
+!!!1593346.java!!!	initState() : void
+        mIndex = -1;
+        mWho = null;
+        mAdded = false;
+        mRemoving = false;
+        mResumed = false;
+        mFromLayout = false;
+        mInLayout = false;
+        mRestored = false;
+        mBackStackNesting = 0;
+        mFragmentManager = null;
+        mChildFragmentManager = null;
+        mActivity = null;
+        mFragmentId = 0;
+        mContainerId = 0;
+        mTag = null;
+        mHidden = false;
+        mDetached = false;
+        mRetaining = false;
+        mLoaderManager = null;
+        mLoadersStarted = false;
+        mCheckedForLoaderManager = false;
+!!!1593474.java!!!	onDetach() : void
+        mCalled = true;
+!!!1593986.java!!!	onOptionsItemSelected(inout item : MenuItem) : boolean
+        return false;
+!!!1594242.java!!!	onCreateContextMenu(inout menu : ContextMenu, inout v : View, inout menuInfo : ContextMenu::ContextMenuInfo) : void
+        getActivity().onCreateContextMenu(menu, v, menuInfo);
+!!!1594370.java!!!	registerForContextMenu(inout view : View) : void
+        view.setOnCreateContextMenuListener(this);
+!!!1594498.java!!!	unregisterForContextMenu(inout view : View) : void
+        view.setOnCreateContextMenuListener(null);
+!!!1594626.java!!!	onContextItemSelected(inout item : MenuItem) : boolean
+        return false;
+!!!1594754.java!!!	setEnterSharedElementCallback(inout callback : SharedElementCallback) : void
+        if (callback == null) {
+            callback = SharedElementCallback.NULL_CALLBACK;
+        }
+        mEnterTransitionCallback = callback;
+!!!1594882.java!!!	setEnterSharedElementTransitionCallback(inout callback : SharedElementCallback) : void
+        setEnterSharedElementCallback(callback);
+!!!1595010.java!!!	setExitSharedElementCallback(inout callback : SharedElementCallback) : void
+        if (callback == null) {
+            callback = SharedElementCallback.NULL_CALLBACK;
+        }
+        mExitTransitionCallback = callback;
+!!!1595138.java!!!	setExitSharedElementTransitionCallback(inout callback : SharedElementCallback) : void
+        setExitSharedElementCallback(callback);
+!!!1595266.java!!!	setEnterTransition(inout transition : Transition) : void
+        mEnterTransition = transition;
+!!!1595394.java!!!	getEnterTransition() : Transition
+        return mEnterTransition;
+!!!1595522.java!!!	setReturnTransition(inout transition : Transition) : void
+        mReturnTransition = transition;
+!!!1595650.java!!!	getReturnTransition() : Transition
+        return mReturnTransition == USE_DEFAULT_TRANSITION ? getEnterTransition()
+                : mReturnTransition;
+!!!1595778.java!!!	setExitTransition(inout transition : Transition) : void
+        mExitTransition = transition;
+!!!1595906.java!!!	getExitTransition() : Transition
+        return mExitTransition;
+!!!1596034.java!!!	setReenterTransition(inout transition : Transition) : void
+        mReenterTransition = transition;
+!!!1596162.java!!!	getReenterTransition() : Transition
+        return mReenterTransition == USE_DEFAULT_TRANSITION ? getExitTransition()
+                : mReenterTransition;
+!!!1596290.java!!!	setSharedElementEnterTransition(inout transition : Transition) : void
+        mSharedElementEnterTransition = transition;
+!!!1596418.java!!!	getSharedElementEnterTransition() : Transition
+        return mSharedElementEnterTransition;
+!!!1596546.java!!!	setSharedElementReturnTransition(inout transition : Transition) : void
+        mSharedElementReturnTransition = transition;
+!!!1596674.java!!!	getSharedElementReturnTransition() : Transition
+        return mSharedElementReturnTransition == USE_DEFAULT_TRANSITION ?
+                getSharedElementEnterTransition() : mSharedElementReturnTransition;
+!!!1596802.java!!!	setAllowEnterTransitionOverlap(inout allow : boolean) : void
+        mAllowEnterTransitionOverlap = allow;
+!!!1596930.java!!!	getAllowEnterTransitionOverlap() : boolean
+        return (mAllowEnterTransitionOverlap == null) ? true : mAllowEnterTransitionOverlap;
+!!!1597058.java!!!	setAllowReturnTransitionOverlap(inout allow : boolean) : void
+        mAllowReturnTransitionOverlap = allow;
+!!!1597186.java!!!	getAllowReturnTransitionOverlap() : boolean
+        return (mAllowReturnTransitionOverlap == null) ? true : mAllowReturnTransitionOverlap;
+!!!1597314.java!!!	dump(in prefix : String, inout fd : FileDescriptor, inout writer : PrintWriter, inout args : String) : void
+        writer.print(prefix); writer.print("mFragmentId=#");
+        writer.print(Integer.toHexString(mFragmentId));
+        writer.print(" mContainerId=#");
+        writer.print(Integer.toHexString(mContainerId));
+        writer.print(" mTag="); writer.println(mTag);
+        writer.print(prefix); writer.print("mState="); writer.print(mState);
+        writer.print(" mIndex="); writer.print(mIndex);
+        writer.print(" mWho="); writer.print(mWho);
+        writer.print(" mBackStackNesting="); writer.println(mBackStackNesting);
+        writer.print(prefix); writer.print("mAdded="); writer.print(mAdded);
+        writer.print(" mRemoving="); writer.print(mRemoving);
+        writer.print(" mResumed="); writer.print(mResumed);
+        writer.print(" mFromLayout="); writer.print(mFromLayout);
+        writer.print(" mInLayout="); writer.println(mInLayout);
+        writer.print(prefix); writer.print("mHidden="); writer.print(mHidden);
+        writer.print(" mDetached="); writer.print(mDetached);
+        writer.print(" mMenuVisible="); writer.print(mMenuVisible);
+        writer.print(" mHasMenu="); writer.println(mHasMenu);
+        writer.print(prefix); writer.print("mRetainInstance="); writer.print(mRetainInstance);
+        writer.print(" mRetaining="); writer.print(mRetaining);
+        writer.print(" mUserVisibleHint="); writer.println(mUserVisibleHint);
+        if (mFragmentManager != null) {
+            writer.print(prefix); writer.print("mFragmentManager=");
+            writer.println(mFragmentManager);
+        }
+        if (mActivity != null) {
+            writer.print(prefix); writer.print("mActivity=");
+            writer.println(mActivity);
+        }
+        if (mParentFragment != null) {
+            writer.print(prefix); writer.print("mParentFragment=");
+            writer.println(mParentFragment);
+        }
+        if (mArguments != null) {
+            writer.print(prefix); writer.print("mArguments="); writer.println(mArguments);
+        }
+        if (mSavedFragmentState != null) {
+            writer.print(prefix); writer.print("mSavedFragmentState=");
+            writer.println(mSavedFragmentState);
+        }
+        if (mSavedViewState != null) {
+            writer.print(prefix); writer.print("mSavedViewState=");
+            writer.println(mSavedViewState);
+        }
+        if (mTarget != null) {
+            writer.print(prefix); writer.print("mTarget="); writer.print(mTarget);
+            writer.print(" mTargetRequestCode=");
+            writer.println(mTargetRequestCode);
+        }
+        if (mNextAnim != 0) {
+            writer.print(prefix); writer.print("mNextAnim="); writer.println(mNextAnim);
+        }
+        if (mContainer != null) {
+            writer.print(prefix); writer.print("mContainer="); writer.println(mContainer);
+        }
+        if (mView != null) {
+            writer.print(prefix); writer.print("mView="); writer.println(mView);
+        }
+        if (mAnimatingAway != null) {
+            writer.print(prefix); writer.print("mAnimatingAway="); writer.println(mAnimatingAway);
+            writer.print(prefix); writer.print("mStateAfterAnimating=");
+            writer.println(mStateAfterAnimating);
+        }
+        if (mLoaderManager != null) {
+            writer.print(prefix); writer.println("Loader Manager:");
+            mLoaderManager.dump(prefix + "  ", fd, writer, args);
+        }
+        if (mChildFragmentManager != null) {
+            writer.print(prefix); writer.println("Child " + mChildFragmentManager + ":");
+            mChildFragmentManager.dump(prefix + "  ", fd, writer, args);
+        }
+!!!1597442.java!!!	findFragmentByWho(in who : String) : Fragment
+        if (who.equals(mWho)) {
+            return this;
+        }
+        if (mChildFragmentManager != null) {
+            return mChildFragmentManager.findFragmentByWho(who);
+        }
+        return null;
+!!!1597570.java!!!	instantiateChildFragmentManager() : void
+        mChildFragmentManager = new FragmentManagerImpl();
+        mChildFragmentManager.attachActivity(mActivity, new FragmentContainer() {
+            @Override
+            public View findViewById(int id) {
+                if (mView == null) {
+                    throw new IllegalStateException("Fragment does not have a view");
+                }
+                return mView.findViewById(id);
+            }
+
+            @Override
+            public boolean hasView() {
+                return (mView != null);
+            }
+        }, this);
+!!!1597698.java!!!	performCreate(inout savedInstanceState : Bundle) : void
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.noteStateNotSaved();
+        }
+        mCalled = false;
+        onCreate(savedInstanceState);
+        if (!mCalled) {
+            throw new SuperNotCalledException("Fragment " + this
+                    + " did not call through to super.onCreate()");
+        }
+        if (savedInstanceState != null) {
+            Parcelable p = savedInstanceState.getParcelable(Activity.FRAGMENTS_TAG);
+            if (p != null) {
+                if (mChildFragmentManager == null) {
+                    instantiateChildFragmentManager();
+                }
+                mChildFragmentManager.restoreAllState(p, null);
+                mChildFragmentManager.dispatchCreate();
+            }
+        }
+!!!1597826.java!!!	performCreateView(inout inflater : LayoutInflater, inout container : ViewGroup, inout savedInstanceState : Bundle) : View
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.noteStateNotSaved();
+        }
+        return onCreateView(inflater, container, savedInstanceState);
+!!!1597954.java!!!	performActivityCreated(inout savedInstanceState : Bundle) : void
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.noteStateNotSaved();
+        }
+        mCalled = false;
+        onActivityCreated(savedInstanceState);
+        if (!mCalled) {
+            throw new SuperNotCalledException("Fragment " + this
+                    + " did not call through to super.onActivityCreated()");
+        }
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.dispatchActivityCreated();
+        }
+!!!1598082.java!!!	performStart() : void
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.noteStateNotSaved();
+            mChildFragmentManager.execPendingActions();
+        }
+        mCalled = false;
+        onStart();
+        if (!mCalled) {
+            throw new SuperNotCalledException("Fragment " + this
+                    + " did not call through to super.onStart()");
+        }
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.dispatchStart();
+        }
+        if (mLoaderManager != null) {
+            mLoaderManager.doReportStart();
+        }
+!!!1598210.java!!!	performResume() : void
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.noteStateNotSaved();
+            mChildFragmentManager.execPendingActions();
+        }
+        mCalled = false;
+        onResume();
+        if (!mCalled) {
+            throw new SuperNotCalledException("Fragment " + this
+                    + " did not call through to super.onResume()");
+        }
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.dispatchResume();
+            mChildFragmentManager.execPendingActions();
+        }
+!!!1598338.java!!!	performConfigurationChanged(inout newConfig : Configuration) : void
+        onConfigurationChanged(newConfig);
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.dispatchConfigurationChanged(newConfig);
+        }
+!!!1598466.java!!!	performLowMemory() : void
+        onLowMemory();
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.dispatchLowMemory();
+        }
+!!!1598594.java!!!	performTrimMemory(in level : int) : void
+        onTrimMemory(level);
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.dispatchTrimMemory(level);
+        }
+!!!1598722.java!!!	performCreateOptionsMenu(inout menu : Menu, inout inflater : MenuInflater) : boolean
+        boolean show = false;
+        if (!mHidden) {
+            if (mHasMenu && mMenuVisible) {
+                show = true;
+                onCreateOptionsMenu(menu, inflater);
+            }
+            if (mChildFragmentManager != null) {
+                show |= mChildFragmentManager.dispatchCreateOptionsMenu(menu, inflater);
+            }
+        }
+        return show;
+!!!1598850.java!!!	performPrepareOptionsMenu(inout menu : Menu) : boolean
+        boolean show = false;
+        if (!mHidden) {
+            if (mHasMenu && mMenuVisible) {
+                show = true;
+                onPrepareOptionsMenu(menu);
+            }
+            if (mChildFragmentManager != null) {
+                show |= mChildFragmentManager.dispatchPrepareOptionsMenu(menu);
+            }
+        }
+        return show;
+!!!1598978.java!!!	performOptionsItemSelected(inout item : MenuItem) : boolean
+        if (!mHidden) {
+            if (mHasMenu && mMenuVisible) {
+                if (onOptionsItemSelected(item)) {
+                    return true;
+                }
+            }
+            if (mChildFragmentManager != null) {
+                if (mChildFragmentManager.dispatchOptionsItemSelected(item)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+!!!1599106.java!!!	performContextItemSelected(inout item : MenuItem) : boolean
+        if (!mHidden) {
+            if (onContextItemSelected(item)) {
+                return true;
+            }
+            if (mChildFragmentManager != null) {
+                if (mChildFragmentManager.dispatchContextItemSelected(item)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+!!!1599234.java!!!	performOptionsMenuClosed(inout menu : Menu) : void
+        if (!mHidden) {
+            if (mHasMenu && mMenuVisible) {
+                onOptionsMenuClosed(menu);
+            }
+            if (mChildFragmentManager != null) {
+                mChildFragmentManager.dispatchOptionsMenuClosed(menu);
+            }
+        }
+!!!1599362.java!!!	performSaveInstanceState(inout outState : Bundle) : void
+        onSaveInstanceState(outState);
+        if (mChildFragmentManager != null) {
+            Parcelable p = mChildFragmentManager.saveAllState();
+            if (p != null) {
+                outState.putParcelable(Activity.FRAGMENTS_TAG, p);
+            }
+        }
+!!!1599490.java!!!	performPause() : void
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.dispatchPause();
+        }
+        mCalled = false;
+        onPause();
+        if (!mCalled) {
+            throw new SuperNotCalledException("Fragment " + this
+                    + " did not call through to super.onPause()");
+        }
+!!!1599618.java!!!	performStop() : void
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.dispatchStop();
+        }
+        mCalled = false;
+        onStop();
+        if (!mCalled) {
+            throw new SuperNotCalledException("Fragment " + this
+                    + " did not call through to super.onStop()");
+        }
+
+        if (mLoadersStarted) {
+            mLoadersStarted = false;
+            if (!mCheckedForLoaderManager) {
+                mCheckedForLoaderManager = true;
+                mLoaderManager = mActivity.getLoaderManager(mWho, mLoadersStarted, false);
+            }
+            if (mLoaderManager != null) {
+                if (mActivity == null || !mActivity.mChangingConfigurations) {
+                    mLoaderManager.doStop();
+                } else {
+                    mLoaderManager.doRetain();
+                }
+            }
+        }
+!!!1599746.java!!!	performDestroyView() : void
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.dispatchDestroyView();
+        }
+        mCalled = false;
+        onDestroyView();
+        if (!mCalled) {
+            throw new SuperNotCalledException("Fragment " + this
+                    + " did not call through to super.onDestroyView()");
+        }
+        if (mLoaderManager != null) {
+            mLoaderManager.doReportNextStart();
+        }
+!!!1599874.java!!!	performDestroy() : void
+        if (mChildFragmentManager != null) {
+            mChildFragmentManager.dispatchDestroy();
+        }
+        mCalled = false;
+        onDestroy();
+        if (!mCalled) {
+            throw new SuperNotCalledException("Fragment " + this
+                    + " did not call through to super.onDestroy()");
+        }
+!!!1600002.java!!!	loadTransition(inout context : Context, inout typedArray : TypedArray, inout currentValue : Transition, inout defaultValue : Transition, in id : int) : Transition
+        if (currentValue != defaultValue) {
+            return currentValue;
+        }
+        int transitionId = typedArray.getResourceId(id, 0);
+        Transition transition = defaultValue;
+        if (transitionId != 0 && transitionId != com.android.internal.R.transition.no_transition) {
+            TransitionInflater inflater = TransitionInflater.from(context);
+            transition = inflater.inflateTransition(transitionId);
+            if (transition instanceof TransitionSet &&
+                    ((TransitionSet)transition).getTransitionCount() == 0) {
+                transition = null;
+            }
+        }
+        return transition;

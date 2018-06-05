@@ -1,0 +1,21 @@
+class GroupMetadata
+!!!2264834.java!!!	obtain(in flPos : int, in lastChildFlPos : int, in gPos : int, in gId : long) : ExpandableListConnector::GroupMetadata
+            GroupMetadata gm = new GroupMetadata();
+            gm.flPos = flPos;
+            gm.lastChildFlPos = lastChildFlPos;
+            gm.gPos = gPos;
+            gm.gId = gId;
+            return gm;
+!!!2264962.java!!!	compareTo(inout another : ExpandableListConnector::GroupMetadata) : int
+            if (another == null) {
+                throw new IllegalArgumentException();
+            }
+            
+            return gPos - another.gPos;
+!!!2265090.java!!!	describeContents() : int
+            return 0;
+!!!2265218.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            dest.writeInt(flPos);
+            dest.writeInt(lastChildFlPos);
+            dest.writeInt(gPos);
+            dest.writeLong(gId);

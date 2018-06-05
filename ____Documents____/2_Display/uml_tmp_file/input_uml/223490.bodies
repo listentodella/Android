@@ -1,0 +1,33 @@
+class InternalInsetsInfo
+!!!992002.java!!!	setTouchableInsets(in val : int) : void
+            mTouchableInsets = val;
+!!!992130.java!!!	reset() : void
+            contentInsets.setEmpty();
+            visibleInsets.setEmpty();
+            touchableRegion.setEmpty();
+            mTouchableInsets = TOUCHABLE_INSETS_FRAME;
+!!!992258.java!!!	isEmpty() : boolean
+            return contentInsets.isEmpty()
+                    && visibleInsets.isEmpty()
+                    && touchableRegion.isEmpty()
+                    && mTouchableInsets == TOUCHABLE_INSETS_FRAME;
+!!!992386.java!!!	hashCode() : int
+            int result = contentInsets.hashCode();
+            result = 31 * result + visibleInsets.hashCode();
+            result = 31 * result + touchableRegion.hashCode();
+            result = 31 * result + mTouchableInsets;
+            return result;
+!!!992514.java!!!	equals(inout o : Object) : boolean
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            InternalInsetsInfo other = (InternalInsetsInfo)o;
+            return mTouchableInsets == other.mTouchableInsets &&
+                    contentInsets.equals(other.contentInsets) &&
+                    visibleInsets.equals(other.visibleInsets) &&
+                    touchableRegion.equals(other.touchableRegion);
+!!!992642.java!!!	set(inout other : ViewTreeObserver::InternalInsetsInfo) : void
+            contentInsets.set(other.contentInsets);
+            visibleInsets.set(other.visibleInsets);
+            touchableRegion.set(other.touchableRegion);
+            mTouchableInsets = other.mTouchableInsets;

@@ -1,0 +1,118 @@
+class MediaStyle
+!!!1700098.java!!!	MediaStyle(inout builder : Notification::Builder)
+            setBuilder(builder);
+!!!1700226.java!!!	setShowActionsInCompactView(inout  : int...actions) : Notification::MediaStyle
+            mActionsToShowInCompact = actions;
+            return this;
+!!!1700354.java!!!	setMediaSession(inout token : MediaSession.Token) : Notification::MediaStyle
+            mToken = token;
+            return this;
+!!!1700482.java!!!	buildStyled(inout wip : Notification) : Notification
+            super.buildStyled(wip);
+            if (wip.category == null) {
+                wip.category = Notification.CATEGORY_TRANSPORT;
+            }
+            return wip;
+!!!1700610.java!!!	populateContentView(inout wip : Notification) : void
+            mBuilder.setBuilderContentView(wip, makeMediaContentView());
+!!!1700738.java!!!	populateBigContentView(inout wip : Notification) : void
+            mBuilder.setBuilderBigContentView(wip, makeMediaBigContentView());
+!!!1700866.java!!!	addExtras(inout extras : Bundle) : void
+            super.addExtras(extras);
+
+            if (mToken != null) {
+                extras.putParcelable(EXTRA_MEDIA_SESSION, mToken);
+            }
+            if (mActionsToShowInCompact != null) {
+                extras.putIntArray(EXTRA_COMPACT_ACTIONS, mActionsToShowInCompact);
+            }
+!!!1700994.java!!!	restoreFromExtras(inout extras : Bundle) : void
+            super.restoreFromExtras(extras);
+
+            if (extras.containsKey(EXTRA_MEDIA_SESSION)) {
+                mToken = extras.getParcelable(EXTRA_MEDIA_SESSION);
+            }
+            if (extras.containsKey(EXTRA_COMPACT_ACTIONS)) {
+                mActionsToShowInCompact = extras.getIntArray(EXTRA_COMPACT_ACTIONS);
+            }
+!!!1701122.java!!!	generateMediaActionButton(inout action : Notification::Action) : RemoteViews
+            final boolean tombstone = (action.actionIntent == null);
+            RemoteViews button = new RemoteViews(mBuilder.mContext.getPackageName(),
+                    R.layout.notification_material_media_action);
+            button.setImageViewResource(R.id.action0, action.icon);
+            button.setDrawableParameters(R.id.action0, false, -1,
+                    0xFFFFFFFF,
+                    PorterDuff.Mode.SRC_ATOP, -1);
+            if (!tombstone) {
+                button.setOnClickPendingIntent(R.id.action0, action.actionIntent);
+            }
+            button.setContentDescription(R.id.action0, action.title);
+            return button;
+!!!1701250.java!!!	makeMediaContentView() : RemoteViews
+            RemoteViews view = mBuilder.applyStandardTemplate(
+                    R.layout.notification_template_material_media, false /* hasProgress */);
+
+            final int numActions = mBuilder.mActions.size();
+            final int N = mActionsToShowInCompact == null
+                    ? 0
+                    : Math.min(mActionsToShowInCompact.length, MAX_MEDIA_BUTTONS_IN_COMPACT);
+            if (N > 0) {
+                view.removeAllViews(com.android.internal.R.id.media_actions);
+                for (int i = 0; i < N; i++) {
+                    if (i >= numActions) {
+                        throw new IllegalArgumentException(String.format(
+                                "setShowActionsInCompactView: action %d out of bounds (max %d)",
+                                i, numActions - 1));
+                    }
+
+                    final Action action = mBuilder.mActions.get(mActionsToShowInCompact[i]);
+                    final RemoteViews button = generateMediaActionButton(action);
+                    view.addView(com.android.internal.R.id.media_actions, button);
+                }
+            }
+            styleText(view);
+            hideRightIcon(view);
+            return view;
+!!!1701378.java!!!	makeMediaBigContentView() : RemoteViews
+            final int actionCount = Math.min(mBuilder.mActions.size(), MAX_MEDIA_BUTTONS);
+            RemoteViews big = mBuilder.applyStandardTemplate(getBigLayoutResource(actionCount),
+                    false /* hasProgress */);
+
+            if (actionCount > 0) {
+                big.removeAllViews(com.android.internal.R.id.media_actions);
+                for (int i = 0; i < actionCount; i++) {
+                    final RemoteViews button = generateMediaActionButton(mBuilder.mActions.get(i));
+                    big.addView(com.android.internal.R.id.media_actions, button);
+                }
+            }
+            styleText(big);
+            hideRightIcon(big);
+            applyTopPadding(big);
+            big.setViewVisibility(android.R.id.progress, View.GONE);
+            return big;
+!!!1701506.java!!!	getBigLayoutResource(in actionCount : int) : int
+            if (actionCount <= 3) {
+                return R.layout.notification_template_material_big_media_narrow;
+            } else {
+                return R.layout.notification_template_material_big_media;
+            }
+!!!1701634.java!!!	hideRightIcon(inout contentView : RemoteViews) : void
+            contentView.setViewVisibility(R.id.right_icon, View.GONE);
+!!!1701762.java!!!	styleText(inout contentView : RemoteViews) : void
+            int primaryColor = mBuilder.mContext.getResources().getColor(
+                    R.color.notification_media_primary_color);
+            int secondaryColor = mBuilder.mContext.getResources().getColor(
+                    R.color.notification_media_secondary_color);
+            contentView.setTextColor(R.id.title, primaryColor);
+            if (mBuilder.showsTimeOrChronometer()) {
+                if (mBuilder.mUseChronometer) {
+                    contentView.setTextColor(R.id.chronometer, secondaryColor);
+                } else {
+                    contentView.setTextColor(R.id.time, secondaryColor);
+                }
+            }
+            contentView.setTextColor(R.id.text2, secondaryColor);
+            contentView.setTextColor(R.id.text, secondaryColor);
+            contentView.setTextColor(R.id.info, secondaryColor);
+!!!1701890.java!!!	hasProgress() : boolean
+            return false;

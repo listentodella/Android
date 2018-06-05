@@ -1,0 +1,31 @@
+class Bounds
+!!!2309378.java!!!	Bounds()
+            reset();
+!!!2309506.java!!!	reset() : void
+            before = Integer.MIN_VALUE;
+            after = Integer.MIN_VALUE;
+            flexibility = CAN_STRETCH; // from the above, we're flexible when empty
+!!!2309634.java!!!	include(in before : int, in after : int) : void
+            this.before = max(this.before, before);
+            this.after = max(this.after, after);
+!!!2309762.java!!!	size(inout min : boolean) : int
+            if (!min) {
+                if (canStretch(flexibility)) {
+                    return MAX_SIZE;
+                }
+            }
+            return before + after;
+!!!2309890.java!!!	getOffset(inout gl : GridLayout, inout c : View, inout a : GridLayout::Alignment, in size : int, inout horizontal : boolean) : int
+            return before - a.getAlignmentValue(c, size, gl.getLayoutMode());
+!!!2310018.java!!!	include(inout gl : GridLayout, inout c : View, inout spec : GridLayout::Spec, inout axis : GridLayout::Axis, in size : int) : void
+            this.flexibility &= spec.getFlexibility();
+            boolean horizontal = axis.horizontal;
+            Alignment alignment = gl.getAlignment(spec.alignment, horizontal);
+            // todo test this works correctly when the returned value is UNDEFINED
+            int before = alignment.getAlignmentValue(c, size, gl.getLayoutMode());
+            include(before, size - before);
+!!!2310146.java!!!	toString() : String
+            return "Bounds{" +
+                    "before=" + before +
+                    ", after=" + after +
+                    '}';

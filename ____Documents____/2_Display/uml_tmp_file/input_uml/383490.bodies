@@ -1,0 +1,82 @@
+class MultiAutoCompleteTextView
+!!!2356482.java!!!	MultiAutoCompleteTextView(inout context : Context)
+        this(context, null);
+!!!2356610.java!!!	MultiAutoCompleteTextView(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, com.android.internal.R.attr.autoCompleteTextViewStyle);
+!!!2356738.java!!!	MultiAutoCompleteTextView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2356866.java!!!	MultiAutoCompleteTextView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+!!!2357122.java!!!	setTokenizer(inout t : MultiAutoCompleteTextView::Tokenizer) : void
+        mTokenizer = t;
+!!!2357250.java!!!	performFiltering(inout text : CharSequence, in keyCode : int) : void
+        if (enoughToFilter()) {
+            int end = getSelectionEnd();
+            int start = mTokenizer.findTokenStart(text, end);
+
+            performFiltering(text, start, end, keyCode);
+        } else {
+            dismissDropDown();
+
+            Filter f = getFilter();
+            if (f != null) {
+                f.filter(null);
+            }
+        }
+!!!2357378.java!!!	enoughToFilter() : boolean
+        Editable text = getText();
+
+        int end = getSelectionEnd();
+        if (end < 0 || mTokenizer == null) {
+            return false;
+        }
+
+        int start = mTokenizer.findTokenStart(text, end);
+
+        if (end - start >= getThreshold()) {
+            return true;
+        } else {
+            return false;
+        }
+!!!2357506.java!!!	performValidation() : void
+        Validator v = getValidator();
+
+        if (v == null || mTokenizer == null) {
+            return;
+        }
+
+        Editable e = getText();
+        int i = getText().length();
+        while (i > 0) {
+            int start = mTokenizer.findTokenStart(e, i);
+            int end = mTokenizer.findTokenEnd(e, start);
+
+            CharSequence sub = e.subSequence(start, end);
+            if (TextUtils.isEmpty(sub)) {
+                e.replace(start, i, "");
+            } else if (!v.isValid(sub)) {
+                e.replace(start, i,
+                          mTokenizer.terminateToken(v.fixText(sub)));
+            }
+
+            i = start;
+        }
+!!!2357634.java!!!	performFiltering(inout text : CharSequence, in start : int, in end : int, in keyCode : int) : void
+        getFilter().filter(text.subSequence(start, end), this);
+!!!2357762.java!!!	replaceText(inout text : CharSequence) : void
+        clearComposingText();
+
+        int end = getSelectionEnd();
+        int start = mTokenizer.findTokenStart(getText(), end);
+
+        Editable editable = getText();
+        String original = TextUtils.substring(editable, start, end);
+
+        QwertyKeyListener.markAsReplaced(editable, start, end, original);
+        editable.replace(start, end, mTokenizer.terminateToken(text));
+!!!2357890.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(MultiAutoCompleteTextView.class.getName());
+!!!2358018.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(MultiAutoCompleteTextView.class.getName());

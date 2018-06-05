@@ -1,0 +1,227 @@
+class InputMethodInfo
+!!!1155586.java!!!	InputMethodInfo(inout context : Context, inout service : ResolveInfo)
+        this(context, service, null);
+!!!1155714.java!!!	InputMethodInfo(inout context : Context, inout service : ResolveInfo, inout additionalSubtypesMap : Map<String, List<InputMethodSubtype>>)
+        mService = service;
+        ServiceInfo si = service.serviceInfo;
+        mId = new ComponentName(si.packageName, si.name).flattenToShortString();
+        boolean isAuxIme = true;
+        boolean supportsSwitchingToNextInputMethod = false; // false as default
+        mForceDefault = false;
+
+        PackageManager pm = context.getPackageManager();
+        String settingsActivityComponent = null;
+        int isDefaultResId = 0;
+
+        XmlResourceParser parser = null;
+        final ArrayList<InputMethodSubtype> subtypes = new ArrayList<InputMethodSubtype>();
+        try {
+            parser = si.loadXmlMetaData(pm, InputMethod.SERVICE_META_DATA);
+            if (parser == null) {
+                throw new XmlPullParserException("No "
+                        + InputMethod.SERVICE_META_DATA + " meta-data");
+            }
+
+            Resources res = pm.getResourcesForApplication(si.applicationInfo);
+
+            AttributeSet attrs = Xml.asAttributeSet(parser);
+
+            int type;
+            while ((type=parser.next()) != XmlPullParser.END_DOCUMENT
+                    && type != XmlPullParser.START_TAG) {
+            }
+
+            String nodeName = parser.getName();
+            if (!"input-method".equals(nodeName)) {
+                throw new XmlPullParserException(
+                        "Meta-data does not start with input-method tag");
+            }
+
+            TypedArray sa = res.obtainAttributes(attrs,
+                    com.android.internal.R.styleable.InputMethod);
+            settingsActivityComponent = sa.getString(
+                    com.android.internal.R.styleable.InputMethod_settingsActivity);
+            isDefaultResId = sa.getResourceId(
+                    com.android.internal.R.styleable.InputMethod_isDefault, 0);
+            supportsSwitchingToNextInputMethod = sa.getBoolean(
+                    com.android.internal.R.styleable.InputMethod_supportsSwitchingToNextInputMethod,
+                    false);
+            sa.recycle();
+
+            final int depth = parser.getDepth();
+            // Parse all subtypes
+            while (((type = parser.next()) != XmlPullParser.END_TAG || parser.getDepth() > depth)
+                    && type != XmlPullParser.END_DOCUMENT) {
+                if (type == XmlPullParser.START_TAG) {
+                    nodeName = parser.getName();
+                    if (!"subtype".equals(nodeName)) {
+                        throw new XmlPullParserException(
+                                "Meta-data in input-method does not start with subtype tag");
+                    }
+                    final TypedArray a = res.obtainAttributes(
+                            attrs, com.android.internal.R.styleable.InputMethod_Subtype);
+                    final InputMethodSubtype subtype = new InputMethodSubtypeBuilder()
+                            .setSubtypeNameResId(a.getResourceId(com.android.internal.R.styleable
+                                    .InputMethod_Subtype_label, 0))
+                            .setSubtypeIconResId(a.getResourceId(com.android.internal.R.styleable
+                                    .InputMethod_Subtype_icon, 0))
+                            .setSubtypeLocale(a.getString(com.android.internal.R.styleable
+                                    .InputMethod_Subtype_imeSubtypeLocale))
+                            .setSubtypeMode(a.getString(com.android.internal.R.styleable
+                                    .InputMethod_Subtype_imeSubtypeMode))
+                            .setSubtypeExtraValue(a.getString(com.android.internal.R.styleable
+                                    .InputMethod_Subtype_imeSubtypeExtraValue))
+                            .setIsAuxiliary(a.getBoolean(com.android.internal.R.styleable
+                                    .InputMethod_Subtype_isAuxiliary, false))
+                            .setOverridesImplicitlyEnabledSubtype(a.getBoolean(
+                                    com.android.internal.R.styleable
+                                    .InputMethod_Subtype_overridesImplicitlyEnabledSubtype, false))
+                            .setSubtypeId(a.getInt(com.android.internal.R.styleable
+                                    .InputMethod_Subtype_subtypeId, 0 /* use Arrays.hashCode */))
+                            .setIsAsciiCapable(a.getBoolean(com.android.internal.R.styleable
+                                    .InputMethod_Subtype_isAsciiCapable, false)).build();
+                    if (!subtype.isAuxiliary()) {
+                        isAuxIme = false;
+                    }
+                    subtypes.add(subtype);
+                }
+            }
+        } catch (NameNotFoundException e) {
+            throw new XmlPullParserException(
+                    "Unable to create context for: " + si.packageName);
+        } finally {
+            if (parser != null) parser.close();
+        }
+
+        if (subtypes.size() == 0) {
+            isAuxIme = false;
+        }
+
+        if (additionalSubtypesMap != null && additionalSubtypesMap.containsKey(mId)) {
+            final List<InputMethodSubtype> additionalSubtypes = additionalSubtypesMap.get(mId);
+            final int N = additionalSubtypes.size();
+            for (int i = 0; i < N; ++i) {
+                final InputMethodSubtype subtype = additionalSubtypes.get(i);
+                if (!subtypes.contains(subtype)) {
+                    subtypes.add(subtype);
+                } else {
+                    Slog.w(TAG, "Duplicated subtype definition found: "
+                            + subtype.getLocale() + ", " + subtype.getMode());
+                }
+            }
+        }
+        mSubtypes = new InputMethodSubtypeArray(subtypes);
+        mSettingsActivityName = settingsActivityComponent;
+        mIsDefaultResId = isDefaultResId;
+        mIsAuxIme = isAuxIme;
+        mSupportsSwitchingToNextInputMethod = supportsSwitchingToNextInputMethod;
+!!!1155842.java!!!	InputMethodInfo(inout source : Parcel)
+        mId = source.readString();
+        mSettingsActivityName = source.readString();
+        mIsDefaultResId = source.readInt();
+        mIsAuxIme = source.readInt() == 1;
+        mSupportsSwitchingToNextInputMethod = source.readInt() == 1;
+        mService = ResolveInfo.CREATOR.createFromParcel(source);
+        mSubtypes = new InputMethodSubtypeArray(source);
+        mForceDefault = false;
+!!!1155970.java!!!	InputMethodInfo(in packageName : String, in className : String, inout label : CharSequence, in settingsActivity : String)
+        this(buildDummyResolveInfo(packageName, className, label), false, settingsActivity, null,
+                0, false /* forceDefault */, true /* supportsSwitchingToNextInputMethod */);
+!!!1156098.java!!!	InputMethodInfo(inout ri : ResolveInfo, inout isAuxIme : boolean, in settingsActivity : String, inout subtypes : List<InputMethodSubtype>, in isDefaultResId : int, inout forceDefault : boolean)
+        this(ri, isAuxIme, settingsActivity, subtypes, isDefaultResId,
+                forceDefault, true /* supportsSwitchingToNextInputMethod */);
+!!!1156226.java!!!	InputMethodInfo(inout ri : ResolveInfo, inout isAuxIme : boolean, in settingsActivity : String, inout subtypes : List<InputMethodSubtype>, in isDefaultResId : int, inout forceDefault : boolean, inout supportsSwitchingToNextInputMethod : boolean)
+        final ServiceInfo si = ri.serviceInfo;
+        mService = ri;
+        mId = new ComponentName(si.packageName, si.name).flattenToShortString();
+        mSettingsActivityName = settingsActivity;
+        mIsDefaultResId = isDefaultResId;
+        mIsAuxIme = isAuxIme;
+        mSubtypes = new InputMethodSubtypeArray(subtypes);
+        mForceDefault = forceDefault;
+        mSupportsSwitchingToNextInputMethod = supportsSwitchingToNextInputMethod;
+!!!1156354.java!!!	buildDummyResolveInfo(in packageName : String, in className : String, inout label : CharSequence) : ResolveInfo
+        ResolveInfo ri = new ResolveInfo();
+        ServiceInfo si = new ServiceInfo();
+        ApplicationInfo ai = new ApplicationInfo();
+        ai.packageName = packageName;
+        ai.enabled = true;
+        si.applicationInfo = ai;
+        si.enabled = true;
+        si.packageName = packageName;
+        si.name = className;
+        si.exported = true;
+        si.nonLocalizedLabel = label;
+        ri.serviceInfo = si;
+        return ri;
+!!!1156482.java!!!	getId() : String
+        return mId;
+!!!1156610.java!!!	getPackageName() : String
+        return mService.serviceInfo.packageName;
+!!!1156738.java!!!	getServiceName() : String
+        return mService.serviceInfo.name;
+!!!1156866.java!!!	getServiceInfo() : ServiceInfo
+        return mService.serviceInfo;
+!!!1156994.java!!!	getComponent() : ComponentName
+        return new ComponentName(mService.serviceInfo.packageName,
+                mService.serviceInfo.name);
+!!!1157122.java!!!	loadLabel(inout pm : PackageManager) : CharSequence
+        return mService.loadLabel(pm);
+!!!1157250.java!!!	loadIcon(inout pm : PackageManager) : Drawable
+        return mService.loadIcon(pm);
+!!!1157378.java!!!	getSettingsActivity() : String
+        return mSettingsActivityName;
+!!!1157506.java!!!	getSubtypeCount() : int
+        return mSubtypes.getCount();
+!!!1157634.java!!!	getSubtypeAt(in index : int) : InputMethodSubtype
+        return mSubtypes.get(index);
+!!!1157762.java!!!	getIsDefaultResourceId() : int
+        return mIsDefaultResId;
+!!!1157890.java!!!	isDefault(inout context : Context) : boolean
+        if (mForceDefault) {
+            return true;
+        }
+        try {
+            if (getIsDefaultResourceId() == 0) {
+                return false;
+            }
+            final Resources res = context.createPackageContext(getPackageName(), 0).getResources();
+            return res.getBoolean(getIsDefaultResourceId());
+        } catch (NameNotFoundException | NotFoundException e) {
+            return false;
+        }
+!!!1158018.java!!!	dump(inout pw : Printer, in prefix : String) : void
+        pw.println(prefix + "mId=" + mId
+                + " mSettingsActivityName=" + mSettingsActivityName);
+        pw.println(prefix + "mIsDefaultResId=0x"
+                + Integer.toHexString(mIsDefaultResId));
+        pw.println(prefix + "Service:");
+        mService.dump(pw, prefix + "  ");
+!!!1158146.java!!!	toString() : String
+        return "InputMethodInfo{" + mId
+                + ", settings: "
+                + mSettingsActivityName + "}";
+!!!1158274.java!!!	equals(inout o : Object) : boolean
+        if (o == this) return true;
+        if (o == null) return false;
+
+        if (!(o instanceof InputMethodInfo)) return false;
+
+        InputMethodInfo obj = (InputMethodInfo) o;
+        return mId.equals(obj.mId);
+!!!1158402.java!!!	hashCode() : int
+        return mId.hashCode();
+!!!1158530.java!!!	isAuxiliaryIme() : boolean
+        return mIsAuxIme;
+!!!1158658.java!!!	supportsSwitchingToNextInputMethod() : boolean
+        return mSupportsSwitchingToNextInputMethod;
+!!!1158786.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        dest.writeString(mId);
+        dest.writeString(mSettingsActivityName);
+        dest.writeInt(mIsDefaultResId);
+        dest.writeInt(mIsAuxIme ? 1 : 0);
+        dest.writeInt(mSupportsSwitchingToNextInputMethod ? 1 : 0);
+        mService.writeToParcel(dest, flags);
+        mSubtypes.writeToParcel(dest);
+!!!1158914.java!!!	describeContents() : int
+        return 0;

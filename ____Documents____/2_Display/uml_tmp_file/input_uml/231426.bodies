@@ -1,0 +1,33 @@
+class PhysicalDisplayInfo
+!!!836226.java!!!	PhysicalDisplayInfo(inout other : SurfaceControl::PhysicalDisplayInfo)
+            copyFrom(other);
+!!!836354.java!!!	equals(inout o : Object) : boolean
+            return o instanceof PhysicalDisplayInfo && equals((PhysicalDisplayInfo)o);
+!!!836482.java!!!	equals(inout other : SurfaceControl::PhysicalDisplayInfo) : boolean
+            return other != null
+                    && width == other.width
+                    && height == other.height
+                    && refreshRate == other.refreshRate
+                    && density == other.density
+                    && xDpi == other.xDpi
+                    && yDpi == other.yDpi
+                    && secure == other.secure
+                    && appVsyncOffsetNanos == other.appVsyncOffsetNanos
+                    && presentationDeadlineNanos == other.presentationDeadlineNanos;
+!!!836610.java!!!	hashCode() : int
+            return 0; // don't care
+!!!836738.java!!!	copyFrom(inout other : SurfaceControl::PhysicalDisplayInfo) : void
+            width = other.width;
+            height = other.height;
+            refreshRate = other.refreshRate;
+            density = other.density;
+            xDpi = other.xDpi;
+            yDpi = other.yDpi;
+            secure = other.secure;
+            appVsyncOffsetNanos = other.appVsyncOffsetNanos;
+            presentationDeadlineNanos = other.presentationDeadlineNanos;
+!!!836866.java!!!	toString() : String
+            return "PhysicalDisplayInfo{" + width + " x " + height + ", " + refreshRate + " fps, "
+                    + "density " + density + ", " + xDpi + " x " + yDpi + " dpi, secure " + secure
+                    + ", appVsyncOffset " + appVsyncOffsetNanos
+                    + ", bufferDeadline " + presentationDeadlineNanos + "}";

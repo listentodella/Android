@@ -1,0 +1,38 @@
+class WindowContentFrameStats
+!!!1022338.java!!!	WindowContentFrameStats()
+        /* do nothing */
+!!!1022466.java!!!	init(in refreshPeriodNano : long, inout framesPostedTimeNano : long, inout framesPresentedTimeNano : long, inout framesReadyTimeNano : long) : void
+        mRefreshPeriodNano = refreshPeriodNano;
+        mFramesPostedTimeNano = framesPostedTimeNano;
+        mFramesPresentedTimeNano = framesPresentedTimeNano;
+        mFramesReadyTimeNano = framesReadyTimeNano;
+!!!1022594.java!!!	WindowContentFrameStats(inout parcel : Parcel)
+        mRefreshPeriodNano = parcel.readLong();
+        mFramesPostedTimeNano = parcel.createLongArray();
+        mFramesPresentedTimeNano = parcel.createLongArray();
+        mFramesReadyTimeNano = parcel.createLongArray();
+!!!1022722.java!!!	getFramePostedTimeNano(in index : int) : long
+        if (mFramesPostedTimeNano == null) {
+            throw new IndexOutOfBoundsException();
+        }
+        return mFramesPostedTimeNano[index];
+!!!1022850.java!!!	getFrameReadyTimeNano(in index : int) : long
+        if (mFramesReadyTimeNano == null) {
+            throw new IndexOutOfBoundsException();
+        }
+        return mFramesReadyTimeNano[index];
+!!!1022978.java!!!	describeContents() : int
+        return 0;
+!!!1023106.java!!!	writeToParcel(inout parcel : Parcel, in flags : int) : void
+        parcel.writeLong(mRefreshPeriodNano);
+        parcel.writeLongArray(mFramesPostedTimeNano);
+        parcel.writeLongArray(mFramesPresentedTimeNano);
+        parcel.writeLongArray(mFramesReadyTimeNano);
+!!!1023234.java!!!	toString() : String
+        StringBuilder builder = new StringBuilder();
+        builder.append("WindowContentFrameStats[");
+        builder.append("frameCount:" + getFrameCount());
+        builder.append(", fromTimeNano:" + getStartTimeNano());
+        builder.append(", toTimeNano:" + getEndTimeNano());
+        builder.append(']');
+        return builder.toString();

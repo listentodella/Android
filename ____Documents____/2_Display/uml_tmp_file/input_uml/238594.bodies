@@ -1,0 +1,28 @@
+class ImeInputStage
+!!!959746.java!!!	ImeInputStage(inout next : ViewRootImpl::InputStage, in traceCounter : String)
+            super(next, traceCounter);
+!!!959874.java!!!	onProcess(inout q : ViewRootImpl::QueuedInputEvent) : int
+            if (mLastWasImTarget && !isInLocalFocusMode()) {
+                InputMethodManager imm = InputMethodManager.peekInstance();
+                if (imm != null) {
+                    final InputEvent event = q.mEvent;
+                    if (DEBUG_IMF) Log.v(TAG, "Sending input event to IME: " + event);
+                    int result = imm.dispatchInputEvent(event, q, this, mHandler);
+                    if (result == InputMethodManager.DISPATCH_HANDLED) {
+                        return FINISH_HANDLED;
+                    } else if (result == InputMethodManager.DISPATCH_NOT_HANDLED) {
+                        // The IME could not handle it, so skip along to the next InputStage
+                        return FORWARD;
+                    } else {
+                        return DEFER; // callback will be invoked later
+                    }
+                }
+            }
+            return FORWARD;
+!!!960002.java!!!	onFinishedInputEvent(inout token : Object, inout handled : boolean) : void
+            QueuedInputEvent q = (QueuedInputEvent)token;
+            if (handled) {
+                finish(q, true);
+                return;
+            }
+            forward(q);

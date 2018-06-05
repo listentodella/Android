@@ -1,0 +1,51 @@
+class EarlyPostImeInputStage
+!!!960130.java!!!	EarlyPostImeInputStage(inout next : ViewRootImpl::InputStage)
+            super(next);
+!!!960258.java!!!	onProcess(inout q : ViewRootImpl::QueuedInputEvent) : int
+            if (q.mEvent instanceof KeyEvent) {
+                return processKeyEvent(q);
+            } else {
+                final int source = q.mEvent.getSource();
+                if ((source & InputDevice.SOURCE_CLASS_POINTER) != 0) {
+                    return processPointerEvent(q);
+                }
+            }
+            return FORWARD;
+!!!960386.java!!!	processKeyEvent(inout q : ViewRootImpl::QueuedInputEvent) : int
+            final KeyEvent event = (KeyEvent)q.mEvent;
+
+            // If the key's purpose is to exit touch mode then we consume it
+            // and consider it handled.
+            if (checkForLeavingTouchModeAndConsume(event)) {
+                return FINISH_HANDLED;
+            }
+
+            // Make sure the fallback event policy sees all keys that will be
+            // delivered to the view hierarchy.
+            mFallbackEventHandler.preDispatchKeyEvent(event);
+            return FORWARD;
+!!!960514.java!!!	processPointerEvent(inout q : ViewRootImpl::QueuedInputEvent) : int
+            final MotionEvent event = (MotionEvent)q.mEvent;
+
+            // Translate the pointer event for compatibility, if needed.
+            if (mTranslator != null) {
+                mTranslator.translateEventInScreenToAppWindow(event);
+            }
+
+            // Enter touch mode on down or scroll.
+            final int action = event.getAction();
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_SCROLL) {
+                ensureTouchMode(true);
+            }
+
+            // Offset the scroll position.
+            if (mCurScrollY != 0) {
+                event.offsetLocation(0, mCurScrollY);
+            }
+
+            // Remember the touch position for possible drag-initiation.
+            if (event.isTouchEvent()) {
+                mLastTouchPoint.x = event.getRawX();
+                mLastTouchPoint.y = event.getRawY();
+            }
+            return FORWARD;

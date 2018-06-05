@@ -1,0 +1,7 @@
+class Formatter
+!!!247938.cpp!!!	indent(inout f : Formatter) : Formatter
+    f.mIndent++;
+    return f;
+!!!248066.cpp!!!	dedent(inout f : Formatter) : Formatter
+    f.mIndent--;
+    return f;

@@ -1,0 +1,249 @@
+class AccessibilityRecord
+!!!1058050.java!!!	setSource(inout source : View) : void
+        setSource(source, UNDEFINED);
+!!!1058178.java!!!	setSource(inout root : View, in virtualDescendantId : int) : void
+        enforceNotSealed();
+        final boolean important;
+        if (virtualDescendantId == UNDEFINED) {
+            important = (root != null) ? root.isImportantForAccessibility() : true;
+        } else {
+            important = true;
+        }
+        setBooleanProperty(PROPERTY_IMPORTANT_FOR_ACCESSIBILITY, important);
+        mSourceWindowId = (root != null) ? root.getAccessibilityWindowId() : UNDEFINED;
+        final int rootViewId = (root != null) ? root.getAccessibilityViewId() : UNDEFINED;
+        mSourceNodeId = AccessibilityNodeInfo.makeNodeId(rootViewId, virtualDescendantId);
+!!!1058306.java!!!	getSource() : AccessibilityNodeInfo
+        enforceSealed();
+        if (mConnectionId == UNDEFINED || mSourceWindowId == UNDEFINED
+                || AccessibilityNodeInfo.getAccessibilityViewId(mSourceNodeId) == UNDEFINED) {
+            return null;
+        }
+        AccessibilityInteractionClient client = AccessibilityInteractionClient.getInstance();
+        return client.findAccessibilityNodeInfoByAccessibilityId(mConnectionId, mSourceWindowId,
+                mSourceNodeId, false, GET_SOURCE_PREFETCH_FLAGS);
+!!!1058434.java!!!	setWindowId(in windowId : int) : void
+        mSourceWindowId = windowId;
+!!!1058562.java!!!	getWindowId() : int
+        return mSourceWindowId;
+!!!1058690.java!!!	isChecked() : boolean
+        return getBooleanProperty(PROPERTY_CHECKED);
+!!!1058818.java!!!	setChecked(inout isChecked : boolean) : void
+        enforceNotSealed();
+        setBooleanProperty(PROPERTY_CHECKED, isChecked);
+!!!1058946.java!!!	isEnabled() : boolean
+        return getBooleanProperty(PROPERTY_ENABLED);
+!!!1059074.java!!!	setEnabled(inout isEnabled : boolean) : void
+        enforceNotSealed();
+        setBooleanProperty(PROPERTY_ENABLED, isEnabled);
+!!!1059202.java!!!	isPassword() : boolean
+        return getBooleanProperty(PROPERTY_PASSWORD);
+!!!1059330.java!!!	setPassword(inout isPassword : boolean) : void
+        enforceNotSealed();
+        setBooleanProperty(PROPERTY_PASSWORD, isPassword);
+!!!1059458.java!!!	isFullScreen() : boolean
+        return getBooleanProperty(PROPERTY_FULL_SCREEN);
+!!!1059586.java!!!	setFullScreen(inout isFullScreen : boolean) : void
+        enforceNotSealed();
+        setBooleanProperty(PROPERTY_FULL_SCREEN, isFullScreen);
+!!!1059714.java!!!	isScrollable() : boolean
+        return getBooleanProperty(PROPERTY_SCROLLABLE);
+!!!1059842.java!!!	setScrollable(inout scrollable : boolean) : void
+        enforceNotSealed();
+        setBooleanProperty(PROPERTY_SCROLLABLE, scrollable);
+!!!1059970.java!!!	isImportantForAccessibility() : boolean
+        return getBooleanProperty(PROPERTY_IMPORTANT_FOR_ACCESSIBILITY);
+!!!1060098.java!!!	getItemCount() : int
+        return mItemCount;
+!!!1060226.java!!!	setItemCount(in itemCount : int) : void
+        enforceNotSealed();
+        mItemCount = itemCount;
+!!!1060354.java!!!	getCurrentItemIndex() : int
+        return mCurrentItemIndex;
+!!!1060482.java!!!	setCurrentItemIndex(in currentItemIndex : int) : void
+        enforceNotSealed();
+        mCurrentItemIndex = currentItemIndex;
+!!!1060610.java!!!	getFromIndex() : int
+        return mFromIndex;
+!!!1060738.java!!!	setFromIndex(in fromIndex : int) : void
+        enforceNotSealed();
+        mFromIndex = fromIndex;
+!!!1060866.java!!!	getToIndex() : int
+        return mToIndex;
+!!!1060994.java!!!	setToIndex(in toIndex : int) : void
+        enforceNotSealed();
+        mToIndex = toIndex;
+!!!1061122.java!!!	getScrollX() : int
+        return mScrollX;
+!!!1061250.java!!!	setScrollX(in scrollX : int) : void
+        enforceNotSealed();
+        mScrollX = scrollX;
+!!!1061378.java!!!	getScrollY() : int
+        return mScrollY;
+!!!1061506.java!!!	setScrollY(in scrollY : int) : void
+        enforceNotSealed();
+        mScrollY = scrollY;
+!!!1061634.java!!!	getMaxScrollX() : int
+        return mMaxScrollX;
+!!!1061762.java!!!	setMaxScrollX(in maxScrollX : int) : void
+        enforceNotSealed();
+        mMaxScrollX = maxScrollX;
+!!!1061890.java!!!	getMaxScrollY() : int
+        return mMaxScrollY;
+!!!1062018.java!!!	setMaxScrollY(in maxScrollY : int) : void
+        enforceNotSealed();
+        mMaxScrollY = maxScrollY;
+!!!1062146.java!!!	getAddedCount() : int
+        return mAddedCount;
+!!!1062274.java!!!	setAddedCount(in addedCount : int) : void
+        enforceNotSealed();
+        mAddedCount = addedCount;
+!!!1062402.java!!!	getRemovedCount() : int
+        return mRemovedCount;
+!!!1062530.java!!!	setRemovedCount(in removedCount : int) : void
+        enforceNotSealed();
+        mRemovedCount = removedCount;
+!!!1062658.java!!!	getClassName() : CharSequence
+        return mClassName;
+!!!1062786.java!!!	setClassName(inout className : CharSequence) : void
+        enforceNotSealed();
+        mClassName = className;
+!!!1062914.java!!!	getText() : List<CharSequence>
+        return mText;
+!!!1063042.java!!!	getBeforeText() : CharSequence
+        return mBeforeText;
+!!!1063170.java!!!	setBeforeText(inout beforeText : CharSequence) : void
+        enforceNotSealed();
+        mBeforeText = beforeText;
+!!!1063298.java!!!	getContentDescription() : CharSequence
+        return mContentDescription;
+!!!1063426.java!!!	setContentDescription(inout contentDescription : CharSequence) : void
+        enforceNotSealed();
+        mContentDescription = contentDescription;
+!!!1063554.java!!!	getParcelableData() : Parcelable
+        return mParcelableData;
+!!!1063682.java!!!	setParcelableData(inout parcelableData : Parcelable) : void
+        enforceNotSealed();
+        mParcelableData = parcelableData;
+!!!1063810.java!!!	getSourceNodeId() : long
+        return mSourceNodeId;
+!!!1063938.java!!!	setConnectionId(in connectionId : int) : void
+        enforceNotSealed();
+        mConnectionId = connectionId;
+!!!1064066.java!!!	setSealed(inout sealed : boolean) : void
+        mSealed = sealed;
+!!!1064194.java!!!	isSealed() : boolean
+        return mSealed;
+!!!1064322.java!!!	enforceSealed() : void
+        if (!isSealed()) {
+            throw new IllegalStateException("Cannot perform this "
+                    + "action on a not sealed instance.");
+        }
+!!!1064450.java!!!	enforceNotSealed() : void
+        if (isSealed()) {
+            throw new IllegalStateException("Cannot perform this "
+                    + "action on a sealed instance.");
+        }
+!!!1064578.java!!!	getBooleanProperty(in property : int) : boolean
+        return (mBooleanProperties & property) == property;
+!!!1064706.java!!!	setBooleanProperty(in property : int, inout value : boolean) : void
+        if (value) {
+            mBooleanProperties |= property;
+        } else {
+            mBooleanProperties &= ~property;
+        }
+!!!1064834.java!!!	obtain(inout record : AccessibilityRecord) : AccessibilityRecord
+       AccessibilityRecord clone = AccessibilityRecord.obtain();
+       clone.init(record);
+       return clone;
+!!!1064962.java!!!	obtain() : AccessibilityRecord
+        synchronized (sPoolLock) {
+            if (sPool != null) {
+                AccessibilityRecord record = sPool;
+                sPool = sPool.mNext;
+                sPoolSize--;
+                record.mNext = null;
+                record.mIsInPool = false;
+                return record;
+            }
+            return new AccessibilityRecord();
+        }
+!!!1065090.java!!!	recycle() : void
+        if (mIsInPool) {
+            throw new IllegalStateException("Record already recycled!");
+        }
+        clear();
+        synchronized (sPoolLock) {
+            if (sPoolSize <= MAX_POOL_SIZE) {
+                mNext = sPool;
+                sPool = this;
+                mIsInPool = true;
+                sPoolSize++;
+            }
+        }
+!!!1065218.java!!!	init(inout record : AccessibilityRecord) : void
+        mSealed = record.mSealed;
+        mBooleanProperties = record.mBooleanProperties;
+        mCurrentItemIndex = record.mCurrentItemIndex;
+        mItemCount = record.mItemCount;
+        mFromIndex = record.mFromIndex;
+        mToIndex = record.mToIndex;
+        mScrollX = record.mScrollX;
+        mScrollY = record.mScrollY;
+        mMaxScrollX = record.mMaxScrollX;
+        mMaxScrollY = record.mMaxScrollY;
+        mAddedCount = record.mAddedCount;
+        mRemovedCount = record.mRemovedCount;
+        mClassName = record.mClassName;
+        mContentDescription = record.mContentDescription;
+        mBeforeText = record.mBeforeText;
+        mParcelableData = record.mParcelableData;
+        mText.addAll(record.mText);
+        mSourceWindowId = record.mSourceWindowId;
+        mSourceNodeId = record.mSourceNodeId;
+        mConnectionId = record.mConnectionId;
+!!!1065346.java!!!	clear() : void
+        mSealed = false;
+        mBooleanProperties = 0;
+        mCurrentItemIndex = UNDEFINED;
+        mItemCount = UNDEFINED;
+        mFromIndex = UNDEFINED;
+        mToIndex = UNDEFINED;
+        mScrollX = UNDEFINED;
+        mScrollY = UNDEFINED;
+        mMaxScrollX = UNDEFINED;
+        mMaxScrollY = UNDEFINED;
+        mAddedCount = UNDEFINED;
+        mRemovedCount = UNDEFINED;
+        mClassName = null;
+        mContentDescription = null;
+        mBeforeText = null;
+        mParcelableData = null;
+        mText.clear();
+        mSourceNodeId = AccessibilityNodeInfo.makeNodeId(UNDEFINED, UNDEFINED);
+        mSourceWindowId = UNDEFINED;
+        mConnectionId = UNDEFINED;
+!!!1065474.java!!!	toString() : String
+        StringBuilder builder = new StringBuilder();
+        builder.append(" [ ClassName: " + mClassName);
+        builder.append("; Text: " + mText);
+        builder.append("; ContentDescription: " + mContentDescription);
+        builder.append("; ItemCount: " + mItemCount);
+        builder.append("; CurrentItemIndex: " + mCurrentItemIndex);
+        builder.append("; IsEnabled: " + getBooleanProperty(PROPERTY_ENABLED));
+        builder.append("; IsPassword: " + getBooleanProperty(PROPERTY_PASSWORD));
+        builder.append("; IsChecked: " + getBooleanProperty(PROPERTY_CHECKED));
+        builder.append("; IsFullScreen: " + getBooleanProperty(PROPERTY_FULL_SCREEN));
+        builder.append("; Scrollable: " + getBooleanProperty(PROPERTY_SCROLLABLE));
+        builder.append("; BeforeText: " + mBeforeText);
+        builder.append("; FromIndex: " + mFromIndex);
+        builder.append("; ToIndex: " + mToIndex);
+        builder.append("; ScrollX: " + mScrollX);
+        builder.append("; ScrollY: " + mScrollY);
+        builder.append("; MaxScrollX: " + mMaxScrollX);
+        builder.append("; MaxScrollY: " + mMaxScrollY);
+        builder.append("; AddedCount: " + mAddedCount);
+        builder.append("; RemovedCount: " + mRemovedCount);
+        builder.append("; ParcelableData: " + mParcelableData);
+        builder.append(" ]");
+        return builder.toString();

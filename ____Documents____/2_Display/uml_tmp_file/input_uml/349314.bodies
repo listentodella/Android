@@ -1,0 +1,10 @@
+class RemoteViewsIndexMetaData
+!!!1921154.java!!!	RemoteViewsIndexMetaData(inout v : RemoteViews, in itemId : long)
+            set(v, itemId);
+!!!1921282.java!!!	set(inout v : RemoteViews, in id : long) : void
+            itemId = id;
+            if (v != null) {
+                typeId = v.getLayoutId();
+            } else {
+                typeId = 0;
+            }

@@ -1,0 +1,4 @@
+class GcIdler
+!!!1445890.java!!!	queueIdle() : boolean
+            doGcIfNeeded();
+            return false;

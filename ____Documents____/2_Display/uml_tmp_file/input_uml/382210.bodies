@@ -1,0 +1,3 @@
+class ListSelectorHider
+!!!2350850.java!!!	run() : void
+            clearListSelection();

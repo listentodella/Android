@@ -1,0 +1,63 @@
+class TabActivity
+!!!1745794.java!!!	setDefaultTab(in tag : String) : void
+        mDefaultTab = tag;
+        mDefaultTabIndex = -1;
+!!!1745922.java!!!	setDefaultTab(in index : int) : void
+        mDefaultTab = null;
+        mDefaultTabIndex = index;
+!!!1746050.java!!!	onRestoreInstanceState(inout state : Bundle) : void
+        super.onRestoreInstanceState(state);
+        ensureTabHost();
+        String cur = state.getString("currentTab");
+        if (cur != null) {
+            mTabHost.setCurrentTabByTag(cur);
+        }
+        if (mTabHost.getCurrentTab() < 0) {
+            if (mDefaultTab != null) {
+                mTabHost.setCurrentTabByTag(mDefaultTab);
+            } else if (mDefaultTabIndex >= 0) {
+                mTabHost.setCurrentTab(mDefaultTabIndex);
+            }
+        }
+!!!1746178.java!!!	onPostCreate(inout icicle : Bundle) : void
+        
+        super.onPostCreate(icicle);
+
+        ensureTabHost();
+
+        if (mTabHost.getCurrentTab() == -1) {
+            mTabHost.setCurrentTab(0);
+        }
+!!!1746306.java!!!	onSaveInstanceState(inout outState : Bundle) : void
+        super.onSaveInstanceState(outState);
+        String currentTabTag = mTabHost.getCurrentTabTag();
+        if (currentTabTag != null) {
+            outState.putString("currentTab", currentTabTag);
+        }
+!!!1746434.java!!!	onContentChanged() : void
+        super.onContentChanged();
+        mTabHost = (TabHost) findViewById(com.android.internal.R.id.tabhost);
+
+        if (mTabHost == null) {
+            throw new RuntimeException(
+                    "Your content must have a TabHost whose id attribute is " +
+                    "'android.R.id.tabhost'");
+        }
+        mTabHost.setup(getLocalActivityManager());
+!!!1746562.java!!!	ensureTabHost() : void
+        if (mTabHost == null) {
+            this.setContentView(com.android.internal.R.layout.tab_content);
+        }
+!!!1746690.java!!!	onChildTitleChanged(inout childActivity : Activity, inout title : CharSequence) : void
+        // Dorky implementation until we can have multiple activities running.
+        if (getLocalActivityManager().getCurrentActivity() == childActivity) {
+            View tabView = mTabHost.getCurrentTabView();
+            if (tabView != null && tabView instanceof TextView) {
+                ((TextView) tabView).setText(title);
+            }
+        }
+!!!1746818.java!!!	getTabHost() : TabHost
+        ensureTabHost();
+        return mTabHost;
+!!!1746946.java!!!	getTabWidget() : TabWidget
+        return mTabHost.getTabWidget();

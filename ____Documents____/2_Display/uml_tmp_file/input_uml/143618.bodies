@@ -1,0 +1,24 @@
+class InputMapper
+!!!236290.cpp!!!	populateDeviceInfo(inout info : InputDeviceInfo) : void
+    info->addSource(getSources());
+!!!237058.cpp!!!	getKeyCodeState(in sourceMask : uint32_t, in keyCode : int32_t) : int32_t
+    return AKEY_STATE_UNKNOWN;
+!!!237186.cpp!!!	getScanCodeState(in sourceMask : uint32_t, in scanCode : int32_t) : int32_t
+    return AKEY_STATE_UNKNOWN;
+!!!237314.cpp!!!	getSwitchState(in sourceMask : uint32_t, in switchCode : int32_t) : int32_t
+    return AKEY_STATE_UNKNOWN;
+!!!237442.cpp!!!	markSupportedKeyCodes(in sourceMask : uint32_t, in numCodes : size_t, in keyCodes : int32_t, inout outFlags : uint8_t) : bool
+    return false;
+!!!237826.cpp!!!	getMetaState() : int32_t
+    return 0;
+!!!238082.cpp!!!	getAbsoluteAxisInfo(in axis : int32_t, inout axisInfo : RawAbsoluteAxisInfo) : status_t
+    return getEventHub()->getAbsoluteAxisInfo(getDeviceId(), axis, axisInfo);
+!!!238210.cpp!!!	bumpGeneration() : void
+    mDevice->bumpGeneration();
+!!!238338.cpp!!!	dumpRawAbsoluteAxisInfo(inout dump : String8, in axis : RawAbsoluteAxisInfo, in name : char) : void
+    if (axis.valid) {
+        dump.appendFormat(INDENT4 "%s: min=%d, max=%d, flat=%d, fuzz=%d, resolution=%d\n",
+                name, axis.minValue, axis.maxValue, axis.flat, axis.fuzz, axis.resolution);
+    } else {
+        dump.appendFormat(INDENT4 "%s: unknown range\n", name);
+    }

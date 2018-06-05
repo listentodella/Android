@@ -1,0 +1,3 @@
+class ConsumeBatchedInputRunnable
+!!!971778.java!!!	run() : void
+            doConsumeBatchedInput(mChoreographer.getFrameTimeNanos());

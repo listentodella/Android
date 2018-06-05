@@ -1,0 +1,7 @@
+class SavedState
+!!!1989250.java!!!	SavedState(inout in : Parcel)
+            openSubMenuId = in.readInt();
+!!!1989378.java!!!	describeContents() : int
+            return 0;
+!!!1989506.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            dest.writeInt(openSubMenuId);

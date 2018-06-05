@@ -1,0 +1,709 @@
+class Switch
+!!!2479746.java!!!	Switch(inout context : Context)
+        this(context, null);
+!!!2479874.java!!!	Switch(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, com.android.internal.R.attr.switchStyle);
+!!!2480002.java!!!	Switch(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2480130.java!!!	Switch(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        mTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+
+        final Resources res = getResources();
+        mTextPaint.density = res.getDisplayMetrics().density;
+        mTextPaint.setCompatibilityScaling(res.getCompatibilityInfo().applicationScale);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, com.android.internal.R.styleable.Switch, defStyleAttr, defStyleRes);
+        mThumbDrawable = a.getDrawable(com.android.internal.R.styleable.Switch_thumb);
+        if (mThumbDrawable != null) {
+            mThumbDrawable.setCallback(this);
+        }
+        mTrackDrawable = a.getDrawable(com.android.internal.R.styleable.Switch_track);
+        if (mTrackDrawable != null) {
+            mTrackDrawable.setCallback(this);
+        }
+        mTextOn = a.getText(com.android.internal.R.styleable.Switch_textOn);
+        mTextOff = a.getText(com.android.internal.R.styleable.Switch_textOff);
+        mShowText = a.getBoolean(com.android.internal.R.styleable.Switch_showText, true);
+        mThumbTextPadding = a.getDimensionPixelSize(
+                com.android.internal.R.styleable.Switch_thumbTextPadding, 0);
+        mSwitchMinWidth = a.getDimensionPixelSize(
+                com.android.internal.R.styleable.Switch_switchMinWidth, 0);
+        mSwitchPadding = a.getDimensionPixelSize(
+                com.android.internal.R.styleable.Switch_switchPadding, 0);
+        mSplitTrack = a.getBoolean(com.android.internal.R.styleable.Switch_splitTrack, false);
+
+        final int appearance = a.getResourceId(
+                com.android.internal.R.styleable.Switch_switchTextAppearance, 0);
+        if (appearance != 0) {
+            setSwitchTextAppearance(context, appearance);
+        }
+        a.recycle();
+
+        final ViewConfiguration config = ViewConfiguration.get(context);
+        mTouchSlop = config.getScaledTouchSlop();
+        mMinFlingVelocity = config.getScaledMinimumFlingVelocity();
+
+        // Refresh display with current params
+        refreshDrawableState();
+        setChecked(isChecked());
+!!!2480258.java!!!	setSwitchTextAppearance(inout context : Context, in resid : int) : void
+        TypedArray appearance =
+                context.obtainStyledAttributes(resid,
+                        com.android.internal.R.styleable.TextAppearance);
+
+        ColorStateList colors;
+        int ts;
+
+        colors = appearance.getColorStateList(com.android.internal.R.styleable.
+                TextAppearance_textColor);
+        if (colors != null) {
+            mTextColors = colors;
+        } else {
+            // If no color set in TextAppearance, default to the view's textColor
+            mTextColors = getTextColors();
+        }
+
+        ts = appearance.getDimensionPixelSize(com.android.internal.R.styleable.
+                TextAppearance_textSize, 0);
+        if (ts != 0) {
+            if (ts != mTextPaint.getTextSize()) {
+                mTextPaint.setTextSize(ts);
+                requestLayout();
+            }
+        }
+
+        int typefaceIndex, styleIndex;
+
+        typefaceIndex = appearance.getInt(com.android.internal.R.styleable.
+                TextAppearance_typeface, -1);
+        styleIndex = appearance.getInt(com.android.internal.R.styleable.
+                TextAppearance_textStyle, -1);
+
+        setSwitchTypefaceByIndex(typefaceIndex, styleIndex);
+
+        boolean allCaps = appearance.getBoolean(com.android.internal.R.styleable.
+                TextAppearance_textAllCaps, false);
+        if (allCaps) {
+            mSwitchTransformationMethod = new AllCapsTransformationMethod(getContext());
+            mSwitchTransformationMethod.setLengthChangesAllowed(true);
+        } else {
+            mSwitchTransformationMethod = null;
+        }
+
+        appearance.recycle();
+!!!2480386.java!!!	setSwitchTypefaceByIndex(in typefaceIndex : int, in styleIndex : int) : void
+        Typeface tf = null;
+        switch (typefaceIndex) {
+            case SANS:
+                tf = Typeface.SANS_SERIF;
+                break;
+
+            case SERIF:
+                tf = Typeface.SERIF;
+                break;
+
+            case MONOSPACE:
+                tf = Typeface.MONOSPACE;
+                break;
+        }
+
+        setSwitchTypeface(tf, styleIndex);
+!!!2480514.java!!!	setSwitchTypeface(inout tf : Typeface, in style : int) : void
+        if (style > 0) {
+            if (tf == null) {
+                tf = Typeface.defaultFromStyle(style);
+            } else {
+                tf = Typeface.create(tf, style);
+            }
+
+            setSwitchTypeface(tf);
+            // now compute what (if any) algorithmic styling is needed
+            int typefaceStyle = tf != null ? tf.getStyle() : 0;
+            int need = style & ~typefaceStyle;
+            mTextPaint.setFakeBoldText((need & Typeface.BOLD) != 0);
+            mTextPaint.setTextSkewX((need & Typeface.ITALIC) != 0 ? -0.25f : 0);
+        } else {
+            mTextPaint.setFakeBoldText(false);
+            mTextPaint.setTextSkewX(0);
+            setSwitchTypeface(tf);
+        }
+!!!2480642.java!!!	setSwitchTypeface(inout tf : Typeface) : void
+        if (mTextPaint.getTypeface() != tf) {
+            mTextPaint.setTypeface(tf);
+
+            requestLayout();
+            invalidate();
+        }
+!!!2480770.java!!!	setSwitchPadding(in pixels : int) : void
+        mSwitchPadding = pixels;
+        requestLayout();
+!!!2480898.java!!!	getSwitchPadding() : int
+        return mSwitchPadding;
+!!!2481026.java!!!	setSwitchMinWidth(in pixels : int) : void
+        mSwitchMinWidth = pixels;
+        requestLayout();
+!!!2481154.java!!!	getSwitchMinWidth() : int
+        return mSwitchMinWidth;
+!!!2481282.java!!!	setThumbTextPadding(in pixels : int) : void
+        mThumbTextPadding = pixels;
+        requestLayout();
+!!!2481410.java!!!	getThumbTextPadding() : int
+        return mThumbTextPadding;
+!!!2481538.java!!!	setTrackDrawable(inout track : Drawable) : void
+        if (mTrackDrawable != null) {
+            mTrackDrawable.setCallback(null);
+        }
+        mTrackDrawable = track;
+        if (track != null) {
+            track.setCallback(this);
+        }
+        requestLayout();
+!!!2481666.java!!!	setTrackResource(in resId : int) : void
+        setTrackDrawable(getContext().getDrawable(resId));
+!!!2481794.java!!!	getTrackDrawable() : Drawable
+        return mTrackDrawable;
+!!!2481922.java!!!	setThumbDrawable(inout thumb : Drawable) : void
+        if (mThumbDrawable != null) {
+            mThumbDrawable.setCallback(null);
+        }
+        mThumbDrawable = thumb;
+        if (thumb != null) {
+            thumb.setCallback(this);
+        }
+        requestLayout();
+!!!2482050.java!!!	setThumbResource(in resId : int) : void
+        setThumbDrawable(getContext().getDrawable(resId));
+!!!2482178.java!!!	getThumbDrawable() : Drawable
+        return mThumbDrawable;
+!!!2482306.java!!!	setSplitTrack(inout splitTrack : boolean) : void
+        mSplitTrack = splitTrack;
+        invalidate();
+!!!2482434.java!!!	getSplitTrack() : boolean
+        return mSplitTrack;
+!!!2482562.java!!!	getTextOn() : CharSequence
+        return mTextOn;
+!!!2482690.java!!!	setTextOn(inout textOn : CharSequence) : void
+        mTextOn = textOn;
+        requestLayout();
+!!!2482818.java!!!	getTextOff() : CharSequence
+        return mTextOff;
+!!!2482946.java!!!	setTextOff(inout textOff : CharSequence) : void
+        mTextOff = textOff;
+        requestLayout();
+!!!2483074.java!!!	setShowText(inout showText : boolean) : void
+        if (mShowText != showText) {
+            mShowText = showText;
+            requestLayout();
+        }
+!!!2483202.java!!!	getShowText() : boolean
+        return mShowText;
+!!!2483330.java!!!	onMeasure(in widthMeasureSpec : int, in heightMeasureSpec : int) : void
+        if (mShowText) {
+            if (mOnLayout == null) {
+                mOnLayout = makeLayout(mTextOn);
+            }
+
+            if (mOffLayout == null) {
+                mOffLayout = makeLayout(mTextOff);
+            }
+        }
+
+        final Rect padding = mTempRect;
+        final int thumbWidth;
+        final int thumbHeight;
+        if (mThumbDrawable != null) {
+            // Cached thumb width does not include padding.
+            mThumbDrawable.getPadding(padding);
+            thumbWidth = mThumbDrawable.getIntrinsicWidth() - padding.left - padding.right;
+            thumbHeight = mThumbDrawable.getIntrinsicHeight();
+        } else {
+            thumbWidth = 0;
+            thumbHeight = 0;
+        }
+
+        final int maxTextWidth;
+        if (mShowText) {
+            maxTextWidth = Math.max(mOnLayout.getWidth(), mOffLayout.getWidth())
+                    + mThumbTextPadding * 2;
+        } else {
+            maxTextWidth = 0;
+        }
+
+        mThumbWidth = Math.max(maxTextWidth, thumbWidth);
+
+        final int trackHeight;
+        if (mTrackDrawable != null) {
+            mTrackDrawable.getPadding(padding);
+            trackHeight = mTrackDrawable.getIntrinsicHeight();
+        } else {
+            padding.setEmpty();
+            trackHeight = 0;
+        }
+
+        // Adjust left and right padding to ensure there's enough room for the
+        // thumb's padding (when present).
+        int paddingLeft = padding.left;
+        int paddingRight = padding.right;
+        if (mThumbDrawable != null) {
+            final Insets inset = mThumbDrawable.getOpticalInsets();
+            paddingLeft = Math.max(paddingLeft, inset.left);
+            paddingRight = Math.max(paddingRight, inset.right);
+        }
+
+        final int switchWidth = Math.max(mSwitchMinWidth,
+                2 * mThumbWidth + paddingLeft + paddingRight);
+        final int switchHeight = Math.max(trackHeight, thumbHeight);
+        mSwitchWidth = switchWidth;
+        mSwitchHeight = switchHeight;
+
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        final int measuredHeight = getMeasuredHeight();
+        if (measuredHeight < switchHeight) {
+            setMeasuredDimension(getMeasuredWidthAndState(), switchHeight);
+        }
+!!!2483458.java!!!	onPopulateAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onPopulateAccessibilityEvent(event);
+
+        final CharSequence text = isChecked() ? mTextOn : mTextOff;
+        if (text != null) {
+            event.getText().add(text);
+        }
+!!!2483586.java!!!	makeLayout(inout text : CharSequence) : Layout
+        final CharSequence transformed = (mSwitchTransformationMethod != null)
+                    ? mSwitchTransformationMethod.getTransformation(text, this)
+                    : text;
+
+        return new StaticLayout(transformed, mTextPaint,
+                (int) Math.ceil(Layout.getDesiredWidth(transformed, mTextPaint)),
+                Layout.Alignment.ALIGN_NORMAL, 1.f, 0, true);
+!!!2483714.java!!!	hitThumb(in x : float, in y : float) : boolean
+        // Relies on mTempRect, MUST be called first!
+        final int thumbOffset = getThumbOffset();
+
+        mThumbDrawable.getPadding(mTempRect);
+        final int thumbTop = mSwitchTop - mTouchSlop;
+        final int thumbLeft = mSwitchLeft + thumbOffset - mTouchSlop;
+        final int thumbRight = thumbLeft + mThumbWidth +
+                mTempRect.left + mTempRect.right + mTouchSlop;
+        final int thumbBottom = mSwitchBottom + mTouchSlop;
+        return x > thumbLeft && x < thumbRight && y > thumbTop && y < thumbBottom;
+!!!2483842.java!!!	onTouchEvent(inout ev : MotionEvent) : boolean
+        mVelocityTracker.addMovement(ev);
+        final int action = ev.getActionMasked();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN: {
+                final float x = ev.getX();
+                final float y = ev.getY();
+                if (isEnabled() && hitThumb(x, y)) {
+                    mTouchMode = TOUCH_MODE_DOWN;
+                    mTouchX = x;
+                    mTouchY = y;
+                }
+                break;
+            }
+
+            case MotionEvent.ACTION_MOVE: {
+                switch (mTouchMode) {
+                    case TOUCH_MODE_IDLE:
+                        // Didn't target the thumb, treat normally.
+                        break;
+
+                    case TOUCH_MODE_DOWN: {
+                        final float x = ev.getX();
+                        final float y = ev.getY();
+                        if (Math.abs(x - mTouchX) > mTouchSlop ||
+                                Math.abs(y - mTouchY) > mTouchSlop) {
+                            mTouchMode = TOUCH_MODE_DRAGGING;
+                            getParent().requestDisallowInterceptTouchEvent(true);
+                            mTouchX = x;
+                            mTouchY = y;
+                            return true;
+                        }
+                        break;
+                    }
+
+                    case TOUCH_MODE_DRAGGING: {
+                        final float x = ev.getX();
+                        final int thumbScrollRange = getThumbScrollRange();
+                        final float thumbScrollOffset = x - mTouchX;
+                        float dPos;
+                        if (thumbScrollRange != 0) {
+                            dPos = thumbScrollOffset / thumbScrollRange;
+                        } else {
+                            // If the thumb scroll range is empty, just use the
+                            // movement direction to snap on or off.
+                            dPos = thumbScrollOffset > 0 ? 1 : -1;
+                        }
+                        if (isLayoutRtl()) {
+                            dPos = -dPos;
+                        }
+                        final float newPos = MathUtils.constrain(mThumbPosition + dPos, 0, 1);
+                        if (newPos != mThumbPosition) {
+                            mTouchX = x;
+                            setThumbPosition(newPos);
+                        }
+                        return true;
+                    }
+                }
+                break;
+            }
+
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL: {
+                if (mTouchMode == TOUCH_MODE_DRAGGING) {
+                    stopDrag(ev);
+                    // Allow super class to handle pressed state, etc.
+                    super.onTouchEvent(ev);
+                    return true;
+                }
+                mTouchMode = TOUCH_MODE_IDLE;
+                mVelocityTracker.clear();
+                break;
+            }
+        }
+
+        return super.onTouchEvent(ev);
+!!!2483970.java!!!	cancelSuperTouch(inout ev : MotionEvent) : void
+        MotionEvent cancel = MotionEvent.obtain(ev);
+        cancel.setAction(MotionEvent.ACTION_CANCEL);
+        super.onTouchEvent(cancel);
+        cancel.recycle();
+!!!2484098.java!!!	stopDrag(inout ev : MotionEvent) : void
+        mTouchMode = TOUCH_MODE_IDLE;
+
+        // Commit the change if the event is up and not canceled and the switch
+        // has not been disabled during the drag.
+        final boolean commitChange = ev.getAction() == MotionEvent.ACTION_UP && isEnabled();
+        final boolean newState;
+        if (commitChange) {
+            mVelocityTracker.computeCurrentVelocity(1000);
+            final float xvel = mVelocityTracker.getXVelocity();
+            if (Math.abs(xvel) > mMinFlingVelocity) {
+                newState = isLayoutRtl() ? (xvel < 0) : (xvel > 0);
+            } else {
+                newState = getTargetCheckedState();
+            }
+        } else {
+            newState = isChecked();
+        }
+
+        setChecked(newState);
+        cancelSuperTouch(ev);
+!!!2484226.java!!!	animateThumbToCheckedState(inout newCheckedState : boolean) : void
+        final float targetPosition = newCheckedState ? 1 : 0;
+        mPositionAnimator = ObjectAnimator.ofFloat(this, THUMB_POS, targetPosition);
+        mPositionAnimator.setDuration(THUMB_ANIMATION_DURATION);
+        mPositionAnimator.setAutoCancel(true);
+        mPositionAnimator.start();
+!!!2484354.java!!!	cancelPositionAnimator() : void
+        if (mPositionAnimator != null) {
+            mPositionAnimator.cancel();
+        }
+!!!2484482.java!!!	getTargetCheckedState() : boolean
+        return mThumbPosition > 0.5f;
+!!!2484610.java!!!	setThumbPosition(in position : float) : void
+        mThumbPosition = position;
+        invalidate();
+!!!2484738.java!!!	toggle() : void
+        setChecked(!isChecked());
+!!!2484866.java!!!	setChecked(inout checked : boolean) : void
+        super.setChecked(checked);
+
+        // Calling the super method may result in setChecked() getting called
+        // recursively with a different value, so load the REAL value...
+        checked = isChecked();
+
+        if (isAttachedToWindow() && isLaidOut()) {
+            animateThumbToCheckedState(checked);
+        } else {
+            // Immediately move the thumb to the new position.
+            cancelPositionAnimator();
+            setThumbPosition(checked ? 1 : 0);
+        }
+!!!2484994.java!!!	onLayout(inout changed : boolean, in left : int, in top : int, in right : int, in bottom : int) : void
+        super.onLayout(changed, left, top, right, bottom);
+
+        int opticalInsetLeft = 0;
+        int opticalInsetRight = 0;
+        if (mThumbDrawable != null) {
+            final Rect trackPadding = mTempRect;
+            if (mTrackDrawable != null) {
+                mTrackDrawable.getPadding(trackPadding);
+            } else {
+                trackPadding.setEmpty();
+            }
+
+            final Insets insets = mThumbDrawable.getOpticalInsets();
+            opticalInsetLeft = Math.max(0, insets.left - trackPadding.left);
+            opticalInsetRight = Math.max(0, insets.right - trackPadding.right);
+        }
+
+        final int switchRight;
+        final int switchLeft;
+        if (isLayoutRtl()) {
+            switchLeft = getPaddingLeft() + opticalInsetLeft;
+            switchRight = switchLeft + mSwitchWidth - opticalInsetLeft - opticalInsetRight;
+        } else {
+            switchRight = getWidth() - getPaddingRight() - opticalInsetRight;
+            switchLeft = switchRight - mSwitchWidth + opticalInsetLeft + opticalInsetRight;
+        }
+
+        final int switchTop;
+        final int switchBottom;
+        switch (getGravity() & Gravity.VERTICAL_GRAVITY_MASK) {
+            default:
+            case Gravity.TOP:
+                switchTop = getPaddingTop();
+                switchBottom = switchTop + mSwitchHeight;
+                break;
+
+            case Gravity.CENTER_VERTICAL:
+                switchTop = (getPaddingTop() + getHeight() - getPaddingBottom()) / 2 -
+                        mSwitchHeight / 2;
+                switchBottom = switchTop + mSwitchHeight;
+                break;
+
+            case Gravity.BOTTOM:
+                switchBottom = getHeight() - getPaddingBottom();
+                switchTop = switchBottom - mSwitchHeight;
+                break;
+        }
+
+        mSwitchLeft = switchLeft;
+        mSwitchTop = switchTop;
+        mSwitchBottom = switchBottom;
+        mSwitchRight = switchRight;
+!!!2485122.java!!!	draw(inout c : Canvas) : void
+        final Rect padding = mTempRect;
+        final int switchLeft = mSwitchLeft;
+        final int switchTop = mSwitchTop;
+        final int switchRight = mSwitchRight;
+        final int switchBottom = mSwitchBottom;
+
+        int thumbInitialLeft = switchLeft + getThumbOffset();
+
+        final Insets thumbInsets;
+        if (mThumbDrawable != null) {
+            thumbInsets = mThumbDrawable.getOpticalInsets();
+        } else {
+            thumbInsets = Insets.NONE;
+        }
+
+        // Layout the track.
+        if (mTrackDrawable != null) {
+            mTrackDrawable.getPadding(padding);
+
+            // Adjust thumb position for track padding.
+            thumbInitialLeft += padding.left;
+
+            // If necessary, offset by the optical insets of the thumb asset.
+            int trackLeft = switchLeft;
+            int trackTop = switchTop;
+            int trackRight = switchRight;
+            int trackBottom = switchBottom;
+            if (thumbInsets != Insets.NONE) {
+                if (thumbInsets.left > padding.left) {
+                    trackLeft += thumbInsets.left - padding.left;
+                }
+                if (thumbInsets.top > padding.top) {
+                    trackTop += thumbInsets.top - padding.top;
+                }
+                if (thumbInsets.right > padding.right) {
+                    trackRight -= thumbInsets.right - padding.right;
+                }
+                if (thumbInsets.bottom > padding.bottom) {
+                    trackBottom -= thumbInsets.bottom - padding.bottom;
+                }
+            }
+            mTrackDrawable.setBounds(trackLeft, trackTop, trackRight, trackBottom);
+        }
+
+        // Layout the thumb.
+        if (mThumbDrawable != null) {
+            mThumbDrawable.getPadding(padding);
+
+            final int thumbLeft = thumbInitialLeft - padding.left;
+            final int thumbRight = thumbInitialLeft + mThumbWidth + padding.right;
+            mThumbDrawable.setBounds(thumbLeft, switchTop, thumbRight, switchBottom);
+
+            final Drawable background = getBackground();
+            if (background != null) {
+                background.setHotspotBounds(thumbLeft, switchTop, thumbRight, switchBottom);
+            }
+        }
+
+        // Draw the background.
+        super.draw(c);
+!!!2485250.java!!!	onDraw(inout canvas : Canvas) : void
+        super.onDraw(canvas);
+
+        final Rect padding = mTempRect;
+        final Drawable trackDrawable = mTrackDrawable;
+        if (trackDrawable != null) {
+            trackDrawable.getPadding(padding);
+        } else {
+            padding.setEmpty();
+        }
+
+        final int switchTop = mSwitchTop;
+        final int switchBottom = mSwitchBottom;
+        final int switchInnerTop = switchTop + padding.top;
+        final int switchInnerBottom = switchBottom - padding.bottom;
+
+        final Drawable thumbDrawable = mThumbDrawable;
+        if (trackDrawable != null) {
+            if (mSplitTrack && thumbDrawable != null) {
+                final Insets insets = thumbDrawable.getOpticalInsets();
+                thumbDrawable.copyBounds(padding);
+                padding.left += insets.left;
+                padding.right -= insets.right;
+
+                final int saveCount = canvas.save();
+                canvas.clipRect(padding, Op.DIFFERENCE);
+                trackDrawable.draw(canvas);
+                canvas.restoreToCount(saveCount);
+            } else {
+                trackDrawable.draw(canvas);
+            }
+        }
+
+        final int saveCount = canvas.save();
+
+        if (thumbDrawable != null) {
+            thumbDrawable.draw(canvas);
+        }
+
+        final Layout switchText = getTargetCheckedState() ? mOnLayout : mOffLayout;
+        if (switchText != null) {
+            final int drawableState[] = getDrawableState();
+            if (mTextColors != null) {
+                mTextPaint.setColor(mTextColors.getColorForState(drawableState, 0));
+            }
+            mTextPaint.drawableState = drawableState;
+
+            final int cX;
+            if (thumbDrawable != null) {
+                final Rect bounds = thumbDrawable.getBounds();
+                cX = bounds.left + bounds.right;
+            } else {
+                cX = getWidth();
+            }
+
+            final int left = cX / 2 - switchText.getWidth() / 2;
+            final int top = (switchInnerTop + switchInnerBottom) / 2 - switchText.getHeight() / 2;
+            canvas.translate(left, top);
+            switchText.draw(canvas);
+        }
+
+        canvas.restoreToCount(saveCount);
+!!!2485378.java!!!	getCompoundPaddingLeft() : int
+        if (!isLayoutRtl()) {
+            return super.getCompoundPaddingLeft();
+        }
+        int padding = super.getCompoundPaddingLeft() + mSwitchWidth;
+        if (!TextUtils.isEmpty(getText())) {
+            padding += mSwitchPadding;
+        }
+        return padding;
+!!!2485506.java!!!	getCompoundPaddingRight() : int
+        if (isLayoutRtl()) {
+            return super.getCompoundPaddingRight();
+        }
+        int padding = super.getCompoundPaddingRight() + mSwitchWidth;
+        if (!TextUtils.isEmpty(getText())) {
+            padding += mSwitchPadding;
+        }
+        return padding;
+!!!2485634.java!!!	getThumbOffset() : int
+        final float thumbPosition;
+        if (isLayoutRtl()) {
+            thumbPosition = 1 - mThumbPosition;
+        } else {
+            thumbPosition = mThumbPosition;
+        }
+        return (int) (thumbPosition * getThumbScrollRange() + 0.5f);
+!!!2485762.java!!!	getThumbScrollRange() : int
+        if (mTrackDrawable != null) {
+            final Rect padding = mTempRect;
+            mTrackDrawable.getPadding(padding);
+
+            final Insets insets;
+            if (mThumbDrawable != null) {
+                insets = mThumbDrawable.getOpticalInsets();
+            } else {
+                insets = Insets.NONE;
+            }
+
+            return mSwitchWidth - mThumbWidth - padding.left - padding.right
+                    - insets.left - insets.right;
+        } else {
+            return 0;
+        }
+!!!2485890.java!!!	onCreateDrawableState(in extraSpace : int) : int
+        final int[] drawableState = super.onCreateDrawableState(extraSpace + 1);
+        if (isChecked()) {
+            mergeDrawableStates(drawableState, CHECKED_STATE_SET);
+        }
+        return drawableState;
+!!!2486018.java!!!	drawableStateChanged() : void
+        super.drawableStateChanged();
+
+        final int[] myDrawableState = getDrawableState();
+
+        if (mThumbDrawable != null) {
+            mThumbDrawable.setState(myDrawableState);
+        }
+
+        if (mTrackDrawable != null) {
+            mTrackDrawable.setState(myDrawableState);
+        }
+
+        invalidate();
+!!!2486146.java!!!	drawableHotspotChanged(in x : float, in y : float) : void
+        super.drawableHotspotChanged(x, y);
+
+        if (mThumbDrawable != null) {
+            mThumbDrawable.setHotspot(x, y);
+        }
+
+        if (mTrackDrawable != null) {
+            mTrackDrawable.setHotspot(x, y);
+        }
+!!!2486274.java!!!	verifyDrawable(inout who : Drawable) : boolean
+        return super.verifyDrawable(who) || who == mThumbDrawable || who == mTrackDrawable;
+!!!2486402.java!!!	jumpDrawablesToCurrentState() : void
+        super.jumpDrawablesToCurrentState();
+
+        if (mThumbDrawable != null) {
+            mThumbDrawable.jumpToCurrentState();
+        }
+
+        if (mTrackDrawable != null) {
+            mTrackDrawable.jumpToCurrentState();
+        }
+
+        if (mPositionAnimator != null && mPositionAnimator.isRunning()) {
+            mPositionAnimator.end();
+            mPositionAnimator = null;
+        }
+!!!2486530.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(Switch.class.getName());
+!!!2486658.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(Switch.class.getName());
+        CharSequence switchText = isChecked() ? mTextOn : mTextOff;
+        if (!TextUtils.isEmpty(switchText)) {
+            CharSequence oldText = info.getText();
+            if (TextUtils.isEmpty(oldText)) {
+                info.setText(switchText);
+            } else {
+                StringBuilder newText = new StringBuilder();
+                newText.append(oldText).append(' ').append(switchText);
+                info.setText(newText);
+            }
+        }

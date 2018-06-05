@@ -1,0 +1,29 @@
+class EventControlThread
+!!!174082.cpp!!!	setVsyncEnabled(in enabled : bool) : void
+    Mutex::Autolock lock(mMutex);
+    mVsyncEnabled = enabled;
+    mCond.signal();
+!!!174210.cpp!!!	threadLoop() : bool
+    Mutex::Autolock lock(mMutex);
+
+    bool vsyncEnabled = mVsyncEnabled;
+
+    mFlinger->eventControl(HWC_DISPLAY_PRIMARY, SurfaceFlinger::EVENT_VSYNC,
+            mVsyncEnabled);
+
+    while (true) {
+        status_t err = mCond.wait(mMutex);
+        if (err != NO_ERROR) {
+            ALOGE("error waiting for new events: %s (%d)",
+                strerror(-err), err);
+            return false;
+        }
+
+        if (vsyncEnabled != mVsyncEnabled) {
+            mFlinger->eventControl(HWC_DISPLAY_PRIMARY,
+                    SurfaceFlinger::EVENT_VSYNC, mVsyncEnabled);
+            vsyncEnabled = mVsyncEnabled;
+        }
+    }
+
+    return false;

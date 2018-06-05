@@ -1,0 +1,151 @@
+class SurfaceTrace
+!!!1284610.java!!!	SurfaceTrace(inout s : SurfaceSession, in name : String, in w : int, in h : int, in format : int, in flags : int)
+            super(s, name, w, h, format, flags);
+            mName = name != null ? name : "Not named";
+            mSize.set(w, h);
+            if (logSurfaceTrace) Slog.v(SURFACE_TAG, "ctor: " + this + ". Called by "
+                    + Debug.getCallers(3));
+            synchronized (sSurfaces) {
+                sSurfaces.add(0, this);
+            }
+!!!1284738.java!!!	setAlpha(in alpha : float) : void
+            if (mSurfaceTraceAlpha != alpha) {
+                if (logSurfaceTrace) Slog.v(SURFACE_TAG, "setAlpha(" + alpha + "): OLD:" + this +
+                        ". Called by " + Debug.getCallers(3));
+                mSurfaceTraceAlpha = alpha;
+            }
+            super.setAlpha(alpha);
+!!!1284866.java!!!	setLayer(in zorder : int) : void
+            if (zorder != mLayer) {
+                if (logSurfaceTrace) Slog.v(SURFACE_TAG, "setLayer(" + zorder + "): OLD:" + this
+                        + ". Called by " + Debug.getCallers(3));
+                mLayer = zorder;
+            }
+            super.setLayer(zorder);
+
+            synchronized (sSurfaces) {
+                sSurfaces.remove(this);
+                int i;
+                for (i = sSurfaces.size() - 1; i >= 0; i--) {
+                    SurfaceTrace s = sSurfaces.get(i);
+                    if (s.mLayer < zorder) {
+                        break;
+                    }
+                }
+                sSurfaces.add(i + 1, this);
+            }
+!!!1284994.java!!!	setPosition(in x : float, in y : float) : void
+            if (x != mPosition.x || y != mPosition.y) {
+                if (logSurfaceTrace) Slog.v(SURFACE_TAG, "setPosition(" + x + "," + y + "): OLD:"
+                        + this + ". Called by " + Debug.getCallers(3));
+                mPosition.set(x, y);
+            }
+            super.setPosition(x, y);
+!!!1285122.java!!!	setSize(in w : int, in h : int) : void
+            if (w != mSize.x || h != mSize.y) {
+                if (logSurfaceTrace) Slog.v(SURFACE_TAG, "setSize(" + w + "," + h + "): OLD:"
+                        + this + ". Called by " + Debug.getCallers(3));
+                mSize.set(w, h);
+            }
+            super.setSize(w, h);
+!!!1285250.java!!!	setWindowCrop(inout crop : Rect) : void
+            if (crop != null) {
+                if (!crop.equals(mWindowCrop)) {
+                    if (logSurfaceTrace) Slog.v(SURFACE_TAG, "setWindowCrop("
+                            + crop.toShortString() + "): OLD:" + this + ". Called by "
+                            + Debug.getCallers(3));
+                    mWindowCrop.set(crop);
+                }
+            }
+            super.setWindowCrop(crop);
+!!!1285378.java!!!	setLayerStack(in layerStack : int) : void
+            if (layerStack != mLayerStack) {
+                if (logSurfaceTrace) Slog.v(SURFACE_TAG, "setLayerStack(" + layerStack + "): OLD:"
+                        + this + ". Called by " + Debug.getCallers(3));
+                mLayerStack = layerStack;
+            }
+            super.setLayerStack(layerStack);
+!!!1285506.java!!!	setOpaque(inout isOpaque : boolean) : void
+            if (isOpaque != mIsOpaque) {
+                if (logSurfaceTrace) Slog.v(SURFACE_TAG, "setOpaque(" + isOpaque + "): OLD:"
+                        + this + ". Called by " + Debug.getCallers(3));
+                mIsOpaque = isOpaque;
+            }
+            super.setOpaque(isOpaque);
+!!!1285634.java!!!	setMatrix(in dsdx : float, in dtdx : float, in dsdy : float, in dtdy : float) : void
+            if (dsdx != mDsdx || dtdx != mDtdx || dsdy != mDsdy || dtdy != mDtdy) {
+                if (logSurfaceTrace) Slog.v(SURFACE_TAG, "setMatrix(" + dsdx + "," + dtdx + ","
+                        + dsdy + "," + dtdy + "): OLD:" + this + ". Called by "
+                        + Debug.getCallers(3));
+                mDsdx = dsdx;
+                mDtdx = dtdx;
+                mDsdy = dsdy;
+                mDtdy = dtdy;
+            }
+            super.setMatrix(dsdx, dtdx, dsdy, dtdy);
+!!!1285762.java!!!	hide() : void
+            if (mShown) {
+                if (logSurfaceTrace) Slog.v(SURFACE_TAG, "hide: OLD:" + this + ". Called by "
+                        + Debug.getCallers(3));
+                mShown = false;
+            }
+            super.hide();
+!!!1285890.java!!!	show() : void
+            if (!mShown) {
+                if (logSurfaceTrace) Slog.v(SURFACE_TAG, "show: OLD:" + this + ". Called by "
+                        + Debug.getCallers(3));
+                mShown = true;
+            }
+            super.show();
+!!!1286018.java!!!	destroy() : void
+            super.destroy();
+            if (logSurfaceTrace) Slog.v(SURFACE_TAG, "destroy: " + this + ". Called by "
+                    + Debug.getCallers(3));
+            synchronized (sSurfaces) {
+                sSurfaces.remove(this);
+            }
+!!!1286146.java!!!	release() : void
+            super.release();
+            if (logSurfaceTrace) Slog.v(SURFACE_TAG, "release: " + this + ". Called by "
+                    + Debug.getCallers(3));
+            synchronized (sSurfaces) {
+                sSurfaces.remove(this);
+            }
+!!!1286274.java!!!	dumpAllSurfaces(inout pw : PrintWriter, in header : String) : void
+            synchronized (sSurfaces) {
+                final int N = sSurfaces.size();
+                if (N <= 0) {
+                    return;
+                }
+                if (header != null) {
+                    pw.println(header);
+                }
+                pw.println("WINDOW MANAGER SURFACES (dumpsys window surfaces)");
+                for (int i = 0; i < N; i++) {
+                    SurfaceTrace s = sSurfaces.get(i);
+                    pw.print("  Surface #"); pw.print(i); pw.print(": #");
+                            pw.print(Integer.toHexString(System.identityHashCode(s)));
+                            pw.print(" "); pw.println(s.mName);
+                    pw.print("    mLayerStack="); pw.print(s.mLayerStack);
+                            pw.print(" mLayer="); pw.println(s.mLayer);
+                    pw.print("    mShown="); pw.print(s.mShown); pw.print(" mAlpha=");
+                            pw.print(s.mSurfaceTraceAlpha); pw.print(" mIsOpaque=");
+                            pw.println(s.mIsOpaque);
+                    pw.print("    mPosition="); pw.print(s.mPosition.x); pw.print(",");
+                            pw.print(s.mPosition.y);
+                            pw.print(" mSize="); pw.print(s.mSize.x); pw.print("x");
+                            pw.println(s.mSize.y);
+                    pw.print("    mCrop="); s.mWindowCrop.printShortString(pw); pw.println();
+                    pw.print("    Transform: ("); pw.print(s.mDsdx); pw.print(", ");
+                            pw.print(s.mDtdx); pw.print(", "); pw.print(s.mDsdy);
+                            pw.print(", "); pw.print(s.mDtdy); pw.println(")");
+                }
+            }
+!!!1286402.java!!!	toString() : String
+            return "Surface " + Integer.toHexString(System.identityHashCode(this)) + " "
+                    + mName + " (" + mLayerStack + "): shown=" + mShown + " layer=" + mLayer
+                    + " alpha=" + mSurfaceTraceAlpha + " " + mPosition.x + "," + mPosition.y
+                    + " " + mSize.x + "x" + mSize.y
+                    + " crop=" + mWindowCrop.toShortString()
+                    + " opaque=" + mIsOpaque
+                    + " (" + mDsdx + "," + mDtdx + "," + mDsdy + "," + mDtdy + ")";

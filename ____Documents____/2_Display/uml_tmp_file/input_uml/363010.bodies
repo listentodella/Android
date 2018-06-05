@@ -1,0 +1,75 @@
+class Marquee
+!!!2107778.java!!!	Marquee(inout v : TextView)
+            final float density = v.getContext().getResources().getDisplayMetrics().density;
+            mPixelsPerSecond = MARQUEE_DP_PER_SECOND * density;
+            mView = new WeakReference<TextView>(v);
+            mChoreographer = Choreographer.getInstance();
+!!!2107906.java!!!	tick() : void
+            if (mStatus != MARQUEE_RUNNING) {
+                return;
+            }
+
+            mChoreographer.removeFrameCallback(mTickCallback);
+
+            final TextView textView = mView.get();
+            if (textView != null && (textView.isFocused() || textView.isSelected())) {
+                long currentMs = mChoreographer.getFrameTime();
+                long deltaMs = currentMs - mLastAnimationMs;
+                mLastAnimationMs = currentMs;
+                float deltaPx = deltaMs / 1000f * mPixelsPerSecond;
+                mScroll += deltaPx;
+                if (mScroll > mMaxScroll) {
+                    mScroll = mMaxScroll;
+                    mChoreographer.postFrameCallbackDelayed(mRestartCallback, MARQUEE_DELAY);
+                } else {
+                    mChoreographer.postFrameCallback(mTickCallback);
+                }
+                textView.invalidate();
+            }
+!!!2108034.java!!!	stop() : void
+            mStatus = MARQUEE_STOPPED;
+            mChoreographer.removeFrameCallback(mStartCallback);
+            mChoreographer.removeFrameCallback(mRestartCallback);
+            mChoreographer.removeFrameCallback(mTickCallback);
+            resetScroll();
+!!!2108162.java!!!	resetScroll() : void
+            mScroll = 0.0f;
+            final TextView textView = mView.get();
+            if (textView != null) textView.invalidate();
+!!!2108290.java!!!	start(in repeatLimit : int) : void
+            if (repeatLimit == 0) {
+                stop();
+                return;
+            }
+            mRepeatLimit = repeatLimit;
+            final TextView textView = mView.get();
+            if (textView != null && textView.mLayout != null) {
+                mStatus = MARQUEE_STARTING;
+                mScroll = 0.0f;
+                final int textWidth = textView.getWidth() - textView.getCompoundPaddingLeft() -
+                        textView.getCompoundPaddingRight();
+                final float lineWidth = textView.mLayout.getLineWidth(0);
+                final float gap = textWidth / 3.0f;
+                mGhostStart = lineWidth - textWidth + gap;
+                mMaxScroll = mGhostStart + textWidth;
+                mGhostOffset = lineWidth + gap;
+                mFadeStop = lineWidth + textWidth / 6.0f;
+                mMaxFadeScroll = mGhostStart + lineWidth + lineWidth;
+
+                textView.invalidate();
+                mChoreographer.postFrameCallback(mStartCallback);
+            }
+!!!2108418.java!!!	getGhostOffset() : float
+            return mGhostOffset;
+!!!2108546.java!!!	getScroll() : float
+            return mScroll;
+!!!2108674.java!!!	getMaxFadeScroll() : float
+            return mMaxFadeScroll;
+!!!2108802.java!!!	shouldDrawLeftFade() : boolean
+            return mScroll <= mFadeStop;
+!!!2108930.java!!!	shouldDrawGhost() : boolean
+            return mStatus == MARQUEE_RUNNING && mScroll > mGhostStart;
+!!!2109058.java!!!	isRunning() : boolean
+            return mStatus == MARQUEE_RUNNING;
+!!!2109186.java!!!	isStopped() : boolean
+            return mStatus == MARQUEE_STOPPED;

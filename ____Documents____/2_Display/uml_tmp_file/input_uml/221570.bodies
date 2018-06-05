@@ -1,0 +1,332 @@
+class ViewTreeObserver
+!!!993026.java!!!	merge(inout observer : ViewTreeObserver) : void
+        if (observer.mOnWindowAttachListeners != null) {
+            if (mOnWindowAttachListeners != null) {
+                mOnWindowAttachListeners.addAll(observer.mOnWindowAttachListeners);
+            } else {
+                mOnWindowAttachListeners = observer.mOnWindowAttachListeners;
+            }
+        }
+
+        if (observer.mOnWindowFocusListeners != null) {
+            if (mOnWindowFocusListeners != null) {
+                mOnWindowFocusListeners.addAll(observer.mOnWindowFocusListeners);
+            } else {
+                mOnWindowFocusListeners = observer.mOnWindowFocusListeners;
+            }
+        }
+
+        if (observer.mOnGlobalFocusListeners != null) {
+            if (mOnGlobalFocusListeners != null) {
+                mOnGlobalFocusListeners.addAll(observer.mOnGlobalFocusListeners);
+            } else {
+                mOnGlobalFocusListeners = observer.mOnGlobalFocusListeners;
+            }
+        }
+
+        if (observer.mOnGlobalLayoutListeners != null) {
+            if (mOnGlobalLayoutListeners != null) {
+                mOnGlobalLayoutListeners.addAll(observer.mOnGlobalLayoutListeners);
+            } else {
+                mOnGlobalLayoutListeners = observer.mOnGlobalLayoutListeners;
+            }
+        }
+
+        if (observer.mOnPreDrawListeners != null) {
+            if (mOnPreDrawListeners != null) {
+                mOnPreDrawListeners.addAll(observer.mOnPreDrawListeners);
+            } else {
+                mOnPreDrawListeners = observer.mOnPreDrawListeners;
+            }
+        }
+
+        if (observer.mOnTouchModeChangeListeners != null) {
+            if (mOnTouchModeChangeListeners != null) {
+                mOnTouchModeChangeListeners.addAll(observer.mOnTouchModeChangeListeners);
+            } else {
+                mOnTouchModeChangeListeners = observer.mOnTouchModeChangeListeners;
+            }
+        }
+
+        if (observer.mOnComputeInternalInsetsListeners != null) {
+            if (mOnComputeInternalInsetsListeners != null) {
+                mOnComputeInternalInsetsListeners.addAll(observer.mOnComputeInternalInsetsListeners);
+            } else {
+                mOnComputeInternalInsetsListeners = observer.mOnComputeInternalInsetsListeners;
+            }
+        }
+
+        if (observer.mOnScrollChangedListeners != null) {
+            if (mOnScrollChangedListeners != null) {
+                mOnScrollChangedListeners.addAll(observer.mOnScrollChangedListeners);
+            } else {
+                mOnScrollChangedListeners = observer.mOnScrollChangedListeners;
+            }
+        }
+
+        observer.kill();
+!!!993154.java!!!	addOnWindowAttachListener(inout listener : ViewTreeObserver::OnWindowAttachListener) : void
+        checkIsAlive();
+
+        if (mOnWindowAttachListeners == null) {
+            mOnWindowAttachListeners
+                    = new CopyOnWriteArrayList<OnWindowAttachListener>();
+        }
+
+        mOnWindowAttachListeners.add(listener);
+!!!993282.java!!!	removeOnWindowAttachListener(inout victim : ViewTreeObserver::OnWindowAttachListener) : void
+        checkIsAlive();
+        if (mOnWindowAttachListeners == null) {
+            return;
+        }
+        mOnWindowAttachListeners.remove(victim);
+!!!993410.java!!!	addOnWindowFocusChangeListener(inout listener : ViewTreeObserver::OnWindowFocusChangeListener) : void
+        checkIsAlive();
+
+        if (mOnWindowFocusListeners == null) {
+            mOnWindowFocusListeners
+                    = new CopyOnWriteArrayList<OnWindowFocusChangeListener>();
+        }
+
+        mOnWindowFocusListeners.add(listener);
+!!!993538.java!!!	removeOnWindowFocusChangeListener(inout victim : ViewTreeObserver::OnWindowFocusChangeListener) : void
+        checkIsAlive();
+        if (mOnWindowFocusListeners == null) {
+            return;
+        }
+        mOnWindowFocusListeners.remove(victim);
+!!!993666.java!!!	addOnGlobalFocusChangeListener(inout listener : ViewTreeObserver::OnGlobalFocusChangeListener) : void
+        checkIsAlive();
+
+        if (mOnGlobalFocusListeners == null) {
+            mOnGlobalFocusListeners = new CopyOnWriteArrayList<OnGlobalFocusChangeListener>();
+        }
+
+        mOnGlobalFocusListeners.add(listener);
+!!!993794.java!!!	removeOnGlobalFocusChangeListener(inout victim : ViewTreeObserver::OnGlobalFocusChangeListener) : void
+        checkIsAlive();
+        if (mOnGlobalFocusListeners == null) {
+            return;
+        }
+        mOnGlobalFocusListeners.remove(victim);
+!!!993922.java!!!	addOnGlobalLayoutListener(inout listener : ViewTreeObserver::OnGlobalLayoutListener) : void
+        checkIsAlive();
+
+        if (mOnGlobalLayoutListeners == null) {
+            mOnGlobalLayoutListeners = new CopyOnWriteArray<OnGlobalLayoutListener>();
+        }
+
+        mOnGlobalLayoutListeners.add(listener);
+!!!994050.java!!!	removeGlobalOnLayoutListener(inout victim : ViewTreeObserver::OnGlobalLayoutListener) : void
+        removeOnGlobalLayoutListener(victim);
+!!!994178.java!!!	removeOnGlobalLayoutListener(inout victim : ViewTreeObserver::OnGlobalLayoutListener) : void
+        checkIsAlive();
+        if (mOnGlobalLayoutListeners == null) {
+            return;
+        }
+        mOnGlobalLayoutListeners.remove(victim);
+!!!994306.java!!!	addOnPreDrawListener(inout listener : ViewTreeObserver::OnPreDrawListener) : void
+        checkIsAlive();
+
+        if (mOnPreDrawListeners == null) {
+            mOnPreDrawListeners = new CopyOnWriteArray<OnPreDrawListener>();
+        }
+
+        mOnPreDrawListeners.add(listener);
+!!!994434.java!!!	removeOnPreDrawListener(inout victim : ViewTreeObserver::OnPreDrawListener) : void
+        checkIsAlive();
+        if (mOnPreDrawListeners == null) {
+            return;
+        }
+        mOnPreDrawListeners.remove(victim);
+!!!994562.java!!!	addOnDrawListener(inout listener : ViewTreeObserver::OnDrawListener) : void
+        checkIsAlive();
+
+        if (mOnDrawListeners == null) {
+            mOnDrawListeners = new ArrayList<OnDrawListener>();
+        }
+
+        mOnDrawListeners.add(listener);
+!!!994690.java!!!	removeOnDrawListener(inout victim : ViewTreeObserver::OnDrawListener) : void
+        checkIsAlive();
+        if (mOnDrawListeners == null) {
+            return;
+        }
+        mOnDrawListeners.remove(victim);
+!!!994818.java!!!	addOnScrollChangedListener(inout listener : ViewTreeObserver::OnScrollChangedListener) : void
+        checkIsAlive();
+
+        if (mOnScrollChangedListeners == null) {
+            mOnScrollChangedListeners = new CopyOnWriteArray<OnScrollChangedListener>();
+        }
+
+        mOnScrollChangedListeners.add(listener);
+!!!994946.java!!!	removeOnScrollChangedListener(inout victim : ViewTreeObserver::OnScrollChangedListener) : void
+        checkIsAlive();
+        if (mOnScrollChangedListeners == null) {
+            return;
+        }
+        mOnScrollChangedListeners.remove(victim);
+!!!995074.java!!!	addOnTouchModeChangeListener(inout listener : ViewTreeObserver::OnTouchModeChangeListener) : void
+        checkIsAlive();
+
+        if (mOnTouchModeChangeListeners == null) {
+            mOnTouchModeChangeListeners = new CopyOnWriteArrayList<OnTouchModeChangeListener>();
+        }
+
+        mOnTouchModeChangeListeners.add(listener);
+!!!995202.java!!!	removeOnTouchModeChangeListener(inout victim : ViewTreeObserver::OnTouchModeChangeListener) : void
+        checkIsAlive();
+        if (mOnTouchModeChangeListeners == null) {
+            return;
+        }
+        mOnTouchModeChangeListeners.remove(victim);
+!!!995330.java!!!	addOnComputeInternalInsetsListener(inout listener : ViewTreeObserver::OnComputeInternalInsetsListener) : void
+        checkIsAlive();
+
+        if (mOnComputeInternalInsetsListeners == null) {
+            mOnComputeInternalInsetsListeners =
+                    new CopyOnWriteArray<OnComputeInternalInsetsListener>();
+        }
+
+        mOnComputeInternalInsetsListeners.add(listener);
+!!!995458.java!!!	removeOnComputeInternalInsetsListener(inout victim : ViewTreeObserver::OnComputeInternalInsetsListener) : void
+        checkIsAlive();
+        if (mOnComputeInternalInsetsListeners == null) {
+            return;
+        }
+        mOnComputeInternalInsetsListeners.remove(victim);
+!!!995586.java!!!	checkIsAlive() : void
+        if (!mAlive) {
+            throw new IllegalStateException("This ViewTreeObserver is not alive, call "
+                    + "getViewTreeObserver() again");
+        }
+!!!995714.java!!!	isAlive() : boolean
+        return mAlive;
+!!!995842.java!!!	kill() : void
+        mAlive = false;
+!!!995970.java!!!	dispatchOnWindowAttachedChange(inout attached : boolean) : void
+        // NOTE: because of the use of CopyOnWriteArrayList, we *must* use an iterator to
+        // perform the dispatching. The iterator is a safe guard against listeners that
+        // could mutate the list by calling the various add/remove methods. This prevents
+        // the array from being modified while we iterate it.
+        final CopyOnWriteArrayList<OnWindowAttachListener> listeners
+                = mOnWindowAttachListeners;
+        if (listeners != null && listeners.size() > 0) {
+            for (OnWindowAttachListener listener : listeners) {
+                if (attached) listener.onWindowAttached();
+                else listener.onWindowDetached();
+            }
+        }
+!!!996098.java!!!	dispatchOnWindowFocusChange(inout hasFocus : boolean) : void
+        // NOTE: because of the use of CopyOnWriteArrayList, we *must* use an iterator to
+        // perform the dispatching. The iterator is a safe guard against listeners that
+        // could mutate the list by calling the various add/remove methods. This prevents
+        // the array from being modified while we iterate it.
+        final CopyOnWriteArrayList<OnWindowFocusChangeListener> listeners
+                = mOnWindowFocusListeners;
+        if (listeners != null && listeners.size() > 0) {
+            for (OnWindowFocusChangeListener listener : listeners) {
+                listener.onWindowFocusChanged(hasFocus);
+            }
+        }
+!!!996226.java!!!	dispatchOnGlobalFocusChange(inout oldFocus : View, inout newFocus : View) : void
+        // NOTE: because of the use of CopyOnWriteArrayList, we *must* use an iterator to
+        // perform the dispatching. The iterator is a safe guard against listeners that
+        // could mutate the list by calling the various add/remove methods. This prevents
+        // the array from being modified while we iterate it.
+        final CopyOnWriteArrayList<OnGlobalFocusChangeListener> listeners = mOnGlobalFocusListeners;
+        if (listeners != null && listeners.size() > 0) {
+            for (OnGlobalFocusChangeListener listener : listeners) {
+                listener.onGlobalFocusChanged(oldFocus, newFocus);
+            }
+        }
+!!!996354.java!!!	dispatchOnGlobalLayout() : void
+        // NOTE: because of the use of CopyOnWriteArrayList, we *must* use an iterator to
+        // perform the dispatching. The iterator is a safe guard against listeners that
+        // could mutate the list by calling the various add/remove methods. This prevents
+        // the array from being modified while we iterate it.
+        final CopyOnWriteArray<OnGlobalLayoutListener> listeners = mOnGlobalLayoutListeners;
+        if (listeners != null && listeners.size() > 0) {
+            CopyOnWriteArray.Access<OnGlobalLayoutListener> access = listeners.start();
+            try {
+                int count = access.size();
+                for (int i = 0; i < count; i++) {
+                    access.get(i).onGlobalLayout();
+                }
+            } finally {
+                listeners.end();
+            }
+        }
+!!!996482.java!!!	hasOnPreDrawListeners() : boolean
+        return mOnPreDrawListeners != null && mOnPreDrawListeners.size() > 0;
+!!!996610.java!!!	dispatchOnPreDraw() : boolean
+        boolean cancelDraw = false;
+        final CopyOnWriteArray<OnPreDrawListener> listeners = mOnPreDrawListeners;
+        if (listeners != null && listeners.size() > 0) {
+            CopyOnWriteArray.Access<OnPreDrawListener> access = listeners.start();
+            try {
+                int count = access.size();
+                for (int i = 0; i < count; i++) {
+                    cancelDraw |= !(access.get(i).onPreDraw());
+                }
+            } finally {
+                listeners.end();
+            }
+        }
+        return cancelDraw;
+!!!996738.java!!!	dispatchOnDraw() : void
+        if (mOnDrawListeners != null) {
+            final ArrayList<OnDrawListener> listeners = mOnDrawListeners;
+            int numListeners = listeners.size();
+            for (int i = 0; i < numListeners; ++i) {
+                listeners.get(i).onDraw();
+            }
+        }
+!!!996866.java!!!	dispatchOnTouchModeChanged(inout inTouchMode : boolean) : void
+        final CopyOnWriteArrayList<OnTouchModeChangeListener> listeners =
+                mOnTouchModeChangeListeners;
+        if (listeners != null && listeners.size() > 0) {
+            for (OnTouchModeChangeListener listener : listeners) {
+                listener.onTouchModeChanged(inTouchMode);
+            }
+        }
+!!!996994.java!!!	dispatchOnScrollChanged() : void
+        // NOTE: because of the use of CopyOnWriteArrayList, we *must* use an iterator to
+        // perform the dispatching. The iterator is a safe guard against listeners that
+        // could mutate the list by calling the various add/remove methods. This prevents
+        // the array from being modified while we iterate it.
+        final CopyOnWriteArray<OnScrollChangedListener> listeners = mOnScrollChangedListeners;
+        if (listeners != null && listeners.size() > 0) {
+            CopyOnWriteArray.Access<OnScrollChangedListener> access = listeners.start();
+            try {
+                int count = access.size();
+                for (int i = 0; i < count; i++) {
+                    access.get(i).onScrollChanged();
+                }
+            } finally {
+                listeners.end();
+            }
+        }
+!!!997122.java!!!	hasComputeInternalInsetsListeners() : boolean
+        final CopyOnWriteArray<OnComputeInternalInsetsListener> listeners =
+                mOnComputeInternalInsetsListeners;
+        return (listeners != null && listeners.size() > 0);
+!!!997250.java!!!	dispatchOnComputeInternalInsets(inout inoutInfo : ViewTreeObserver::InternalInsetsInfo) : void
+        // NOTE: because of the use of CopyOnWriteArrayList, we *must* use an iterator to
+        // perform the dispatching. The iterator is a safe guard against listeners that
+        // could mutate the list by calling the various add/remove methods. This prevents
+        // the array from being modified while we iterate it.
+        final CopyOnWriteArray<OnComputeInternalInsetsListener> listeners =
+                mOnComputeInternalInsetsListeners;
+        if (listeners != null && listeners.size() > 0) {
+            CopyOnWriteArray.Access<OnComputeInternalInsetsListener> access = listeners.start();
+            try {
+                int count = access.size();
+                for (int i = 0; i < count; i++) {
+                    access.get(i).onComputeInternalInsets(inoutInfo);
+                }
+            } finally {
+                listeners.end();
+            }
+        }

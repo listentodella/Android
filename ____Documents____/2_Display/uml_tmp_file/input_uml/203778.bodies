@@ -1,0 +1,166 @@
+class KeyguardServiceDelegate
+!!!530178.java!!!	KeyguardServiceDelegate(inout context : Context, inout lockPatternUtils : LockPatternUtils)
+        mScrim = createScrim(context);
+!!!530306.java!!!	bindService(inout context : Context) : void
+        Intent intent = new Intent();
+        intent.setClassName(KEYGUARD_PACKAGE, KEYGUARD_CLASS);
+        if (!context.bindServiceAsUser(intent, mKeyguardConnection,
+                Context.BIND_AUTO_CREATE, UserHandle.OWNER)) {
+            if (DEBUG) Log.v(TAG, "*** Keyguard: can't bind to " + KEYGUARD_CLASS);
+            mKeyguardState.showing = false;
+            mKeyguardState.showingAndNotOccluded = false;
+            mKeyguardState.secure = false;
+        } else {
+            if (DEBUG) Log.v(TAG, "*** Keyguard started");
+        }
+!!!530434.java!!!	isShowing() : boolean
+        if (mKeyguardService != null) {
+            mKeyguardState.showing = mKeyguardService.isShowing();
+        }
+        return mKeyguardState.showing;
+!!!530562.java!!!	isShowingAndNotOccluded() : boolean
+        if (mKeyguardService != null) {
+            mKeyguardState.showingAndNotOccluded = mKeyguardService.isShowingAndNotOccluded();
+        }
+        return mKeyguardState.showingAndNotOccluded;
+!!!530690.java!!!	isInputRestricted() : boolean
+        if (mKeyguardService != null) {
+            mKeyguardState.inputRestricted = mKeyguardService.isInputRestricted();
+        }
+        return mKeyguardState.inputRestricted;
+!!!530818.java!!!	verifyUnlock(in onKeyguardExitResult : OnKeyguardExitResult) : void
+        if (mKeyguardService != null) {
+            mKeyguardService.verifyUnlock(new KeyguardExitDelegate(onKeyguardExitResult));
+        }
+!!!530946.java!!!	keyguardDone(inout authenticated : boolean, inout wakeup : boolean) : void
+        if (mKeyguardService != null) {
+            mKeyguardService.keyguardDone(authenticated, wakeup);
+        }
+!!!531074.java!!!	setOccluded(inout isOccluded : boolean) : int
+        int result = 0;
+        if (mKeyguardService != null) {
+            result = mKeyguardService.setOccluded(isOccluded);
+        }
+        mKeyguardState.occluded = isOccluded;
+        return result;
+!!!531202.java!!!	dismiss() : void
+        if (mKeyguardService != null) {
+            mKeyguardService.dismiss();
+        }
+!!!531330.java!!!	isSecure() : boolean
+        if (mKeyguardService != null) {
+            mKeyguardState.secure = mKeyguardService.isSecure();
+        }
+        return mKeyguardState.secure;
+!!!531458.java!!!	onDreamingStarted() : void
+        if (mKeyguardService != null) {
+            mKeyguardService.onDreamingStarted();
+        }
+        mKeyguardState.dreaming = true;
+!!!531586.java!!!	onDreamingStopped() : void
+        if (mKeyguardService != null) {
+            mKeyguardService.onDreamingStopped();
+        }
+        mKeyguardState.dreaming = false;
+!!!531714.java!!!	onScreenTurnedOn(in showListener : KeyguardServiceDelegate::ShowListener) : void
+        if (mKeyguardService != null) {
+            if (DEBUG) Log.v(TAG, "onScreenTurnedOn(showListener = " + showListener + ")");
+            mKeyguardService.onScreenTurnedOn(new KeyguardShowDelegate(showListener));
+        } else {
+            // try again when we establish a connection
+            Slog.w(TAG, "onScreenTurnedOn(): no keyguard service!");
+            // This shouldn't happen, but if it does, invoke the listener immediately
+            // to avoid a dark screen...
+            showListener.onShown(null);
+        }
+        mKeyguardState.screenIsOn = true;
+!!!531842.java!!!	onScreenTurnedOff(in why : int) : void
+        if (mKeyguardService != null) {
+            mKeyguardService.onScreenTurnedOff(why);
+        }
+        mKeyguardState.offReason = why;
+        mKeyguardState.screenIsOn = false;
+!!!531970.java!!!	setKeyguardEnabled(inout enabled : boolean) : void
+        if (mKeyguardService != null) {
+            mKeyguardService.setKeyguardEnabled(enabled);
+        }
+        mKeyguardState.enabled = enabled;
+!!!532098.java!!!	isDismissable() : boolean
+        if (mKeyguardService != null) {
+            mKeyguardState.dismissable = mKeyguardService.isDismissable();
+        }
+        return mKeyguardState.dismissable;
+!!!532226.java!!!	onSystemReady() : void
+        if (mKeyguardService != null) {
+            mKeyguardService.onSystemReady();
+        } else {
+            mKeyguardState.systemIsReady = true;
+        }
+!!!532354.java!!!	doKeyguardTimeout(inout options : Bundle) : void
+        if (mKeyguardService != null) {
+            mKeyguardService.doKeyguardTimeout(options);
+        }
+!!!532482.java!!!	showAssistant() : void
+        if (mKeyguardService != null) {
+            mKeyguardService.showAssistant();
+        }
+!!!532610.java!!!	setCurrentUser(in newUserId : int) : void
+        if (mKeyguardService != null) {
+            mKeyguardService.setCurrentUser(newUserId);
+        }
+        mKeyguardState.currentUser = newUserId;
+!!!532738.java!!!	startKeyguardExitAnimation(in startTime : long, in fadeoutDuration : long) : void
+        if (mKeyguardService != null) {
+            mKeyguardService.startKeyguardExitAnimation(startTime, fadeoutDuration);
+        }
+!!!532866.java!!!	createScrim(inout context : Context) : View
+        View view = new View(context);
+
+        int flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
+                | WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN
+                | WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER
+                ;
+
+        final int stretch = ViewGroup.LayoutParams.MATCH_PARENT;
+        final int type = WindowManager.LayoutParams.TYPE_KEYGUARD_SCRIM;
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                stretch, stretch, type, flags, PixelFormat.TRANSLUCENT);
+        lp.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE;
+        lp.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_NOSENSOR;
+        lp.privateFlags |= WindowManager.LayoutParams.PRIVATE_FLAG_FAKE_HARDWARE_ACCELERATED;
+        lp.setTitle("KeyguardScrim");
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        wm.addView(view, lp);
+        view.setVisibility(View.GONE);
+        // Disable pretty much everything in statusbar until keyguard comes back and we know
+        // the state of the world.
+        view.setSystemUiVisibility(View.STATUS_BAR_DISABLE_HOME
+                | View.STATUS_BAR_DISABLE_BACK
+                | View.STATUS_BAR_DISABLE_RECENT
+                | View.STATUS_BAR_DISABLE_EXPAND
+                | View.STATUS_BAR_DISABLE_SEARCH);
+        return view;
+!!!532994.java!!!	showScrim() : void
+        mScrim.post(new Runnable() {
+            @Override
+            public void run() {
+                mScrim.setVisibility(View.VISIBLE);
+            }
+        });
+!!!533122.java!!!	hideScrim() : void
+        mScrim.post(new Runnable() {
+            @Override
+            public void run() {
+                mScrim.setVisibility(View.GONE);
+            }
+        });
+!!!533250.java!!!	onBootCompleted() : void
+        if (mKeyguardService != null) {
+            mKeyguardService.onBootCompleted();
+        }
+        mKeyguardState.bootCompleted = true;
+!!!533378.java!!!	onActivityDrawn() : void
+        if (mKeyguardService != null) {
+            mKeyguardService.onActivityDrawn();
+        }

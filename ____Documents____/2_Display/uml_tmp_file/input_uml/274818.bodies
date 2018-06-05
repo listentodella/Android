@@ -1,0 +1,5 @@
+class FragmentManager
+!!!1539074.java!!!	openTransaction() : FragmentTransaction
+        return beginTransaction();
+!!!1541506.java!!!	enableDebugLogging(inout enabled : boolean) : void
+        FragmentManagerImpl.DEBUG = enabled;

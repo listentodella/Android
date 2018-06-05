@@ -1,0 +1,4 @@
+class DeviceResetEntry
+!!!182146.cpp!!!	appendDescription(inout msg : String8) : void
+    msg.appendFormat("DeviceResetEvent(deviceId=%d), policyFlags=0x%08x",
+            deviceId, policyFlags);

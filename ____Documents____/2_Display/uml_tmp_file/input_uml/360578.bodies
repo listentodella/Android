@@ -1,0 +1,12 @@
+class SavedState
+!!!2040450.java!!!	SavedState(inout superState : Parcelable, in whichChild : int)
+            super(superState);
+            this.whichChild = whichChild;
+!!!2040578.java!!!	SavedState(inout in : Parcel)
+            super(in);
+            this.whichChild = in.readInt();
+!!!2040706.java!!!	writeToParcel(inout out : Parcel, in flags : int) : void
+            super.writeToParcel(out, flags);
+            out.writeInt(this.whichChild);
+!!!2040834.java!!!	toString() : String
+            return "AdapterViewAnimator.SavedState{ whichChild = " + this.whichChild + " }";

@@ -1,0 +1,8 @@
+class ContinueTransitionListener
+!!!1467906.java!!!	onTransitionStart(inout transition : Transition) : void
+            mIsStartingTransition = false;
+            Runnable pending = mPendingTransition;
+            mPendingTransition = null;
+            if (pending != null) {
+                startTransition(pending);
+            }

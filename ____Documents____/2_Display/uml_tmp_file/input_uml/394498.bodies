@@ -1,0 +1,270 @@
+class TabHost
+!!!2486786.java!!!	TabHost(inout context : Context)
+        super(context);
+        initTabHost();
+!!!2486914.java!!!	TabHost(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, com.android.internal.R.attr.tabWidgetStyle);
+!!!2487042.java!!!	TabHost(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2487170.java!!!	TabHost(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, com.android.internal.R.styleable.TabWidget, defStyleAttr, defStyleRes);
+
+        mTabLayoutId = a.getResourceId(R.styleable.TabWidget_tabLayout, 0);
+        a.recycle();
+
+        if (mTabLayoutId == 0) {
+            // In case the tabWidgetStyle does not inherit from Widget.TabWidget and tabLayout is
+            // not defined.
+            mTabLayoutId = R.layout.tab_indicator_holo;
+        }
+
+        initTabHost();
+!!!2487298.java!!!	initTabHost() : void
+        setFocusableInTouchMode(true);
+        setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
+
+        mCurrentTab = -1;
+        mCurrentView = null;
+!!!2487426.java!!!	newTabSpec(in tag : String) : TabHost::TabSpec
+        return new TabSpec(tag);
+!!!2487554.java!!!	setup() : void
+        mTabWidget = (TabWidget) findViewById(com.android.internal.R.id.tabs);
+        if (mTabWidget == null) {
+            throw new RuntimeException(
+                    "Your TabHost must have a TabWidget whose id attribute is 'android.R.id.tabs'");
+        }
+
+        // KeyListener to attach to all tabs. Detects non-navigation keys
+        // and relays them to the tab content.
+        mTabKeyListener = new OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                switch (keyCode) {
+                    case KeyEvent.KEYCODE_DPAD_CENTER:
+                    case KeyEvent.KEYCODE_DPAD_LEFT:
+                    case KeyEvent.KEYCODE_DPAD_RIGHT:
+                    case KeyEvent.KEYCODE_DPAD_UP:
+                    case KeyEvent.KEYCODE_DPAD_DOWN:
+                    case KeyEvent.KEYCODE_ENTER:
+                        return false;
+
+                }
+                mTabContent.requestFocus(View.FOCUS_FORWARD);
+                return mTabContent.dispatchKeyEvent(event);
+            }
+
+        };
+
+        mTabWidget.setTabSelectionListener(new TabWidget.OnTabSelectionChanged() {
+            public void onTabSelectionChanged(int tabIndex, boolean clicked) {
+                setCurrentTab(tabIndex);
+                if (clicked) {
+                    mTabContent.requestFocus(View.FOCUS_FORWARD);
+                }
+            }
+        });
+
+        mTabContent = (FrameLayout) findViewById(com.android.internal.R.id.tabcontent);
+        if (mTabContent == null) {
+            throw new RuntimeException(
+                    "Your TabHost must have a FrameLayout whose id attribute is "
+                            + "'android.R.id.tabcontent'");
+        }
+!!!2487682.java!!!	sendAccessibilityEvent(in eventType : int) : void
+        /* avoid super class behavior - TabWidget sends the right events */
+!!!2487810.java!!!	setup(inout activityGroup : LocalActivityManager) : void
+        setup();
+        mLocalActivityManager = activityGroup;
+!!!2487938.java!!!	onAttachedToWindow() : void
+        super.onAttachedToWindow();
+        final ViewTreeObserver treeObserver = getViewTreeObserver();
+        treeObserver.addOnTouchModeChangeListener(this);
+!!!2488066.java!!!	onDetachedFromWindow() : void
+        super.onDetachedFromWindow();
+        final ViewTreeObserver treeObserver = getViewTreeObserver();
+        treeObserver.removeOnTouchModeChangeListener(this);
+!!!2488194.java!!!	onTouchModeChanged(inout isInTouchMode : boolean) : void
+        if (!isInTouchMode) {
+            // leaving touch mode.. if nothing has focus, let's give it to
+            // the indicator of the current tab
+            if (mCurrentView != null && (!mCurrentView.hasFocus() || mCurrentView.isFocused())) {
+                mTabWidget.getChildTabViewAt(mCurrentTab).requestFocus();
+            }
+        }
+!!!2488322.java!!!	addTab(inout tabSpec : TabHost::TabSpec) : void
+
+        if (tabSpec.mIndicatorStrategy == null) {
+            throw new IllegalArgumentException("you must specify a way to create the tab indicator.");
+        }
+
+        if (tabSpec.mContentStrategy == null) {
+            throw new IllegalArgumentException("you must specify a way to create the tab content");
+        }
+        View tabIndicator = tabSpec.mIndicatorStrategy.createIndicatorView();
+        tabIndicator.setOnKeyListener(mTabKeyListener);
+
+        // If this is a custom view, then do not draw the bottom strips for
+        // the tab indicators.
+        if (tabSpec.mIndicatorStrategy instanceof ViewIndicatorStrategy) {
+            mTabWidget.setStripEnabled(false);
+        }
+
+        mTabWidget.addView(tabIndicator);
+        mTabSpecs.add(tabSpec);
+
+        if (mCurrentTab == -1) {
+            setCurrentTab(0);
+        }
+!!!2488450.java!!!	clearAllTabs() : void
+        mTabWidget.removeAllViews();
+        initTabHost();
+        mTabContent.removeAllViews();
+        mTabSpecs.clear();
+        requestLayout();
+        invalidate();
+!!!2488578.java!!!	getTabWidget() : TabWidget
+        return mTabWidget;
+!!!2488706.java!!!	getCurrentTab() : int
+        return mCurrentTab;
+!!!2488834.java!!!	getCurrentTabTag() : String
+        if (mCurrentTab >= 0 && mCurrentTab < mTabSpecs.size()) {
+            return mTabSpecs.get(mCurrentTab).getTag();
+        }
+        return null;
+!!!2488962.java!!!	getCurrentTabView() : View
+        if (mCurrentTab >= 0 && mCurrentTab < mTabSpecs.size()) {
+            return mTabWidget.getChildTabViewAt(mCurrentTab);
+        }
+        return null;
+!!!2489090.java!!!	getCurrentView() : View
+        return mCurrentView;
+!!!2489218.java!!!	setCurrentTabByTag(in tag : String) : void
+        int i;
+        for (i = 0; i < mTabSpecs.size(); i++) {
+            if (mTabSpecs.get(i).getTag().equals(tag)) {
+                setCurrentTab(i);
+                break;
+            }
+        }
+!!!2489346.java!!!	getTabContentView() : FrameLayout
+        return mTabContent;
+!!!2489474.java!!!	getTabWidgetLocation() : int
+        int location = TABWIDGET_LOCATION_TOP;
+
+        switch (mTabWidget.getOrientation()) {
+            case LinearLayout.VERTICAL:
+                location = (mTabContent.getLeft() < mTabWidget.getLeft()) ? TABWIDGET_LOCATION_RIGHT
+                        : TABWIDGET_LOCATION_LEFT;
+                break;
+            case LinearLayout.HORIZONTAL:
+            default:
+                location = (mTabContent.getTop() < mTabWidget.getTop()) ? TABWIDGET_LOCATION_BOTTOM
+                        : TABWIDGET_LOCATION_TOP;
+                break;
+        }
+        return location;
+!!!2489602.java!!!	dispatchKeyEvent(inout event : KeyEvent) : boolean
+        final boolean handled = super.dispatchKeyEvent(event);
+
+        // unhandled key events change focus to tab indicator for embedded
+        // activities when there is nothing that will take focus from default
+        // focus searching
+        if (!handled
+                && (event.getAction() == KeyEvent.ACTION_DOWN)
+                && (mCurrentView != null)
+                && (mCurrentView.isRootNamespace())
+                && (mCurrentView.hasFocus())) {
+            int keyCodeShouldChangeFocus = KeyEvent.KEYCODE_DPAD_UP;
+            int directionShouldChangeFocus = View.FOCUS_UP;
+            int soundEffect = SoundEffectConstants.NAVIGATION_UP;
+
+            switch (getTabWidgetLocation()) {
+                case TABWIDGET_LOCATION_LEFT:
+                    keyCodeShouldChangeFocus = KeyEvent.KEYCODE_DPAD_LEFT;
+                    directionShouldChangeFocus = View.FOCUS_LEFT;
+                    soundEffect = SoundEffectConstants.NAVIGATION_LEFT;
+                    break;
+                case TABWIDGET_LOCATION_RIGHT:
+                    keyCodeShouldChangeFocus = KeyEvent.KEYCODE_DPAD_RIGHT;
+                    directionShouldChangeFocus = View.FOCUS_RIGHT;
+                    soundEffect = SoundEffectConstants.NAVIGATION_RIGHT;
+                    break;
+                case TABWIDGET_LOCATION_BOTTOM:
+                    keyCodeShouldChangeFocus = KeyEvent.KEYCODE_DPAD_DOWN;
+                    directionShouldChangeFocus = View.FOCUS_DOWN;
+                    soundEffect = SoundEffectConstants.NAVIGATION_DOWN;
+                    break;
+                case TABWIDGET_LOCATION_TOP:
+                default:
+                    keyCodeShouldChangeFocus = KeyEvent.KEYCODE_DPAD_UP;
+                    directionShouldChangeFocus = View.FOCUS_UP;
+                    soundEffect = SoundEffectConstants.NAVIGATION_UP;
+                    break;
+            }
+            if (event.getKeyCode() == keyCodeShouldChangeFocus
+                    && mCurrentView.findFocus().focusSearch(directionShouldChangeFocus) == null) {
+                mTabWidget.getChildTabViewAt(mCurrentTab).requestFocus();
+                playSoundEffect(soundEffect);
+                return true;
+            }
+        }
+        return handled;
+!!!2489730.java!!!	dispatchWindowFocusChanged(inout hasFocus : boolean) : void
+        if (mCurrentView != null){
+            mCurrentView.dispatchWindowFocusChanged(hasFocus);
+        }
+!!!2489858.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(TabHost.class.getName());
+!!!2489986.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(TabHost.class.getName());
+!!!2490114.java!!!	setCurrentTab(in index : int) : void
+        if (index < 0 || index >= mTabSpecs.size()) {
+            return;
+        }
+
+        if (index == mCurrentTab) {
+            return;
+        }
+
+        // notify old tab content
+        if (mCurrentTab != -1) {
+            mTabSpecs.get(mCurrentTab).mContentStrategy.tabClosed();
+        }
+
+        mCurrentTab = index;
+        final TabHost.TabSpec spec = mTabSpecs.get(index);
+
+        // Call the tab widget's focusCurrentTab(), instead of just
+        // selecting the tab.
+        mTabWidget.focusCurrentTab(mCurrentTab);
+
+        // tab content
+        mCurrentView = spec.mContentStrategy.getContentView();
+
+        if (mCurrentView.getParent() == null) {
+            mTabContent
+                    .addView(
+                            mCurrentView,
+                            new ViewGroup.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+
+        if (!mTabWidget.hasFocus()) {
+            // if the tab widget didn't take focus (likely because we're in touch mode)
+            // give the current tab content view a shot
+            mCurrentView.requestFocus();
+        }
+
+        //mTabContent.requestFocus(View.FOCUS_FORWARD);
+        invokeOnTabChangeListener();
+!!!2490242.java!!!	setOnTabChangedListener(inout l : TabHost::OnTabChangeListener) : void
+        mOnTabChangeListener = l;
+!!!2490370.java!!!	invokeOnTabChangeListener() : void
+        if (mOnTabChangeListener != null) {
+            mOnTabChangeListener.onTabChanged(getCurrentTabTag());
+        }

@@ -1,0 +1,45 @@
+class SendViewStateChangedAccessibilityEvent
+!!!696706.java!!!	run() : void
+            mPosted = false;
+            mPostedWithDelay = false;
+            mLastEventTimeMillis = SystemClock.uptimeMillis();
+            if (AccessibilityManager.getInstance(mContext).isEnabled()) {
+                final AccessibilityEvent event = AccessibilityEvent.obtain();
+                event.setEventType(AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED);
+                event.setContentChangeTypes(mChangeTypes);
+                sendAccessibilityEventUnchecked(event);
+            }
+            mChangeTypes = 0;
+!!!696834.java!!!	runOrPost(in changeType : int) : void
+            mChangeTypes |= changeType;
+
+            // If this is a live region or the child of a live region, collect
+            // all events from this frame and send them on the next frame.
+            if (inLiveRegion()) {
+                // If we're already posted with a delay, remove that.
+                if (mPostedWithDelay) {
+                    removeCallbacks(this);
+                    mPostedWithDelay = false;
+                }
+                // Only post if we're not already posted.
+                if (!mPosted) {
+                    post(this);
+                    mPosted = true;
+                }
+                return;
+            }
+
+            if (mPosted) {
+                return;
+            }
+
+            final long timeSinceLastMillis = SystemClock.uptimeMillis() - mLastEventTimeMillis;
+            final long minEventIntevalMillis =
+                    ViewConfiguration.getSendRecurringAccessibilityEventsInterval();
+            if (timeSinceLastMillis >= minEventIntevalMillis) {
+                removeCallbacks(this);
+                run();
+            } else {
+                postDelayed(this, minEventIntevalMillis - timeSinceLastMillis);
+                mPostedWithDelay = true;
+            }

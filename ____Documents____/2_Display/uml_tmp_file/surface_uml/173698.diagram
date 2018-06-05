@@ -1,0 +1,374 @@
+format 76
+
+classinstance 129794 class_ref 144898 // SurfaceFlinger
+  name ""   xyz 342.7 31.8 2000 life_line_z 2000
+classinstance 178306 class_ref 144770 // Layer
+  name ""   xyz 1318.9 21 2000 life_line_z 2000
+note 198530 "return mQueuedFrames > 0 || mSidebandStreamChanged;"
+  xyzwh 1361.2 204.8 2015 351 35
+note 198914 "// if (hw->isDisplayOn())"
+  xyzwh 449 415 2000 167 35
+note 199298 "hw->setVisibleLayersSortedByZ(layersSortedByZ);
+hw->undefinedRegion.set(bounds);
+hw->undefinedRegion.subtractSelf(tr.transform(opaqueRegion));
+hw->dirtyRegion.orSelf(dirtyRegion);"
+  xyzwh 443 511 2000 385 89
+note 199682 "// for (size_t dpy=0 ; dpy<mDisplays.size() ; dpy++)
+    // if (hw->isDisplayOn())"
+  xyzwh 416 957 2000 315 51
+note 200834 "const Region dirtyRegion(hw->getDirtyRegion(repaintEverything));"
+  xyzwh 440 1038 2000 401 35
+classinstance 200962 class_ref 145410 // DisplayDevice
+  name ""   xyz 939 23 2000 life_line_z 2000
+classinstance 201346 class_ref 242178 // FramebufferSurface
+  name ""   xyz 1119 20 2000 life_line_z 2000
+note 201730 "getDefaultDisplayDevice()->makeCurrent(mEGLDisplay, mEGLContext);"
+  xyzwh 431 2491 2000 579 85
+note 202626 "// we start with the whole screen area
+const Region bounds(hw->getBounds());
+
+// we remove the scissor part
+// we're left with the letterbox region
+// (common case is that letterbox ends-up being empty)
+const Region letterbox(bounds.subtract(hw->getScissor()));
+
+// compute the area to clear
+Region region(hw->undefinedRegion.merge(letterbox));
+
+// but limit it to the dirty region
+region.andSelf(dirty);
+
+// screen is already cleared here
+if (!region.isEmpty()) {
+    // can happen with SurfaceView
+    drawWormhole(hw, region);
+}
+"
+  xyzwh 446 1242 2000 387 305
+note 203010 "// we're not using h/w composer
+for (size_t i=0 ; i<count ; ++i) {
+    const sp<Layer>& layer(layers[i]);
+    const Region clip(dirty.intersect(
+            tr.transform(layer->visibleRegion)));
+    if (!clip.isEmpty()) {
+        layer->draw(hw, clip);
+    }
+}
+"
+  xyzwh 442 1632 2000 391 159
+note 204162 "hw->swapRegion.orSelf(dirtyRegion);
+"
+  xyzwh 448 1857 2000 273 37
+classinstance 204802 class_ref 242306 // egl.cpp
+  name ""   xyz 1223 63 2000 life_line_z 2000
+classinstance 205186 class_ref 242434 // egl_window_surface_v2_t
+  name ""   xyz 1418 24 2000 life_line_z 2000
+classinstance 205570 class_ref 183682 // Surface
+  name ""   xyz 1606 26 2000 life_line_z 2000
+classinstance 206210 class_ref 172674 // BufferQueueProducer
+  name ""   xyz 1767 28 2000 life_line_z 2000
+note 206850 "mCore->mQueue.push_back(item);
+listener = mCore->mConsumerListener;
+"
+  xyzwh 1879 2053 2000 279 55
+classinstance 206978 class_ref 154242 // FramebufferSurface
+  name ""   xyz 2015 24 2000 life_line_z 2000
+classinstance 207618 class_ref 146178 // HWComposer
+  name ""   xyz 2213 29 2000 life_line_z 2000
+note 208002 "mFbDev->post(mFbDev, buffer->handle);"
+  xyzwh 2277 2229 2000 269 35
+durationcanvas 196610 classinstance_ref 129794 // :SurfaceFlinger
+  xyzwh 384 146 2010 11 2535
+  overlappingdurationcanvas 196994
+    xyzwh 390 172 2020 11 73
+  end
+  overlappingdurationcanvas 197250
+    xyzwh 390 366 2020 11 248
+    overlappingdurationcanvas 198658
+      xyzwh 396 406 2030 11 68
+    end
+    overlappingdurationcanvas 199042
+      xyzwh 396 516 2030 11 92
+    end
+  end
+  overlappingdurationcanvas 197506
+    xyzwh 390 718 2020 11 153
+    overlappingdurationcanvas 199426
+      xyzwh 396 752 2030 11 74
+    end
+  end
+  overlappingdurationcanvas 197762
+    xyzwh 390 939 2020 11 1658
+    overlappingdurationcanvas 199810
+      xyzwh 396 1033 2030 11 64
+    end
+    overlappingdurationcanvas 200066
+      xyzwh 396 1132 2030 11 1180
+      overlappingdurationcanvas 201858
+	xyzwh 402 1169 2040 11 1137
+	overlappingdurationcanvas 202114
+	  xyzwh 408 1194 2050 11 615
+	  overlappingdurationcanvas 202370
+	    xyzwh 414 1231 2060 11 571
+	    overlappingdurationcanvas 202754
+	      xyzwh 420 1596 2070 11 201
+	    end
+	  end
+	end
+	overlappingdurationcanvas 203906
+	  xyzwh 408 1852 2050 11 47
+	end
+	overlappingdurationcanvas 204290
+	  xyzwh 408 1941 2050 11 360
+	end
+      end
+    end
+    overlappingdurationcanvas 200322
+      xyzwh 396 2365 2030 11 48
+    end
+    overlappingdurationcanvas 200578
+      xyzwh 396 2482 2030 11 110
+    end
+  end
+  overlappingdurationcanvas 198018
+    xyzwh 390 2645 2020 11 31
+  end
+end
+durationcanvas 198274 classinstance_ref 178306 // :Layer
+  xyzwh 1337 196 2010 11 47
+end
+durationcanvas 201090 classinstance_ref 200962 // :DisplayDevice
+  xyzwh 980 2377 2010 11 35
+end
+durationcanvas 201474 classinstance_ref 201346 // :FramebufferSurface
+  xyzwh 1175 2382 2010 11 30
+end
+durationcanvas 203138 classinstance_ref 178306 // :Layer
+  xyzwh 1337 1622 2010 11 130
+  overlappingdurationcanvas 203394
+    xyzwh 1343 1643 2020 11 94
+    overlappingdurationcanvas 203650
+      xyzwh 1349 1671 2030 11 60
+    end
+  end
+end
+durationcanvas 204546 classinstance_ref 200962 // :DisplayDevice
+  xyzwh 980 1971 2010 11 357
+end
+durationcanvas 204930 classinstance_ref 204802 // :egl.cpp
+  xyzwh 1245 2004 2010 11 326
+end
+durationcanvas 205314 classinstance_ref 205186 // :egl_window_surface_v2_t
+  xyzwh 1491 2004 2010 11 343
+end
+durationcanvas 205698 classinstance_ref 205570 // :Surface
+  xyzwh 1629 2010 2010 11 258
+end
+durationcanvas 205954 classinstance_ref 205570 // :Surface
+  xyzwh 1629 2336 2010 11 25
+end
+durationcanvas 206338 classinstance_ref 206210 // :BufferQueueProducer
+  xyzwh 1828 2037 2010 11 228
+  overlappingdurationcanvas 206594
+    xyzwh 1834 2057 2020 11 76
+  end
+end
+durationcanvas 207106 classinstance_ref 206978 // :FramebufferSurface
+  xyzwh 2071 2163 2010 11 104
+  overlappingdurationcanvas 207362
+    xyzwh 2077 2174 2020 11 25
+  end
+end
+durationcanvas 207746 classinstance_ref 207618 // :HWComposer
+  xyzwh 2254 2225 2010 11 41
+end
+lostfoundmsgsupport 196738 xyz 121 149 2015
+msg 196866 found_synchronous
+  from lostfoundmsgsupport_ref 196738
+  to durationcanvas_ref 196610
+  yz 147 2015 explicitmsg "handleMessageRefresh"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 141 133
+reflexivemsg 197122 synchronous
+  to durationcanvas_ref 196994
+  yz 172 2025 explicitmsg "A1. preComposition()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 400 153
+reflexivemsg 197378 synchronous
+  to durationcanvas_ref 197250
+  yz 366 2025 explicitmsg "A2. rebuildLayerStacks() // rebuild the visible layer list per screen"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 405 348
+reflexivemsg 197634 synchronous
+  to durationcanvas_ref 197506
+  yz 718 2025 explicitmsg "A3. setUpHWComposer()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 398 697
+reflexivemsg 197890 synchronous
+  to durationcanvas_ref 197762
+  yz 939 2025 explicitmsg "A4. doComposition()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 408 920
+reflexivemsg 198146 synchronous
+  to durationcanvas_ref 198018
+  yz 2645 2025 explicitmsg "A5. postComposition()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 404 2625
+msg 198402 synchronous
+  from durationcanvas_ref 196994
+  to durationcanvas_ref 198274
+  yz 196 2025 explicitmsg "B1. layers[i]->onPreComposition()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 433 182
+reflexivemsg 198786 synchronous
+  to durationcanvas_ref 198658
+  yz 406 2035 explicitmsg "B1. SurfaceFlinger::computeVisibleRegions(layers, hw->getLayerStack(), dirtyRegion, opaqueRegion);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 418 389
+reflexivemsg 199170 synchronous
+  to durationcanvas_ref 199042
+  yz 516 2035 explicitmsg "B2. //"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 410 496
+reflexivemsg 199554 synchronous
+  to durationcanvas_ref 199426
+  yz 752 2035 explicitmsg "B1. // if (hwc.initCheck() == NO_ERROR)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 421 736
+reflexivemsg 199938 synchronous
+  to durationcanvas_ref 199810
+  yz 1033 2035 explicitmsg "B1. // transform the dirty region into this screen's coordinate space"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 425 1015
+reflexivemsg 200194 synchronous
+  to durationcanvas_ref 200066
+  yz 1132 2035 explicitmsg "B2. // repaint the framebuffer (if needed)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 419 1111
+reflexivemsg 200450 synchronous
+  to durationcanvas_ref 200322
+  yz 2365 2035 explicitmsg "B3. // inform the h/w that we're done compositing"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 409 2344
+reflexivemsg 200706 synchronous
+  to durationcanvas_ref 200578
+  yz 2482 2035 explicitmsg "B4. postFramebuffer();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 404 2466
+msg 201218 synchronous
+  from durationcanvas_ref 200322
+  to durationcanvas_ref 201090
+  yz 2383 2040 explicitmsg "C1. hw->compositionComplete();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 435 2370
+msg 201602 synchronous
+  from durationcanvas_ref 201090
+  to durationcanvas_ref 201474
+  yz 2384 2045 explicitmsg "D1. mDisplaySurface->compositionComplete();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 997 2367
+reflexivemsg 201986 synchronous
+  to durationcanvas_ref 201858
+  yz 1169 2045 explicitmsg "C1. doDisplayComposition(hw, dirtyRegion);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 423 1153
+reflexivemsg 202242 synchronous
+  to durationcanvas_ref 202114
+  yz 1194 2055 explicitmsg "D1. doComposeSurfaces(hw, dirtyRegion);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 440 1180
+reflexivemsg 202498 synchronous
+  to durationcanvas_ref 202370
+  yz 1231 2065 explicitmsg "E1. //"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 443 1217
+reflexivemsg 202882 synchronous
+  to durationcanvas_ref 202754
+  yz 1596 2075 explicitmsg "E2. and then, render the layers targeted at the framebuffer"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 442 1575
+msg 203266 synchronous
+  from durationcanvas_ref 202754
+  to durationcanvas_ref 203138
+  yz 1622 2075 explicitmsg "F1. layer->draw(hw, clip);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 474 1608
+reflexivemsg 203522 synchronous
+  to durationcanvas_ref 203394
+  yz 1643 2025 explicitmsg "G1. onDraw(hw, clip, false);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1361 1624
+reflexivemsg 203778 synchronous
+  to durationcanvas_ref 203650
+  yz 1671 2035 explicitmsg "H1. drawWithOpenGL(hw, clip, useIdentityTransform);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1371 1659
+reflexivemsg 204034 synchronous
+  to durationcanvas_ref 203906
+  yz 1852 2055 explicitmsg "D2. // update the swap region and clear the dirty region"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 425 1832
+reflexivemsg 204418 synchronous
+  to durationcanvas_ref 204290
+  yz 1941 2055 explicitmsg "D3. // swap buffers (presentation)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 427 1923
+msg 204674 synchronous
+  from durationcanvas_ref 204290
+  to durationcanvas_ref 204546
+  yz 1972 2060 explicitmsg "E1. hw->swapBuffers(getHwComposer());"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 439 1959
+msg 205058 synchronous
+  from durationcanvas_ref 204546
+  to durationcanvas_ref 204930
+  yz 2006 2015 explicitmsg "F1. eglSwapBuffers(mDisplay, mSurface)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 995 1992
+msg 205442 synchronous
+  from durationcanvas_ref 204930
+  to durationcanvas_ref 205314
+  yz 2012 2015 explicitmsg "G1. d->swapBuffers(); // post the surface"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1263 1997
+msg 205826 synchronous
+  from durationcanvas_ref 205314
+  to durationcanvas_ref 205698
+  yz 2011 2020 explicitmsg "H1. nativeWindow->queueBuffer(nativeWindow, buffer, -1);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1516 1992
+msg 206082 synchronous
+  from durationcanvas_ref 205314
+  to durationcanvas_ref 205954
+  yz 2336 2015 explicitmsg "H2. nativeWindow->dequeueBuffer(nativeWindow, &buffer, &fenceFd) == NO_ERROR)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1514 2319
+msg 206466 synchronous
+  from durationcanvas_ref 205698
+  to durationcanvas_ref 206338
+  yz 2038 2015 explicitmsg "I1. mGraphicBufferProducer->queueBuffer(i, input, &output)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1653 2024
+reflexivemsg 206722 synchronous
+  to durationcanvas_ref 206594
+  yz 2057 2025 explicitmsg "J1. //"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1841 2042
+msg 207234 synchronous
+  from durationcanvas_ref 206338
+  to durationcanvas_ref 207106
+  yz 2164 2015 explicitmsg "J2. listener->onFrameAvailable();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1853 2150
+reflexivemsg 207490 synchronous
+  to durationcanvas_ref 207362
+  yz 2174 2025 explicitmsg "K1. err = nextBuffer(buf, acquireFence);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2099 2156
+msg 207874 synchronous
+  from durationcanvas_ref 207106
+  to durationcanvas_ref 207746
+  yz 2226 2015 explicitmsg "K2. err = mHwc.fbPost(mDisplayType, acquireFence, buf);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 2096 2209
+end

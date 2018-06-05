@@ -1,0 +1,8 @@
+class TouchAffineTransformation
+!!!209410.cpp!!!	applyTo(inout x : float, inout y : float) : void
+    float newX, newY;
+    newX = x * x_scale + y * x_ymix + x_offset;
+    newY = x * y_xmix + y * y_scale + y_offset;
+
+    x = newX;
+    y = newY;

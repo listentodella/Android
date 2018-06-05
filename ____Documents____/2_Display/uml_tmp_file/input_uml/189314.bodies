@@ -1,0 +1,15 @@
+class RWLock
+!!!397954.cpp!!!	RWLock()
+    pthread_rwlock_init(&mRWLock, NULL);
+!!!398338.cpp!!!	~RWLock()
+    pthread_rwlock_destroy(&mRWLock);
+!!!398466.cpp!!!	readLock() : status_t
+    return -pthread_rwlock_rdlock(&mRWLock);
+!!!398594.cpp!!!	tryReadLock() : status_t
+    return -pthread_rwlock_tryrdlock(&mRWLock);
+!!!398722.cpp!!!	writeLock() : status_t
+    return -pthread_rwlock_wrlock(&mRWLock);
+!!!398850.cpp!!!	tryWriteLock() : status_t
+    return -pthread_rwlock_trywrlock(&mRWLock);
+!!!398978.cpp!!!	unlock() : void
+    pthread_rwlock_unlock(&mRWLock);

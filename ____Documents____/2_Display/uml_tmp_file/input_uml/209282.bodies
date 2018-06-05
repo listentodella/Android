@@ -1,0 +1,9 @@
+class AccessibilityNodeProvider
+!!!1096194.java!!!	createAccessibilityNodeInfo(in virtualViewId : int) : AccessibilityNodeInfo
+        return null;
+!!!1096322.java!!!	performAction(in virtualViewId : int, in action : int, inout arguments : Bundle) : boolean
+        return false;
+!!!1096450.java!!!	findAccessibilityNodeInfosByText(in text : String, in virtualViewId : int) : AccessibilityNodeInfo
+        return null;
+!!!1096578.java!!!	findFocus(in focus : int) : AccessibilityNodeInfo
+        return null;

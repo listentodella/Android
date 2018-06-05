@@ -1,0 +1,161 @@
+class ActivityView
+!!!1470722.java!!!	ActivityView(inout context : Context)
+        this(context, null);
+!!!1470850.java!!!	ActivityView(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!1470978.java!!!	ActivityView(inout context : Context, inout attrs : AttributeSet, in defStyle : int)
+        super(context, attrs, defStyle);
+
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                mActivity = (Activity)context;
+                break;
+            }
+            context = ((ContextWrapper)context).getBaseContext();
+        }
+        if (mActivity == null) {
+            throw new IllegalStateException("The ActivityView's Context is not an Activity.");
+        }
+
+        try {
+            mActivityContainer = new ActivityContainerWrapper(
+                    ActivityManagerNative.getDefault().createActivityContainer(
+                            mActivity.getActivityToken(), new ActivityContainerCallback(this)));
+        } catch (RemoteException e) {
+            throw new RuntimeException("ActivityView: Unable to create ActivityContainer. "
+                    + e);
+        }
+
+        mTextureView = new TextureView(context);
+        mTextureView.setSurfaceTextureListener(new ActivityViewSurfaceTextureListener());
+        addView(mTextureView);
+
+        WindowManager wm = (WindowManager)mActivity.getSystemService(Context.WINDOW_SERVICE);
+        mMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(mMetrics);
+
+        mLastVisibility = getVisibility();
+
+        if (DEBUG) Log.v(TAG, "ctor()");
+!!!1471106.java!!!	onLayout(inout changed : boolean, in l : int, in t : int, in r : int, in b : int) : void
+        mTextureView.layout(0, 0, r - l, b - t);
+!!!1471234.java!!!	onVisibilityChanged(inout changedView : View, in visibility : int) : void
+        super.onVisibilityChanged(changedView, visibility);
+
+        if (mSurface != null) {
+            try {
+                if (visibility == View.GONE) {
+                    mActivityContainer.setSurface(null, mWidth, mHeight, mMetrics.densityDpi);
+                } else if (mLastVisibility == View.GONE) {
+                    // Don't change surface when going between View.VISIBLE and View.INVISIBLE.
+                    mActivityContainer.setSurface(mSurface, mWidth, mHeight, mMetrics.densityDpi);
+                }
+            } catch (RemoteException e) {
+                throw new RuntimeException(
+                        "ActivityView: Unable to set surface of ActivityContainer. " + e);
+            }
+        }
+        mLastVisibility = visibility;
+!!!1471362.java!!!	injectInputEvent(inout event : InputEvent) : boolean
+        return mActivityContainer != null && mActivityContainer.injectEvent(event);
+!!!1471490.java!!!	onTouchEvent(inout event : MotionEvent) : boolean
+        return injectInputEvent(event) || super.onTouchEvent(event);
+!!!1471618.java!!!	onGenericMotionEvent(inout event : MotionEvent) : boolean
+        if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) {
+            if (injectInputEvent(event)) {
+                return true;
+            }
+        }
+        return super.onGenericMotionEvent(event);
+!!!1471746.java!!!	onAttachedToWindow() : void
+        if (DEBUG) Log.v(TAG, "onAttachedToWindow(): mActivityContainer=" + mActivityContainer +
+                " mSurface=" + mSurface);
+!!!1471874.java!!!	onDetachedFromWindow() : void
+        if (DEBUG) Log.v(TAG, "onDetachedFromWindow(): mActivityContainer=" + mActivityContainer +
+                " mSurface=" + mSurface);
+!!!1472002.java!!!	isAttachedToDisplay() : boolean
+        return mSurface != null;
+!!!1472130.java!!!	startActivity(inout intent : Intent) : void
+        if (mActivityContainer == null) {
+            throw new IllegalStateException("Attempt to call startActivity after release");
+        }
+        if (DEBUG) Log.v(TAG, "startActivity(): intent=" + intent + " " +
+                (isAttachedToDisplay() ? "" : "not") + " attached");
+        if (mSurface != null) {
+            mActivityContainer.startActivity(intent);
+        } else {
+            mActivityContainer.checkEmbeddedAllowed(intent);
+            mQueuedIntent = intent;
+            mQueuedPendingIntent = null;
+        }
+!!!1472258.java!!!	startActivity(inout intentSender : IntentSender) : void
+        if (mActivityContainer == null) {
+            throw new IllegalStateException("Attempt to call startActivity after release");
+        }
+        if (DEBUG) Log.v(TAG, "startActivityIntentSender(): intentSender=" + intentSender + " " +
+                (isAttachedToDisplay() ? "" : "not") + " attached");
+        final IIntentSender iIntentSender = intentSender.getTarget();
+        if (mSurface != null) {
+            mActivityContainer.startActivityIntentSender(iIntentSender);
+        } else {
+            mActivityContainer.checkEmbeddedAllowedIntentSender(iIntentSender);
+            mQueuedPendingIntent = iIntentSender;
+            mQueuedIntent = null;
+        }
+!!!1472386.java!!!	startActivity(inout pendingIntent : PendingIntent) : void
+        if (mActivityContainer == null) {
+            throw new IllegalStateException("Attempt to call startActivity after release");
+        }
+        if (DEBUG) Log.v(TAG, "startActivityPendingIntent(): PendingIntent=" + pendingIntent + " "
+                + (isAttachedToDisplay() ? "" : "not") + " attached");
+        final IIntentSender iIntentSender = pendingIntent.getTarget();
+        if (mSurface != null) {
+            mActivityContainer.startActivityIntentSender(iIntentSender);
+        } else {
+            mActivityContainer.checkEmbeddedAllowedIntentSender(iIntentSender);
+            mQueuedPendingIntent = iIntentSender;
+            mQueuedIntent = null;
+        }
+!!!1472514.java!!!	release() : void
+        if (DEBUG) Log.v(TAG, "release() mActivityContainer=" + mActivityContainer +
+                " mSurface=" + mSurface);
+        if (mActivityContainer == null) {
+            Log.e(TAG, "Duplicate call to release");
+            return;
+        }
+        mActivityContainer.release();
+        mActivityContainer = null;
+
+        if (mSurface != null) {
+            mSurface.release();
+            mSurface = null;
+        }
+
+        mTextureView.setSurfaceTextureListener(null);
+!!!1472642.java!!!	attachToSurfaceWhenReady() : void
+        final SurfaceTexture surfaceTexture = mTextureView.getSurfaceTexture();
+        if (surfaceTexture == null || mSurface != null) {
+            // Either not ready to attach, or already attached.
+            return;
+        }
+
+        mSurface = new Surface(surfaceTexture);
+        try {
+            mActivityContainer.setSurface(mSurface, mWidth, mHeight, mMetrics.densityDpi);
+        } catch (RemoteException e) {
+            mSurface.release();
+            mSurface = null;
+            throw new RuntimeException("ActivityView: Unable to create ActivityContainer. " + e);
+        }
+
+        if (DEBUG) Log.v(TAG, "attachToSurfaceWhenReady: " + (mQueuedIntent != null ||
+                mQueuedPendingIntent != null ? "" : "no") + " queued intent");
+        if (mQueuedIntent != null) {
+            mActivityContainer.startActivity(mQueuedIntent);
+            mQueuedIntent = null;
+        } else if (mQueuedPendingIntent != null) {
+            mActivityContainer.startActivityIntentSender(mQueuedPendingIntent);
+            mQueuedPendingIntent = null;
+        }
+!!!1472770.java!!!	setCallback(inout callback : ActivityView::ActivityViewCallback) : void
+        mActivityViewCallback = callback;

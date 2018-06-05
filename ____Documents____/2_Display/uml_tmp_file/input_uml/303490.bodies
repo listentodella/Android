@@ -1,0 +1,9 @@
+class SearchBar
+!!!1735170.java!!!	SearchBar(inout context : Context, inout attrs : AttributeSet)
+            super(context, attrs);
+!!!1735298.java!!!	SearchBar(inout context : Context)
+            super(context);
+!!!1735426.java!!!	setSearchDialog(inout searchDialog : SearchDialog) : void
+            mSearchDialog = searchDialog;
+!!!1735554.java!!!	startActionModeForChild(inout child : View, inout callback : ActionMode::Callback) : ActionMode
+            return null;

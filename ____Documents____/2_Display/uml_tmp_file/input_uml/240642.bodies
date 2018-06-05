@@ -1,0 +1,42 @@
+class SyntheticInputStage
+!!!961922.java!!!	SyntheticInputStage()
+            super(null);
+!!!962050.java!!!	onProcess(inout q : ViewRootImpl::QueuedInputEvent) : int
+            q.mFlags |= QueuedInputEvent.FLAG_RESYNTHESIZED;
+            if (q.mEvent instanceof MotionEvent) {
+                final MotionEvent event = (MotionEvent)q.mEvent;
+                final int source = event.getSource();
+                if ((source & InputDevice.SOURCE_CLASS_TRACKBALL) != 0) {
+                    mTrackball.process(event);
+                    return FINISH_HANDLED;
+                } else if ((source & InputDevice.SOURCE_CLASS_JOYSTICK) != 0) {
+                    mJoystick.process(event);
+                    return FINISH_HANDLED;
+                } else if ((source & InputDevice.SOURCE_TOUCH_NAVIGATION)
+                        == InputDevice.SOURCE_TOUCH_NAVIGATION) {
+                    mTouchNavigation.process(event);
+                    return FINISH_HANDLED;
+                }
+            } else if ((q.mFlags & QueuedInputEvent.FLAG_UNHANDLED) != 0) {
+                mKeyboard.process((KeyEvent)q.mEvent);
+                return FINISH_HANDLED;
+            }
+
+            return FORWARD;
+!!!962178.java!!!	onDeliverToNext(inout q : ViewRootImpl::QueuedInputEvent) : void
+            if ((q.mFlags & QueuedInputEvent.FLAG_RESYNTHESIZED) == 0) {
+                // Cancel related synthetic events if any prior stage has handled the event.
+                if (q.mEvent instanceof MotionEvent) {
+                    final MotionEvent event = (MotionEvent)q.mEvent;
+                    final int source = event.getSource();
+                    if ((source & InputDevice.SOURCE_CLASS_TRACKBALL) != 0) {
+                        mTrackball.cancel(event);
+                    } else if ((source & InputDevice.SOURCE_CLASS_JOYSTICK) != 0) {
+                        mJoystick.cancel(event);
+                    } else if ((source & InputDevice.SOURCE_TOUCH_NAVIGATION)
+                            == InputDevice.SOURCE_TOUCH_NAVIGATION) {
+                        mTouchNavigation.cancel(event);
+                    }
+                }
+            }
+            super.onDeliverToNext(q);

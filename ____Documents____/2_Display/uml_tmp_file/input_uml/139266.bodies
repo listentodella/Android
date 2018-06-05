@@ -1,0 +1,30 @@
+class Connection
+!!!188162.cpp!!!	getWindowName() : char
+    if (inputWindowHandle != NULL) {
+        return inputWindowHandle->getName().string();
+    }
+    if (monitor) {
+        return "monitor";
+    }
+    return "?";
+!!!188290.cpp!!!	getStatusLabel() : char
+    switch (status) {
+    case STATUS_NORMAL:
+        return "NORMAL";
+
+    case STATUS_BROKEN:
+        return "BROKEN";
+
+    case STATUS_ZOMBIE:
+        return "ZOMBIE";
+
+    default:
+        return "UNKNOWN";
+    }
+!!!188418.cpp!!!	findWaitQueueEntry(in seq : uint32_t) : InputDispatcher::DispatchEntry
+    for (DispatchEntry* entry = waitQueue.head; entry != NULL; entry = entry->next) {
+        if (entry->seq == seq) {
+            return entry;
+        }
+    }
+    return NULL;

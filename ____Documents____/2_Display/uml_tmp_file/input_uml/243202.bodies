@@ -1,0 +1,107 @@
+class AccessibilityInteractionConnection
+!!!987138.java!!!	AccessibilityInteractionConnection(inout viewRootImpl : ViewRootImpl)
+            mViewRootImpl = new WeakReference<ViewRootImpl>(viewRootImpl);
+!!!987266.java!!!	findAccessibilityNodeInfoByAccessibilityId(in accessibilityNodeId : long, inout interactiveRegion : Region, in interactionId : int, inout callback : IAccessibilityInteractionConnectionCallback, in flags : int, in interrogatingPid : int, in interrogatingTid : long, inout spec : MagnificationSpec) : void
+            ViewRootImpl viewRootImpl = mViewRootImpl.get();
+            if (viewRootImpl != null && viewRootImpl.mView != null) {
+                viewRootImpl.getAccessibilityInteractionController()
+                    .findAccessibilityNodeInfoByAccessibilityIdClientThread(accessibilityNodeId,
+                            interactiveRegion, interactionId, callback, flags, interrogatingPid,
+                            interrogatingTid, spec);
+            } else {
+                // We cannot make the call and notify the caller so it does not wait.
+                try {
+                    callback.setFindAccessibilityNodeInfosResult(null, interactionId);
+                } catch (RemoteException re) {
+                    /* best effort - ignore */
+                }
+            }
+!!!987394.java!!!	performAccessibilityAction(in accessibilityNodeId : long, in action : int, inout arguments : Bundle, in interactionId : int, inout callback : IAccessibilityInteractionConnectionCallback, in flags : int, in interrogatingPid : int, in interrogatingTid : long) : void
+            ViewRootImpl viewRootImpl = mViewRootImpl.get();
+            if (viewRootImpl != null && viewRootImpl.mView != null) {
+                viewRootImpl.getAccessibilityInteractionController()
+                    .performAccessibilityActionClientThread(accessibilityNodeId, action, arguments,
+                            interactionId, callback, flags, interrogatingPid, interrogatingTid);
+            } else {
+                // We cannot make the call and notify the caller so it does not wait.
+                try {
+                    callback.setPerformAccessibilityActionResult(false, interactionId);
+                } catch (RemoteException re) {
+                    /* best effort - ignore */
+                }
+            }
+!!!987522.java!!!	computeClickPointInScreen(in accessibilityNodeId : long, inout interactiveRegion : Region, in interactionId : int, inout callback : IAccessibilityInteractionConnectionCallback, in interrogatingPid : int, in interrogatingTid : long, inout spec : MagnificationSpec) : void
+            ViewRootImpl viewRootImpl = mViewRootImpl.get();
+            if (viewRootImpl != null && viewRootImpl.mView != null) {
+                viewRootImpl.getAccessibilityInteractionController()
+                        .computeClickPointInScreenClientThread(accessibilityNodeId,
+                                interactiveRegion, interactionId, callback, interrogatingPid,
+                                interrogatingTid, spec);
+            } else {
+                // We cannot make the call and notify the caller so it does not wait.
+                try {
+                    callback.setComputeClickPointInScreenActionResult(null, interactionId);
+                } catch (RemoteException re) {
+                    /* best effort - ignore */
+                }
+            }
+!!!987650.java!!!	findAccessibilityNodeInfosByViewId(in accessibilityNodeId : long, in viewId : String, inout interactiveRegion : Region, in interactionId : int, inout callback : IAccessibilityInteractionConnectionCallback, in flags : int, in interrogatingPid : int, in interrogatingTid : long, inout spec : MagnificationSpec) : void
+            ViewRootImpl viewRootImpl = mViewRootImpl.get();
+            if (viewRootImpl != null && viewRootImpl.mView != null) {
+                viewRootImpl.getAccessibilityInteractionController()
+                    .findAccessibilityNodeInfosByViewIdClientThread(accessibilityNodeId,
+                            viewId, interactiveRegion, interactionId, callback, flags,
+                            interrogatingPid, interrogatingTid, spec);
+            } else {
+                // We cannot make the call and notify the caller so it does not wait.
+                try {
+                    callback.setFindAccessibilityNodeInfoResult(null, interactionId);
+                } catch (RemoteException re) {
+                    /* best effort - ignore */
+                }
+            }
+!!!987778.java!!!	findAccessibilityNodeInfosByText(in accessibilityNodeId : long, in text : String, inout interactiveRegion : Region, in interactionId : int, inout callback : IAccessibilityInteractionConnectionCallback, in flags : int, in interrogatingPid : int, in interrogatingTid : long, inout spec : MagnificationSpec) : void
+            ViewRootImpl viewRootImpl = mViewRootImpl.get();
+            if (viewRootImpl != null && viewRootImpl.mView != null) {
+                viewRootImpl.getAccessibilityInteractionController()
+                    .findAccessibilityNodeInfosByTextClientThread(accessibilityNodeId, text,
+                            interactiveRegion, interactionId, callback, flags, interrogatingPid,
+                            interrogatingTid, spec);
+            } else {
+                // We cannot make the call and notify the caller so it does not wait.
+                try {
+                    callback.setFindAccessibilityNodeInfosResult(null, interactionId);
+                } catch (RemoteException re) {
+                    /* best effort - ignore */
+                }
+            }
+!!!987906.java!!!	findFocus(in accessibilityNodeId : long, in focusType : int, inout interactiveRegion : Region, in interactionId : int, inout callback : IAccessibilityInteractionConnectionCallback, in flags : int, in interrogatingPid : int, in interrogatingTid : long, inout spec : MagnificationSpec) : void
+            ViewRootImpl viewRootImpl = mViewRootImpl.get();
+            if (viewRootImpl != null && viewRootImpl.mView != null) {
+                viewRootImpl.getAccessibilityInteractionController()
+                    .findFocusClientThread(accessibilityNodeId, focusType, interactiveRegion,
+                            interactionId, callback, flags, interrogatingPid, interrogatingTid,
+                            spec);
+            } else {
+                // We cannot make the call and notify the caller so it does not wait.
+                try {
+                    callback.setFindAccessibilityNodeInfoResult(null, interactionId);
+                } catch (RemoteException re) {
+                    /* best effort - ignore */
+                }
+            }
+!!!988034.java!!!	focusSearch(in accessibilityNodeId : long, in direction : int, inout interactiveRegion : Region, in interactionId : int, inout callback : IAccessibilityInteractionConnectionCallback, in flags : int, in interrogatingPid : int, in interrogatingTid : long, inout spec : MagnificationSpec) : void
+            ViewRootImpl viewRootImpl = mViewRootImpl.get();
+            if (viewRootImpl != null && viewRootImpl.mView != null) {
+                viewRootImpl.getAccessibilityInteractionController()
+                    .focusSearchClientThread(accessibilityNodeId, direction, interactiveRegion,
+                            interactionId, callback, flags, interrogatingPid, interrogatingTid,
+                            spec);
+            } else {
+                // We cannot make the call and notify the caller so it does not wait.
+                try {
+                    callback.setFindAccessibilityNodeInfoResult(null, interactionId);
+                } catch (RemoteException re) {
+                    /* best effort - ignore */
+                }
+            }

@@ -1,0 +1,235 @@
+class CompoundButton
+!!!2149122.java!!!	CompoundButton(inout context : Context)
+        this(context, null);
+!!!2149250.java!!!	CompoundButton(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!2149378.java!!!	CompoundButton(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2149506.java!!!	CompoundButton(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, com.android.internal.R.styleable.CompoundButton, defStyleAttr, defStyleRes);
+
+        final Drawable d = a.getDrawable(com.android.internal.R.styleable.CompoundButton_button);
+        if (d != null) {
+            setButtonDrawable(d);
+        }
+
+        if (a.hasValue(R.styleable.CompoundButton_buttonTintMode)) {
+            mButtonTintMode = Drawable.parseTintMode(a.getInt(
+                    R.styleable.CompoundButton_buttonTintMode, -1), mButtonTintMode);
+            mHasButtonTintMode = true;
+        }
+
+        if (a.hasValue(R.styleable.CompoundButton_buttonTint)) {
+            mButtonTintList = a.getColorStateList(R.styleable.CompoundButton_buttonTint);
+            mHasButtonTint = true;
+        }
+
+        final boolean checked = a.getBoolean(
+                com.android.internal.R.styleable.CompoundButton_checked, false);
+        setChecked(checked);
+
+        a.recycle();
+
+        applyButtonTint();
+!!!2149634.java!!!	toggle() : void
+        setChecked(!mChecked);
+!!!2149762.java!!!	performClick() : boolean
+        /*
+         * XXX: These are tiny, need some surrounding 'expanded touch area',
+         * which will need to be implemented in Button if we only override
+         * performClick()
+         */
+
+        /* When clicked, toggle the state */
+        toggle();
+        return super.performClick();
+!!!2149890.java!!!	isChecked() : boolean
+        return mChecked;
+!!!2150018.java!!!	setChecked(inout checked : boolean) : void
+        if (mChecked != checked) {
+            mChecked = checked;
+            refreshDrawableState();
+            notifyViewAccessibilityStateChangedIfNeeded(
+                    AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED);
+
+            // Avoid infinite recursions if setChecked() is called from a listener
+            if (mBroadcasting) {
+                return;
+            }
+
+            mBroadcasting = true;
+            if (mOnCheckedChangeListener != null) {
+                mOnCheckedChangeListener.onCheckedChanged(this, mChecked);
+            }
+            if (mOnCheckedChangeWidgetListener != null) {
+                mOnCheckedChangeWidgetListener.onCheckedChanged(this, mChecked);
+            }
+
+            mBroadcasting = false;            
+        }
+!!!2150146.java!!!	setOnCheckedChangeListener(inout listener : CompoundButton::OnCheckedChangeListener) : void
+        mOnCheckedChangeListener = listener;
+!!!2150274.java!!!	setOnCheckedChangeWidgetListener(inout listener : CompoundButton::OnCheckedChangeListener) : void
+        mOnCheckedChangeWidgetListener = listener;
+!!!2150530.java!!!	setButtonDrawable(in resid : int) : void
+        if (resid != 0 && resid == mButtonResource) {
+            return;
+        }
+
+        mButtonResource = resid;
+
+        Drawable d = null;
+        if (mButtonResource != 0) {
+            d = getContext().getDrawable(mButtonResource);
+        }
+        setButtonDrawable(d);
+!!!2150658.java!!!	setButtonDrawable(inout d : Drawable) : void
+        if (mButtonDrawable != d) {
+            if (mButtonDrawable != null) {
+                mButtonDrawable.setCallback(null);
+                unscheduleDrawable(mButtonDrawable);
+            }
+
+            mButtonDrawable = d;
+
+            if (d != null) {
+                d.setCallback(this);
+                d.setLayoutDirection(getLayoutDirection());
+                if (d.isStateful()) {
+                    d.setState(getDrawableState());
+                }
+                d.setVisible(getVisibility() == VISIBLE, false);
+                setMinHeight(d.getIntrinsicHeight());
+                applyButtonTint();
+            }
+        }
+!!!2150786.java!!!	setButtonTintList(inout tint : ColorStateList) : void
+        mButtonTintList = tint;
+        mHasButtonTint = true;
+
+        applyButtonTint();
+!!!2150914.java!!!	getButtonTintList() : ColorStateList
+        return mButtonTintList;
+!!!2151042.java!!!	setButtonTintMode(inout tintMode : PorterDuff.Mode) : void
+        mButtonTintMode = tintMode;
+        mHasButtonTintMode = true;
+
+        applyButtonTint();
+!!!2151170.java!!!	getButtonTintMode() : PorterDuff.Mode
+        return mButtonTintMode;
+!!!2151298.java!!!	applyButtonTint() : void
+        if (mButtonDrawable != null && (mHasButtonTint || mHasButtonTintMode)) {
+            mButtonDrawable = mButtonDrawable.mutate();
+
+            if (mHasButtonTint) {
+                mButtonDrawable.setTintList(mButtonTintList);
+            }
+
+            if (mHasButtonTintMode) {
+                mButtonDrawable.setTintMode(mButtonTintMode);
+            }
+        }
+!!!2151426.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(CompoundButton.class.getName());
+        event.setChecked(mChecked);
+!!!2151554.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(CompoundButton.class.getName());
+        info.setCheckable(true);
+        info.setChecked(mChecked);
+!!!2151682.java!!!	getCompoundPaddingLeft() : int
+        int padding = super.getCompoundPaddingLeft();
+        if (!isLayoutRtl()) {
+            final Drawable buttonDrawable = mButtonDrawable;
+            if (buttonDrawable != null) {
+                padding += buttonDrawable.getIntrinsicWidth();
+            }
+        }
+        return padding;
+!!!2151810.java!!!	getCompoundPaddingRight() : int
+        int padding = super.getCompoundPaddingRight();
+        if (isLayoutRtl()) {
+            final Drawable buttonDrawable = mButtonDrawable;
+            if (buttonDrawable != null) {
+                padding += buttonDrawable.getIntrinsicWidth();
+            }
+        }
+        return padding;
+!!!2151938.java!!!	getHorizontalOffsetForDrawables() : int
+        final Drawable buttonDrawable = mButtonDrawable;
+        return (buttonDrawable != null) ? buttonDrawable.getIntrinsicWidth() : 0;
+!!!2152066.java!!!	onDraw(inout canvas : Canvas) : void
+        final Drawable buttonDrawable = mButtonDrawable;
+        if (buttonDrawable != null) {
+            final int verticalGravity = getGravity() & Gravity.VERTICAL_GRAVITY_MASK;
+            final int drawableHeight = buttonDrawable.getIntrinsicHeight();
+            final int drawableWidth = buttonDrawable.getIntrinsicWidth();
+
+            final int top;
+            switch (verticalGravity) {
+                case Gravity.BOTTOM:
+                    top = getHeight() - drawableHeight;
+                    break;
+                case Gravity.CENTER_VERTICAL:
+                    top = (getHeight() - drawableHeight) / 2;
+                    break;
+                default:
+                    top = 0;
+            }
+            final int bottom = top + drawableHeight;
+            final int left = isLayoutRtl() ? getWidth() - drawableWidth : 0;
+            final int right = isLayoutRtl() ? getWidth() : drawableWidth;
+
+            buttonDrawable.setBounds(left, top, right, bottom);
+
+            final Drawable background = getBackground();
+            if (background != null) {
+                background.setHotspotBounds(left, top, right, bottom);
+            }
+        }
+
+        super.onDraw(canvas);
+
+        if (buttonDrawable != null) {
+            final int scrollX = mScrollX;
+            final int scrollY = mScrollY;
+            if (scrollX == 0 && scrollY == 0) {
+                buttonDrawable.draw(canvas);
+            } else {
+                canvas.translate(scrollX, scrollY);
+                buttonDrawable.draw(canvas);
+                canvas.translate(-scrollX, -scrollY);
+            }
+        }
+!!!2152194.java!!!	onCreateDrawableState(in extraSpace : int) : int
+        final int[] drawableState = super.onCreateDrawableState(extraSpace + 1);
+        if (isChecked()) {
+            mergeDrawableStates(drawableState, CHECKED_STATE_SET);
+        }
+        return drawableState;
+!!!2152322.java!!!	drawableStateChanged() : void
+        super.drawableStateChanged();
+        
+        if (mButtonDrawable != null) {
+            int[] myDrawableState = getDrawableState();
+            
+            // Set the state of the Drawable
+            mButtonDrawable.setState(myDrawableState);
+            
+            invalidate();
+        }
+!!!2152450.java!!!	drawableHotspotChanged(in x : float, in y : float) : void
+        super.drawableHotspotChanged(x, y);
+
+        if (mButtonDrawable != null) {
+            mButtonDrawable.setHotspot(x, y);
+        }
+!!!2152578.java!!!	verifyDrawable(inout who : Drawable) : boolean
+        return super.verifyDrawable(who) || who == mButtonDrawable;
+!!!2152706.java!!!	jumpDrawablesToCurrentState() : void
+        super.jumpDrawablesToCurrentState();
+        if (mButtonDrawable != null) mButtonDrawable.jumpToCurrentState();

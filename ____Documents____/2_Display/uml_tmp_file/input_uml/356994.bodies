@@ -1,0 +1,8 @@
+class MenuBuilderCallback
+!!!2011778.java!!!	onMenuItemSelected(inout menu : MenuBuilder, inout item : MenuItem) : boolean
+            return mOnMenuItemClickListener != null &&
+                    mOnMenuItemClickListener.onMenuItemClick(item);
+!!!2011906.java!!!	onMenuModeChange(inout menu : MenuBuilder) : void
+            if (mMenuBuilderCallback != null) {
+                mMenuBuilderCallback.onMenuModeChange(menu);
+            }

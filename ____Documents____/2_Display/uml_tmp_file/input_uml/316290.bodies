@@ -1,0 +1,10 @@
+class NativeInputChannel
+!!!1859074.cpp!!!	setDisposeCallback(in callback : InputChannelObjDisposeCallback, inout data : void) : void
+    mDisposeCallback = callback;
+    mDisposeData = data;
+!!!1859202.cpp!!!	invokeAndRemoveDisposeCallback(inout env : JNIEnv, in obj : jobject) : void
+    if (mDisposeCallback) {
+        mDisposeCallback(env, obj, mInputChannel, mDisposeData);
+        mDisposeCallback = NULL;
+        mDisposeData = NULL;
+    }

@@ -1,0 +1,5 @@
+class WindowRunnnable
+!!!1942530.java!!!	rememberWindowAttachCount() : void
+            mOriginalAttachCount = getWindowAttachCount();
+!!!1942658.java!!!	sameWindow() : boolean
+            return getWindowAttachCount() == mOriginalAttachCount;

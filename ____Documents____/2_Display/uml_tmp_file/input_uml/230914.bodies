@@ -1,0 +1,17 @@
+class CompatibleCanvas
+!!!828674.java!!!	setMatrix(inout matrix : Matrix) : void
+            if (mCompatibleMatrix == null || mOrigMatrix == null || mOrigMatrix.equals(matrix)) {
+                // don't scale the matrix if it's not compatibility mode, or
+                // the matrix was obtained from getMatrix.
+                super.setMatrix(matrix);
+            } else {
+                Matrix m = new Matrix(mCompatibleMatrix);
+                m.preConcat(matrix);
+                super.setMatrix(m);
+            }
+!!!828802.java!!!	getMatrix(inout m : Matrix) : void
+            super.getMatrix(m);
+            if (mOrigMatrix == null) {
+                mOrigMatrix = new Matrix();
+            }
+            mOrigMatrix.set(m);

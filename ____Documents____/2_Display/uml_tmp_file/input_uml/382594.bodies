@@ -1,0 +1,3 @@
+class TriggerLongPress
+!!!2349058.java!!!	run() : void
+                onLongPress();

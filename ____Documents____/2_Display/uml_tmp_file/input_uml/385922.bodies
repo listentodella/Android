@@ -1,0 +1,128 @@
+class QuickContactBadge
+!!!2381826.java!!!	QuickContactBadge(inout context : Context)
+        this(context, null);
+!!!2381954.java!!!	QuickContactBadge(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!2382082.java!!!	QuickContactBadge(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2382210.java!!!	QuickContactBadge(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        TypedArray styledAttributes = mContext.obtainStyledAttributes(R.styleable.Theme);
+        mOverlay = styledAttributes.getDrawable(
+                com.android.internal.R.styleable.Theme_quickContactBadgeOverlay);
+        styledAttributes.recycle();
+
+        if (!isInEditMode()) {
+            mQueryHandler = new QueryHandler(mContext.getContentResolver());
+        }
+        setOnClickListener(this);
+!!!2382338.java!!!	drawableStateChanged() : void
+        super.drawableStateChanged();
+        if (mOverlay != null && mOverlay.isStateful()) {
+            mOverlay.setState(getDrawableState());
+            invalidate();
+        }
+!!!2382466.java!!!	drawableHotspotChanged(in x : float, in y : float) : void
+        super.drawableHotspotChanged(x, y);
+
+        if (mOverlay != null) {
+            mOverlay.setHotspot(x, y);
+        }
+!!!2382722.java!!!	onDraw(inout canvas : Canvas) : void
+        super.onDraw(canvas);
+
+        if (!isEnabled()) {
+            // not clickable? don't show triangle
+            return;
+        }
+
+        if (mOverlay == null || mOverlay.getIntrinsicWidth() == 0 ||
+                mOverlay.getIntrinsicHeight() == 0) {
+            // nothing to draw
+            return;
+        }
+
+        mOverlay.setBounds(0, 0, getWidth(), getHeight());
+
+        if (mPaddingTop == 0 && mPaddingLeft == 0) {
+            mOverlay.draw(canvas);
+        } else {
+            int saveCount = canvas.getSaveCount();
+            canvas.save();
+            canvas.translate(mPaddingLeft, mPaddingTop);
+            mOverlay.draw(canvas);
+            canvas.restoreToCount(saveCount);
+        }
+!!!2382850.java!!!	isAssigned() : boolean
+        return mContactUri != null || mContactEmail != null || mContactPhone != null;
+!!!2382978.java!!!	setImageToDefault() : void
+        if (mDefaultAvatar == null) {
+            mDefaultAvatar = mContext.getDrawable(R.drawable.ic_contact_picture);
+        }
+        setImageDrawable(mDefaultAvatar);
+!!!2383106.java!!!	assignContactUri(inout contactUri : Uri) : void
+        mContactUri = contactUri;
+        mContactEmail = null;
+        mContactPhone = null;
+        onContactUriChanged();
+!!!2383234.java!!!	assignContactFromEmail(in emailAddress : String, inout lazyLookup : boolean) : void
+        assignContactFromEmail(emailAddress, lazyLookup, null);
+!!!2383362.java!!!	assignContactFromEmail(in emailAddress : String, inout lazyLookup : boolean, inout extras : Bundle) : void
+        mContactEmail = emailAddress;
+        mExtras = extras;
+        if (!lazyLookup && mQueryHandler != null) {
+            mQueryHandler.startQuery(TOKEN_EMAIL_LOOKUP, null,
+                    Uri.withAppendedPath(Email.CONTENT_LOOKUP_URI, Uri.encode(mContactEmail)),
+                    EMAIL_LOOKUP_PROJECTION, null, null, null);
+        } else {
+            mContactUri = null;
+            onContactUriChanged();
+        }
+!!!2383490.java!!!	assignContactFromPhone(in phoneNumber : String, inout lazyLookup : boolean) : void
+        assignContactFromPhone(phoneNumber, lazyLookup, new Bundle());
+!!!2383618.java!!!	assignContactFromPhone(in phoneNumber : String, inout lazyLookup : boolean, inout extras : Bundle) : void
+        mContactPhone = phoneNumber;
+        mExtras = extras;
+        if (!lazyLookup && mQueryHandler != null) {
+            mQueryHandler.startQuery(TOKEN_PHONE_LOOKUP, null,
+                    Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, mContactPhone),
+                    PHONE_LOOKUP_PROJECTION, null, null, null);
+        } else {
+            mContactUri = null;
+            onContactUriChanged();
+        }
+!!!2383746.java!!!	setOverlay(inout overlay : Drawable) : void
+        mOverlay = overlay;
+!!!2383874.java!!!	onContactUriChanged() : void
+        setEnabled(isAssigned());
+!!!2384002.java!!!	onClick(inout v : View) : void
+        // If contact has been assigned, mExtras should no longer be null, but do a null check
+        // anyway just in case assignContactFromPhone or Email was called with a null bundle or
+        // wasn't assigned previously.
+        final Bundle extras = (mExtras == null) ? new Bundle() : mExtras;
+        if (mContactUri != null) {
+            QuickContact.showQuickContact(getContext(), QuickContactBadge.this, mContactUri,
+                    QuickContact.MODE_LARGE, mExcludeMimes);
+        } else if (mContactEmail != null && mQueryHandler != null) {
+            extras.putString(EXTRA_URI_CONTENT, mContactEmail);
+            mQueryHandler.startQuery(TOKEN_EMAIL_LOOKUP_AND_TRIGGER, extras,
+                    Uri.withAppendedPath(Email.CONTENT_LOOKUP_URI, Uri.encode(mContactEmail)),
+                    EMAIL_LOOKUP_PROJECTION, null, null, null);
+        } else if (mContactPhone != null && mQueryHandler != null) {
+            extras.putString(EXTRA_URI_CONTENT, mContactPhone);
+            mQueryHandler.startQuery(TOKEN_PHONE_LOOKUP_AND_TRIGGER, extras,
+                    Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, mContactPhone),
+                    PHONE_LOOKUP_PROJECTION, null, null, null);
+        } else {
+            // If a contact hasn't been assigned, don't react to click.
+            return;
+        }
+!!!2384130.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(QuickContactBadge.class.getName());
+!!!2384258.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(QuickContactBadge.class.getName());
+!!!2384386.java!!!	setExcludeMimes(inout excludeMimes : String) : void
+        mExcludeMimes = excludeMimes;

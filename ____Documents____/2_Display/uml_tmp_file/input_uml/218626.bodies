@@ -1,0 +1,179 @@
+class RenderNode
+!!!796162.java!!!	RenderNode(in name : String, inout owningView : View)
+        mNativeRenderNode = nCreate(name);
+        mOwningView = owningView;
+!!!796290.java!!!	RenderNode(in nativePtr : long)
+        mNativeRenderNode = nativePtr;
+        mOwningView = null;
+!!!796418.java!!!	create(in name : String, inout owningView : View) : RenderNode
+        return new RenderNode(name, owningView);
+!!!796546.java!!!	adopt(in nativePtr : long) : RenderNode
+        return new RenderNode(nativePtr);
+!!!796674.java!!!	start(in width : int, in height : int) : HardwareCanvas
+        HardwareCanvas canvas = GLES20RecordingCanvas.obtain(this);
+        canvas.setViewport(width, height);
+        // The dirty rect should always be null for a display list
+        canvas.onPreDraw(null);
+        return canvas;
+!!!796802.java!!!	end(inout endCanvas : HardwareCanvas) : void
+        if (!(endCanvas instanceof GLES20RecordingCanvas)) {
+            throw new IllegalArgumentException("Passed an invalid canvas to end!");
+        }
+
+        GLES20RecordingCanvas canvas = (GLES20RecordingCanvas) endCanvas;
+        canvas.onPostDraw();
+        long renderNodeData = canvas.finishRecording();
+        nSetDisplayListData(mNativeRenderNode, renderNodeData);
+        canvas.recycle();
+        mValid = true;
+!!!796930.java!!!	destroyDisplayListData() : void
+        if (!mValid) return;
+
+        nSetDisplayListData(mNativeRenderNode, 0);
+        mValid = false;
+!!!797058.java!!!	isValid() : boolean
+ return mValid;
+!!!797186.java!!!	getNativeDisplayList() : long
+        if (!mValid) {
+            throw new IllegalStateException("The display list is not valid.");
+        }
+        return mNativeRenderNode;
+!!!797314.java!!!	hasIdentityMatrix() : boolean
+        return nHasIdentityMatrix(mNativeRenderNode);
+!!!797442.java!!!	getMatrix(inout outMatrix : Matrix) : void
+        nGetTransformMatrix(mNativeRenderNode, outMatrix.native_instance);
+!!!797570.java!!!	getInverseMatrix(inout outMatrix : Matrix) : void
+        nGetInverseTransformMatrix(mNativeRenderNode, outMatrix.native_instance);
+!!!797698.java!!!	setLayerType(in layerType : int) : boolean
+        return nSetLayerType(mNativeRenderNode, layerType);
+!!!797826.java!!!	setLayerPaint(inout paint : Paint) : boolean
+        return nSetLayerPaint(mNativeRenderNode, paint != null ? paint.mNativePaint : 0);
+!!!797954.java!!!	setClipBounds(inout rect : Rect) : boolean
+        if (rect == null) {
+            return nSetClipBoundsEmpty(mNativeRenderNode);
+        } else {
+            return nSetClipBounds(mNativeRenderNode, rect.left, rect.top, rect.right, rect.bottom);
+        }
+!!!798082.java!!!	setClipToBounds(inout clipToBounds : boolean) : boolean
+        return nSetClipToBounds(mNativeRenderNode, clipToBounds);
+!!!798210.java!!!	setProjectBackwards(inout shouldProject : boolean) : boolean
+        return nSetProjectBackwards(mNativeRenderNode, shouldProject);
+!!!798338.java!!!	setProjectionReceiver(inout shouldRecieve : boolean) : boolean
+        return nSetProjectionReceiver(mNativeRenderNode, shouldRecieve);
+!!!798466.java!!!	setOutline(inout outline : Outline) : boolean
+        if (outline == null) {
+            return nSetOutlineNone(mNativeRenderNode);
+        } else if (outline.isEmpty()) {
+            return nSetOutlineEmpty(mNativeRenderNode);
+        } else if (outline.mRect != null) {
+            return nSetOutlineRoundRect(mNativeRenderNode, outline.mRect.left, outline.mRect.top,
+                    outline.mRect.right, outline.mRect.bottom, outline.mRadius, outline.mAlpha);
+        } else if (outline.mPath != null) {
+            return nSetOutlineConvexPath(mNativeRenderNode, outline.mPath.mNativePath,
+                    outline.mAlpha);
+        }
+        throw new IllegalArgumentException("Unrecognized outline?");
+!!!798594.java!!!	hasShadow() : boolean
+        return nHasShadow(mNativeRenderNode);
+!!!798722.java!!!	setClipToOutline(inout clipToOutline : boolean) : boolean
+        return nSetClipToOutline(mNativeRenderNode, clipToOutline);
+!!!798850.java!!!	getClipToOutline() : boolean
+        return nGetClipToOutline(mNativeRenderNode);
+!!!798978.java!!!	setRevealClip(inout shouldClip : boolean, in x : float, in y : float, in radius : float) : boolean
+        return nSetRevealClip(mNativeRenderNode, shouldClip, x, y, radius);
+!!!799106.java!!!	setStaticMatrix(inout matrix : Matrix) : boolean
+        return nSetStaticMatrix(mNativeRenderNode, matrix.native_instance);
+!!!799234.java!!!	setAnimationMatrix(inout matrix : Matrix) : boolean
+        return nSetAnimationMatrix(mNativeRenderNode,
+                (matrix != null) ? matrix.native_instance : 0);
+!!!799362.java!!!	setAlpha(in alpha : float) : boolean
+        return nSetAlpha(mNativeRenderNode, alpha);
+!!!799490.java!!!	getAlpha() : float
+        return nGetAlpha(mNativeRenderNode);
+!!!799618.java!!!	setHasOverlappingRendering(inout hasOverlappingRendering : boolean) : boolean
+        return nSetHasOverlappingRendering(mNativeRenderNode, hasOverlappingRendering);
+!!!799746.java!!!	hasOverlappingRendering() : boolean
+        //noinspection SimplifiableIfStatement
+        return nHasOverlappingRendering(mNativeRenderNode);
+!!!799874.java!!!	setElevation(in lift : float) : boolean
+        return nSetElevation(mNativeRenderNode, lift);
+!!!800002.java!!!	getElevation() : float
+        return nGetElevation(mNativeRenderNode);
+!!!800130.java!!!	setTranslationX(in translationX : float) : boolean
+        return nSetTranslationX(mNativeRenderNode, translationX);
+!!!800258.java!!!	getTranslationX() : float
+        return nGetTranslationX(mNativeRenderNode);
+!!!800386.java!!!	setTranslationY(in translationY : float) : boolean
+        return nSetTranslationY(mNativeRenderNode, translationY);
+!!!800514.java!!!	getTranslationY() : float
+        return nGetTranslationY(mNativeRenderNode);
+!!!800642.java!!!	setTranslationZ(in translationZ : float) : boolean
+        return nSetTranslationZ(mNativeRenderNode, translationZ);
+!!!800770.java!!!	getTranslationZ() : float
+        return nGetTranslationZ(mNativeRenderNode);
+!!!800898.java!!!	setRotation(in rotation : float) : boolean
+        return nSetRotation(mNativeRenderNode, rotation);
+!!!801026.java!!!	getRotation() : float
+        return nGetRotation(mNativeRenderNode);
+!!!801154.java!!!	setRotationX(in rotationX : float) : boolean
+        return nSetRotationX(mNativeRenderNode, rotationX);
+!!!801282.java!!!	getRotationX() : float
+        return nGetRotationX(mNativeRenderNode);
+!!!801410.java!!!	setRotationY(in rotationY : float) : boolean
+        return nSetRotationY(mNativeRenderNode, rotationY);
+!!!801538.java!!!	getRotationY() : float
+        return nGetRotationY(mNativeRenderNode);
+!!!801666.java!!!	setScaleX(in scaleX : float) : boolean
+        return nSetScaleX(mNativeRenderNode, scaleX);
+!!!801794.java!!!	getScaleX() : float
+        return nGetScaleX(mNativeRenderNode);
+!!!801922.java!!!	setScaleY(in scaleY : float) : boolean
+        return nSetScaleY(mNativeRenderNode, scaleY);
+!!!802050.java!!!	getScaleY() : float
+        return nGetScaleY(mNativeRenderNode);
+!!!802178.java!!!	setPivotX(in pivotX : float) : boolean
+        return nSetPivotX(mNativeRenderNode, pivotX);
+!!!802306.java!!!	getPivotX() : float
+        return nGetPivotX(mNativeRenderNode);
+!!!802434.java!!!	setPivotY(in pivotY : float) : boolean
+        return nSetPivotY(mNativeRenderNode, pivotY);
+!!!802562.java!!!	getPivotY() : float
+        return nGetPivotY(mNativeRenderNode);
+!!!802690.java!!!	isPivotExplicitlySet() : boolean
+        return nIsPivotExplicitlySet(mNativeRenderNode);
+!!!802818.java!!!	setCameraDistance(in distance : float) : boolean
+        return nSetCameraDistance(mNativeRenderNode, distance);
+!!!802946.java!!!	getCameraDistance() : float
+        return nGetCameraDistance(mNativeRenderNode);
+!!!803074.java!!!	setLeft(in left : int) : boolean
+        return nSetLeft(mNativeRenderNode, left);
+!!!803202.java!!!	setTop(in top : int) : boolean
+        return nSetTop(mNativeRenderNode, top);
+!!!803330.java!!!	setRight(in right : int) : boolean
+        return nSetRight(mNativeRenderNode, right);
+!!!803458.java!!!	setBottom(in bottom : int) : boolean
+        return nSetBottom(mNativeRenderNode, bottom);
+!!!803586.java!!!	setLeftTopRightBottom(in left : int, in top : int, in right : int, in bottom : int) : boolean
+        return nSetLeftTopRightBottom(mNativeRenderNode, left, top, right, bottom);
+!!!803714.java!!!	offsetLeftAndRight(in offset : int) : boolean
+        return nOffsetLeftAndRight(mNativeRenderNode, offset);
+!!!803842.java!!!	offsetTopAndBottom(in offset : int) : boolean
+        return nOffsetTopAndBottom(mNativeRenderNode, offset);
+!!!803970.java!!!	output() : void
+        nOutput(mNativeRenderNode);
+!!!804098.java!!!	getDebugSize() : int
+        return nGetDebugSize(mNativeRenderNode);
+!!!804226.java!!!	addAnimator(inout animator : RenderNodeAnimator) : void
+        if (mOwningView == null || mOwningView.mAttachInfo == null) {
+            throw new IllegalStateException("Cannot start this animator on a detached view!");
+        }
+        nAddAnimator(mNativeRenderNode, animator.getNativeAnimator());
+        mOwningView.mAttachInfo.mViewRootImpl.registerAnimatingRenderNode(this);
+!!!804354.java!!!	endAllAnimators() : void
+        nEndAllAnimators(mNativeRenderNode);
+!!!812546.java!!!	finalize() : void
+        try {
+            nDestroyRenderNode(mNativeRenderNode);
+        } finally {
+            super.finalize();
+        }

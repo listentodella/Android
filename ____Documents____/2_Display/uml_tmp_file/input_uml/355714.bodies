@@ -1,0 +1,68 @@
+class OverflowMenuButton
+!!!2012546.java!!!	OverflowMenuButton(inout context : Context)
+            super(context, null, com.android.internal.R.attr.actionOverflowButtonStyle);
+
+            setClickable(true);
+            setFocusable(true);
+            setVisibility(VISIBLE);
+            setEnabled(true);
+
+            setOnTouchListener(new ForwardingListener(this) {
+                @Override
+                public ListPopupWindow getPopup() {
+                    if (mOverflowPopup == null) {
+                        return null;
+                    }
+
+                    return mOverflowPopup.getPopup();
+                }
+
+                @Override
+                public boolean onForwardingStarted() {
+                    showOverflowMenu();
+                    return true;
+                }
+
+                @Override
+                public boolean onForwardingStopped() {
+                    // Displaying the popup occurs asynchronously, so wait for
+                    // the runnable to finish before deciding whether to stop
+                    // forwarding.
+                    if (mPostedOpenRunnable != null) {
+                        return false;
+                    }
+
+                    hideOverflowMenu();
+                    return true;
+                }
+            });
+!!!2012674.java!!!	performClick() : boolean
+            if (super.performClick()) {
+                return true;
+            }
+
+            playSoundEffect(SoundEffectConstants.CLICK);
+            showOverflowMenu();
+            return true;
+!!!2012802.java!!!	needsDividerBefore() : boolean
+            return false;
+!!!2012930.java!!!	needsDividerAfter() : boolean
+            return false;
+!!!2013058.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+            super.onInitializeAccessibilityNodeInfo(info);
+            info.setCanOpenPopup(true);
+!!!2013186.java!!!	setFrame(in l : int, in t : int, in r : int, in b : int) : boolean
+            final boolean changed = super.setFrame(l, t, r, b);
+
+            // Set up the hotspot bounds to be centered on the image.
+            final Drawable d = getDrawable();
+            final Drawable bg = getBackground();
+            if (d != null && bg != null) {
+                final float[] pts = mTempPts;
+                pts[0] = d.getBounds().centerX();
+                getImageMatrix().mapPoints(pts);
+                final int offset =  (int) pts[0] - getWidth() / 2;
+                bg.setHotspotBounds(offset, 0, getWidth() + offset, getHeight());
+            }
+
+            return changed;

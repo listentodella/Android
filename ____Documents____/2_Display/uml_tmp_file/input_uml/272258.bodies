@@ -1,0 +1,3 @@
+class FragmentTransaction
+!!!1536258.java!!!	setCustomTransition(in sceneRootId : int, in transitionId : int) : FragmentTransaction
+        return this;

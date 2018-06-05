@@ -1,0 +1,84 @@
+class Style
+!!!1694338.java!!!	internalSetBigContentTitle(inout title : CharSequence) : void
+            mBigContentTitle = title;
+!!!1694466.java!!!	internalSetSummaryText(inout cs : CharSequence) : void
+            mSummaryText = cs;
+            mSummaryTextSet = true;
+!!!1694594.java!!!	setBuilder(inout builder : Notification::Builder) : void
+            if (mBuilder != builder) {
+                mBuilder = builder;
+                if (mBuilder != null) {
+                    mBuilder.setStyle(this);
+                }
+            }
+!!!1694722.java!!!	checkBuilder() : void
+            if (mBuilder == null) {
+                throw new IllegalArgumentException("Style requires a valid Builder object");
+            }
+!!!1694850.java!!!	getStandardView(in layoutId : int) : RemoteViews
+            checkBuilder();
+
+            // Nasty.
+            CharSequence oldBuilderContentTitle = mBuilder.mContentTitle;
+            if (mBigContentTitle != null) {
+                mBuilder.setContentTitle(mBigContentTitle);
+            }
+
+            RemoteViews contentView = mBuilder.applyStandardTemplateWithActions(layoutId);
+
+            mBuilder.mContentTitle = oldBuilderContentTitle;
+
+            if (mBigContentTitle != null && mBigContentTitle.equals("")) {
+                contentView.setViewVisibility(R.id.line1, View.GONE);
+            } else {
+                contentView.setViewVisibility(R.id.line1, View.VISIBLE);
+            }
+
+            // The last line defaults to the subtext, but can be replaced by mSummaryText
+            final CharSequence overflowText =
+                    mSummaryTextSet ? mSummaryText
+                                    : mBuilder.mSubText;
+            if (overflowText != null) {
+                contentView.setTextViewText(R.id.text, mBuilder.processLegacyText(overflowText));
+                contentView.setViewVisibility(R.id.overflow_divider, View.VISIBLE);
+                contentView.setViewVisibility(R.id.line3, View.VISIBLE);
+            } else {
+                // Clear text in case we use the line to show the profile badge.
+                contentView.setTextViewText(R.id.text, "");
+                contentView.setViewVisibility(R.id.overflow_divider, View.GONE);
+                contentView.setViewVisibility(R.id.line3, View.GONE);
+            }
+
+            return contentView;
+!!!1694978.java!!!	applyTopPadding(inout contentView : RemoteViews) : void
+            int topPadding = Builder.calculateTopPadding(mBuilder.mContext,
+                    mBuilder.mHasThreeLines,
+                    mBuilder.mContext.getResources().getConfiguration().fontScale);
+            contentView.setViewPadding(R.id.line1, 0, topPadding, 0, 0);
+!!!1695106.java!!!	addExtras(inout extras : Bundle) : void
+            if (mSummaryTextSet) {
+                extras.putCharSequence(EXTRA_SUMMARY_TEXT, mSummaryText);
+            }
+            if (mBigContentTitle != null) {
+                extras.putCharSequence(EXTRA_TITLE_BIG, mBigContentTitle);
+            }
+            extras.putString(EXTRA_TEMPLATE, this.getClass().getName());
+!!!1695234.java!!!	restoreFromExtras(inout extras : Bundle) : void
+            if (extras.containsKey(EXTRA_SUMMARY_TEXT)) {
+                mSummaryText = extras.getCharSequence(EXTRA_SUMMARY_TEXT);
+                mSummaryTextSet = true;
+            }
+            if (extras.containsKey(EXTRA_TITLE_BIG)) {
+                mBigContentTitle = extras.getCharSequence(EXTRA_TITLE_BIG);
+            }
+!!!1695362.java!!!	buildStyled(inout wip : Notification) : Notification
+            populateTickerView(wip);
+            populateContentView(wip);
+            populateBigContentView(wip);
+            populateHeadsUpContentView(wip);
+            return wip;
+!!!1696002.java!!!	build() : Notification
+            checkBuilder();
+            return mBuilder.build();
+!!!1696130.java!!!	hasProgress() : boolean
+            return true;

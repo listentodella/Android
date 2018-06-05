@@ -1,0 +1,6 @@
+class Arc
+!!!2307586.java!!!	Arc(inout span : GridLayout::Interval, inout value : GridLayout::MutableInt)
+            this.span = span;
+            this.value = value;
+!!!2307714.java!!!	toString() : String
+            return span + " " + (!valid ? "+>" : "->") + " " + value;

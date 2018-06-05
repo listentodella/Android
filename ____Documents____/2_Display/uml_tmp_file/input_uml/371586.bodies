@@ -1,0 +1,93 @@
+class SimpleMonthAdapter
+!!!2451074.java!!!	SimpleMonthAdapter(inout context : Context, inout controller : DatePickerController)
+        mContext = context;
+        mController = controller;
+        init();
+        setSelectedDay(mController.getSelectedDay());
+!!!2451202.java!!!	setSelectedDay(inout day : Calendar) : void
+        if (mSelectedDay != day) {
+            mSelectedDay = day;
+            notifyDataSetChanged();
+        }
+!!!2451330.java!!!	setCalendarTextColor(inout colors : ColorStateList) : void
+        mCalendarTextColors = colors;
+!!!2451458.java!!!	init() : void
+        mSelectedDay = Calendar.getInstance();
+!!!2451586.java!!!	getCount() : int
+        final int diffYear = mController.getMaxYear() - mController.getMinYear();
+        final int diffMonth = 1 + mController.getMaxMonth() - mController.getMinMonth()
+                + 12 * diffYear;
+        return diffMonth;
+!!!2451714.java!!!	getItem(in position : int) : Object
+        return null;
+!!!2451842.java!!!	getItemId(in position : int) : long
+        return position;
+!!!2451970.java!!!	hasStableIds() : boolean
+        return true;
+!!!2452098.java!!!	getView(in position : int, inout convertView : View, inout parent : ViewGroup) : View
+        SimpleMonthView v;
+        HashMap<String, Integer> drawingParams = null;
+        if (convertView != null) {
+            v = (SimpleMonthView) convertView;
+            // We store the drawing parameters in the view so it can be recycled
+            drawingParams = (HashMap<String, Integer>) v.getTag();
+        } else {
+            v = new SimpleMonthView(mContext);
+            // Set up the new view
+            AbsListView.LayoutParams params = new AbsListView.LayoutParams(
+                    AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.MATCH_PARENT);
+            v.setLayoutParams(params);
+            v.setClickable(true);
+            v.setOnDayClickListener(this);
+            if (mCalendarTextColors != null) {
+                v.setTextColor(mCalendarTextColors);
+            }
+        }
+        if (drawingParams == null) {
+            drawingParams = new HashMap<String, Integer>();
+        } else {
+            drawingParams.clear();
+        }
+        final int currentMonth = position + mController.getMinMonth();
+        final int month = currentMonth % 12;
+        final int year = currentMonth / 12 + mController.getMinYear();
+
+        int selectedDay = -1;
+        if (isSelectedDayInMonth(year, month)) {
+            selectedDay = mSelectedDay.get(Calendar.DAY_OF_MONTH);
+        }
+
+        // Invokes requestLayout() to ensure that the recycled view is set with the appropriate
+        // height/number of weeks before being displayed.
+        v.reuse();
+
+        final int enabledDayRangeStart;
+        if (mController.getMinMonth() == month && mController.getMinYear() == year) {
+            enabledDayRangeStart = mController.getMinDay();
+        } else {
+            enabledDayRangeStart = 1;
+        }
+
+        final int enabledDayRangeEnd;
+        if (mController.getMaxMonth() == month && mController.getMaxYear() == year) {
+            enabledDayRangeEnd = mController.getMaxDay();
+        } else {
+            enabledDayRangeEnd = 31;
+        }
+
+        v.setMonthParams(selectedDay, month, year, mController.getFirstDayOfWeek(),
+                enabledDayRangeStart, enabledDayRangeEnd);
+        v.invalidate();
+
+        return v;
+!!!2452226.java!!!	isSelectedDayInMonth(in year : int, in month : int) : boolean
+        return mSelectedDay.get(Calendar.YEAR) == year && mSelectedDay.get(Calendar.MONTH) == month;
+!!!2452354.java!!!	onDayClick(inout view : SimpleMonthView, inout day : Calendar) : void
+        if (day != null) {
+            onDayTapped(day);
+        }
+!!!2452482.java!!!	onDayTapped(inout day : Calendar) : void
+        mController.tryVibrate();
+        mController.onDayOfMonthSelected(day.get(Calendar.YEAR), day.get(Calendar.MONTH),
+                day.get(Calendar.DAY_OF_MONTH));
+        setSelectedDay(day);

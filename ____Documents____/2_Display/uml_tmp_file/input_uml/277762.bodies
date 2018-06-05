@@ -1,0 +1,27 @@
+class ProfilerInfo
+!!!1716866.java!!!	ProfilerInfo(in filename : String, inout fd : ParcelFileDescriptor, in interval : int, inout autoStop : boolean)
+        profileFile = filename;
+        profileFd = fd;
+        samplingInterval = interval;
+        autoStopProfiler = autoStop;
+!!!1716994.java!!!	describeContents() : int
+        if (profileFd != null) {
+            return profileFd.describeContents();
+        } else {
+            return 0;
+        }
+!!!1717122.java!!!	writeToParcel(inout out : Parcel, in flags : int) : void
+        out.writeString(profileFile);
+        if (profileFd != null) {
+            out.writeInt(1);
+            profileFd.writeToParcel(out, flags);
+        } else {
+            out.writeInt(0);
+        }
+        out.writeInt(samplingInterval);
+        out.writeInt(autoStopProfiler ? 1 : 0);
+!!!1717250.java!!!	ProfilerInfo(inout in : Parcel)
+        profileFile = in.readString();
+        profileFd = in.readInt() != 0 ? ParcelFileDescriptor.CREATOR.createFromParcel(in) : null;
+        samplingInterval = in.readInt();
+        autoStopProfiler = in.readInt() != 0;

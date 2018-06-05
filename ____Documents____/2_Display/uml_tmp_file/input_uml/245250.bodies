@@ -1,0 +1,48 @@
+class WindowCallbackWrapper
+!!!1019522.java!!!	WindowCallbackWrapper(inout wrapped : Window::Callback)
+        if (wrapped == null) {
+            throw new IllegalArgumentException("Window callback may not be null");
+        }
+        mWrapped = wrapped;
+!!!1019650.java!!!	dispatchKeyEvent(inout event : KeyEvent) : boolean
+        return mWrapped.dispatchKeyEvent(event);
+!!!1019778.java!!!	dispatchKeyShortcutEvent(inout event : KeyEvent) : boolean
+        return mWrapped.dispatchKeyShortcutEvent(event);
+!!!1019906.java!!!	dispatchTouchEvent(inout event : MotionEvent) : boolean
+        return mWrapped.dispatchTouchEvent(event);
+!!!1020034.java!!!	dispatchTrackballEvent(inout event : MotionEvent) : boolean
+        return mWrapped.dispatchTrackballEvent(event);
+!!!1020162.java!!!	dispatchGenericMotionEvent(inout event : MotionEvent) : boolean
+        return mWrapped.dispatchGenericMotionEvent(event);
+!!!1020290.java!!!	dispatchPopulateAccessibilityEvent(inout event : AccessibilityEvent) : boolean
+        return mWrapped.dispatchPopulateAccessibilityEvent(event);
+!!!1020418.java!!!	onCreatePanelView(in featureId : int) : View
+        return mWrapped.onCreatePanelView(featureId);
+!!!1020546.java!!!	onCreatePanelMenu(in featureId : int, inout menu : Menu) : boolean
+        return mWrapped.onCreatePanelMenu(featureId, menu);
+!!!1020674.java!!!	onPreparePanel(in featureId : int, inout view : View, inout menu : Menu) : boolean
+        return mWrapped.onPreparePanel(featureId, view, menu);
+!!!1020802.java!!!	onMenuOpened(in featureId : int, inout menu : Menu) : boolean
+        return mWrapped.onMenuOpened(featureId, menu);
+!!!1020930.java!!!	onMenuItemSelected(in featureId : int, inout item : MenuItem) : boolean
+        return mWrapped.onMenuItemSelected(featureId, item);
+!!!1021058.java!!!	onWindowAttributesChanged(inout attrs : WindowManager::LayoutParams) : void
+        mWrapped.onWindowAttributesChanged(attrs);
+!!!1021186.java!!!	onContentChanged() : void
+        mWrapped.onContentChanged();
+!!!1021314.java!!!	onWindowFocusChanged(inout hasFocus : boolean) : void
+        mWrapped.onWindowFocusChanged(hasFocus);
+!!!1021442.java!!!	onAttachedToWindow() : void
+        mWrapped.onAttachedToWindow();
+!!!1021570.java!!!	onDetachedFromWindow() : void
+        mWrapped.onDetachedFromWindow();
+!!!1021698.java!!!	onPanelClosed(in featureId : int, inout menu : Menu) : void
+        mWrapped.onPanelClosed(featureId, menu);
+!!!1021826.java!!!	onSearchRequested() : boolean
+        return mWrapped.onSearchRequested();
+!!!1021954.java!!!	onWindowStartingActionMode(inout callback : ActionMode::Callback) : ActionMode
+        return mWrapped.onWindowStartingActionMode(callback);
+!!!1022082.java!!!	onActionModeStarted(inout mode : ActionMode) : void
+        mWrapped.onActionModeStarted(mode);
+!!!1022210.java!!!	onActionModeFinished(inout mode : ActionMode) : void
+        mWrapped.onActionModeFinished(mode);

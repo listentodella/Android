@@ -1,0 +1,5 @@
+class ManagedCursor
+!!!1307906.java!!!	ManagedCursor(inout cursor : Cursor)
+            mCursor = cursor;
+            mReleased = false;
+            mUpdated = false;

@@ -1,0 +1,39 @@
+class MyHandler
+!!!1186946.java!!!	MyHandler(inout looper : Looper)
+                super(looper);
+!!!1187074.java!!!	handleMessage(inout message : Message) : void
+                switch (message.what) {
+                    case MESSAGE_NOTIFY_MAGNIFIED_BOUNDS_CHANGED: {
+                        Region bounds = (Region) message.obj;
+                        mCallbacks.onMagnifedBoundsChanged(bounds);
+                        bounds.recycle();
+                    } break;
+
+                    case MESSAGE_NOTIFY_RECTANGLE_ON_SCREEN_REQUESTED: {
+                        SomeArgs args = (SomeArgs) message.obj;
+                        final int left = args.argi1;
+                        final int top = args.argi2;
+                        final int right = args.argi3;
+                        final int bottom = args.argi4;
+                        mCallbacks.onRectangleOnScreenRequested(left, top, right, bottom);
+                        args.recycle();
+                    } break;
+
+                    case MESSAGE_NOTIFY_USER_CONTEXT_CHANGED: {
+                        mCallbacks.onUserContextChanged();
+                    } break;
+
+                    case MESSAGE_NOTIFY_ROTATION_CHANGED: {
+                        final int rotation = message.arg1;
+                        mCallbacks.onRotationChanged(rotation);
+                    } break;
+
+                    case MESSAGE_SHOW_MAGNIFIED_REGION_BOUNDS_IF_NEEDED : {
+                        synchronized (mWindowManagerService.mWindowMap) {
+                            if (mMagnifedViewport.isMagnifyingLocked()) {
+                                mMagnifedViewport.setMagnifiedRegionBorderShownLocked(true, true);
+                                mWindowManagerService.scheduleAnimationLocked();
+                            }
+                        }
+                    } break;
+                }

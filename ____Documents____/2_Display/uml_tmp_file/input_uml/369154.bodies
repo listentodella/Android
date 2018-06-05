@@ -1,0 +1,7 @@
+class MyDataSetObserver
+!!!2170498.java!!!	onChanged() : void
+                mDataValid = true;
+                notifyDataSetChanged();
+!!!2170626.java!!!	onInvalidated() : void
+                mDataValid = false;
+                notifyDataSetInvalidated();

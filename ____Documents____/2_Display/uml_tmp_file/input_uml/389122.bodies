@@ -1,0 +1,13 @@
+class SavedState
+!!!2421378.java!!!	SavedState(inout superState : Parcelable)
+            super(superState);
+!!!2421506.java!!!	SavedState(inout source : Parcel)
+            super(source);
+            scrollPosition = source.readInt();
+!!!2421634.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            super.writeToParcel(dest, flags);
+            dest.writeInt(scrollPosition);
+!!!2421762.java!!!	toString() : String
+            return "HorizontalScrollView.SavedState{"
+                    + Integer.toHexString(System.identityHashCode(this))
+                    + " scrollPosition=" + scrollPosition + "}";

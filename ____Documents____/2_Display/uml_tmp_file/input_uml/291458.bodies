@@ -1,0 +1,3 @@
+class InstantiationException
+!!!1584770.java!!!	InstantiationException(in msg : String, inout cause : Exception)
+            super(msg, cause);

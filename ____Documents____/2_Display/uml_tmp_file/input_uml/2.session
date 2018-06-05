@@ -1,0 +1,39 @@
+window_sizes 1600 838 314 1280 729 36
+diagrams
+  classdiagram_ref 141186 // input_class_view
+    1280 729 120 10 0 0
+  active  sequencediagram_ref 141314 // input_create_thread
+    1280 729 90 10 0 979
+  sequencediagram_ref 141442 // input_reader
+    831 541 90 9 0 209
+  objectdiagram_ref 147970 // input_object
+    918 543 100 4 0 0
+  objectdiagram_ref 148098 // input_object
+    918 543 100 4 0 0
+  sequencediagram_ref 154626 // input_dispatcher
+    1287 679 90 9 290 33
+  sequencediagram_ref 161154 // InputChannel
+    1334 674 90 10 1008 1243
+  sequencediagram_ref 167682 // dispatch_input_event
+    1063 543 60 10 50 0
+  sequencediagram_ref 168066 // process_input_event
+    1334 674 100 10 2196 738
+  sequencediagram_ref 174594 // input_stage
+    1432 724 90 10 3347 302
+  sequencediagram_ref 181122 // input_reader_mtp
+    1254 678 100 9 436 189
+end
+show_stereotypes
+selected classview_ref 129154 // cc
+open
+  
+  package_ref 128130 // uml_tmp_file
+  classview_ref 129282 // inputflinger
+  deploymentview_ref 128642 // inputflinger
+  classview_ref 129410 // inputflinger
+  classview_ref 136066 // input
+  deploymentview_ref 135426 // input
+  classview_ref 136194 // input
+  classview_ref 176002 // widget
+end
+end

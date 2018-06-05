@@ -1,0 +1,44 @@
+class DialogMenuCallback
+!!!492802.java!!!	DialogMenuCallback(in featureId : int)
+            mFeatureId = featureId;
+!!!492930.java!!!	onCloseMenu(inout menu : MenuBuilder, inout allMenusAreClosing : boolean) : void
+            if (menu.getRootMenu() != menu) {
+                onCloseSubMenu(menu);
+            }
+
+            if (allMenusAreClosing) {
+                Callback callback = getCallback();
+                if (callback != null && !isDestroyed()) {
+                    callback.onPanelClosed(mFeatureId, menu);
+                }
+
+                if (menu == mContextMenu) {
+                    dismissContextMenu();
+                }
+
+                // Dismiss the submenu, if it is showing
+                if (mSubMenuHelper != null) {
+                    mSubMenuHelper.dismiss();
+                    mSubMenuHelper = null;
+                }
+            }
+!!!493058.java!!!	onCloseSubMenu(inout menu : MenuBuilder) : void
+            Callback callback = getCallback();
+            if (callback != null && !isDestroyed()) {
+                callback.onPanelClosed(mFeatureId, menu.getRootMenu());
+            }
+!!!493186.java!!!	onMenuItemSelected(inout menu : MenuBuilder, inout item : MenuItem) : boolean
+            Callback callback = getCallback();
+            return (callback != null && !isDestroyed())
+                    && callback.onMenuItemSelected(mFeatureId, item);
+!!!493442.java!!!	onOpenSubMenu(inout subMenu : MenuBuilder) : boolean
+            if (subMenu == null) return false;
+
+            // Set a simple callback for the submenu
+            subMenu.setCallback(this);
+
+            // The window manager will give us a valid window token
+            mSubMenuHelper = new MenuDialogHelper(subMenu);
+            mSubMenuHelper.show(null);
+
+            return true;

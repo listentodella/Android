@@ -1,0 +1,6 @@
+class PolicyInfo
+!!!1769218.java!!!	PolicyInfo(in identIn : int, in tagIn : String, in labelIn : int, in descriptionIn : int)
+            ident = identIn;
+            tag = tagIn;
+            label = labelIn;
+            description = descriptionIn;

@@ -1,0 +1,5 @@
+class Father
+!!!136450.java!!!	getMoney() : int
+return money;
+!!!136578.java!!!	setMoney(in money : int) : void
+this.money = money;

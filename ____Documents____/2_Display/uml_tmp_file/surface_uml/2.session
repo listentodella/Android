@@ -1,0 +1,23 @@
+window_sizes 1600 838 260 758 600 86
+diagrams
+  sequencediagram_ref 134530 // 001_create_client
+    1330 679 100 10 72 0
+  sequencediagram_ref 141058 // 002_vsync
+    1063 543 100 10 0 0
+  sequencediagram_ref 147586 // 003_sf_use_vsync
+    1063 543 100 10 0 0
+  active  sequencediagram_ref 173826 // 005_create_DisplayDevice
+    1334 674 140 10 1404 1999
+end
+show_stereotypes
+selected sequencediagram_ref 173826 // 005_create_DisplayDevice
+open
+  classview_ref 134658 // gui
+  classview_ref 134914 // surfaceflinger
+  deploymentview_ref 134914 // surfaceflinger
+  classview_ref 135042 // DisplayHardware
+  classview_ref 135170 // RenderEngine
+  classview_ref 135298 // surfaceflinger
+  classview_ref 142210 // seq
+end
+end

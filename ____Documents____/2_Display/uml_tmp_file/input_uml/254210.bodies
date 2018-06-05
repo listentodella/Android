@@ -1,0 +1,44 @@
+class SuggestionsInfo
+!!!1176578.java!!!	SuggestionsInfo(in suggestionsAttributes : int, inout suggestions : String)
+        this(suggestionsAttributes, suggestions, 0, 0);
+!!!1176706.java!!!	SuggestionsInfo(in suggestionsAttributes : int, inout suggestions : String, in cookie : int, in sequence : int)
+        if (suggestions == null) {
+            mSuggestions = EMPTY;
+            mSuggestionsAvailable = false;
+        } else {
+            mSuggestions = suggestions;
+            mSuggestionsAvailable = true;
+        }
+        mSuggestionsAttributes = suggestionsAttributes;
+        mCookie = cookie;
+        mSequence = sequence;
+!!!1176834.java!!!	SuggestionsInfo(inout source : Parcel)
+        mSuggestionsAttributes = source.readInt();
+        mSuggestions = source.readStringArray();
+        mCookie = source.readInt();
+        mSequence = source.readInt();
+        mSuggestionsAvailable = source.readInt() == 1;
+!!!1176962.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        dest.writeInt(mSuggestionsAttributes);
+        dest.writeStringArray(mSuggestions);
+        dest.writeInt(mCookie);
+        dest.writeInt(mSequence);
+        dest.writeInt(mSuggestionsAvailable ? 1 : 0);
+!!!1177090.java!!!	setCookieAndSequence(in cookie : int, in sequence : int) : void
+        mCookie = cookie;
+        mSequence = sequence;
+!!!1177218.java!!!	getCookie() : int
+        return mCookie;
+!!!1177346.java!!!	getSequence() : int
+        return mSequence;
+!!!1177474.java!!!	getSuggestionsAttributes() : int
+        return mSuggestionsAttributes;
+!!!1177602.java!!!	getSuggestionsCount() : int
+        if (!mSuggestionsAvailable) {
+            return -1;
+        }
+        return mSuggestions.length;
+!!!1177730.java!!!	getSuggestionAt(in i : int) : String
+        return mSuggestions[i];
+!!!1177858.java!!!	describeContents() : int
+        return 0;

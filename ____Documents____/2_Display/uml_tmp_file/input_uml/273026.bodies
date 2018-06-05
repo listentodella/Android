@@ -1,0 +1,139 @@
+class Application
+!!!1501826.java!!!	Application()
+        super(null);
+!!!1502210.java!!!	onConfigurationChanged(inout newConfig : Configuration) : void
+        Object[] callbacks = collectComponentCallbacks();
+        if (callbacks != null) {
+            for (int i=0; i<callbacks.length; i++) {
+                ((ComponentCallbacks)callbacks[i]).onConfigurationChanged(newConfig);
+            }
+        }
+!!!1502338.java!!!	onLowMemory() : void
+        Object[] callbacks = collectComponentCallbacks();
+        if (callbacks != null) {
+            for (int i=0; i<callbacks.length; i++) {
+                ((ComponentCallbacks)callbacks[i]).onLowMemory();
+            }
+        }
+!!!1502466.java!!!	onTrimMemory(in level : int) : void
+        Object[] callbacks = collectComponentCallbacks();
+        if (callbacks != null) {
+            for (int i=0; i<callbacks.length; i++) {
+                Object c = callbacks[i];
+                if (c instanceof ComponentCallbacks2) {
+                    ((ComponentCallbacks2)c).onTrimMemory(level);
+                }
+            }
+        }
+!!!1502594.java!!!	registerComponentCallbacks(inout callback : ComponentCallbacks) : void
+        synchronized (mComponentCallbacks) {
+            mComponentCallbacks.add(callback);
+        }
+!!!1502722.java!!!	unregisterComponentCallbacks(inout callback : ComponentCallbacks) : void
+        synchronized (mComponentCallbacks) {
+            mComponentCallbacks.remove(callback);
+        }
+!!!1502850.java!!!	registerActivityLifecycleCallbacks(inout callback : Application::ActivityLifecycleCallbacks) : void
+        synchronized (mActivityLifecycleCallbacks) {
+            mActivityLifecycleCallbacks.add(callback);
+        }
+!!!1502978.java!!!	unregisterActivityLifecycleCallbacks(inout callback : Application::ActivityLifecycleCallbacks) : void
+        synchronized (mActivityLifecycleCallbacks) {
+            mActivityLifecycleCallbacks.remove(callback);
+        }
+!!!1503106.java!!!	registerOnProvideAssistDataListener(inout callback : Application::OnProvideAssistDataListener) : void
+        synchronized (this) {
+            if (mAssistCallbacks == null) {
+                mAssistCallbacks = new ArrayList<OnProvideAssistDataListener>();
+            }
+            mAssistCallbacks.add(callback);
+        }
+!!!1503234.java!!!	unregisterOnProvideAssistDataListener(inout callback : Application::OnProvideAssistDataListener) : void
+        synchronized (this) {
+            if (mAssistCallbacks != null) {
+                mAssistCallbacks.remove(callback);
+            }
+        }
+!!!1503362.java!!!	attach(inout context : Context) : void
+        attachBaseContext(context);
+        mLoadedApk = ContextImpl.getImpl(context).mPackageInfo;
+!!!1503490.java!!!	dispatchActivityCreated(inout activity : Activity, inout savedInstanceState : Bundle) : void
+        Object[] callbacks = collectActivityLifecycleCallbacks();
+        if (callbacks != null) {
+            for (int i=0; i<callbacks.length; i++) {
+                ((ActivityLifecycleCallbacks)callbacks[i]).onActivityCreated(activity,
+                        savedInstanceState);
+            }
+        }
+!!!1503618.java!!!	dispatchActivityStarted(inout activity : Activity) : void
+        Object[] callbacks = collectActivityLifecycleCallbacks();
+        if (callbacks != null) {
+            for (int i=0; i<callbacks.length; i++) {
+                ((ActivityLifecycleCallbacks)callbacks[i]).onActivityStarted(activity);
+            }
+        }
+!!!1503746.java!!!	dispatchActivityResumed(inout activity : Activity) : void
+        Object[] callbacks = collectActivityLifecycleCallbacks();
+        if (callbacks != null) {
+            for (int i=0; i<callbacks.length; i++) {
+                ((ActivityLifecycleCallbacks)callbacks[i]).onActivityResumed(activity);
+            }
+        }
+!!!1503874.java!!!	dispatchActivityPaused(inout activity : Activity) : void
+        Object[] callbacks = collectActivityLifecycleCallbacks();
+        if (callbacks != null) {
+            for (int i=0; i<callbacks.length; i++) {
+                ((ActivityLifecycleCallbacks)callbacks[i]).onActivityPaused(activity);
+            }
+        }
+!!!1504002.java!!!	dispatchActivityStopped(inout activity : Activity) : void
+        Object[] callbacks = collectActivityLifecycleCallbacks();
+        if (callbacks != null) {
+            for (int i=0; i<callbacks.length; i++) {
+                ((ActivityLifecycleCallbacks)callbacks[i]).onActivityStopped(activity);
+            }
+        }
+!!!1504130.java!!!	dispatchActivitySaveInstanceState(inout activity : Activity, inout outState : Bundle) : void
+        Object[] callbacks = collectActivityLifecycleCallbacks();
+        if (callbacks != null) {
+            for (int i=0; i<callbacks.length; i++) {
+                ((ActivityLifecycleCallbacks)callbacks[i]).onActivitySaveInstanceState(activity,
+                        outState);
+            }
+        }
+!!!1504258.java!!!	dispatchActivityDestroyed(inout activity : Activity) : void
+        Object[] callbacks = collectActivityLifecycleCallbacks();
+        if (callbacks != null) {
+            for (int i=0; i<callbacks.length; i++) {
+                ((ActivityLifecycleCallbacks)callbacks[i]).onActivityDestroyed(activity);
+            }
+        }
+!!!1504386.java!!!	collectComponentCallbacks() : Object
+        Object[] callbacks = null;
+        synchronized (mComponentCallbacks) {
+            if (mComponentCallbacks.size() > 0) {
+                callbacks = mComponentCallbacks.toArray();
+            }
+        }
+        return callbacks;
+!!!1504514.java!!!	collectActivityLifecycleCallbacks() : Object
+        Object[] callbacks = null;
+        synchronized (mActivityLifecycleCallbacks) {
+            if (mActivityLifecycleCallbacks.size() > 0) {
+                callbacks = mActivityLifecycleCallbacks.toArray();
+            }
+        }
+        return callbacks;
+!!!1504642.java!!!	dispatchOnProvideAssistData(inout activity : Activity, inout data : Bundle) : void
+        Object[] callbacks;
+        synchronized (this) {
+            if (mAssistCallbacks == null) {
+                return;
+            }
+            callbacks = mAssistCallbacks.toArray();
+        }
+        if (callbacks != null) {
+            for (int i=0; i<callbacks.length; i++) {
+                ((OnProvideAssistDataListener)callbacks[i]).onProvideAssistData(activity, data);
+            }
+        }

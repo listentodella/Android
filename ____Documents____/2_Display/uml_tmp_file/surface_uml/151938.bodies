@@ -1,0 +1,54 @@
+class MonitoredProducer
+!!!193794.cpp!!!	~MonitoredProducer()
+    // Remove ourselves from SurfaceFlinger's list. We do this asynchronously
+    // because we don't know where this destructor is called from. It could be
+    // called with the mStateLock held, leading to a dead-lock (it actually
+    // happens).
+    class MessageCleanUpList : public MessageBase {
+    public:
+        MessageCleanUpList(const sp<SurfaceFlinger>& flinger,
+                const wp<IBinder>& producer)
+            : mFlinger(flinger), mProducer(producer) {}
+
+        virtual ~MessageCleanUpList() {}
+
+        virtual bool handler() {
+            Mutex::Autolock _l(mFlinger->mStateLock);
+            mFlinger->mGraphicBufferProducerList.remove(mProducer);
+            return true;
+        }
+
+    private:
+        sp<SurfaceFlinger> mFlinger;
+        wp<IBinder> mProducer;
+    };
+
+    mFlinger->postMessageAsync(new MessageCleanUpList(mFlinger, asBinder()));
+!!!193922.cpp!!!	requestBuffer(in slot : int, inout buf : sp<GraphicBuffer>) : status_t
+    return mProducer->requestBuffer(slot, buf);
+!!!194050.cpp!!!	setBufferCount(in bufferCount : int) : status_t
+    return mProducer->setBufferCount(bufferCount);
+!!!194178.cpp!!!	dequeueBuffer(inout slot : int, inout fence : sp<Fence>, in async : bool, in w : uint32_t, in h : uint32_t, in format : uint32_t, in usage : uint32_t) : status_t
+    return mProducer->dequeueBuffer(slot, fence, async, w, h, format, usage);
+!!!194306.cpp!!!	detachBuffer(in slot : int) : status_t
+    return mProducer->detachBuffer(slot);
+!!!194434.cpp!!!	detachNextBuffer(inout outBuffer : sp<GraphicBuffer>, inout outFence : sp<Fence>) : status_t
+    return mProducer->detachNextBuffer(outBuffer, outFence);
+!!!194562.cpp!!!	attachBuffer(inout outSlot : int, in buffer : sp<GraphicBuffer>) : status_t
+    return mProducer->attachBuffer(outSlot, buffer);
+!!!194690.cpp!!!	queueBuffer(in slot : int, in input : QueueBufferInput, inout output : QueueBufferOutput) : status_t
+    return mProducer->queueBuffer(slot, input, output);
+!!!194818.cpp!!!	cancelBuffer(in slot : int, in fence : sp<Fence>) : void
+    mProducer->cancelBuffer(slot, fence);
+!!!194946.cpp!!!	query(in what : int, inout value : int) : int
+    return mProducer->query(what, value);
+!!!195074.cpp!!!	connect(in listener : sp<IProducerListener>, in api : int, in producerControlledByApp : bool, inout output : QueueBufferOutput) : status_t
+    return mProducer->connect(listener, api, producerControlledByApp, output);
+!!!195202.cpp!!!	disconnect(in api : int) : status_t
+    return mProducer->disconnect(api);
+!!!195330.cpp!!!	setSidebandStream(in stream : sp<NativeHandle>) : status_t
+    return mProducer->setSidebandStream(stream);
+!!!195458.cpp!!!	allocateBuffers(in async : bool, in width : uint32_t, in height : uint32_t, in format : uint32_t, in usage : uint32_t) : void
+    mProducer->allocateBuffers(async, width, height, format, usage);
+!!!195586.cpp!!!	onAsBinder() : IBinder
+    return mProducer->asBinder().get();

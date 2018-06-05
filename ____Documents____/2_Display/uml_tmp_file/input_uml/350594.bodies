@@ -1,0 +1,20 @@
+class CheckForKeyLongPress
+!!!1943042.java!!!	run() : void
+            if (isPressed() && mSelectedPosition >= 0) {
+                int index = mSelectedPosition - mFirstPosition;
+                View v = getChildAt(index);
+
+                if (!mDataChanged) {
+                    boolean handled = false;
+                    if (sameWindow()) {
+                        handled = performLongPress(v, mSelectedPosition, mSelectedRowId);
+                    }
+                    if (handled) {
+                        setPressed(false);
+                        v.setPressed(false);
+                    }
+                } else {
+                    setPressed(false);
+                    if (v != null) v.setPressed(false);
+                }
+            }

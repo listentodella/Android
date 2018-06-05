@@ -1,0 +1,33 @@
+class OpEntry
+!!!1528066.java!!!	OpEntry(in op : int, in mode : int, in time : long, in rejectTime : long, in duration : int)
+            mOp = op;
+            mMode = mode;
+            mTime = time;
+            mRejectTime = rejectTime;
+            mDuration = duration;
+!!!1528194.java!!!	getOp() : int
+            return mOp;
+!!!1528322.java!!!	getMode() : int
+            return mMode;
+!!!1528450.java!!!	getTime() : long
+            return mTime;
+!!!1528578.java!!!	getRejectTime() : long
+            return mRejectTime;
+!!!1528706.java!!!	isRunning() : boolean
+            return mDuration == -1;
+!!!1528834.java!!!	getDuration() : int
+            return mDuration == -1 ? (int)(System.currentTimeMillis()-mTime) : mDuration;
+!!!1528962.java!!!	describeContents() : int
+            return 0;
+!!!1529090.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            dest.writeInt(mOp);
+            dest.writeInt(mMode);
+            dest.writeLong(mTime);
+            dest.writeLong(mRejectTime);
+            dest.writeInt(mDuration);
+!!!1529218.java!!!	OpEntry(inout source : Parcel)
+            mOp = source.readInt();
+            mMode = source.readInt();
+            mTime = source.readLong();
+            mRejectTime = source.readLong();
+            mDuration = source.readInt();

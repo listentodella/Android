@@ -1,0 +1,60 @@
+class BigTextStyle
+!!!1697666.java!!!	BigTextStyle(inout builder : Notification::Builder)
+            setBuilder(builder);
+!!!1697794.java!!!	setBigContentTitle(inout title : CharSequence) : Notification::BigTextStyle
+            internalSetBigContentTitle(safeCharSequence(title));
+            return this;
+!!!1697922.java!!!	setSummaryText(inout cs : CharSequence) : Notification::BigTextStyle
+            internalSetSummaryText(safeCharSequence(cs));
+            return this;
+!!!1698050.java!!!	bigText(inout cs : CharSequence) : Notification::BigTextStyle
+            mBigText = safeCharSequence(cs);
+            return this;
+!!!1698178.java!!!	addExtras(inout extras : Bundle) : void
+            super.addExtras(extras);
+
+            extras.putCharSequence(EXTRA_BIG_TEXT, mBigText);
+!!!1698306.java!!!	restoreFromExtras(inout extras : Bundle) : void
+            super.restoreFromExtras(extras);
+
+            mBigText = extras.getCharSequence(EXTRA_BIG_TEXT);
+!!!1698434.java!!!	makeBigContentView() : RemoteViews
+
+            // Nasty
+            CharSequence oldBuilderContentText = mBuilder.mContentText;
+            mBuilder.mContentText = null;
+
+            RemoteViews contentView = getStandardView(mBuilder.getBigTextLayoutResource());
+
+            mBuilder.mContentText = oldBuilderContentText;
+
+            contentView.setTextViewText(R.id.big_text, mBuilder.processLegacyText(mBigText));
+            contentView.setViewVisibility(R.id.big_text, View.VISIBLE);
+            contentView.setInt(R.id.big_text, "setMaxLines", calculateMaxLines());
+            contentView.setViewVisibility(R.id.text2, View.GONE);
+
+            applyTopPadding(contentView);
+
+            mBuilder.shrinkLine3Text(contentView);
+
+            mBuilder.addProfileBadge(contentView, R.id.profile_badge_large_template);
+
+            return contentView;
+!!!1698562.java!!!	calculateMaxLines() : int
+            int lineCount = MAX_LINES;
+            boolean hasActions = mBuilder.mActions.size() > 0;
+            boolean hasSummary = (mSummaryTextSet ? mSummaryText : mBuilder.mSubText) != null;
+            if (hasActions) {
+                lineCount -= LINES_CONSUMED_BY_ACTIONS;
+            }
+            if (hasSummary) {
+                lineCount -= LINES_CONSUMED_BY_SUMMARY;
+            }
+
+            // If we have less top padding at the top, we can fit less lines.
+            if (!mBuilder.mHasThreeLines) {
+                lineCount--;
+            }
+            return lineCount;
+!!!1698690.java!!!	populateBigContentView(inout wip : Notification) : void
+            mBuilder.setBuilderBigContentView(wip, makeBigContentView());

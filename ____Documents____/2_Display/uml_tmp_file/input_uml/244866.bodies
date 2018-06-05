@@ -1,0 +1,266 @@
+class Window
+!!!1001602.java!!!	Window(inout context : Context)
+        mContext = context;
+!!!1001730.java!!!	getContext() : Context
+        return mContext;
+!!!1001858.java!!!	getWindowStyle() : TypedArray
+        synchronized (this) {
+            if (mWindowStyle == null) {
+                mWindowStyle = mContext.obtainStyledAttributes(
+                        com.android.internal.R.styleable.Window);
+            }
+            return mWindowStyle;
+        }
+!!!1001986.java!!!	setContainer(inout container : Window) : void
+        mContainer = container;
+        if (container != null) {
+            // Embedded screens never have a title.
+            mFeatures |= 1<<FEATURE_NO_TITLE;
+            mLocalFeatures |= 1<<FEATURE_NO_TITLE;
+            container.mHasChildren = true;
+        }
+!!!1002114.java!!!	getContainer() : Window
+        return mContainer;
+!!!1002242.java!!!	hasChildren() : boolean
+        return mHasChildren;
+!!!1002370.java!!!	destroy() : void
+        mDestroyed = true;
+!!!1002498.java!!!	isDestroyed() : boolean
+        return mDestroyed;
+!!!1002626.java!!!	setWindowManager(inout wm : WindowManager, inout appToken : IBinder, in appName : String) : void
+        setWindowManager(wm, appToken, appName, false);
+!!!1002754.java!!!	setWindowManager(inout wm : WindowManager, inout appToken : IBinder, in appName : String, inout hardwareAccelerated : boolean) : void
+        mAppToken = appToken;
+        mAppName = appName;
+        mHardwareAccelerated = hardwareAccelerated
+                || SystemProperties.getBoolean(PROPERTY_HARDWARE_UI, false);
+        if (wm == null) {
+            wm = (WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE);
+        }
+        mWindowManager = ((WindowManagerImpl)wm).createLocalWindowManager(this);
+!!!1002882.java!!!	adjustLayoutParamsForSubWindow(inout wp : WindowManager::LayoutParams) : void
+        CharSequence curTitle = wp.getTitle();
+        if (wp.type >= WindowManager.LayoutParams.FIRST_SUB_WINDOW &&
+            wp.type <= WindowManager.LayoutParams.LAST_SUB_WINDOW) {
+            if (wp.token == null) {
+                View decor = peekDecorView();
+                if (decor != null) {
+                    wp.token = decor.getWindowToken();
+                }
+            }
+            if (curTitle == null || curTitle.length() == 0) {
+                String title;
+                if (wp.type == WindowManager.LayoutParams.TYPE_APPLICATION_MEDIA) {
+                    title="Media";
+                } else if (wp.type == WindowManager.LayoutParams.TYPE_APPLICATION_MEDIA_OVERLAY) {
+                    title="MediaOvr";
+                } else if (wp.type == WindowManager.LayoutParams.TYPE_APPLICATION_PANEL) {
+                    title="Panel";
+                } else if (wp.type == WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL) {
+                    title="SubPanel";
+                } else if (wp.type == WindowManager.LayoutParams.TYPE_APPLICATION_ATTACHED_DIALOG) {
+                    title="AtchDlg";
+                } else {
+                    title=Integer.toString(wp.type);
+                }
+                if (mAppName != null) {
+                    title += ":" + mAppName;
+                }
+                wp.setTitle(title);
+            }
+        } else {
+            if (wp.token == null) {
+                wp.token = mContainer == null ? mAppToken : mContainer.mAppToken;
+            }
+            if ((curTitle == null || curTitle.length() == 0)
+                    && mAppName != null) {
+                wp.setTitle(mAppName);
+            }
+        }
+        if (wp.packageName == null) {
+            wp.packageName = mContext.getPackageName();
+        }
+        if (mHardwareAccelerated) {
+            wp.flags |= WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
+        }
+!!!1003010.java!!!	getWindowManager() : WindowManager
+        return mWindowManager;
+!!!1003138.java!!!	setCallback(inout callback : Window::Callback) : void
+        mCallback = callback;
+!!!1003266.java!!!	getCallback() : Window::Callback
+        return mCallback;
+!!!1003394.java!!!	setOnWindowDismissedCallback(inout dcb : Window::OnWindowDismissedCallback) : void
+        mOnWindowDismissedCallback = dcb;
+!!!1003522.java!!!	dispatchOnWindowDismissed() : void
+        if (mOnWindowDismissedCallback != null) {
+            mOnWindowDismissedCallback.onWindowDismissed();
+        }
+!!!1004034.java!!!	setLayout(in width : int, in height : int) : void
+        final WindowManager.LayoutParams attrs = getAttributes();
+        attrs.width = width;
+        attrs.height = height;
+        dispatchWindowAttributesChanged(attrs);
+!!!1004162.java!!!	setGravity(in gravity : int) : void
+        final WindowManager.LayoutParams attrs = getAttributes();
+        attrs.gravity = gravity;
+        dispatchWindowAttributesChanged(attrs);
+!!!1004290.java!!!	setType(in type : int) : void
+        final WindowManager.LayoutParams attrs = getAttributes();
+        attrs.type = type;
+        dispatchWindowAttributesChanged(attrs);
+!!!1004418.java!!!	setFormat(in format : int) : void
+        final WindowManager.LayoutParams attrs = getAttributes();
+        if (format != PixelFormat.UNKNOWN) {
+            attrs.format = format;
+            mHaveWindowFormat = true;
+        } else {
+            attrs.format = mDefaultWindowFormat;
+            mHaveWindowFormat = false;
+        }
+        dispatchWindowAttributesChanged(attrs);
+!!!1004546.java!!!	setWindowAnimations(in resId : int) : void
+        final WindowManager.LayoutParams attrs = getAttributes();
+        attrs.windowAnimations = resId;
+        dispatchWindowAttributesChanged(attrs);
+!!!1004674.java!!!	setSoftInputMode(in mode : int) : void
+        final WindowManager.LayoutParams attrs = getAttributes();
+        if (mode != WindowManager.LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED) {
+            attrs.softInputMode = mode;
+            mHasSoftInputMode = true;
+        } else {
+            mHasSoftInputMode = false;
+        }
+        dispatchWindowAttributesChanged(attrs);
+!!!1004802.java!!!	addFlags(in flags : int) : void
+        setFlags(flags, flags);
+!!!1004930.java!!!	addPrivateFlags(in flags : int) : void
+        setPrivateFlags(flags, flags);
+!!!1005058.java!!!	clearFlags(in flags : int) : void
+        setFlags(0, flags);
+!!!1005186.java!!!	setFlags(in flags : int, in mask : int) : void
+        final WindowManager.LayoutParams attrs = getAttributes();
+        attrs.flags = (attrs.flags&~mask) | (flags&mask);
+        if ((mask&WindowManager.LayoutParams.FLAG_NEEDS_MENU_KEY) != 0) {
+            attrs.privateFlags |= WindowManager.LayoutParams.PRIVATE_FLAG_SET_NEEDS_MENU_KEY;
+        }
+        mForcedWindowFlags |= mask;
+        dispatchWindowAttributesChanged(attrs);
+!!!1005314.java!!!	setPrivateFlags(in flags : int, in mask : int) : void
+        final WindowManager.LayoutParams attrs = getAttributes();
+        attrs.privateFlags = (attrs.privateFlags & ~mask) | (flags & mask);
+        dispatchWindowAttributesChanged(attrs);
+!!!1005442.java!!!	dispatchWindowAttributesChanged(inout attrs : WindowManager::LayoutParams) : void
+        if (mCallback != null) {
+            mCallback.onWindowAttributesChanged(attrs);
+        }
+!!!1005570.java!!!	setDimAmount(in amount : float) : void
+        final WindowManager.LayoutParams attrs = getAttributes();
+        attrs.dimAmount = amount;
+        mHaveDimAmount = true;
+        dispatchWindowAttributesChanged(attrs);
+!!!1005698.java!!!	setAttributes(inout a : WindowManager::LayoutParams) : void
+        mWindowAttributes.copyFrom(a);
+        dispatchWindowAttributesChanged(mWindowAttributes);
+!!!1005826.java!!!	getAttributes() : WindowManager::LayoutParams
+        return mWindowAttributes;
+!!!1005954.java!!!	getForcedWindowFlags() : int
+        return mForcedWindowFlags;
+!!!1006082.java!!!	hasSoftInputMode() : boolean
+        return mHasSoftInputMode;
+!!!1006210.java!!!	setCloseOnTouchOutside(inout close : boolean) : void
+        mCloseOnTouchOutside = close;
+        mSetCloseOnTouchOutside = true;
+!!!1006338.java!!!	setCloseOnTouchOutsideIfNotSet(inout close : boolean) : void
+        if (!mSetCloseOnTouchOutside) {
+            mCloseOnTouchOutside = close;
+            mSetCloseOnTouchOutside = true;
+        }
+!!!1006594.java!!!	shouldCloseOnTouch(inout context : Context, inout event : MotionEvent) : boolean
+        if (mCloseOnTouchOutside && event.getAction() == MotionEvent.ACTION_DOWN
+                && isOutOfBounds(context, event) && peekDecorView() != null) {
+            return true;
+        }
+        return false;
+!!!1006722.java!!!	isOutOfBounds(inout context : Context, inout event : MotionEvent) : boolean
+        final int x = (int) event.getX();
+        final int y = (int) event.getY();
+        final int slop = ViewConfiguration.get(context).getScaledWindowTouchSlop();
+        final View decorView = getDecorView();
+        return (x < -slop) || (y < -slop)
+                || (x > (decorView.getWidth()+slop))
+                || (y > (decorView.getHeight()+slop));
+!!!1006850.java!!!	requestFeature(in featureId : int) : boolean
+        final int flag = 1<<featureId;
+        mFeatures |= flag;
+        mLocalFeatures |= mContainer != null ? (flag&~mContainer.mFeatures) : flag;
+        return (mFeatures&flag) != 0;
+!!!1006978.java!!!	removeFeature(in featureId : int) : void
+        final int flag = 1<<featureId;
+        mFeatures &= ~flag;
+        mLocalFeatures &= ~(mContainer != null ? (flag&~mContainer.mFeatures) : flag);
+!!!1007106.java!!!	makeActive() : void
+        if (mContainer != null) {
+            if (mContainer.mActiveChild != null) {
+                mContainer.mActiveChild.mIsActive = false;
+            }
+            mContainer.mActiveChild = this;
+        }
+        mIsActive = true;
+        onActive();
+!!!1007234.java!!!	isActive() : boolean
+        return mIsActive;
+!!!1007362.java!!!	findViewById(in id : int) : View
+        return getDecorView().findViewById(id);
+!!!1009666.java!!!	setBackgroundDrawableResource(in resid : int) : void
+        setBackgroundDrawable(mContext.getDrawable(resid));
+!!!1011970.java!!!	getFeatures() : int
+        return mFeatures;
+!!!1012098.java!!!	hasFeature(in feature : int) : boolean
+        return (getFeatures() & (1 << feature)) != 0;
+!!!1012226.java!!!	getLocalFeatures() : int
+        return mLocalFeatures;
+!!!1012354.java!!!	setDefaultWindowFormat(in format : int) : void
+        mDefaultWindowFormat = format;
+        if (!mHaveWindowFormat) {
+            final WindowManager.LayoutParams attrs = getAttributes();
+            attrs.format = format;
+            dispatchWindowAttributesChanged(attrs);
+        }
+!!!1012482.java!!!	haveDimAmount() : boolean
+        return mHaveDimAmount;
+!!!1013378.java!!!	getMediaController() : MediaController
+        return null;
+!!!1014530.java!!!	getTransitionManager() : TransitionManager
+        return null;
+!!!1014658.java!!!	setTransitionManager(inout tm : TransitionManager) : void
+        throw new UnsupportedOperationException();
+!!!1014786.java!!!	getContentScene() : Scene
+        return null;
+!!!1015426.java!!!	getEnterTransition() : Transition
+ return null;
+!!!1015554.java!!!	getReturnTransition() : Transition
+ return null;
+!!!1015682.java!!!	getExitTransition() : Transition
+ return null;
+!!!1015810.java!!!	getReenterTransition() : Transition
+ return null;
+!!!1016194.java!!!	getSharedElementEnterTransition() : Transition
+ return null;
+!!!1016322.java!!!	getSharedElementReturnTransition() : Transition
+ return null;
+!!!1016706.java!!!	getSharedElementExitTransition() : Transition
+ return null;
+!!!1016834.java!!!	getSharedElementReenterTransition() : Transition
+ return null;
+!!!1017090.java!!!	getAllowEnterTransitionOverlap() : boolean
+ return true;
+!!!1017346.java!!!	setAllowExitTransitionOverlap(inout allow : boolean) : void
+        setAllowReturnTransitionOverlap(allow);
+!!!1017474.java!!!	getAllowReturnTransitionOverlap() : boolean
+ return true;
+!!!1017602.java!!!	getAllowExitTransitionOverlap() : boolean
+ return getAllowReturnTransitionOverlap();
+!!!1017730.java!!!	getTransitionBackgroundFadeDuration() : long
+ return 0;
+!!!1017986.java!!!	getSharedElementsUseOverlay() : boolean
+ return true;

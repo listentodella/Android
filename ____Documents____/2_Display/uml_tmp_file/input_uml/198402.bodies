@@ -1,0 +1,5 @@
+class State
+!!!454402.java!!!	State(inout intermediate : boolean)
+                inTransition = intermediate;
+!!!454530.java!!!	inTransition() : boolean
+                return inTransition;

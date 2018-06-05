@@ -1,0 +1,26 @@
+class JobParameters
+!!!1819906.java!!!	JobParameters(inout callback : IBinder, in jobId : int, inout extras : PersistableBundle, inout overrideDeadlineExpired : boolean)
+        this.jobId = jobId;
+        this.extras = extras;
+        this.callback = callback;
+        this.overrideDeadlineExpired = overrideDeadlineExpired;
+!!!1820034.java!!!	getJobId() : int
+        return jobId;
+!!!1820162.java!!!	getExtras() : PersistableBundle
+        return extras;
+!!!1820290.java!!!	isOverrideDeadlineExpired() : boolean
+        return overrideDeadlineExpired;
+!!!1820418.java!!!	getCallback() : IJobCallback
+        return IJobCallback.Stub.asInterface(callback);
+!!!1820546.java!!!	JobParameters(inout in : Parcel)
+        jobId = in.readInt();
+        extras = in.readPersistableBundle();
+        callback = in.readStrongBinder();
+        overrideDeadlineExpired = in.readInt() == 1;
+!!!1820674.java!!!	describeContents() : int
+        return 0;
+!!!1820802.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        dest.writeInt(jobId);
+        dest.writePersistableBundle(extras);
+        dest.writeStrongBinder(callback);
+        dest.writeInt(overrideDeadlineExpired ? 1 : 0);

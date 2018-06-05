@@ -1,0 +1,8 @@
+class KeyguardExitDelegate
+!!!529922.java!!!	KeyguardExitDelegate(inout onKeyguardExitResult : OnKeyguardExitResult)
+            mOnKeyguardExitResult = onKeyguardExitResult;
+!!!530050.java!!!	onKeyguardExitResult(inout success : boolean) : void
+            if (DEBUG) Log.v(TAG, "**** onKeyguardExitResult(" + success +") CALLED ****");
+            if (mOnKeyguardExitResult != null) {
+                mOnKeyguardExitResult.onKeyguardExitResult(success);
+            }

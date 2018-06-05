@@ -1,0 +1,1163 @@
+class Proxy
+!!!1830018.java!!!	Proxy(inout remote : android.os.IBinder)
+mRemote = remote;
+!!!1830146.java!!!	asBinder() : android.os.IBinder
+return mRemote;
+!!!1830274.java!!!	getInterfaceDescriptor() : java.lang.String
+return DESCRIPTOR;
+!!!1830402.java!!!	startViewServer(in port : int) : boolean
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+boolean _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(port);
+mRemote.transact(Stub.TRANSACTION_startViewServer, _data, _reply, 0);
+_reply.readException();
+_result = (0!=_reply.readInt());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1830530.java!!!	stopViewServer() : boolean
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+boolean _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_stopViewServer, _data, _reply, 0);
+_reply.readException();
+_result = (0!=_reply.readInt());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1830658.java!!!	isViewServerRunning() : boolean
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+boolean _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_isViewServerRunning, _data, _reply, 0);
+_reply.readException();
+_result = (0!=_reply.readInt());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1830786.java!!!	openSession(inout callback : android.view.IWindowSessionCallback, inout client : com.android.internal.view.IInputMethodClient, inout inputContext : com.android.internal.view.IInputContext) : IWindowSession
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+android.view.IWindowSession _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder((((callback!=null))?(callback.asBinder()):(null)));
+_data.writeStrongBinder((((client!=null))?(client.asBinder()):(null)));
+_data.writeStrongBinder((((inputContext!=null))?(inputContext.asBinder()):(null)));
+mRemote.transact(Stub.TRANSACTION_openSession, _data, _reply, 0);
+_reply.readException();
+_result = android.view.IWindowSession.Stub.asInterface(_reply.readStrongBinder());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1830914.java!!!	inputMethodClientHasFocus(inout client : com.android.internal.view.IInputMethodClient) : boolean
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+boolean _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder((((client!=null))?(client.asBinder()):(null)));
+mRemote.transact(Stub.TRANSACTION_inputMethodClientHasFocus, _data, _reply, 0);
+_reply.readException();
+_result = (0!=_reply.readInt());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1831042.java!!!	getInitialDisplaySize(in displayId : int, inout size : android.graphics.Point) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(displayId);
+mRemote.transact(Stub.TRANSACTION_getInitialDisplaySize, _data, _reply, 0);
+_reply.readException();
+if ((0!=_reply.readInt())) {
+size.readFromParcel(_reply);
+}
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1831170.java!!!	getBaseDisplaySize(in displayId : int, inout size : android.graphics.Point) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(displayId);
+mRemote.transact(Stub.TRANSACTION_getBaseDisplaySize, _data, _reply, 0);
+_reply.readException();
+if ((0!=_reply.readInt())) {
+size.readFromParcel(_reply);
+}
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1831298.java!!!	setForcedDisplaySize(in displayId : int, in width : int, in height : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(displayId);
+_data.writeInt(width);
+_data.writeInt(height);
+mRemote.transact(Stub.TRANSACTION_setForcedDisplaySize, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1831426.java!!!	clearForcedDisplaySize(in displayId : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(displayId);
+mRemote.transact(Stub.TRANSACTION_clearForcedDisplaySize, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1831554.java!!!	getInitialDisplayDensity(in displayId : int) : int
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+int _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(displayId);
+mRemote.transact(Stub.TRANSACTION_getInitialDisplayDensity, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readInt();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1831682.java!!!	getBaseDisplayDensity(in displayId : int) : int
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+int _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(displayId);
+mRemote.transact(Stub.TRANSACTION_getBaseDisplayDensity, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readInt();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1831810.java!!!	setForcedDisplayDensity(in displayId : int, in density : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(displayId);
+_data.writeInt(density);
+mRemote.transact(Stub.TRANSACTION_setForcedDisplayDensity, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1831938.java!!!	clearForcedDisplayDensity(in displayId : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(displayId);
+mRemote.transact(Stub.TRANSACTION_clearForcedDisplayDensity, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1832066.java!!!	setOverscan(in displayId : int, in left : int, in top : int, in right : int, in bottom : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(displayId);
+_data.writeInt(left);
+_data.writeInt(top);
+_data.writeInt(right);
+_data.writeInt(bottom);
+mRemote.transact(Stub.TRANSACTION_setOverscan, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1832194.java!!!	pauseKeyDispatching(inout token : android.os.IBinder) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+mRemote.transact(Stub.TRANSACTION_pauseKeyDispatching, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1832322.java!!!	resumeKeyDispatching(inout token : android.os.IBinder) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+mRemote.transact(Stub.TRANSACTION_resumeKeyDispatching, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1832450.java!!!	setEventDispatching(inout enabled : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(((enabled)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_setEventDispatching, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1832578.java!!!	addWindowToken(inout token : android.os.IBinder, in type : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+_data.writeInt(type);
+mRemote.transact(Stub.TRANSACTION_addWindowToken, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1832706.java!!!	removeWindowToken(inout token : android.os.IBinder) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+mRemote.transact(Stub.TRANSACTION_removeWindowToken, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1832834.java!!!	addAppToken(in addPos : int, inout token : android.view.IApplicationToken, in groupId : int, in stackId : int, in requestedOrientation : int, inout fullscreen : boolean, inout showWhenLocked : boolean, in userId : int, in configChanges : int, inout voiceInteraction : boolean, inout launchTaskBehind : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(addPos);
+_data.writeStrongBinder((((token!=null))?(token.asBinder()):(null)));
+_data.writeInt(groupId);
+_data.writeInt(stackId);
+_data.writeInt(requestedOrientation);
+_data.writeInt(((fullscreen)?(1):(0)));
+_data.writeInt(((showWhenLocked)?(1):(0)));
+_data.writeInt(userId);
+_data.writeInt(configChanges);
+_data.writeInt(((voiceInteraction)?(1):(0)));
+_data.writeInt(((launchTaskBehind)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_addAppToken, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1832962.java!!!	setAppGroupId(inout token : android.os.IBinder, in groupId : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+_data.writeInt(groupId);
+mRemote.transact(Stub.TRANSACTION_setAppGroupId, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1833090.java!!!	setAppOrientation(inout token : android.view.IApplicationToken, in requestedOrientation : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder((((token!=null))?(token.asBinder()):(null)));
+_data.writeInt(requestedOrientation);
+mRemote.transact(Stub.TRANSACTION_setAppOrientation, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1833218.java!!!	getAppOrientation(inout token : android.view.IApplicationToken) : int
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+int _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder((((token!=null))?(token.asBinder()):(null)));
+mRemote.transact(Stub.TRANSACTION_getAppOrientation, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readInt();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1833346.java!!!	setFocusedApp(inout token : android.os.IBinder, inout moveFocusNow : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+_data.writeInt(((moveFocusNow)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_setFocusedApp, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1833474.java!!!	prepareAppTransition(in transit : int, inout alwaysKeepCurrent : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(transit);
+_data.writeInt(((alwaysKeepCurrent)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_prepareAppTransition, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1833602.java!!!	getPendingAppTransition() : int
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+int _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_getPendingAppTransition, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readInt();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1833730.java!!!	overridePendingAppTransition(inout packageName : java.lang.String, in enterAnim : int, in exitAnim : int, inout startedCallback : android.os.IRemoteCallback) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeString(packageName);
+_data.writeInt(enterAnim);
+_data.writeInt(exitAnim);
+_data.writeStrongBinder((((startedCallback!=null))?(startedCallback.asBinder()):(null)));
+mRemote.transact(Stub.TRANSACTION_overridePendingAppTransition, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1833858.java!!!	overridePendingAppTransitionScaleUp(in startX : int, in startY : int, in startWidth : int, in startHeight : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(startX);
+_data.writeInt(startY);
+_data.writeInt(startWidth);
+_data.writeInt(startHeight);
+mRemote.transact(Stub.TRANSACTION_overridePendingAppTransitionScaleUp, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1833986.java!!!	overridePendingAppTransitionThumb(inout srcThumb : android.graphics.Bitmap, in startX : int, in startY : int, inout startedCallback : android.os.IRemoteCallback, inout scaleUp : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+if ((srcThumb!=null)) {
+_data.writeInt(1);
+srcThumb.writeToParcel(_data, 0);
+}
+else {
+_data.writeInt(0);
+}
+_data.writeInt(startX);
+_data.writeInt(startY);
+_data.writeStrongBinder((((startedCallback!=null))?(startedCallback.asBinder()):(null)));
+_data.writeInt(((scaleUp)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_overridePendingAppTransitionThumb, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1834114.java!!!	overridePendingAppTransitionAspectScaledThumb(inout srcThumb : android.graphics.Bitmap, in startX : int, in startY : int, in targetWidth : int, in targetHeight : int, inout startedCallback : android.os.IRemoteCallback, inout scaleUp : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+if ((srcThumb!=null)) {
+_data.writeInt(1);
+srcThumb.writeToParcel(_data, 0);
+}
+else {
+_data.writeInt(0);
+}
+_data.writeInt(startX);
+_data.writeInt(startY);
+_data.writeInt(targetWidth);
+_data.writeInt(targetHeight);
+_data.writeStrongBinder((((startedCallback!=null))?(startedCallback.asBinder()):(null)));
+_data.writeInt(((scaleUp)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_overridePendingAppTransitionAspectScaledThumb, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1834242.java!!!	executeAppTransition() : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_executeAppTransition, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1834370.java!!!	setAppStartingWindow(inout token : android.os.IBinder, inout pkg : java.lang.String, in theme : int, inout compatInfo : android.content.res.CompatibilityInfo, inout nonLocalizedLabel : java.lang.CharSequence, in labelRes : int, in icon : int, in logo : int, in windowFlags : int, inout transferFrom : android.os.IBinder, inout createIfNeeded : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+_data.writeString(pkg);
+_data.writeInt(theme);
+if ((compatInfo!=null)) {
+_data.writeInt(1);
+compatInfo.writeToParcel(_data, 0);
+}
+else {
+_data.writeInt(0);
+}
+if ((nonLocalizedLabel!=null)) {
+_data.writeInt(1);
+android.text.TextUtils.writeToParcel(nonLocalizedLabel, _data, 0);
+}
+else {
+_data.writeInt(0);
+}
+_data.writeInt(labelRes);
+_data.writeInt(icon);
+_data.writeInt(logo);
+_data.writeInt(windowFlags);
+_data.writeStrongBinder(transferFrom);
+_data.writeInt(((createIfNeeded)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_setAppStartingWindow, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1834498.java!!!	setAppWillBeHidden(inout token : android.os.IBinder) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+mRemote.transact(Stub.TRANSACTION_setAppWillBeHidden, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1834626.java!!!	setAppVisibility(inout token : android.os.IBinder, inout visible : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+_data.writeInt(((visible)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_setAppVisibility, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1834754.java!!!	startAppFreezingScreen(inout token : android.os.IBinder, in configChanges : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+_data.writeInt(configChanges);
+mRemote.transact(Stub.TRANSACTION_startAppFreezingScreen, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1834882.java!!!	stopAppFreezingScreen(inout token : android.os.IBinder, inout force : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+_data.writeInt(((force)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_stopAppFreezingScreen, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1835010.java!!!	removeAppToken(inout token : android.os.IBinder) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+mRemote.transact(Stub.TRANSACTION_removeAppToken, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1835138.java!!!	updateOrientationFromAppTokens(inout currentConfig : android.content.res.Configuration, inout freezeThisOneIfNeeded : android.os.IBinder) : android.content.res.Configuration
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+android.content.res.Configuration _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+if ((currentConfig!=null)) {
+_data.writeInt(1);
+currentConfig.writeToParcel(_data, 0);
+}
+else {
+_data.writeInt(0);
+}
+_data.writeStrongBinder(freezeThisOneIfNeeded);
+mRemote.transact(Stub.TRANSACTION_updateOrientationFromAppTokens, _data, _reply, 0);
+_reply.readException();
+if ((0!=_reply.readInt())) {
+_result = android.content.res.Configuration.CREATOR.createFromParcel(_reply);
+}
+else {
+_result = null;
+}
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1835266.java!!!	setNewConfiguration(inout config : android.content.res.Configuration) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+if ((config!=null)) {
+_data.writeInt(1);
+config.writeToParcel(_data, 0);
+}
+else {
+_data.writeInt(0);
+}
+mRemote.transact(Stub.TRANSACTION_setNewConfiguration, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1835394.java!!!	startFreezingScreen(in exitAnim : int, in enterAnim : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(exitAnim);
+_data.writeInt(enterAnim);
+mRemote.transact(Stub.TRANSACTION_startFreezingScreen, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1835522.java!!!	stopFreezingScreen() : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_stopFreezingScreen, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1835650.java!!!	disableKeyguard(inout token : android.os.IBinder, inout tag : java.lang.String) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+_data.writeString(tag);
+mRemote.transact(Stub.TRANSACTION_disableKeyguard, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1835778.java!!!	reenableKeyguard(inout token : android.os.IBinder) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+mRemote.transact(Stub.TRANSACTION_reenableKeyguard, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1835906.java!!!	exitKeyguardSecurely(inout callback : android.view.IOnKeyguardExitResult) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder((((callback!=null))?(callback.asBinder()):(null)));
+mRemote.transact(Stub.TRANSACTION_exitKeyguardSecurely, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1836034.java!!!	isKeyguardLocked() : boolean
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+boolean _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_isKeyguardLocked, _data, _reply, 0);
+_reply.readException();
+_result = (0!=_reply.readInt());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1836162.java!!!	isKeyguardSecure() : boolean
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+boolean _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_isKeyguardSecure, _data, _reply, 0);
+_reply.readException();
+_result = (0!=_reply.readInt());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1836290.java!!!	inKeyguardRestrictedInputMode() : boolean
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+boolean _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_inKeyguardRestrictedInputMode, _data, _reply, 0);
+_reply.readException();
+_result = (0!=_reply.readInt());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1836418.java!!!	dismissKeyguard() : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_dismissKeyguard, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1836546.java!!!	keyguardGoingAway(inout disableWindowAnimations : boolean, inout keyguardGoingToNotificationShade : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(((disableWindowAnimations)?(1):(0)));
+_data.writeInt(((keyguardGoingToNotificationShade)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_keyguardGoingAway, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1836674.java!!!	closeSystemDialogs(inout reason : java.lang.String) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeString(reason);
+mRemote.transact(Stub.TRANSACTION_closeSystemDialogs, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1836802.java!!!	getAnimationScale(in which : int) : float
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+float _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(which);
+mRemote.transact(Stub.TRANSACTION_getAnimationScale, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readFloat();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1836930.java!!!	getAnimationScales() : float
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+float[] _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_getAnimationScales, _data, _reply, 0);
+_reply.readException();
+_result = _reply.createFloatArray();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1837058.java!!!	setAnimationScale(in which : int, in scale : float) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(which);
+_data.writeFloat(scale);
+mRemote.transact(Stub.TRANSACTION_setAnimationScale, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1837186.java!!!	setAnimationScales(inout scales : float) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeFloatArray(scales);
+mRemote.transact(Stub.TRANSACTION_setAnimationScales, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1837314.java!!!	getCurrentAnimatorScale() : float
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+float _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_getCurrentAnimatorScale, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readFloat();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1837442.java!!!	setInTouchMode(inout showFocus : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(((showFocus)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_setInTouchMode, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1837570.java!!!	showStrictModeViolation(inout on : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(((on)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_showStrictModeViolation, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1837698.java!!!	setStrictModeVisualIndicatorPreference(inout enabled : java.lang.String) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeString(enabled);
+mRemote.transact(Stub.TRANSACTION_setStrictModeVisualIndicatorPreference, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1837826.java!!!	setScreenCaptureDisabled(in userId : int, inout disabled : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(userId);
+_data.writeInt(((disabled)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_setScreenCaptureDisabled, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1837954.java!!!	updateRotation(inout alwaysSendConfiguration : boolean, inout forceRelayout : boolean) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(((alwaysSendConfiguration)?(1):(0)));
+_data.writeInt(((forceRelayout)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_updateRotation, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1838082.java!!!	getRotation() : int
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+int _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_getRotation, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readInt();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1838210.java!!!	watchRotation(inout watcher : android.view.IRotationWatcher) : int
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+int _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder((((watcher!=null))?(watcher.asBinder()):(null)));
+mRemote.transact(Stub.TRANSACTION_watchRotation, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readInt();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1838338.java!!!	removeRotationWatcher(inout watcher : android.view.IRotationWatcher) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder((((watcher!=null))?(watcher.asBinder()):(null)));
+mRemote.transact(Stub.TRANSACTION_removeRotationWatcher, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1838466.java!!!	getPreferredOptionsPanelGravity() : int
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+int _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_getPreferredOptionsPanelGravity, _data, _reply, 0);
+_reply.readException();
+_result = _reply.readInt();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1838594.java!!!	freezeRotation(in rotation : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(rotation);
+mRemote.transact(Stub.TRANSACTION_freezeRotation, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1838722.java!!!	thawRotation() : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_thawRotation, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1838850.java!!!	isRotationFrozen() : boolean
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+boolean _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_isRotationFrozen, _data, _reply, 0);
+_reply.readException();
+_result = (0!=_reply.readInt());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1838978.java!!!	screenshotApplications(inout appToken : android.os.IBinder, in displayId : int, in maxWidth : int, in maxHeight : int, inout force565 : boolean) : android.graphics.Bitmap
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+android.graphics.Bitmap _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(appToken);
+_data.writeInt(displayId);
+_data.writeInt(maxWidth);
+_data.writeInt(maxHeight);
+_data.writeInt(((force565)?(1):(0)));
+mRemote.transact(Stub.TRANSACTION_screenshotApplications, _data, _reply, 0);
+_reply.readException();
+if ((0!=_reply.readInt())) {
+_result = android.graphics.Bitmap.CREATOR.createFromParcel(_reply);
+}
+else {
+_result = null;
+}
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1839106.java!!!	statusBarVisibilityChanged(in visibility : int) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeInt(visibility);
+mRemote.transact(Stub.TRANSACTION_statusBarVisibilityChanged, _data, null, android.os.IBinder.FLAG_ONEWAY);
+}
+finally {
+_data.recycle();
+}
+!!!1839234.java!!!	hasNavigationBar() : boolean
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+boolean _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_hasNavigationBar, _data, _reply, 0);
+_reply.readException();
+_result = (0!=_reply.readInt());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1839362.java!!!	lockNow(inout options : android.os.Bundle) : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+if ((options!=null)) {
+_data.writeInt(1);
+options.writeToParcel(_data, 0);
+}
+else {
+_data.writeInt(0);
+}
+mRemote.transact(Stub.TRANSACTION_lockNow, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1839490.java!!!	isSafeModeEnabled() : boolean
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+boolean _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_isSafeModeEnabled, _data, _reply, 0);
+_reply.readException();
+_result = (0!=_reply.readInt());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1839618.java!!!	enableScreenIfNeeded() : void
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+mRemote.transact(Stub.TRANSACTION_enableScreenIfNeeded, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+!!!1839746.java!!!	clearWindowContentFrameStats(inout token : android.os.IBinder) : boolean
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+boolean _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+mRemote.transact(Stub.TRANSACTION_clearWindowContentFrameStats, _data, _reply, 0);
+_reply.readException();
+_result = (0!=_reply.readInt());
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;
+!!!1839874.java!!!	getWindowContentFrameStats(inout token : android.os.IBinder) : android.view.WindowContentFrameStats
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+android.view.WindowContentFrameStats _result;
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeStrongBinder(token);
+mRemote.transact(Stub.TRANSACTION_getWindowContentFrameStats, _data, _reply, 0);
+_reply.readException();
+if ((0!=_reply.readInt())) {
+_result = android.view.WindowContentFrameStats.CREATOR.createFromParcel(_reply);
+}
+else {
+_result = null;
+}
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+return _result;

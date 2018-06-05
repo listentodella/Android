@@ -1,0 +1,4 @@
+class RotationWatcher
+!!!1227778.java!!!	RotationWatcher(inout w : IRotationWatcher, inout d : IBinder.DeathRecipient)
+            watcher = w;
+            deathRecipient = d;

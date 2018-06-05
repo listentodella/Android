@@ -1,0 +1,27 @@
+class RangeInfo
+!!!1092226.java!!!	obtain(inout other : AccessibilityNodeInfo::RangeInfo) : AccessibilityNodeInfo::RangeInfo
+            return obtain(other.mType, other.mMin, other.mMax, other.mCurrent);
+!!!1092354.java!!!	obtain(in type : int, in min : float, in max : float, in current : float) : AccessibilityNodeInfo::RangeInfo
+            RangeInfo info = sPool.acquire();
+            return (info != null) ? info : new RangeInfo(type, min, max, current);
+!!!1092482.java!!!	RangeInfo(in type : int, in min : float, in max : float, in current : float)
+            mType = type;
+            mMin = min;
+            mMax = max;
+            mCurrent = current;
+!!!1092610.java!!!	getType() : int
+            return mType;
+!!!1092738.java!!!	getMin() : float
+            return mMin;
+!!!1092866.java!!!	getMax() : float
+            return mMax;
+!!!1092994.java!!!	getCurrent() : float
+            return mCurrent;
+!!!1093122.java!!!	recycle() : void
+            clear();
+            sPool.release(this);
+!!!1093250.java!!!	clear() : void
+            mType = 0;
+            mMin = 0;
+            mMax = 0;
+            mCurrent = 0;

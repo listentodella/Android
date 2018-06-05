@@ -1,0 +1,29 @@
+class TwoLineListItem
+!!!2549378.java!!!	TwoLineListItem(inout context : Context)
+        this(context, null, 0);
+!!!2549506.java!!!	TwoLineListItem(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0); 
+!!!2549634.java!!!	TwoLineListItem(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2549762.java!!!	TwoLineListItem(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, com.android.internal.R.styleable.TwoLineListItem, defStyleAttr, defStyleRes);
+
+        a.recycle();
+!!!2549890.java!!!	onFinishInflate() : void
+        super.onFinishInflate();
+        
+        mText1 = (TextView) findViewById(com.android.internal.R.id.text1);
+        mText2 = (TextView) findViewById(com.android.internal.R.id.text2);
+!!!2550018.java!!!	getText1() : TextView
+        return mText1;
+!!!2550146.java!!!	getText2() : TextView
+        return mText2;
+!!!2550274.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(TwoLineListItem.class.getName());
+!!!2550402.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(TwoLineListItem.class.getName());

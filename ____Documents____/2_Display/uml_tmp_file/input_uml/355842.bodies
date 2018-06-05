@@ -1,0 +1,18 @@
+class ImageButton
+!!!1998722.java!!!	ImageButton(inout context : Context)
+        this(context, null);
+!!!1998850.java!!!	ImageButton(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, com.android.internal.R.attr.imageButtonStyle);
+!!!1998978.java!!!	ImageButton(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!1999106.java!!!	ImageButton(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+        setFocusable(true);
+!!!1999234.java!!!	onSetAlpha(in alpha : int) : boolean
+        return false;
+!!!1999362.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(ImageButton.class.getName());
+!!!1999490.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(ImageButton.class.getName());

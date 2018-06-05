@@ -1,0 +1,7 @@
+class Son
+!!!137090.java!!!	getNum() : int
+return i;
+!!!137218.java!!!	getName() : String
+return name;
+!!!137346.java!!!	study() : void
+System.out.println("I am study");

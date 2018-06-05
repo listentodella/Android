@@ -1,0 +1,3 @@
+class MyPermissionInfo
+!!!2050050.java!!!	MyPermissionInfo(inout info : PermissionInfo)
+            super(info);

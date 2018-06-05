@@ -1,0 +1,3 @@
+class NotifyConfigurationChangedArgs
+!!!201730.cpp!!!	notify(in listener : sp<InputListenerInterface>) : void
+    listener->notifyConfigurationChanged(this);

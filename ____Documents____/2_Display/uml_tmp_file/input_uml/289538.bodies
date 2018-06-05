@@ -1,0 +1,11 @@
+class FragmentManagerState
+!!!1541890.java!!!	FragmentManagerState(inout in : Parcel)
+        mActive = in.createTypedArray(FragmentState.CREATOR);
+        mAdded = in.createIntArray();
+        mBackStack = in.createTypedArray(BackStackState.CREATOR);
+!!!1542018.java!!!	describeContents() : int
+        return 0;
+!!!1542146.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        dest.writeTypedArray(mActive, flags);
+        dest.writeIntArray(mAdded);
+        dest.writeTypedArray(mBackStack, flags);

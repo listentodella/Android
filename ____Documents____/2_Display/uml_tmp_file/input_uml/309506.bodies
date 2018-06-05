@@ -1,0 +1,5 @@
+class FailRunnable
+!!!1797378.java!!!	FailRunnable(in message : String)
+            mMessage = message;
+!!!1797506.java!!!	run() : void
+            throw new IllegalStateException(mMessage);

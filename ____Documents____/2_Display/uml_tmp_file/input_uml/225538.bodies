@@ -1,0 +1,51 @@
+class InputChannel
+!!!735618.java!!!	finalize() : void
+        try {
+            nativeDispose(true);
+        } finally {
+            super.finalize();
+        }
+!!!735746.java!!!	openInputChannelPair(in name : String) : InputChannel
+        if (name == null) {
+            throw new IllegalArgumentException("name must not be null");
+        }
+
+        if (DEBUG) {
+            Slog.d(TAG, "Opening input channel pair '" + name + "'");
+        }
+        return nativeOpenInputChannelPair(name);
+!!!735874.java!!!	getName() : String
+        String name = nativeGetName();
+        return name != null ? name : "uninitialized";
+!!!736002.java!!!	dispose() : void
+        nativeDispose(false);
+!!!736130.java!!!	transferTo(inout outParameter : InputChannel) : void
+        if (outParameter == null) {
+            throw new IllegalArgumentException("outParameter must not be null");
+        }
+        
+        nativeTransferTo(outParameter);
+!!!736258.java!!!	dup() : InputChannel
+        InputChannel target = new InputChannel();
+        nativeDup(target);
+        return target;
+!!!736386.java!!!	describeContents() : int
+        return Parcelable.CONTENTS_FILE_DESCRIPTOR;
+!!!736514.java!!!	readFromParcel(inout in : Parcel) : void
+        if (in == null) {
+            throw new IllegalArgumentException("in must not be null");
+        }
+        
+        nativeReadFromParcel(in);
+!!!736642.java!!!	writeToParcel(inout out : Parcel, in flags : int) : void
+        if (out == null) {
+            throw new IllegalArgumentException("out must not be null");
+        }
+        
+        nativeWriteToParcel(out);
+        
+        if ((flags & PARCELABLE_WRITE_RETURN_VALUE) != 0) {
+            dispose();
+        }
+!!!736770.java!!!	toString() : String
+        return getName();

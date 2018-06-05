@@ -1,0 +1,5 @@
+class ViewIndicatorStrategy
+!!!2492674.java!!!	ViewIndicatorStrategy(inout view : View)
+            mView = view;
+!!!2492802.java!!!	createIndicatorView() : View
+            return mView;

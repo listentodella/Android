@@ -1,0 +1,12 @@
+class BuilderRemoteViews
+!!!1707010.java!!!	BuilderRemoteViews(inout parcel : Parcel)
+            super(parcel);
+!!!1707138.java!!!	BuilderRemoteViews(inout appInfo : ApplicationInfo, in layoutId : int)
+            super(appInfo, layoutId);
+!!!1707266.java!!!	clone() : Notification::BuilderRemoteViews
+            Parcel p = Parcel.obtain();
+            writeToParcel(p, 0);
+            p.setDataPosition(0);
+            BuilderRemoteViews brv = new BuilderRemoteViews(p);
+            p.recycle();
+            return brv;

@@ -1,0 +1,23 @@
+class ProcessErrorStateInfo
+!!!1354882.java!!!	describeContents() : int
+            return 0;
+!!!1355010.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            dest.writeInt(condition);
+            dest.writeString(processName);
+            dest.writeInt(pid);
+            dest.writeInt(uid);
+            dest.writeString(tag);
+            dest.writeString(shortMsg);
+            dest.writeString(longMsg);
+            dest.writeString(stackTrace);
+!!!1355138.java!!!	readFromParcel(inout source : Parcel) : void
+            condition = source.readInt();
+            processName = source.readString();
+            pid = source.readInt();
+            uid = source.readInt();
+            tag = source.readString();
+            shortMsg = source.readString();
+            longMsg = source.readString();
+            stackTrace = source.readString();
+!!!1355266.java!!!	ProcessErrorStateInfo(inout source : Parcel)
+            readFromParcel(source);

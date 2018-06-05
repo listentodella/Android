@@ -1,0 +1,49 @@
+class ActivityGroup
+!!!1341826.java!!!	ActivityGroup()
+        this(true);
+!!!1341954.java!!!	ActivityGroup(inout singleActivityMode : boolean)
+        mLocalActivityManager = new LocalActivityManager(this, singleActivityMode);
+!!!1342082.java!!!	onCreate(inout savedInstanceState : Bundle) : void
+        super.onCreate(savedInstanceState);
+        Bundle states = savedInstanceState != null
+                ? (Bundle) savedInstanceState.getBundle(STATES_KEY) : null;
+        mLocalActivityManager.dispatchCreate(states);
+!!!1342210.java!!!	onResume() : void
+        super.onResume();
+        mLocalActivityManager.dispatchResume();
+!!!1342338.java!!!	onSaveInstanceState(inout outState : Bundle) : void
+        super.onSaveInstanceState(outState);
+        Bundle state = mLocalActivityManager.saveInstanceState();
+        if (state != null) {
+            outState.putBundle(STATES_KEY, state);
+        }
+!!!1342466.java!!!	onPause() : void
+        super.onPause();
+        mLocalActivityManager.dispatchPause(isFinishing());
+!!!1342594.java!!!	onStop() : void
+        super.onStop();
+        mLocalActivityManager.dispatchStop();
+!!!1342722.java!!!	onDestroy() : void
+        super.onDestroy();
+        mLocalActivityManager.dispatchDestroy(isFinishing());
+!!!1342850.java!!!	onRetainNonConfigurationChildInstances() : HashMap<String,Object>
+        return mLocalActivityManager.dispatchRetainNonConfigurationInstance();
+!!!1342978.java!!!	getCurrentActivity() : Activity
+        return mLocalActivityManager.getCurrentActivity();
+!!!1343106.java!!!	getLocalActivityManager() : LocalActivityManager
+        return mLocalActivityManager;
+!!!1343234.java!!!	dispatchActivityResult(in who : String, in requestCode : int, in resultCode : int, inout data : Intent) : void
+        if (who != null) {
+            Activity act = mLocalActivityManager.getActivity(who);
+            /*
+            if (false) Log.v(
+                TAG, "Dispatching result: who=" + who + ", reqCode=" + requestCode
+                + ", resCode=" + resultCode + ", data=" + data
+                + ", rec=" + rec);
+            */
+            if (act != null) {
+                act.onActivityResult(requestCode, resultCode, data);
+                return;
+            }
+        }
+        super.dispatchActivityResult(who, requestCode, resultCode, data);

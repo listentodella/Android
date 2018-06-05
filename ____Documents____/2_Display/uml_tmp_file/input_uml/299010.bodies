@@ -1,0 +1,69 @@
+class MediaRouteActionProvider
+!!!1665794.java!!!	MediaRouteActionProvider(inout context : Context)
+        super(context);
+
+        mContext = context;
+        mRouter = (MediaRouter) context.getSystemService(Context.MEDIA_ROUTER_SERVICE);
+        mCallback = new MediaRouterCallback(this);
+
+        // Start with live audio by default.
+        // TODO Update this when new route types are added; segment by API level
+        // when different route types were added.
+        setRouteTypes(MediaRouter.ROUTE_TYPE_LIVE_AUDIO);
+!!!1665922.java!!!	setRouteTypes(in types : int) : void
+        if (mRouteTypes != types) {
+            // FIXME: We currently have no way of knowing whether the action provider
+            // is still needed by the UI.  Unfortunately this means the action provider
+            // may leak callbacks until garbage collection occurs.  This may result in
+            // media route providers doing more work than necessary in the short term
+            // while trying to discover routes that are no longer of interest to the
+            // application.  To solve this problem, the action provider will need some
+            // indication from the framework that it is being destroyed.
+            if (mRouteTypes != 0) {
+                mRouter.removeCallback(mCallback);
+            }
+            mRouteTypes = types;
+            if (types != 0) {
+                mRouter.addCallback(types, mCallback,
+                        MediaRouter.CALLBACK_FLAG_PASSIVE_DISCOVERY);
+            }
+            refreshRoute();
+
+            if (mButton != null) {
+                mButton.setRouteTypes(mRouteTypes);
+            }
+        }
+!!!1666050.java!!!	setExtendedSettingsClickListener(inout listener : View::OnClickListener) : void
+        mExtendedSettingsListener = listener;
+        if (mButton != null) {
+            mButton.setExtendedSettingsClickListener(listener);
+        }
+!!!1666178.java!!!	onCreateActionView() : View
+        throw new UnsupportedOperationException("Use onCreateActionView(MenuItem) instead.");
+!!!1666306.java!!!	onCreateActionView(inout item : MenuItem) : View
+        if (mButton != null) {
+            Log.e(TAG, "onCreateActionView: this ActionProvider is already associated " +
+                    "with a menu item. Don't reuse MediaRouteActionProvider instances! " +
+                    "Abandoning the old one...");
+        }
+
+        mButton = new MediaRouteButton(mContext);
+        mButton.setCheatSheetEnabled(true);
+        mButton.setRouteTypes(mRouteTypes);
+        mButton.setExtendedSettingsClickListener(mExtendedSettingsListener);
+        mButton.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        return mButton;
+!!!1666434.java!!!	onPerformDefaultAction() : boolean
+        if (mButton != null) {
+            return mButton.showDialogInternal();
+        }
+        return false;
+!!!1666562.java!!!	overridesItemVisibility() : boolean
+        return true;
+!!!1666690.java!!!	isVisible() : boolean
+        return mRouter.isRouteAvailable(mRouteTypes,
+                MediaRouter.AVAILABILITY_FLAG_IGNORE_DEFAULT_ROUTE);
+!!!1666818.java!!!	refreshRoute() : void
+        refreshVisibility();

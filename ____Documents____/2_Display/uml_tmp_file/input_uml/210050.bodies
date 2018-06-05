@@ -1,0 +1,69 @@
+class CharacterTextSegmentIterator
+!!!542722.java!!!	getInstance(inout locale : Locale) : AccessibilityIterators::CharacterTextSegmentIterator
+            if (sInstance == null) {
+                sInstance = new CharacterTextSegmentIterator(locale);
+            }
+            return sInstance;
+!!!542850.java!!!	CharacterTextSegmentIterator(inout locale : Locale)
+            mLocale = locale;
+            onLocaleChanged(locale);
+            ViewRootImpl.addConfigCallback(this);
+!!!542978.java!!!	initialize(in text : String) : void
+            super.initialize(text);
+            mImpl.setText(text);
+!!!543106.java!!!	following(in offset : int) : int
+            final int textLegth = mText.length();
+            if (textLegth <= 0) {
+                return null;
+            }
+            if (offset >= textLegth) {
+                return null;
+            }
+            int start = offset;
+            if (start < 0) {
+                start = 0;
+            }
+            while (!mImpl.isBoundary(start)) {
+                start = mImpl.following(start);
+                if (start == BreakIterator.DONE) {
+                    return null;
+                }
+            }
+            final int end = mImpl.following(start);
+            if (end == BreakIterator.DONE) {
+                return null;
+            }
+            return getRange(start, end);
+!!!543234.java!!!	preceding(in offset : int) : int
+            final int textLegth = mText.length();
+            if (textLegth <= 0) {
+                return null;
+            }
+            if (offset <= 0) {
+                return null;
+            }
+            int end = offset;
+            if (end > textLegth) {
+                end = textLegth;
+            }
+            while (!mImpl.isBoundary(end)) {
+                end = mImpl.preceding(end);
+                if (end == BreakIterator.DONE) {
+                    return null;
+                }
+            }
+            final int start = mImpl.preceding(end);
+            if (start == BreakIterator.DONE) {
+                return null;
+            }
+            return getRange(start, end);
+!!!543362.java!!!	onConfigurationChanged(inout newConfig : Configuration) : void
+            Locale locale = newConfig.locale;
+            if (!mLocale.equals(locale)) {
+                mLocale = locale;
+                onLocaleChanged(locale);
+            }
+!!!543490.java!!!	onLowMemory() : void
+            /* ignore */
+!!!543618.java!!!	onLocaleChanged(inout locale : Locale) : void
+            mImpl = BreakIterator.getCharacterInstance(locale);

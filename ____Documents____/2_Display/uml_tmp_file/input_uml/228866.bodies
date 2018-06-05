@@ -1,0 +1,26 @@
+class PointerProperties
+!!!790146.java!!!	PointerProperties()
+            clear();
+!!!790274.java!!!	PointerProperties(inout other : MotionEvent::PointerProperties)
+            copyFrom(other);
+!!!790402.java!!!	createArray(in size : int) : MotionEvent::PointerProperties
+            PointerProperties[] array = new PointerProperties[size];
+            for (int i = 0; i < size; i++) {
+                array[i] = new PointerProperties();
+            }
+            return array;
+!!!790530.java!!!	clear() : void
+            id = INVALID_POINTER_ID;
+            toolType = TOOL_TYPE_UNKNOWN;
+!!!790658.java!!!	copyFrom(inout other : MotionEvent::PointerProperties) : void
+            id = other.id;
+            toolType = other.toolType;
+!!!790786.java!!!	equals(inout other : Object) : boolean
+            if (other instanceof PointerProperties) {
+                return equals((PointerProperties)other);
+            }
+            return false;
+!!!790914.java!!!	equals(inout other : MotionEvent::PointerProperties) : boolean
+            return other != null && id == other.id && toolType == other.toolType;
+!!!791042.java!!!	hashCode() : int
+            return id | (toolType << 8);

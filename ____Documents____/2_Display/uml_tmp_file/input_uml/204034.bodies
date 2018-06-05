@@ -1,0 +1,10 @@
+class MyWakeGestureListener
+!!!495618.java!!!	MyWakeGestureListener(inout context : Context, inout handler : Handler)
+            super(context, handler);
+!!!495746.java!!!	onWakeUp() : void
+            synchronized (mLock) {
+                if (shouldEnableWakeGestureLp()) {
+                    performHapticFeedbackLw(null, HapticFeedbackConstants.VIRTUAL_KEY, false);
+                    mPowerManager.wakeUp(SystemClock.uptimeMillis());
+                }
+            }

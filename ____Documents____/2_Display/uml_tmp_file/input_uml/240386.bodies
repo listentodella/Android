@@ -1,0 +1,16 @@
+class NativePostImeInputStage
+!!!960642.java!!!	NativePostImeInputStage(inout next : ViewRootImpl::InputStage, in traceCounter : String)
+            super(next, traceCounter);
+!!!960770.java!!!	onProcess(inout q : ViewRootImpl::QueuedInputEvent) : int
+            if (mInputQueue != null) {
+                mInputQueue.sendInputEvent(q.mEvent, q, false, this);
+                return DEFER;
+            }
+            return FORWARD;
+!!!960898.java!!!	onFinishedInputEvent(inout token : Object, inout handled : boolean) : void
+            QueuedInputEvent q = (QueuedInputEvent)token;
+            if (handled) {
+                finish(q, true);
+                return;
+            }
+            forward(q);

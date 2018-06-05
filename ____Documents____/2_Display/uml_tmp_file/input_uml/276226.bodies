@@ -1,0 +1,32 @@
+class TaskThumbnail
+!!!1350914.java!!!	describeContents() : int
+            if (thumbnailFileDescriptor != null) {
+                return thumbnailFileDescriptor.describeContents();
+            }
+            return 0;
+!!!1351042.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            if (mainThumbnail != null) {
+                dest.writeInt(1);
+                mainThumbnail.writeToParcel(dest, flags);
+            } else {
+                dest.writeInt(0);
+            }
+            if (thumbnailFileDescriptor != null) {
+                dest.writeInt(1);
+                thumbnailFileDescriptor.writeToParcel(dest, flags);
+            } else {
+                dest.writeInt(0);
+            }
+!!!1351170.java!!!	readFromParcel(inout source : Parcel) : void
+            if (source.readInt() != 0) {
+                mainThumbnail = Bitmap.CREATOR.createFromParcel(source);
+            } else {
+                mainThumbnail = null;
+            }
+            if (source.readInt() != 0) {
+                thumbnailFileDescriptor = ParcelFileDescriptor.CREATOR.createFromParcel(source);
+            } else {
+                thumbnailFileDescriptor = null;
+            }
+!!!1351298.java!!!	TaskThumbnail(inout source : Parcel)
+            readFromParcel(source);

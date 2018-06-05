@@ -1,0 +1,6 @@
+class CommandRequest
+!!!1759490.java!!!	CommandRequest(in command : String, inout args : Bundle)
+            mCommand = command;
+            mArgs = args;
+!!!1759746.java!!!	submit(inout interactor : IVoiceInteractor, in packageName : String, inout callback : IVoiceInteractorCallback) : IVoiceInteractorRequest
+            return interactor.startCommand(packageName, callback, mCommand, mArgs);

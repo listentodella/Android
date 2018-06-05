@@ -1,0 +1,16 @@
+class GhostViewListeners
+!!!1468418.java!!!	GhostViewListeners(inout view : View, inout parent : View, inout decor : ViewGroup)
+            mView = view;
+            mParent = parent;
+            mDecor = decor;
+!!!1468546.java!!!	getView() : View
+            return mView;
+!!!1468674.java!!!	onPreDraw() : boolean
+            GhostView ghostView = GhostView.getGhost(mView);
+            if (ghostView == null) {
+                mParent.getViewTreeObserver().removeOnPreDrawListener(this);
+            } else {
+                GhostView.calculateMatrix(mView, mDecor, mMatrix);
+                ghostView.setMatrix(mMatrix);
+            }
+            return true;

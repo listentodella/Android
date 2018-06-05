@@ -1,0 +1,50 @@
+class VelocityTracker
+!!!861698.java!!!	obtain() : VelocityTracker
+        VelocityTracker instance = sPool.acquire();
+        return (instance != null) ? instance : new VelocityTracker(null);
+!!!861826.java!!!	obtain(in strategy : String) : VelocityTracker
+        if (strategy == null) {
+            return obtain();
+        }
+        return new VelocityTracker(strategy);
+!!!861954.java!!!	recycle() : void
+        if (mStrategy == null) {
+            clear();
+            sPool.release(this);
+        }
+!!!862082.java!!!	VelocityTracker(in strategy : String)
+        mPtr = nativeInitialize(strategy);
+        mStrategy = strategy;
+!!!862210.java!!!	finalize() : void
+        try {
+            if (mPtr != 0) {
+                nativeDispose(mPtr);
+                mPtr = 0;
+            }
+        } finally {
+            super.finalize();
+        }
+!!!862338.java!!!	clear() : void
+        nativeClear(mPtr);
+!!!862466.java!!!	addMovement(inout event : MotionEvent) : void
+        if (event == null) {
+            throw new IllegalArgumentException("event must not be null");
+        }
+        nativeAddMovement(mPtr, event);
+!!!862594.java!!!	computeCurrentVelocity(in units : int) : void
+        nativeComputeCurrentVelocity(mPtr, units, Float.MAX_VALUE);
+!!!862722.java!!!	computeCurrentVelocity(in units : int, in maxVelocity : float) : void
+        nativeComputeCurrentVelocity(mPtr, units, maxVelocity);
+!!!862850.java!!!	getXVelocity() : float
+        return nativeGetXVelocity(mPtr, ACTIVE_POINTER_ID);
+!!!862978.java!!!	getYVelocity() : float
+        return nativeGetYVelocity(mPtr, ACTIVE_POINTER_ID);
+!!!863106.java!!!	getXVelocity(in id : int) : float
+        return nativeGetXVelocity(mPtr, id);
+!!!863234.java!!!	getYVelocity(in id : int) : float
+        return nativeGetYVelocity(mPtr, id);
+!!!863362.java!!!	getEstimator(in id : int, inout outEstimator : VelocityTracker::Estimator) : boolean
+        if (outEstimator == null) {
+            throw new IllegalArgumentException("outEstimator must not be null");
+        }
+        return nativeGetEstimator(mPtr, id, outEstimator);

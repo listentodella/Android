@@ -1,0 +1,106 @@
+class BufferProducerThread
+!!!134018.cpp!!!	BufferProducerThread(inout device : tv_input_device_t, in deviceId : int, in stream : tv_stream_t)
+    memcpy(&mStream, stream, sizeof(mStream));
+!!!134146.cpp!!!	readyToRun() : status_t
+    sp<ANativeWindow> anw(mSurface);
+    status_t err = native_window_set_usage(anw.get(), mStream.buffer_producer.usage);
+    if (err != NO_ERROR) {
+        return err;
+    }
+    err = native_window_set_buffers_dimensions(
+            anw.get(), mStream.buffer_producer.width, mStream.buffer_producer.height);
+    if (err != NO_ERROR) {
+        return err;
+    }
+    err = native_window_set_buffers_format(anw.get(), mStream.buffer_producer.format);
+    if (err != NO_ERROR) {
+        return err;
+    }
+    return NO_ERROR;
+!!!134274.cpp!!!	setSurface(in surface : sp<Surface>) : void
+    Mutex::Autolock autoLock(&mLock);
+    setSurfaceLocked(surface);
+!!!134402.cpp!!!	onCaptured(in seq : uint32_t, in succeeded : bool) : void
+    Mutex::Autolock autoLock(&mLock);
+    if (seq != mSeq) {
+        ALOGW("Incorrect sequence value: expected %u actual %u", mSeq, seq);
+    }
+    if (mBufferState != CAPTURING) {
+        ALOGW("mBufferState != CAPTURING : instead %d", mBufferState);
+    }
+    if (succeeded) {
+        mBufferState = CAPTURED;
+    } else {
+        mBuffer.clear();
+        mBufferState = RELEASED;
+    }
+    mCondition.broadcast();
+!!!134530.cpp!!!	shutdown() : void
+    Mutex::Autolock autoLock(&mLock);
+    mShutdown = true;
+    setSurfaceLocked(NULL);
+    requestExitAndWait();
+!!!134658.cpp!!!	threadLoop() : bool
+    Mutex::Autolock autoLock(&mLock);
+
+    status_t err = NO_ERROR;
+    if (mSurface == NULL) {
+        err = mCondition.waitRelative(mLock, s2ns(1));
+        // It's OK to time out here.
+        if (err != NO_ERROR && err != TIMED_OUT) {
+            ALOGE("error %d while wating for non-null surface to be set", err);
+            return false;
+        }
+        return true;
+    }
+    sp<ANativeWindow> anw(mSurface);
+    while (mBufferState == CAPTURING) {
+        err = mCondition.waitRelative(mLock, s2ns(1));
+        if (err != NO_ERROR) {
+            ALOGE("error %d while wating for buffer state to change.", err);
+            return false;
+        }
+    }
+    if (mBufferState == CAPTURED && anw != NULL) {
+        err = anw->queueBuffer(anw.get(), mBuffer.get(), -1);
+        if (err != NO_ERROR) {
+            ALOGE("error %d while queueing buffer to surface", err);
+            return false;
+        }
+        mBuffer.clear();
+        mBufferState = RELEASED;
+    }
+    if (mBuffer == NULL && !mShutdown && anw != NULL) {
+        ANativeWindowBuffer_t* buffer = NULL;
+        err = native_window_dequeue_buffer_and_wait(anw.get(), &buffer);
+        if (err != NO_ERROR) {
+            ALOGE("error %d while dequeueing buffer to surface", err);
+            return false;
+        }
+        mBuffer = buffer;
+        mBufferState = CAPTURING;
+        mDevice->request_capture(mDevice, mDeviceId, mStream.stream_id,
+                                 buffer->handle, ++mSeq);
+    }
+
+    return true;
+!!!134786.cpp!!!	setSurfaceLocked(in surface : sp<Surface>) : void
+    if (surface == mSurface) {
+        return;
+    }
+
+    if (mBufferState == CAPTURING) {
+        mDevice->cancel_capture(mDevice, mDeviceId, mStream.stream_id, mSeq);
+    }
+    while (mBufferState == CAPTURING) {
+        status_t err = mCondition.waitRelative(mLock, s2ns(1));
+        if (err != NO_ERROR) {
+            ALOGE("error %d while wating for buffer state to change.", err);
+            break;
+        }
+    }
+    mBuffer.clear();
+    mBufferState = RELEASED;
+
+    mSurface = surface;
+    mCondition.broadcast();

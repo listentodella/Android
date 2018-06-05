@@ -1,0 +1,67 @@
+class MonthViewTouchHelper
+!!!2449666.java!!!	MonthViewTouchHelper(inout host : View)
+            super(host);
+!!!2449794.java!!!	setFocusedVirtualView(in virtualViewId : int) : void
+            getAccessibilityNodeProvider(SimpleMonthView.this).performAction(
+                    virtualViewId, AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null);
+!!!2449922.java!!!	clearFocusedVirtualView() : void
+            final int focusedVirtualView = getFocusedVirtualView();
+            if (focusedVirtualView != ExploreByTouchHelper.INVALID_ID) {
+                getAccessibilityNodeProvider(SimpleMonthView.this).performAction(
+                        focusedVirtualView,
+                        AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS,
+                        null);
+            }
+!!!2450050.java!!!	getVirtualViewAt(in x : float, in y : float) : int
+            final int day = getDayFromLocation(x, y);
+            if (day >= 0) {
+                return day;
+            }
+            return ExploreByTouchHelper.INVALID_ID;
+!!!2450178.java!!!	getVisibleVirtualViews(inout virtualViewIds : List<Integer>) : void
+            for (int day = 1; day <= mNumCells; day++) {
+                virtualViewIds.add(day);
+            }
+!!!2450306.java!!!	onPopulateEventForVirtualView(in virtualViewId : int, inout event : AccessibilityEvent) : void
+            event.setContentDescription(getItemDescription(virtualViewId));
+!!!2450434.java!!!	onPopulateNodeForVirtualView(in virtualViewId : int, inout node : AccessibilityNodeInfo) : void
+            getItemBounds(virtualViewId, mTempRect);
+
+            node.setContentDescription(getItemDescription(virtualViewId));
+            node.setBoundsInParent(mTempRect);
+            node.addAction(AccessibilityNodeInfo.ACTION_CLICK);
+
+            if (virtualViewId == mSelectedDay) {
+                node.setSelected(true);
+            }
+
+!!!2450562.java!!!	onPerformActionForVirtualView(in virtualViewId : int, in action : int, inout arguments : Bundle) : boolean
+            switch (action) {
+                case AccessibilityNodeInfo.ACTION_CLICK:
+                    onDayClick(virtualViewId);
+                    return true;
+            }
+
+            return false;
+!!!2450690.java!!!	getItemBounds(in day : int, inout rect : Rect) : void
+            final int offsetX = mPadding;
+            final int offsetY = mMonthHeaderSize;
+            final int cellHeight = mRowHeight;
+            final int cellWidth = ((mWidth - (2 * mPadding)) / mNumDays);
+            final int index = ((day - 1) + findDayOffset());
+            final int row = (index / mNumDays);
+            final int column = (index % mNumDays);
+            final int x = (offsetX + (column * cellWidth));
+            final int y = (offsetY + (row * cellHeight));
+
+            rect.set(x, y, (x + cellWidth), (y + cellHeight));
+!!!2450818.java!!!	getItemDescription(in day : int) : CharSequence
+            mTempCalendar.set(mYear, mMonth, day);
+            final CharSequence date = DateFormat.format(DATE_FORMAT,
+                    mTempCalendar.getTimeInMillis());
+
+            if (day == mSelectedDay) {
+                return getContext().getString(R.string.item_is_selected, date);
+            }
+
+            return date;

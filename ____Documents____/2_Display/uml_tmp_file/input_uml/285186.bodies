@@ -1,0 +1,73 @@
+class ActivityContainerWrapper
+!!!1473922.java!!!	ActivityContainerWrapper(inout container : IActivityContainer)
+            mIActivityContainer = container;
+            mOpened = true;
+            mGuard.open("release");
+!!!1474050.java!!!	attachToDisplay(in displayId : int) : void
+            try {
+                mIActivityContainer.attachToDisplay(displayId);
+            } catch (RemoteException e) {
+            }
+!!!1474178.java!!!	setSurface(inout surface : Surface, in width : int, in height : int, in density : int) : void
+            mIActivityContainer.setSurface(surface, width, height, density);
+!!!1474306.java!!!	startActivity(inout intent : Intent) : int
+            try {
+                return mIActivityContainer.startActivity(intent);
+            } catch (RemoteException e) {
+                throw new RuntimeException("ActivityView: Unable to startActivity. " + e);
+            }
+!!!1474434.java!!!	startActivityIntentSender(inout intentSender : IIntentSender) : int
+            try {
+                return mIActivityContainer.startActivityIntentSender(intentSender);
+            } catch (RemoteException e) {
+                throw new RuntimeException(
+                        "ActivityView: Unable to startActivity from IntentSender. " + e);
+            }
+!!!1474562.java!!!	checkEmbeddedAllowed(inout intent : Intent) : void
+            try {
+                mIActivityContainer.checkEmbeddedAllowed(intent);
+            } catch (RemoteException e) {
+                throw new RuntimeException(
+                        "ActivityView: Unable to startActivity from Intent. " + e);
+            }
+!!!1474690.java!!!	checkEmbeddedAllowedIntentSender(inout intentSender : IIntentSender) : void
+            try {
+                mIActivityContainer.checkEmbeddedAllowedIntentSender(intentSender);
+            } catch (RemoteException e) {
+                throw new RuntimeException(
+                        "ActivityView: Unable to startActivity from IntentSender. " + e);
+            }
+!!!1474818.java!!!	getDisplayId() : int
+            try {
+                return mIActivityContainer.getDisplayId();
+            } catch (RemoteException e) {
+                return -1;
+            }
+!!!1474946.java!!!	injectEvent(inout event : InputEvent) : boolean
+            try {
+                return mIActivityContainer.injectEvent(event);
+            } catch (RemoteException e) {
+                return false;
+            }
+!!!1475074.java!!!	release() : void
+            synchronized (mGuard) {
+                if (mOpened) {
+                    if (DEBUG) Log.v(TAG, "ActivityContainerWrapper: release called");
+                    try {
+                        mIActivityContainer.release();
+                        mGuard.close();
+                    } catch (RemoteException e) {
+                    }
+                    mOpened = false;
+                }
+            }
+!!!1475202.java!!!	finalize() : void
+            if (DEBUG) Log.v(TAG, "ActivityContainerWrapper: finalize called");
+            try {
+                if (mGuard != null) {
+                    mGuard.warnIfOpen();
+                    release();
+                }
+            } finally {
+                super.finalize();
+            }

@@ -1,0 +1,7 @@
+class IntHolder
+!!!2391426.java!!!	IntHolder(in value : int)
+            mValue = value;
+!!!2391554.java!!!	setValue(in value : int) : void
+            mValue = value;
+!!!2391682.java!!!	getValue() : int
+            return mValue;

@@ -1,0 +1,19 @@
+class TakenSurfaceHolder
+!!!978818.java!!!	onAllowLockCanvas() : boolean
+            return mDrawingAllowed;
+!!!978946.java!!!	onRelayoutContainer() : void
+            // Not currently interesting -- from changing between fixed and layout size.
+!!!979074.java!!!	setFormat(in format : int) : void
+            ((RootViewSurfaceTaker)mView).setSurfaceFormat(format);
+!!!979202.java!!!	setType(in type : int) : void
+            ((RootViewSurfaceTaker)mView).setSurfaceType(type);
+!!!979330.java!!!	onUpdateSurface() : void
+            // We take care of format and type changes on our own.
+            throw new IllegalStateException("Shouldn't be here");
+!!!979458.java!!!	isCreating() : boolean
+            return mIsCreating;
+!!!979586.java!!!	setFixedSize(in width : int, in height : int) : void
+            throw new UnsupportedOperationException(
+                    "Currently only support sizing from layout");
+!!!979714.java!!!	setKeepScreenOn(inout screenOn : boolean) : void
+            ((RootViewSurfaceTaker)mView).setSurfaceKeepScreenOn(screenOn);

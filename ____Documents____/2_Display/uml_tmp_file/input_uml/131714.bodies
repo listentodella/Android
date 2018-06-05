@@ -1,0 +1,9 @@
+class InputApplicationHandle
+!!!139266.java!!!	InputApplicationHandle(inout appWindowToken : Object)
+        this.appWindowToken = appWindowToken;
+!!!139394.java!!!	finalize() : void
+        try {
+            nativeDispose();
+        } finally {
+            super.finalize();
+        }

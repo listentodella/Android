@@ -1,0 +1,65 @@
+class HdmiCecController
+!!!131074.cpp!!!	init() : void
+    mDevice->register_event_callback(mDevice, HdmiCecController::onReceived, this);
+!!!131202.cpp!!!	sendMessage(in message : cec_message_t) : int
+    // TODO: propagate send_message's return value.
+    return mDevice->send_message(mDevice, &message);
+!!!131330.cpp!!!	addLogicalAddress(in address : cec_logical_address_t) : int
+    return mDevice->add_logical_address(mDevice, address);
+!!!131458.cpp!!!	clearLogicaladdress() : void
+    mDevice->clear_logical_address(mDevice);
+!!!131586.cpp!!!	getPhysicalAddress() : int
+    uint16_t addr;
+    if (!mDevice->get_physical_address(mDevice, &addr)) {
+        return addr;
+    }
+    return INVALID_PHYSICAL_ADDRESS;
+!!!131714.cpp!!!	getVersion() : int
+    int version = 0;
+    mDevice->get_version(mDevice, &version);
+    return version;
+!!!131842.cpp!!!	getVendorId() : uint32_t
+    uint32_t vendorId = 0;
+    mDevice->get_vendor_id(mDevice, &vendorId);
+    return vendorId;
+!!!131970.cpp!!!	getPortInfos() : jobjectArray
+    JNIEnv* env = AndroidRuntime::getJNIEnv();
+    jclass hdmiPortInfo = env->FindClass("android/hardware/hdmi/HdmiPortInfo");
+    if (hdmiPortInfo == NULL) {
+        return NULL;
+    }
+    jmethodID ctor = env->GetMethodID(hdmiPortInfo, "<init>", "(IIIZZZ)V");
+    if (ctor == NULL) {
+        return NULL;
+    }
+    hdmi_port_info* ports;
+    int numPorts;
+    mDevice->get_port_info(mDevice, &ports, &numPorts);
+    jobjectArray res = env->NewObjectArray(numPorts, hdmiPortInfo, NULL);
+
+    // MHL support field will be obtained from MHL HAL. Leave it to false.
+    jboolean mhlSupported = (jboolean) 0;
+    for (int i = 0; i < numPorts; ++i) {
+        hdmi_port_info* info = &ports[i];
+        jboolean cecSupported = (jboolean) info->cec_supported;
+        jboolean arcSupported = (jboolean) info->arc_supported;
+        jobject infoObj = env->NewObject(hdmiPortInfo, ctor, info->port_id, info->type,
+                info->physical_address, cecSupported, mhlSupported, arcSupported);
+        env->SetObjectArrayElement(res, i, infoObj);
+    }
+    return res;
+!!!132098.cpp!!!	setOption(in flag : int, in value : int) : void
+    mDevice->set_option(mDevice, flag, value);
+!!!132226.cpp!!!	setAudioReturnChannel(in enabled : bool) : void
+    mDevice->set_audio_return_channel(mDevice, enabled ? 1 : 0);
+!!!132354.cpp!!!	isConnected(in port : int) : bool
+    return mDevice->is_connected(mDevice, port) == HDMI_CONNECTED;
+!!!132610.cpp!!!	onReceived(in event : hdmi_event_t, inout arg : void) : void
+    HdmiCecController* controller = static_cast<HdmiCecController*>(arg);
+    if (controller == NULL) {
+        return;
+    }
+
+    sp<CecEventWrapper> spEvent(new CecEventWrapper(*event));
+    sp<HdmiCecEventHandler> handler(new HdmiCecEventHandler(controller, spEvent));
+    controller->mLooper->sendMessage(handler, event->type);

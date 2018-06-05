@@ -1,0 +1,17 @@
+class SharedElementCallback
+!!!1739778.java!!!	onCaptureSharedElementSnapshot(inout sharedElement : View, inout viewToGlobalMatrix : Matrix, inout screenBounds : RectF) : Parcelable
+        if (mTempMatrix == null) {
+            mTempMatrix = new Matrix(viewToGlobalMatrix);
+        } else {
+            mTempMatrix.set(viewToGlobalMatrix);
+        }
+        return TransitionUtils.createViewBitmap(sharedElement, mTempMatrix, screenBounds);
+!!!1739906.java!!!	onCreateSnapshotView(inout context : Context, inout snapshot : Parcelable) : View
+        View view = null;
+        if (snapshot instanceof Bitmap) {
+            Bitmap bitmap = (Bitmap) snapshot;
+            view = new View(context);
+            Resources resources = context.getResources();
+            view.setBackground(new BitmapDrawable(resources, bitmap));
+        }
+        return view;

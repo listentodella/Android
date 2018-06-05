@@ -1,0 +1,78 @@
+class InboxStyle
+!!!1698946.java!!!	InboxStyle(inout builder : Notification::Builder)
+            setBuilder(builder);
+!!!1699074.java!!!	setBigContentTitle(inout title : CharSequence) : Notification::InboxStyle
+            internalSetBigContentTitle(safeCharSequence(title));
+            return this;
+!!!1699202.java!!!	setSummaryText(inout cs : CharSequence) : Notification::InboxStyle
+            internalSetSummaryText(safeCharSequence(cs));
+            return this;
+!!!1699330.java!!!	addLine(inout cs : CharSequence) : Notification::InboxStyle
+            mTexts.add(safeCharSequence(cs));
+            return this;
+!!!1699458.java!!!	addExtras(inout extras : Bundle) : void
+            super.addExtras(extras);
+
+            CharSequence[] a = new CharSequence[mTexts.size()];
+            extras.putCharSequenceArray(EXTRA_TEXT_LINES, mTexts.toArray(a));
+!!!1699586.java!!!	restoreFromExtras(inout extras : Bundle) : void
+            super.restoreFromExtras(extras);
+
+            mTexts.clear();
+            if (extras.containsKey(EXTRA_TEXT_LINES)) {
+                Collections.addAll(mTexts, extras.getCharSequenceArray(EXTRA_TEXT_LINES));
+            }
+!!!1699714.java!!!	makeBigContentView() : RemoteViews
+            // Remove the content text so line3 disappears unless you have a summary
+
+            // Nasty
+            CharSequence oldBuilderContentText = mBuilder.mContentText;
+            mBuilder.mContentText = null;
+
+            RemoteViews contentView = getStandardView(mBuilder.getInboxLayoutResource());
+
+            mBuilder.mContentText = oldBuilderContentText;
+
+            contentView.setViewVisibility(R.id.text2, View.GONE);
+
+            int[] rowIds = {R.id.inbox_text0, R.id.inbox_text1, R.id.inbox_text2, R.id.inbox_text3,
+                    R.id.inbox_text4, R.id.inbox_text5, R.id.inbox_text6};
+
+            // Make sure all rows are gone in case we reuse a view.
+            for (int rowId : rowIds) {
+                contentView.setViewVisibility(rowId, View.GONE);
+            }
+
+            final boolean largeText =
+                    mBuilder.mContext.getResources().getConfiguration().fontScale > 1f;
+            final float subTextSize = mBuilder.mContext.getResources().getDimensionPixelSize(
+                    R.dimen.notification_subtext_size);
+            int i=0;
+            while (i < mTexts.size() && i < rowIds.length) {
+                CharSequence str = mTexts.get(i);
+                if (str != null && !str.equals("")) {
+                    contentView.setViewVisibility(rowIds[i], View.VISIBLE);
+                    contentView.setTextViewText(rowIds[i], mBuilder.processLegacyText(str));
+                    if (largeText) {
+                        contentView.setTextViewTextSize(rowIds[i], TypedValue.COMPLEX_UNIT_PX,
+                                subTextSize);
+                    }
+                }
+                i++;
+            }
+
+            contentView.setViewVisibility(R.id.inbox_end_pad,
+                    mTexts.size() > 0 ? View.VISIBLE : View.GONE);
+
+            contentView.setViewVisibility(R.id.inbox_more,
+                    mTexts.size() > rowIds.length ? View.VISIBLE : View.GONE);
+
+            applyTopPadding(contentView);
+
+            mBuilder.shrinkLine3Text(contentView);
+
+            mBuilder.addProfileBadge(contentView, R.id.profile_badge_large_template);
+
+            return contentView;
+!!!1699842.java!!!	populateBigContentView(inout wip : Notification) : void
+            mBuilder.setBuilderBigContentView(wip, makeBigContentView());

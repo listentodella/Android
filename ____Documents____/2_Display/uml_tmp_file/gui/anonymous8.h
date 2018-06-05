@@ -1,0 +1,22 @@
+#ifndef _ANONYMOUS8_H
+#define _ANONYMOUS8_H
+
+
+// ----------------------------------------------------------------------------
+enum  {
+  REQUEST_BUFFER =  IBinder::FIRST_CALL_TRANSACTION,
+  SET_BUFFER_COUNT,
+  DEQUEUE_BUFFER,
+  DETACH_BUFFER,
+  DETACH_NEXT_BUFFER,
+  ATTACH_BUFFER,
+  QUEUE_BUFFER,
+  CANCEL_BUFFER,
+  QUERY,
+  CONNECT,
+  DISCONNECT,
+  SET_SIDEBAND_STREAM,
+  ALLOCATE_BUFFERS
+
+};
+#endif

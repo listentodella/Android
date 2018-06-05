@@ -1,0 +1,43 @@
+class KeyguardManager
+!!!1640450.java!!!	createConfirmDeviceCredentialIntent(inout title : CharSequence, inout description : CharSequence) : Intent
+        if (!isKeyguardSecure()) return null;
+        Intent intent = new Intent(ACTION_CONFIRM_DEVICE_CREDENTIAL);
+        intent.putExtra(EXTRA_TITLE, title);
+        intent.putExtra(EXTRA_DESCRIPTION, description);
+        // For security reasons, only allow this to come from system settings.
+        intent.setPackage("com.android.settings");
+        return intent;
+!!!1641090.java!!!	KeyguardManager()
+        mWM = WindowManagerGlobal.getWindowManagerService();
+!!!1641218.java!!!	newKeyguardLock(in tag : String) : KeyguardManager::KeyguardLock
+        return new KeyguardLock(tag);
+!!!1641346.java!!!	isKeyguardLocked() : boolean
+        try {
+            return mWM.isKeyguardLocked();
+        } catch (RemoteException ex) {
+            return false;
+        }
+!!!1641474.java!!!	isKeyguardSecure() : boolean
+        try {
+            return mWM.isKeyguardSecure();
+        } catch (RemoteException ex) {
+            return false;
+        }
+!!!1641602.java!!!	inKeyguardRestrictedInputMode() : boolean
+        try {
+            return mWM.inKeyguardRestrictedInputMode();
+        } catch (RemoteException ex) {
+            return false;
+        }
+!!!1641730.java!!!	exitKeyguardSecurely(in callback : KeyguardManager::OnKeyguardExitResult) : void
+        try {
+            mWM.exitKeyguardSecurely(new IOnKeyguardExitResult.Stub() {
+                public void onKeyguardExitResult(boolean success) throws RemoteException {
+                    if (callback != null) {
+                        callback.onKeyguardExitResult(success);
+                    }
+                }
+            });
+        } catch (RemoteException e) {
+
+        }

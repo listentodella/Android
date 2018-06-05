@@ -1,0 +1,37 @@
+class WarningContextClassLoader
+!!!1650946.java!!!	warn(in methodName : String) : void
+            if (warned) {
+                return;
+            }
+            warned = true;
+            Thread.currentThread().setContextClassLoader(getParent());
+            Slog.w(ActivityThread.TAG, "ClassLoader." + methodName + ": " +
+                  "The class loader returned by " +
+                  "Thread.getContextClassLoader() may fail for processes " +
+                  "that host multiple applications. You should explicitly " +
+                  "specify a context class loader. For example: " +
+                  "Thread.setContextClassLoader(getClass().getClassLoader());");
+!!!1651074.java!!!	getResource(in resName : String) : URL
+            warn("getResource");
+            return getParent().getResource(resName);
+!!!1651202.java!!!	getResources(in resName : String) : Enumeration<URL>
+            warn("getResources");
+            return getParent().getResources(resName);
+!!!1651330.java!!!	getResourceAsStream(in resName : String) : InputStream
+            warn("getResourceAsStream");
+            return getParent().getResourceAsStream(resName);
+!!!1651458.java!!!	loadClass(in className : String) : Class<?>
+            warn("loadClass");
+            return getParent().loadClass(className);
+!!!1651586.java!!!	setClassAssertionStatus(in cname : String, inout enable : boolean) : void
+            warn("setClassAssertionStatus");
+            getParent().setClassAssertionStatus(cname, enable);
+!!!1651714.java!!!	setPackageAssertionStatus(in pname : String, inout enable : boolean) : void
+            warn("setPackageAssertionStatus");
+            getParent().setPackageAssertionStatus(pname, enable);
+!!!1651842.java!!!	setDefaultAssertionStatus(inout enable : boolean) : void
+            warn("setDefaultAssertionStatus");
+            getParent().setDefaultAssertionStatus(enable);
+!!!1651970.java!!!	clearAssertionStatus() : void
+            warn("clearAssertionStatus");
+            getParent().clearAssertionStatus();

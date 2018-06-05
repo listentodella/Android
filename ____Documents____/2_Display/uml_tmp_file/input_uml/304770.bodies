@@ -1,0 +1,60 @@
+class TimePickerDialog
+!!!1749250.java!!!	TimePickerDialog(inout context : Context, inout callBack : TimePickerDialog::OnTimeSetListener, in hourOfDay : int, in minute : int, inout is24HourView : boolean)
+        this(context, 0, callBack, hourOfDay, minute, is24HourView);
+!!!1749378.java!!!	resolveDialogTheme(inout context : Context, in resid : int) : int
+        if (resid == 0) {
+            final TypedValue outValue = new TypedValue();
+            context.getTheme().resolveAttribute(R.attr.timePickerDialogTheme, outValue, true);
+            return outValue.resourceId;
+        } else {
+            return resid;
+        }
+!!!1749506.java!!!	TimePickerDialog(inout context : Context, in theme : int, inout callBack : TimePickerDialog::OnTimeSetListener, in hourOfDay : int, in minute : int, inout is24HourView : boolean)
+        super(context, resolveDialogTheme(context, theme));
+
+        mTimeSetCallback = callBack;
+        mInitialHourOfDay = hourOfDay;
+        mInitialMinute = minute;
+        mIs24HourView = is24HourView;
+
+        final Context themeContext = getContext();
+        final LayoutInflater inflater = LayoutInflater.from(themeContext);
+        final View view = inflater.inflate(R.layout.time_picker_dialog, null);
+        setView(view);
+        setButton(BUTTON_POSITIVE, themeContext.getString(R.string.ok), this);
+        setButton(BUTTON_NEGATIVE, themeContext.getString(R.string.cancel), this);
+        setButtonPanelLayoutHint(LAYOUT_HINT_SIDE);
+
+        mTimePicker = (TimePicker) view.findViewById(R.id.timePicker);
+        mTimePicker.setIs24HourView(mIs24HourView);
+        mTimePicker.setCurrentHour(mInitialHourOfDay);
+        mTimePicker.setCurrentMinute(mInitialMinute);
+        mTimePicker.setOnTimeChangedListener(this);
+        mTimePicker.setValidationCallback(mValidationCallback);
+!!!1749634.java!!!	onTimeChanged(inout view : TimePicker, in hourOfDay : int, in minute : int) : void
+        /* do nothing */
+!!!1749762.java!!!	onClick(inout dialog : DialogInterface, in which : int) : void
+        switch (which) {
+            case BUTTON_POSITIVE:
+                if (mTimeSetCallback != null) {
+                    mTimeSetCallback.onTimeSet(mTimePicker, mTimePicker.getCurrentHour(),
+                            mTimePicker.getCurrentMinute());
+                }
+                break;
+        }
+!!!1749890.java!!!	updateTime(in hourOfDay : int, in minuteOfHour : int) : void
+        mTimePicker.setCurrentHour(hourOfDay);
+        mTimePicker.setCurrentMinute(minuteOfHour);
+!!!1750018.java!!!	onSaveInstanceState() : Bundle
+        final Bundle state = super.onSaveInstanceState();
+        state.putInt(HOUR, mTimePicker.getCurrentHour());
+        state.putInt(MINUTE, mTimePicker.getCurrentMinute());
+        state.putBoolean(IS_24_HOUR, mTimePicker.is24HourView());
+        return state;
+!!!1750146.java!!!	onRestoreInstanceState(inout savedInstanceState : Bundle) : void
+        super.onRestoreInstanceState(savedInstanceState);
+        final int hour = savedInstanceState.getInt(HOUR);
+        final int minute = savedInstanceState.getInt(MINUTE);
+        mTimePicker.setIs24HourView(savedInstanceState.getBoolean(IS_24_HOUR));
+        mTimePicker.setCurrentHour(hour);
+        mTimePicker.setCurrentMinute(minute);

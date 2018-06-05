@@ -1,0 +1,46 @@
+class UiModeManager
+!!!1756418.java!!!	UiModeManager()
+        mService = IUiModeManager.Stub.asInterface(
+                ServiceManager.getService(Context.UI_MODE_SERVICE));
+!!!1756546.java!!!	enableCarMode(in flags : int) : void
+        if (mService != null) {
+            try {
+                mService.enableCarMode(flags);
+            } catch (RemoteException e) {
+                Log.e(TAG, "disableCarMode: RemoteException", e);
+            }
+        }
+!!!1756674.java!!!	disableCarMode(in flags : int) : void
+        if (mService != null) {
+            try {
+                mService.disableCarMode(flags);
+            } catch (RemoteException e) {
+                Log.e(TAG, "disableCarMode: RemoteException", e);
+            }
+        }
+!!!1756802.java!!!	getCurrentModeType() : int
+        if (mService != null) {
+            try {
+                return mService.getCurrentModeType();
+            } catch (RemoteException e) {
+                Log.e(TAG, "getCurrentModeType: RemoteException", e);
+            }
+        }
+        return Configuration.UI_MODE_TYPE_NORMAL;
+!!!1756930.java!!!	setNightMode(in mode : int) : void
+        if (mService != null) {
+            try {
+                mService.setNightMode(mode);
+            } catch (RemoteException e) {
+                Log.e(TAG, "setNightMode: RemoteException", e);
+            }
+        }
+!!!1757058.java!!!	getNightMode() : int
+        if (mService != null) {
+            try {
+                return mService.getNightMode();
+            } catch (RemoteException e) {
+                Log.e(TAG, "getNightMode: RemoteException", e);
+            }
+        }
+        return -1;

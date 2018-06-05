@@ -1,0 +1,2244 @@
+class PhoneWindow
+!!!465154.java!!!	PhoneWindow(inout context : Context)
+        super(context);
+        mLayoutInflater = LayoutInflater.from(context);
+!!!465282.java!!!	setContainer(inout container : Window) : void
+        super.setContainer(container);
+!!!465410.java!!!	requestFeature(in featureId : int) : boolean
+        if (mContentParent != null) {
+            throw new AndroidRuntimeException("requestFeature() must be called before adding content");
+        }
+        final int features = getFeatures();
+        final int newFeatures = features | (1 << featureId);
+        if ((newFeatures & (1 << FEATURE_CUSTOM_TITLE)) != 0 &&
+                (newFeatures & ~CUSTOM_TITLE_COMPATIBLE_FEATURES) != 0) {
+            // Another feature is enabled and the user is trying to enable the custom title feature
+            // or custom title feature is enabled and the user is trying to enable another feature
+            throw new AndroidRuntimeException(
+                    "You cannot combine custom titles with other title features");
+        }
+        if ((features & (1 << FEATURE_NO_TITLE)) != 0 && featureId == FEATURE_ACTION_BAR) {
+            return false; // Ignore. No title dominates.
+        }
+        if ((features & (1 << FEATURE_ACTION_BAR)) != 0 && featureId == FEATURE_NO_TITLE) {
+            // Remove the action bar feature if we have no title. No title dominates.
+            removeFeature(FEATURE_ACTION_BAR);
+        }
+
+        if ((features & (1 << FEATURE_ACTION_BAR)) != 0 && featureId == FEATURE_SWIPE_TO_DISMISS) {
+            throw new AndroidRuntimeException(
+                    "You cannot combine swipe dismissal and the action bar.");
+        }
+        if ((features & (1 << FEATURE_SWIPE_TO_DISMISS)) != 0 && featureId == FEATURE_ACTION_BAR) {
+            throw new AndroidRuntimeException(
+                    "You cannot combine swipe dismissal and the action bar.");
+        }
+
+        if (featureId == FEATURE_INDETERMINATE_PROGRESS &&
+                getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH)) {
+            throw new AndroidRuntimeException("You cannot use indeterminate progress on a watch.");
+        }
+        return super.requestFeature(featureId);
+!!!465538.java!!!	setUiOptions(in uiOptions : int) : void
+        mUiOptions = uiOptions;
+!!!465666.java!!!	setUiOptions(in uiOptions : int, in mask : int) : void
+        mUiOptions = (mUiOptions & ~mask) | (uiOptions & mask);
+!!!465794.java!!!	getTransitionManager() : TransitionManager
+        return mTransitionManager;
+!!!465922.java!!!	setTransitionManager(inout tm : TransitionManager) : void
+        mTransitionManager = tm;
+!!!466050.java!!!	getContentScene() : Scene
+        return mContentScene;
+!!!466178.java!!!	setContentView(in layoutResID : int) : void
+        // Note: FEATURE_CONTENT_TRANSITIONS may be set in the process of installing the window
+        // decor, when theme attributes and the like are crystalized. Do not check the feature
+        // before this happens.
+        if (mContentParent == null) {
+            installDecor();
+        } else if (!hasFeature(FEATURE_CONTENT_TRANSITIONS)) {
+            mContentParent.removeAllViews();
+        }
+
+        if (hasFeature(FEATURE_CONTENT_TRANSITIONS)) {
+            final Scene newScene = Scene.getSceneForLayout(mContentParent, layoutResID,
+                    getContext());
+            transitionTo(newScene);
+        } else {
+            mLayoutInflater.inflate(layoutResID, mContentParent);
+        }
+        final Callback cb = getCallback();
+        if (cb != null && !isDestroyed()) {
+            cb.onContentChanged();
+        }
+!!!466306.java!!!	setContentView(inout view : View) : void
+        setContentView(view, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+!!!466434.java!!!	setContentView(inout view : View, inout params : ViewGroup.LayoutParams) : void
+        // Note: FEATURE_CONTENT_TRANSITIONS may be set in the process of installing the window
+        // decor, when theme attributes and the like are crystalized. Do not check the feature
+        // before this happens.
+        if (mContentParent == null) {
+            installDecor();
+        } else if (!hasFeature(FEATURE_CONTENT_TRANSITIONS)) {
+            mContentParent.removeAllViews();
+        }
+
+        if (hasFeature(FEATURE_CONTENT_TRANSITIONS)) {
+            view.setLayoutParams(params);
+            final Scene newScene = new Scene(mContentParent, view);
+            transitionTo(newScene);
+        } else {
+            mContentParent.addView(view, params);
+        }
+        final Callback cb = getCallback();
+        if (cb != null && !isDestroyed()) {
+            cb.onContentChanged();
+        }
+!!!466562.java!!!	addContentView(inout view : View, inout params : ViewGroup.LayoutParams) : void
+        if (mContentParent == null) {
+            installDecor();
+        }
+        if (hasFeature(FEATURE_CONTENT_TRANSITIONS)) {
+            // TODO Augment the scenes/transitions API to support this.
+            Log.v(TAG, "addContentView does not support content transitions");
+        }
+        mContentParent.addView(view, params);
+        final Callback cb = getCallback();
+        if (cb != null && !isDestroyed()) {
+            cb.onContentChanged();
+        }
+!!!466690.java!!!	transitionTo(inout scene : Scene) : void
+        if (mContentScene == null) {
+            scene.enter();
+        } else {
+            mTransitionManager.transitionTo(scene);
+        }
+        mContentScene = scene;
+!!!466818.java!!!	getCurrentFocus() : View
+        return mDecor != null ? mDecor.findFocus() : null;
+!!!466946.java!!!	takeSurface(inout callback : SurfaceHolder.Callback2) : void
+        mTakeSurfaceCallback = callback;
+!!!467074.java!!!	takeInputQueue(inout callback : InputQueue.Callback) : void
+        mTakeInputQueueCallback = callback;
+!!!467202.java!!!	isFloating() : boolean
+        return mIsFloating;
+!!!467330.java!!!	getLayoutInflater() : LayoutInflater
+        return mLayoutInflater;
+!!!467458.java!!!	setTitle(inout title : CharSequence) : void
+        if (mTitleView != null) {
+            mTitleView.setText(title);
+        } else if (mDecorContentParent != null) {
+            mDecorContentParent.setWindowTitle(title);
+        }
+        mTitle = title;
+!!!467586.java!!!	setTitleColor(in textColor : int) : void
+        if (mTitleView != null) {
+            mTitleView.setTextColor(textColor);
+        }
+        mTitleColor = textColor;
+!!!467714.java!!!	preparePanel(inout st : PhoneWindow::PanelFeatureState, inout event : KeyEvent) : boolean
+        if (isDestroyed()) {
+            return false;
+        }
+
+        // Already prepared (isPrepared will be reset to false later)
+        if (st.isPrepared) {
+            return true;
+        }
+
+        if ((mPreparedPanel != null) && (mPreparedPanel != st)) {
+            // Another Panel is prepared and possibly open, so close it
+            closePanel(mPreparedPanel, false);
+        }
+
+        final Callback cb = getCallback();
+
+        if (cb != null) {
+            st.createdPanelView = cb.onCreatePanelView(st.featureId);
+        }
+
+        final boolean isActionBarMenu =
+                (st.featureId == FEATURE_OPTIONS_PANEL || st.featureId == FEATURE_ACTION_BAR);
+
+        if (isActionBarMenu && mDecorContentParent != null) {
+            // Enforce ordering guarantees around events so that the action bar never
+            // dispatches menu-related events before the panel is prepared.
+            mDecorContentParent.setMenuPrepared();
+        }
+
+        if (st.createdPanelView == null) {
+            // Init the panel state's menu--return false if init failed
+            if (st.menu == null || st.refreshMenuContent) {
+                if (st.menu == null) {
+                    if (!initializePanelMenu(st) || (st.menu == null)) {
+                        return false;
+                    }
+                }
+
+                if (isActionBarMenu && mDecorContentParent != null) {
+                    if (mActionMenuPresenterCallback == null) {
+                        mActionMenuPresenterCallback = new ActionMenuPresenterCallback();
+                    }
+                    mDecorContentParent.setMenu(st.menu, mActionMenuPresenterCallback);
+                }
+
+                // Call callback, and return if it doesn't want to display menu.
+
+                // Creating the panel menu will involve a lot of manipulation;
+                // don't dispatch change events to presenters until we're done.
+                st.menu.stopDispatchingItemsChanged();
+                if ((cb == null) || !cb.onCreatePanelMenu(st.featureId, st.menu)) {
+                    // Ditch the menu created above
+                    st.setMenu(null);
+
+                    if (isActionBarMenu && mDecorContentParent != null) {
+                        // Don't show it in the action bar either
+                        mDecorContentParent.setMenu(null, mActionMenuPresenterCallback);
+                    }
+
+                    return false;
+                }
+
+                st.refreshMenuContent = false;
+            }
+
+            // Callback and return if the callback does not want to show the menu
+
+            // Preparing the panel menu can involve a lot of manipulation;
+            // don't dispatch change events to presenters until we're done.
+            st.menu.stopDispatchingItemsChanged();
+
+            // Restore action view state before we prepare. This gives apps
+            // an opportunity to override frozen/restored state in onPrepare.
+            if (st.frozenActionViewState != null) {
+                st.menu.restoreActionViewStates(st.frozenActionViewState);
+                st.frozenActionViewState = null;
+            }
+
+            if (!cb.onPreparePanel(st.featureId, st.createdPanelView, st.menu)) {
+                if (isActionBarMenu && mDecorContentParent != null) {
+                    // The app didn't want to show the menu for now but it still exists.
+                    // Clear it out of the action bar.
+                    mDecorContentParent.setMenu(null, mActionMenuPresenterCallback);
+                }
+                st.menu.startDispatchingItemsChanged();
+                return false;
+            }
+
+            // Set the proper keymap
+            KeyCharacterMap kmap = KeyCharacterMap.load(
+                    event != null ? event.getDeviceId() : KeyCharacterMap.VIRTUAL_KEYBOARD);
+            st.qwertyMode = kmap.getKeyboardType() != KeyCharacterMap.NUMERIC;
+            st.menu.setQwertyMode(st.qwertyMode);
+            st.menu.startDispatchingItemsChanged();
+        }
+
+        // Set other state
+        st.isPrepared = true;
+        st.isHandled = false;
+        mPreparedPanel = st;
+
+        return true;
+!!!467842.java!!!	onConfigurationChanged(inout newConfig : Configuration) : void
+        // Action bars handle their own menu state
+        if (mDecorContentParent == null) {
+            PanelFeatureState st = getPanelState(FEATURE_OPTIONS_PANEL, false);
+            if ((st != null) && (st.menu != null)) {
+                if (st.isOpen) {
+                    // Freeze state
+                    final Bundle state = new Bundle();
+                    if (st.iconMenuPresenter != null) {
+                        st.iconMenuPresenter.saveHierarchyState(state);
+                    }
+                    if (st.listMenuPresenter != null) {
+                        st.listMenuPresenter.saveHierarchyState(state);
+                    }
+
+                    // Remove the menu views since they need to be recreated
+                    // according to the new configuration
+                    clearMenuViews(st);
+
+                    // Re-open the same menu
+                    reopenMenu(false);
+
+                    // Restore state
+                    if (st.iconMenuPresenter != null) {
+                        st.iconMenuPresenter.restoreHierarchyState(state);
+                    }
+                    if (st.listMenuPresenter != null) {
+                        st.listMenuPresenter.restoreHierarchyState(state);
+                    }
+
+                } else {
+                    // Clear menu views so on next menu opening, it will use
+                    // the proper layout
+                    clearMenuViews(st);
+                }
+            }
+        }
+!!!467970.java!!!	clearMenuViews(inout st : PhoneWindow::PanelFeatureState) : void
+        // This can be called on config changes, so we should make sure
+        // the views will be reconstructed based on the new orientation, etc.
+
+        // Allow the callback to create a new panel view
+        st.createdPanelView = null;
+
+        // Causes the decor view to be recreated
+        st.refreshDecorView = true;
+
+        st.clearMenuPresenters();
+!!!468098.java!!!	openPanel(in featureId : int, inout event : KeyEvent) : void
+        if (featureId == FEATURE_OPTIONS_PANEL && mDecorContentParent != null &&
+                mDecorContentParent.canShowOverflowMenu() &&
+                !ViewConfiguration.get(getContext()).hasPermanentMenuKey()) {
+            mDecorContentParent.showOverflowMenu();
+        } else {
+            openPanel(getPanelState(featureId, true), event);
+        }
+!!!468226.java!!!	openPanel(in st : PhoneWindow::PanelFeatureState, inout event : KeyEvent) : void
+        // System.out.println("Open panel: isOpen=" + st.isOpen);
+
+        // Already open, return
+        if (st.isOpen || isDestroyed()) {
+            return;
+        }
+
+        // Don't open an options panel for honeycomb apps on xlarge devices.
+        // (The app should be using an action bar for menu items.)
+        if (st.featureId == FEATURE_OPTIONS_PANEL) {
+            Context context = getContext();
+            Configuration config = context.getResources().getConfiguration();
+            boolean isXLarge = (config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) ==
+                    Configuration.SCREENLAYOUT_SIZE_XLARGE;
+            boolean isHoneycombApp = context.getApplicationInfo().targetSdkVersion >=
+                    android.os.Build.VERSION_CODES.HONEYCOMB;
+
+            if (isXLarge && isHoneycombApp) {
+                return;
+            }
+        }
+
+        Callback cb = getCallback();
+        if ((cb != null) && (!cb.onMenuOpened(st.featureId, st.menu))) {
+            // Callback doesn't want the menu to open, reset any state
+            closePanel(st, true);
+            return;
+        }
+
+        final WindowManager wm = getWindowManager();
+        if (wm == null) {
+            return;
+        }
+
+        // Prepare panel (should have been done before, but just in case)
+        if (!preparePanel(st, event)) {
+            return;
+        }
+
+        int width = WRAP_CONTENT;
+        if (st.decorView == null || st.refreshDecorView) {
+            if (st.decorView == null) {
+                // Initialize the panel decor, this will populate st.decorView
+                if (!initializePanelDecor(st) || (st.decorView == null))
+                    return;
+            } else if (st.refreshDecorView && (st.decorView.getChildCount() > 0)) {
+                // Decor needs refreshing, so remove its views
+                st.decorView.removeAllViews();
+            }
+
+            // This will populate st.shownPanelView
+            if (!initializePanelContent(st) || !st.hasPanelItems()) {
+                return;
+            }
+
+            ViewGroup.LayoutParams lp = st.shownPanelView.getLayoutParams();
+            if (lp == null) {
+                lp = new ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
+            }
+
+            int backgroundResId;
+            if (lp.width == ViewGroup.LayoutParams.MATCH_PARENT) {
+                // If the contents is fill parent for the width, set the
+                // corresponding background
+                backgroundResId = st.fullBackground;
+                width = MATCH_PARENT;
+            } else {
+                // Otherwise, set the normal panel background
+                backgroundResId = st.background;
+            }
+            st.decorView.setWindowBackground(getContext().getDrawable(
+                    backgroundResId));
+
+            ViewParent shownPanelParent = st.shownPanelView.getParent();
+            if (shownPanelParent != null && shownPanelParent instanceof ViewGroup) {
+                ((ViewGroup) shownPanelParent).removeView(st.shownPanelView);
+            }
+            st.decorView.addView(st.shownPanelView, lp);
+
+            /*
+             * Give focus to the view, if it or one of its children does not
+             * already have it.
+             */
+            if (!st.shownPanelView.hasFocus()) {
+                st.shownPanelView.requestFocus();
+            }
+        } else if (!st.isInListMode()) {
+            width = MATCH_PARENT;
+        } else if (st.createdPanelView != null) {
+            // If we already had a panel view, carry width=MATCH_PARENT through
+            // as we did above when it was created.
+            ViewGroup.LayoutParams lp = st.createdPanelView.getLayoutParams();
+            if (lp != null && lp.width == ViewGroup.LayoutParams.MATCH_PARENT) {
+                width = MATCH_PARENT;
+            }
+        }
+
+        st.isHandled = false;
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                width, WRAP_CONTENT,
+                st.x, st.y, WindowManager.LayoutParams.TYPE_APPLICATION_ATTACHED_DIALOG,
+                WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+                | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH,
+                st.decorView.mDefaultOpacity);
+
+        if (st.isCompact) {
+            lp.gravity = getOptionsPanelGravity();
+            sRotationWatcher.addWindow(this);
+        } else {
+            lp.gravity = st.gravity;
+        }
+
+        lp.windowAnimations = st.windowAnimations;
+
+        wm.addView(st.decorView, lp);
+        st.isOpen = true;
+        // Log.v(TAG, "Adding main menu to window manager.");
+!!!468354.java!!!	closePanel(in featureId : int) : void
+        if (featureId == FEATURE_OPTIONS_PANEL && mDecorContentParent != null &&
+                mDecorContentParent.canShowOverflowMenu() &&
+                !ViewConfiguration.get(getContext()).hasPermanentMenuKey()) {
+            mDecorContentParent.hideOverflowMenu();
+        } else if (featureId == FEATURE_CONTEXT_MENU) {
+            closeContextMenu();
+        } else {
+            closePanel(getPanelState(featureId, true), true);
+        }
+!!!468482.java!!!	closePanel(inout st : PhoneWindow::PanelFeatureState, inout doCallback : boolean) : void
+        // System.out.println("Close panel: isOpen=" + st.isOpen);
+        if (doCallback && st.featureId == FEATURE_OPTIONS_PANEL &&
+                mDecorContentParent != null && mDecorContentParent.isOverflowMenuShowing()) {
+            checkCloseActionMenu(st.menu);
+            return;
+        }
+
+        final ViewManager wm = getWindowManager();
+        if ((wm != null) && st.isOpen) {
+            if (st.decorView != null) {
+                wm.removeView(st.decorView);
+                // Log.v(TAG, "Removing main menu from window manager.");
+                if (st.isCompact) {
+                    sRotationWatcher.removeWindow(this);
+                }
+            }
+
+            if (doCallback) {
+                callOnPanelClosed(st.featureId, st, null);
+            }
+        }
+
+        st.isPrepared = false;
+        st.isHandled = false;
+        st.isOpen = false;
+
+        // This view is no longer shown, so null it out
+        st.shownPanelView = null;
+
+        if (st.isInExpandedMode) {
+            // Next time the menu opens, it should not be in expanded mode, so
+            // force a refresh of the decor
+            st.refreshDecorView = true;
+            st.isInExpandedMode = false;
+        }
+
+        if (mPreparedPanel == st) {
+            mPreparedPanel = null;
+            mPanelChordingKey = 0;
+        }
+!!!468610.java!!!	checkCloseActionMenu(inout menu : Menu) : void
+        if (mClosingActionMenu) {
+            return;
+        }
+
+        mClosingActionMenu = true;
+        mDecorContentParent.dismissPopups();
+        Callback cb = getCallback();
+        if (cb != null && !isDestroyed()) {
+            cb.onPanelClosed(FEATURE_ACTION_BAR, menu);
+        }
+        mClosingActionMenu = false;
+!!!468738.java!!!	togglePanel(in featureId : int, inout event : KeyEvent) : void
+        PanelFeatureState st = getPanelState(featureId, true);
+        if (st.isOpen) {
+            closePanel(st, true);
+        } else {
+            openPanel(st, event);
+        }
+!!!468866.java!!!	invalidatePanelMenu(in featureId : int) : void
+        mInvalidatePanelMenuFeatures |= 1 << featureId;
+
+        if (!mInvalidatePanelMenuPosted && mDecor != null) {
+            mDecor.postOnAnimation(mInvalidatePanelMenuRunnable);
+            mInvalidatePanelMenuPosted = true;
+        }
+!!!468994.java!!!	doPendingInvalidatePanelMenu() : void
+        if (mInvalidatePanelMenuPosted) {
+            mDecor.removeCallbacks(mInvalidatePanelMenuRunnable);
+            mInvalidatePanelMenuRunnable.run();
+        }
+!!!469122.java!!!	doInvalidatePanelMenu(in featureId : int) : void
+        PanelFeatureState st = getPanelState(featureId, true);
+        Bundle savedActionViewStates = null;
+        if (st.menu != null) {
+            savedActionViewStates = new Bundle();
+            st.menu.saveActionViewStates(savedActionViewStates);
+            if (savedActionViewStates.size() > 0) {
+                st.frozenActionViewState = savedActionViewStates;
+            }
+            // This will be started again when the panel is prepared.
+            st.menu.stopDispatchingItemsChanged();
+            st.menu.clear();
+        }
+        st.refreshMenuContent = true;
+        st.refreshDecorView = true;
+
+        // Prepare the options panel if we have an action bar
+        if ((featureId == FEATURE_ACTION_BAR || featureId == FEATURE_OPTIONS_PANEL)
+                && mDecorContentParent != null) {
+            st = getPanelState(Window.FEATURE_OPTIONS_PANEL, false);
+            if (st != null) {
+                st.isPrepared = false;
+                preparePanel(st, null);
+            }
+        }
+!!!469250.java!!!	onKeyDownPanel(in featureId : int, inout event : KeyEvent) : boolean
+        final int keyCode = event.getKeyCode();
+
+        if (event.getRepeatCount() == 0) {
+            // The panel key was pushed, so set the chording key
+            mPanelChordingKey = keyCode;
+
+            PanelFeatureState st = getPanelState(featureId, true);
+            if (!st.isOpen) {
+                return preparePanel(st, event);
+            }
+        }
+
+        return false;
+!!!469378.java!!!	onKeyUpPanel(in featureId : int, inout event : KeyEvent) : void
+        // The panel key was released, so clear the chording key
+        if (mPanelChordingKey != 0) {
+            mPanelChordingKey = 0;
+
+            if (event.isCanceled() || (mDecor != null && mDecor.mActionMode != null)) {
+                return;
+            }
+
+            boolean playSoundEffect = false;
+            final PanelFeatureState st = getPanelState(featureId, true);
+            if (featureId == FEATURE_OPTIONS_PANEL && mDecorContentParent != null &&
+                    mDecorContentParent.canShowOverflowMenu() &&
+                    !ViewConfiguration.get(getContext()).hasPermanentMenuKey()) {
+                if (!mDecorContentParent.isOverflowMenuShowing()) {
+                    if (!isDestroyed() && preparePanel(st, event)) {
+                        playSoundEffect = mDecorContentParent.showOverflowMenu();
+                    }
+                } else {
+                    playSoundEffect = mDecorContentParent.hideOverflowMenu();
+                }
+            } else {
+                if (st.isOpen || st.isHandled) {
+
+                    // Play the sound effect if the user closed an open menu (and not if
+                    // they just released a menu shortcut)
+                    playSoundEffect = st.isOpen;
+
+                    // Close menu
+                    closePanel(st, true);
+
+                } else if (st.isPrepared) {
+                    boolean show = true;
+                    if (st.refreshMenuContent) {
+                        // Something may have invalidated the menu since we prepared it.
+                        // Re-prepare it to refresh.
+                        st.isPrepared = false;
+                        show = preparePanel(st, event);
+                    }
+
+                    if (show) {
+                        // Write 'menu opened' to event log
+                        EventLog.writeEvent(50001, 0);
+
+                        // Show menu
+                        openPanel(st, event);
+
+                        playSoundEffect = true;
+                    }
+                }
+            }
+
+            if (playSoundEffect) {
+                AudioManager audioManager = (AudioManager) getContext().getSystemService(
+                        Context.AUDIO_SERVICE);
+                if (audioManager != null) {
+                    audioManager.playSoundEffect(AudioManager.FX_KEY_CLICK);
+                } else {
+                    Log.w(TAG, "Couldn't get audio manager");
+                }
+            }
+        }
+!!!469506.java!!!	closeAllPanels() : void
+        final ViewManager wm = getWindowManager();
+        if (wm == null) {
+            return;
+        }
+
+        final PanelFeatureState[] panels = mPanels;
+        final int N = panels != null ? panels.length : 0;
+        for (int i = 0; i < N; i++) {
+            final PanelFeatureState panel = panels[i];
+            if (panel != null) {
+                closePanel(panel, true);
+            }
+        }
+
+        closeContextMenu();
+!!!469634.java!!!	closeContextMenu() : void
+        if (mContextMenu != null) {
+            mContextMenu.close();
+            dismissContextMenu();
+        }
+!!!469762.java!!!	dismissContextMenu() : void
+        mContextMenu = null;
+
+        if (mContextMenuHelper != null) {
+            mContextMenuHelper.dismiss();
+            mContextMenuHelper = null;
+        }
+!!!469890.java!!!	performPanelShortcut(in featureId : int, in keyCode : int, inout event : KeyEvent, in flags : int) : boolean
+        return performPanelShortcut(getPanelState(featureId, true), keyCode, event, flags);
+!!!470018.java!!!	performPanelShortcut(inout st : PhoneWindow::PanelFeatureState, in keyCode : int, inout event : KeyEvent, in flags : int) : boolean
+        if (event.isSystem() || (st == null)) {
+            return false;
+        }
+
+        boolean handled = false;
+
+        // Only try to perform menu shortcuts if preparePanel returned true (possible false
+        // return value from application not wanting to show the menu).
+        if ((st.isPrepared || preparePanel(st, event)) && st.menu != null) {
+            // The menu is prepared now, perform the shortcut on it
+            handled = st.menu.performShortcut(keyCode, event, flags);
+        }
+
+        if (handled) {
+            // Mark as handled
+            st.isHandled = true;
+
+            // Only close down the menu if we don't have an action bar keeping it open.
+            if ((flags & Menu.FLAG_PERFORM_NO_CLOSE) == 0 && mDecorContentParent == null) {
+                closePanel(st, true);
+            }
+        }
+
+        return handled;
+!!!470146.java!!!	performPanelIdentifierAction(in featureId : int, in id : int, in flags : int) : boolean
+
+        PanelFeatureState st = getPanelState(featureId, true);
+        if (!preparePanel(st, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MENU))) {
+            return false;
+        }
+        if (st.menu == null) {
+            return false;
+        }
+
+        boolean res = st.menu.performIdentifierAction(id, flags);
+
+        // Only close down the menu if we don't have an action bar keeping it open.
+        if (mDecorContentParent == null) {
+            closePanel(st, true);
+        }
+
+        return res;
+!!!470274.java!!!	findMenuPanel(inout menu : Menu) : PhoneWindow::PanelFeatureState
+        final PanelFeatureState[] panels = mPanels;
+        final int N = panels != null ? panels.length : 0;
+        for (int i = 0; i < N; i++) {
+            final PanelFeatureState panel = panels[i];
+            if (panel != null && panel.menu == menu) {
+                return panel;
+            }
+        }
+        return null;
+!!!470402.java!!!	onMenuItemSelected(inout menu : MenuBuilder, inout item : MenuItem) : boolean
+        final Callback cb = getCallback();
+        if (cb != null && !isDestroyed()) {
+            final PanelFeatureState panel = findMenuPanel(menu.getRootMenu());
+            if (panel != null) {
+                return cb.onMenuItemSelected(panel.featureId, item);
+            }
+        }
+        return false;
+!!!470530.java!!!	onMenuModeChange(inout menu : MenuBuilder) : void
+        reopenMenu(true);
+!!!470658.java!!!	reopenMenu(inout toggleMenuMode : boolean) : void
+        if (mDecorContentParent != null && mDecorContentParent.canShowOverflowMenu() &&
+                (!ViewConfiguration.get(getContext()).hasPermanentMenuKey() ||
+                        mDecorContentParent.isOverflowMenuShowPending())) {
+            final Callback cb = getCallback();
+            if (!mDecorContentParent.isOverflowMenuShowing() || !toggleMenuMode) {
+                if (cb != null && !isDestroyed()) {
+                    // If we have a menu invalidation pending, do it now.
+                    if (mInvalidatePanelMenuPosted &&
+                            (mInvalidatePanelMenuFeatures & (1 << FEATURE_OPTIONS_PANEL)) != 0) {
+                        mDecor.removeCallbacks(mInvalidatePanelMenuRunnable);
+                        mInvalidatePanelMenuRunnable.run();
+                    }
+
+                    final PanelFeatureState st = getPanelState(FEATURE_OPTIONS_PANEL, true);
+
+                    // If we don't have a menu or we're waiting for a full content refresh,
+                    // forget it. This is a lingering event that no longer matters.
+                    if (st.menu != null && !st.refreshMenuContent &&
+                            cb.onPreparePanel(FEATURE_OPTIONS_PANEL, st.createdPanelView, st.menu)) {
+                        cb.onMenuOpened(FEATURE_ACTION_BAR, st.menu);
+                        mDecorContentParent.showOverflowMenu();
+                    }
+                }
+            } else {
+                mDecorContentParent.hideOverflowMenu();
+                if (cb != null && !isDestroyed()) {
+                    final PanelFeatureState st = getPanelState(FEATURE_OPTIONS_PANEL, true);
+                    cb.onPanelClosed(FEATURE_ACTION_BAR, st.menu);
+                }
+            }
+            return;
+        }
+
+        PanelFeatureState st = getPanelState(FEATURE_OPTIONS_PANEL, true);
+
+        // Save the future expanded mode state since closePanel will reset it
+        boolean newExpandedMode = toggleMenuMode ? !st.isInExpandedMode : st.isInExpandedMode;
+
+        st.refreshDecorView = true;
+        closePanel(st, false);
+
+        // Set the expanded mode state
+        st.isInExpandedMode = newExpandedMode;
+
+        openPanel(st, null);
+!!!470786.java!!!	initializePanelMenu(in st : PhoneWindow::PanelFeatureState) : boolean
+        Context context = getContext();
+
+        // If we have an action bar, initialize the menu with the right theme.
+        if ((st.featureId == FEATURE_OPTIONS_PANEL || st.featureId == FEATURE_ACTION_BAR) &&
+                mDecorContentParent != null) {
+            final TypedValue outValue = new TypedValue();
+            final Theme baseTheme = context.getTheme();
+            baseTheme.resolveAttribute(R.attr.actionBarTheme, outValue, true);
+
+            Theme widgetTheme = null;
+            if (outValue.resourceId != 0) {
+                widgetTheme = context.getResources().newTheme();
+                widgetTheme.setTo(baseTheme);
+                widgetTheme.applyStyle(outValue.resourceId, true);
+                widgetTheme.resolveAttribute(
+                        R.attr.actionBarWidgetTheme, outValue, true);
+            } else {
+                baseTheme.resolveAttribute(
+                        R.attr.actionBarWidgetTheme, outValue, true);
+            }
+
+            if (outValue.resourceId != 0) {
+                if (widgetTheme == null) {
+                    widgetTheme = context.getResources().newTheme();
+                    widgetTheme.setTo(baseTheme);
+                }
+                widgetTheme.applyStyle(outValue.resourceId, true);
+            }
+
+            if (widgetTheme != null) {
+                context = new ContextThemeWrapper(context, 0);
+                context.getTheme().setTo(widgetTheme);
+            }
+        }
+
+        final MenuBuilder menu = new MenuBuilder(context);
+        menu.setCallback(this);
+        st.setMenu(menu);
+
+        return true;
+!!!470914.java!!!	initializePanelDecor(inout st : PhoneWindow::PanelFeatureState) : boolean
+        st.decorView = new DecorView(getContext(), st.featureId);
+        st.gravity = Gravity.CENTER | Gravity.BOTTOM;
+        st.setStyle(getContext());
+        TypedArray a = getContext().obtainStyledAttributes(null,
+                R.styleable.Window, 0, st.listPresenterTheme);
+        final float elevation = a.getDimension(R.styleable.Window_windowElevation, 0);
+        if (elevation != 0) {
+            st.decorView.setElevation(elevation);
+        }
+        a.recycle();
+
+        return true;
+!!!471042.java!!!	getOptionsPanelGravity() : int
+        try {
+            return WindowManagerHolder.sWindowManager.getPreferredOptionsPanelGravity();
+        } catch (RemoteException ex) {
+            Log.e(TAG, "Couldn't getOptionsPanelGravity; using default", ex);
+            return Gravity.CENTER | Gravity.BOTTOM;
+        }
+!!!471170.java!!!	onOptionsPanelRotationChanged() : void
+        final PanelFeatureState st = getPanelState(FEATURE_OPTIONS_PANEL, false);
+        if (st == null) return;
+
+        final WindowManager.LayoutParams lp = st.decorView != null ?
+                (WindowManager.LayoutParams) st.decorView.getLayoutParams() : null;
+        if (lp != null) {
+            lp.gravity = getOptionsPanelGravity();
+            final ViewManager wm = getWindowManager();
+            if (wm != null) {
+                wm.updateViewLayout(st.decorView, lp);
+            }
+        }
+!!!471298.java!!!	initializePanelContent(inout st : PhoneWindow::PanelFeatureState) : boolean
+        if (st.createdPanelView != null) {
+            st.shownPanelView = st.createdPanelView;
+            return true;
+        }
+
+        if (st.menu == null) {
+            return false;
+        }
+
+        if (mPanelMenuPresenterCallback == null) {
+            mPanelMenuPresenterCallback = new PanelMenuPresenterCallback();
+        }
+
+        MenuView menuView = st.isInListMode()
+                ? st.getListMenuView(getContext(), mPanelMenuPresenterCallback)
+                : st.getIconMenuView(getContext(), mPanelMenuPresenterCallback);
+
+        st.shownPanelView = (View) menuView;
+
+        if (st.shownPanelView != null) {
+            // Use the menu View's default animations if it has any
+            final int defaultAnimations = menuView.getWindowAnimations();
+            if (defaultAnimations != 0) {
+                st.windowAnimations = defaultAnimations;
+            }
+            return true;
+        } else {
+            return false;
+        }
+!!!471426.java!!!	performContextMenuIdentifierAction(in id : int, in flags : int) : boolean
+        return (mContextMenu != null) ? mContextMenu.performIdentifierAction(id, flags) : false;
+!!!471554.java!!!	setBackgroundDrawable(inout drawable : Drawable) : void
+        if (drawable != mBackgroundDrawable || mBackgroundResource != 0) {
+            mBackgroundResource = 0;
+            mBackgroundDrawable = drawable;
+            if (mDecor != null) {
+                mDecor.setWindowBackground(drawable);
+            }
+            if (mBackgroundFallbackResource != 0) {
+                mDecor.setBackgroundFallback(drawable != null ? 0 : mBackgroundFallbackResource);
+            }
+        }
+!!!471682.java!!!	setFeatureDrawableResource(in featureId : int, in resId : int) : void
+        if (resId != 0) {
+            DrawableFeatureState st = getDrawableState(featureId, true);
+            if (st.resid != resId) {
+                st.resid = resId;
+                st.uri = null;
+                st.local = getContext().getDrawable(resId);
+                updateDrawable(featureId, st, false);
+            }
+        } else {
+            setFeatureDrawable(featureId, null);
+        }
+!!!471810.java!!!	setFeatureDrawableUri(in featureId : int, inout uri : Uri) : void
+        if (uri != null) {
+            DrawableFeatureState st = getDrawableState(featureId, true);
+            if (st.uri == null || !st.uri.equals(uri)) {
+                st.resid = 0;
+                st.uri = uri;
+                st.local = loadImageURI(uri);
+                updateDrawable(featureId, st, false);
+            }
+        } else {
+            setFeatureDrawable(featureId, null);
+        }
+!!!471938.java!!!	setFeatureDrawable(in featureId : int, inout drawable : Drawable) : void
+        DrawableFeatureState st = getDrawableState(featureId, true);
+        st.resid = 0;
+        st.uri = null;
+        if (st.local != drawable) {
+            st.local = drawable;
+            updateDrawable(featureId, st, false);
+        }
+!!!472066.java!!!	setFeatureDrawableAlpha(in featureId : int, in alpha : int) : void
+        DrawableFeatureState st = getDrawableState(featureId, true);
+        if (st.alpha != alpha) {
+            st.alpha = alpha;
+            updateDrawable(featureId, st, false);
+        }
+!!!472194.java!!!	setFeatureDefaultDrawable(in featureId : int, inout drawable : Drawable) : void
+        DrawableFeatureState st = getDrawableState(featureId, true);
+        if (st.def != drawable) {
+            st.def = drawable;
+            updateDrawable(featureId, st, false);
+        }
+!!!472322.java!!!	setFeatureInt(in featureId : int, in value : int) : void
+        // XXX Should do more management (as with drawable features) to
+        // deal with interactions between multiple window policies.
+        updateInt(featureId, value, false);
+!!!472450.java!!!	updateDrawable(in featureId : int, inout fromActive : boolean) : void
+        final DrawableFeatureState st = getDrawableState(featureId, false);
+        if (st != null) {
+            updateDrawable(featureId, st, fromActive);
+        }
+!!!472578.java!!!	onDrawableChanged(in featureId : int, inout drawable : Drawable, in alpha : int) : void
+        ImageView view;
+        if (featureId == FEATURE_LEFT_ICON) {
+            view = getLeftIconView();
+        } else if (featureId == FEATURE_RIGHT_ICON) {
+            view = getRightIconView();
+        } else {
+            return;
+        }
+
+        if (drawable != null) {
+            drawable.setAlpha(alpha);
+            view.setImageDrawable(drawable);
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.GONE);
+        }
+!!!472706.java!!!	onIntChanged(in featureId : int, in value : int) : void
+        if (featureId == FEATURE_PROGRESS || featureId == FEATURE_INDETERMINATE_PROGRESS) {
+            updateProgressBars(value);
+        } else if (featureId == FEATURE_CUSTOM_TITLE) {
+            FrameLayout titleContainer = (FrameLayout) findViewById(R.id.title_container);
+            if (titleContainer != null) {
+                mLayoutInflater.inflate(value, titleContainer);
+            }
+        }
+!!!472834.java!!!	updateProgressBars(in value : int) : void
+        ProgressBar circularProgressBar = getCircularProgressBar(true);
+        ProgressBar horizontalProgressBar = getHorizontalProgressBar(true);
+
+        final int features = getLocalFeatures();
+        if (value == PROGRESS_VISIBILITY_ON) {
+            if ((features & (1 << FEATURE_PROGRESS)) != 0) {
+                if (horizontalProgressBar != null) {
+                    int level = horizontalProgressBar.getProgress();
+                    int visibility = (horizontalProgressBar.isIndeterminate() || level < 10000) ?
+                            View.VISIBLE : View.INVISIBLE;
+                    horizontalProgressBar.setVisibility(visibility);
+                } else {
+                    Log.e(TAG, "Horizontal progress bar not located in current window decor");
+                }
+            }
+            if ((features & (1 << FEATURE_INDETERMINATE_PROGRESS)) != 0) {
+                if (circularProgressBar != null) {
+                    circularProgressBar.setVisibility(View.VISIBLE);
+                } else {
+                    Log.e(TAG, "Circular progress bar not located in current window decor");
+                }
+            }
+        } else if (value == PROGRESS_VISIBILITY_OFF) {
+            if ((features & (1 << FEATURE_PROGRESS)) != 0) {
+                if (horizontalProgressBar != null) {
+                    horizontalProgressBar.setVisibility(View.GONE);
+                } else {
+                    Log.e(TAG, "Horizontal progress bar not located in current window decor");
+                }
+            }
+            if ((features & (1 << FEATURE_INDETERMINATE_PROGRESS)) != 0) {
+                if (circularProgressBar != null) {
+                    circularProgressBar.setVisibility(View.GONE);
+                } else {
+                    Log.e(TAG, "Circular progress bar not located in current window decor");
+                }
+            }
+        } else if (value == PROGRESS_INDETERMINATE_ON) {
+            if (horizontalProgressBar != null) {
+                horizontalProgressBar.setIndeterminate(true);
+            } else {
+                Log.e(TAG, "Horizontal progress bar not located in current window decor");
+            }
+        } else if (value == PROGRESS_INDETERMINATE_OFF) {
+            if (horizontalProgressBar != null) {
+                horizontalProgressBar.setIndeterminate(false);
+            } else {
+                Log.e(TAG, "Horizontal progress bar not located in current window decor");
+            }
+        } else if (PROGRESS_START <= value && value <= PROGRESS_END) {
+            // We want to set the progress value before testing for visibility
+            // so that when the progress bar becomes visible again, it has the
+            // correct level.
+            if (horizontalProgressBar != null) {
+                horizontalProgressBar.setProgress(value - PROGRESS_START);
+            } else {
+                Log.e(TAG, "Horizontal progress bar not located in current window decor");
+            }
+
+            if (value < PROGRESS_END) {
+                showProgressBars(horizontalProgressBar, circularProgressBar);
+            } else {
+                hideProgressBars(horizontalProgressBar, circularProgressBar);
+            }
+        } else if (PROGRESS_SECONDARY_START <= value && value <= PROGRESS_SECONDARY_END) {
+            if (horizontalProgressBar != null) {
+                horizontalProgressBar.setSecondaryProgress(value - PROGRESS_SECONDARY_START);
+            } else {
+                Log.e(TAG, "Horizontal progress bar not located in current window decor");
+            }
+
+            showProgressBars(horizontalProgressBar, circularProgressBar);
+        }
+
+!!!472962.java!!!	showProgressBars(inout horizontalProgressBar : ProgressBar, inout spinnyProgressBar : ProgressBar) : void
+        final int features = getLocalFeatures();
+        if ((features & (1 << FEATURE_INDETERMINATE_PROGRESS)) != 0 &&
+                spinnyProgressBar != null && spinnyProgressBar.getVisibility() == View.INVISIBLE) {
+            spinnyProgressBar.setVisibility(View.VISIBLE);
+        }
+        // Only show the progress bars if the primary progress is not complete
+        if ((features & (1 << FEATURE_PROGRESS)) != 0 && horizontalProgressBar != null &&
+                horizontalProgressBar.getProgress() < 10000) {
+            horizontalProgressBar.setVisibility(View.VISIBLE);
+        }
+!!!473090.java!!!	hideProgressBars(inout horizontalProgressBar : ProgressBar, inout spinnyProgressBar : ProgressBar) : void
+        final int features = getLocalFeatures();
+        Animation anim = AnimationUtils.loadAnimation(getContext(), R.anim.fade_out);
+        anim.setDuration(1000);
+        if ((features & (1 << FEATURE_INDETERMINATE_PROGRESS)) != 0 &&
+                spinnyProgressBar != null &&
+                spinnyProgressBar.getVisibility() == View.VISIBLE) {
+            spinnyProgressBar.startAnimation(anim);
+            spinnyProgressBar.setVisibility(View.INVISIBLE);
+        }
+        if ((features & (1 << FEATURE_PROGRESS)) != 0 && horizontalProgressBar != null &&
+                horizontalProgressBar.getVisibility() == View.VISIBLE) {
+            horizontalProgressBar.startAnimation(anim);
+            horizontalProgressBar.setVisibility(View.INVISIBLE);
+        }
+!!!473218.java!!!	setIcon(in resId : int) : void
+        mIconRes = resId;
+        mResourcesSetFlags |= FLAG_RESOURCE_SET_ICON;
+        mResourcesSetFlags &= ~FLAG_RESOURCE_SET_ICON_FALLBACK;
+        if (mDecorContentParent != null) {
+            mDecorContentParent.setIcon(resId);
+        }
+!!!473346.java!!!	setDefaultIcon(in resId : int) : void
+        if ((mResourcesSetFlags & FLAG_RESOURCE_SET_ICON) != 0) {
+            return;
+        }
+        mIconRes = resId;
+        if (mDecorContentParent != null && (!mDecorContentParent.hasIcon() ||
+                (mResourcesSetFlags & FLAG_RESOURCE_SET_ICON_FALLBACK) != 0)) {
+            if (resId != 0) {
+                mDecorContentParent.setIcon(resId);
+                mResourcesSetFlags &= ~FLAG_RESOURCE_SET_ICON_FALLBACK;
+            } else {
+                mDecorContentParent.setIcon(
+                        getContext().getPackageManager().getDefaultActivityIcon());
+                mResourcesSetFlags |= FLAG_RESOURCE_SET_ICON_FALLBACK;
+            }
+        }
+!!!473474.java!!!	setLogo(in resId : int) : void
+        mLogoRes = resId;
+        mResourcesSetFlags |= FLAG_RESOURCE_SET_LOGO;
+        if (mDecorContentParent != null) {
+            mDecorContentParent.setLogo(resId);
+        }
+!!!473602.java!!!	setDefaultLogo(in resId : int) : void
+        if ((mResourcesSetFlags & FLAG_RESOURCE_SET_LOGO) != 0) {
+            return;
+        }
+        mLogoRes = resId;
+        if (mDecorContentParent != null && !mDecorContentParent.hasLogo()) {
+            mDecorContentParent.setLogo(resId);
+        }
+!!!473730.java!!!	setLocalFocus(inout hasFocus : boolean, inout inTouchMode : boolean) : void
+        getViewRootImpl().windowFocusChanged(hasFocus, inTouchMode);
+
+!!!473858.java!!!	injectInputEvent(inout event : InputEvent) : void
+        getViewRootImpl().dispatchInputEvent(event);
+!!!473986.java!!!	getViewRootImpl() : ViewRootImpl
+        if (mDecor != null) {
+            ViewRootImpl viewRootImpl = mDecor.getViewRootImpl();
+            if (viewRootImpl != null) {
+                return viewRootImpl;
+            }
+        }
+        throw new IllegalStateException("view not added");
+!!!474114.java!!!	takeKeyEvents(inout get : boolean) : void
+        mDecor.setFocusable(get);
+!!!474242.java!!!	superDispatchKeyEvent(inout event : KeyEvent) : boolean
+        return mDecor.superDispatchKeyEvent(event);
+!!!474370.java!!!	superDispatchKeyShortcutEvent(inout event : KeyEvent) : boolean
+        return mDecor.superDispatchKeyShortcutEvent(event);
+!!!474498.java!!!	superDispatchTouchEvent(inout event : MotionEvent) : boolean
+        return mDecor.superDispatchTouchEvent(event);
+!!!474626.java!!!	superDispatchTrackballEvent(inout event : MotionEvent) : boolean
+        return mDecor.superDispatchTrackballEvent(event);
+!!!474754.java!!!	superDispatchGenericMotionEvent(inout event : MotionEvent) : boolean
+        return mDecor.superDispatchGenericMotionEvent(event);
+!!!474882.java!!!	onKeyDown(in featureId : int, in keyCode : int, inout event : KeyEvent) : boolean
+        /* ****************************************************************************
+         * HOW TO DECIDE WHERE YOUR KEY HANDLING GOES.
+         *
+         * If your key handling must happen before the app gets a crack at the event,
+         * it goes in PhoneWindowManager.
+         *
+         * If your key handling should happen in all windows, and does not depend on
+         * the state of the current application, other than that the current
+         * application can override the behavior by handling the event itself, it
+         * should go in PhoneFallbackEventHandler.
+         *
+         * Only if your handling depends on the window, and the fact that it has
+         * a DecorView, should it go here.
+         * ****************************************************************************/
+
+        final KeyEvent.DispatcherState dispatcher =
+                mDecor != null ? mDecor.getKeyDispatcherState() : null;
+        //Log.i(TAG, "Key down: repeat=" + event.getRepeatCount()
+        //        + " flags=0x" + Integer.toHexString(event.getFlags()));
+
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+            case KeyEvent.KEYCODE_VOLUME_DOWN: {
+                int direction = keyCode == KeyEvent.KEYCODE_VOLUME_UP ? AudioManager.ADJUST_RAISE
+                        : AudioManager.ADJUST_LOWER;
+                // If we have a session send it the volume command, otherwise
+                // use the suggested stream.
+                if (mMediaController != null) {
+                    mMediaController.adjustVolume(direction, AudioManager.FLAG_SHOW_UI);
+                } else {
+                    MediaSessionLegacyHelper.getHelper(getContext()).sendAdjustVolumeBy(
+                            mVolumeControlStreamType, direction,
+                            AudioManager.FLAG_SHOW_UI | AudioManager.FLAG_VIBRATE);
+                }
+                return true;
+            }
+            case KeyEvent.KEYCODE_VOLUME_MUTE: {
+                getAudioManager().handleKeyDown(event, mVolumeControlStreamType);
+                return true;
+            }
+            // These are all the recognized media key codes in
+            // KeyEvent.isMediaKey()
+            case KeyEvent.KEYCODE_MEDIA_PLAY:
+            case KeyEvent.KEYCODE_MEDIA_PAUSE:
+            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+            case KeyEvent.KEYCODE_MUTE:
+            case KeyEvent.KEYCODE_HEADSETHOOK:
+            case KeyEvent.KEYCODE_MEDIA_STOP:
+            case KeyEvent.KEYCODE_MEDIA_NEXT:
+            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+            case KeyEvent.KEYCODE_MEDIA_REWIND:
+            case KeyEvent.KEYCODE_MEDIA_RECORD:
+            case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD: {
+                if (mMediaController != null) {
+                    if (mMediaController.dispatchMediaButtonEvent(event)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            case KeyEvent.KEYCODE_MENU: {
+                onKeyDownPanel((featureId < 0) ? FEATURE_OPTIONS_PANEL : featureId, event);
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_BACK: {
+                if (event.getRepeatCount() > 0) break;
+                if (featureId < 0) break;
+                // Currently don't do anything with long press.
+                if (dispatcher != null) {
+                    dispatcher.startTracking(event, this);
+                }
+                return true;
+            }
+
+        }
+
+        return false;
+!!!475010.java!!!	getKeyguardManager() : KeyguardManager
+        if (mKeyguardManager == null) {
+            mKeyguardManager = (KeyguardManager) getContext().getSystemService(
+                    Context.KEYGUARD_SERVICE);
+        }
+        return mKeyguardManager;
+!!!475138.java!!!	getAudioManager() : AudioManager
+        if (mAudioManager == null) {
+            mAudioManager = (AudioManager)getContext().getSystemService(Context.AUDIO_SERVICE);
+        }
+        return mAudioManager;
+!!!475266.java!!!	onKeyUp(in featureId : int, in keyCode : int, inout event : KeyEvent) : boolean
+        final KeyEvent.DispatcherState dispatcher =
+                mDecor != null ? mDecor.getKeyDispatcherState() : null;
+        if (dispatcher != null) {
+            dispatcher.handleUpEvent(event);
+        }
+        //Log.i(TAG, "Key up: repeat=" + event.getRepeatCount()
+        //        + " flags=0x" + Integer.toHexString(event.getFlags()));
+
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+            case KeyEvent.KEYCODE_VOLUME_DOWN: {
+                // If we have a session send it the volume command, otherwise
+                // use the suggested stream.
+                if (mMediaController != null) {
+                    mMediaController.adjustVolume(0, AudioManager.FLAG_PLAY_SOUND
+                            | AudioManager.FLAG_VIBRATE);
+                } else {
+                    MediaSessionLegacyHelper.getHelper(getContext()).sendAdjustVolumeBy(
+                            mVolumeControlStreamType, 0,
+                            AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_VIBRATE);
+                }
+                return true;
+            }
+            case KeyEvent.KEYCODE_VOLUME_MUTE: {
+                // Similar code is in PhoneFallbackEventHandler in case the window
+                // doesn't have one of these.  In this case, we execute it here and
+                // eat the event instead, because we have mVolumeControlStreamType
+                // and they don't.
+                getAudioManager().handleKeyUp(event, mVolumeControlStreamType);
+                return true;
+            }
+            // These are all the recognized media key codes in
+            // KeyEvent.isMediaKey()
+            case KeyEvent.KEYCODE_MEDIA_PLAY:
+            case KeyEvent.KEYCODE_MEDIA_PAUSE:
+            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+            case KeyEvent.KEYCODE_MUTE:
+            case KeyEvent.KEYCODE_HEADSETHOOK:
+            case KeyEvent.KEYCODE_MEDIA_STOP:
+            case KeyEvent.KEYCODE_MEDIA_NEXT:
+            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+            case KeyEvent.KEYCODE_MEDIA_REWIND:
+            case KeyEvent.KEYCODE_MEDIA_RECORD:
+            case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD: {
+                if (mMediaController != null) {
+                    if (mMediaController.dispatchMediaButtonEvent(event)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            case KeyEvent.KEYCODE_MENU: {
+                onKeyUpPanel(featureId < 0 ? FEATURE_OPTIONS_PANEL : featureId,
+                        event);
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_BACK: {
+                if (featureId < 0) break;
+                if (event.isTracking() && !event.isCanceled()) {
+                    if (featureId == FEATURE_OPTIONS_PANEL) {
+                        PanelFeatureState st = getPanelState(featureId, false);
+                        if (st != null && st.isInExpandedMode) {
+                            // If the user is in an expanded menu and hits back, it
+                            // should go back to the icon menu
+                            reopenMenu(true);
+                            return true;
+                        }
+                    }
+                    closePanel(featureId);
+                    return true;
+                }
+                break;
+            }
+
+            case KeyEvent.KEYCODE_SEARCH: {
+                /*
+                 * Do this in onKeyUp since the Search key is also used for
+                 * chording quick launch shortcuts.
+                 */
+                if (getKeyguardManager().inKeyguardRestrictedInputMode()) {
+                    break;
+                }
+                if (event.isTracking() && !event.isCanceled()) {
+                    launchDefaultSearch();
+                }
+                return true;
+            }
+        }
+
+        return false;
+!!!475522.java!!!	getDecorView() : View
+        if (mDecor == null) {
+            installDecor();
+        }
+        return mDecor;
+!!!475650.java!!!	peekDecorView() : View
+        return mDecor;
+!!!475778.java!!!	saveHierarchyState() : Bundle
+        Bundle outState = new Bundle();
+        if (mContentParent == null) {
+            return outState;
+        }
+
+        SparseArray<Parcelable> states = new SparseArray<Parcelable>();
+        mContentParent.saveHierarchyState(states);
+        outState.putSparseParcelableArray(VIEWS_TAG, states);
+
+        // save the focused view id
+        View focusedView = mContentParent.findFocus();
+        if (focusedView != null) {
+            if (focusedView.getId() != View.NO_ID) {
+                outState.putInt(FOCUSED_ID_TAG, focusedView.getId());
+            } else {
+                if (false) {
+                    Log.d(TAG, "couldn't save which view has focus because the focused view "
+                            + focusedView + " has no id.");
+                }
+            }
+        }
+
+        // save the panels
+        SparseArray<Parcelable> panelStates = new SparseArray<Parcelable>();
+        savePanelState(panelStates);
+        if (panelStates.size() > 0) {
+            outState.putSparseParcelableArray(PANELS_TAG, panelStates);
+        }
+
+        if (mDecorContentParent != null) {
+            SparseArray<Parcelable> actionBarStates = new SparseArray<Parcelable>();
+            mDecorContentParent.saveToolbarHierarchyState(actionBarStates);
+            outState.putSparseParcelableArray(ACTION_BAR_TAG, actionBarStates);
+        }
+
+        return outState;
+!!!475906.java!!!	restoreHierarchyState(inout savedInstanceState : Bundle) : void
+        if (mContentParent == null) {
+            return;
+        }
+
+        SparseArray<Parcelable> savedStates
+                = savedInstanceState.getSparseParcelableArray(VIEWS_TAG);
+        if (savedStates != null) {
+            mContentParent.restoreHierarchyState(savedStates);
+        }
+
+        // restore the focused view
+        int focusedViewId = savedInstanceState.getInt(FOCUSED_ID_TAG, View.NO_ID);
+        if (focusedViewId != View.NO_ID) {
+            View needsFocus = mContentParent.findViewById(focusedViewId);
+            if (needsFocus != null) {
+                needsFocus.requestFocus();
+            } else {
+                Log.w(TAG,
+                        "Previously focused view reported id " + focusedViewId
+                                + " during save, but can't be found during restore.");
+            }
+        }
+
+        // restore the panels
+        SparseArray<Parcelable> panelStates = savedInstanceState.getSparseParcelableArray(PANELS_TAG);
+        if (panelStates != null) {
+            restorePanelState(panelStates);
+        }
+
+        if (mDecorContentParent != null) {
+            SparseArray<Parcelable> actionBarStates =
+                    savedInstanceState.getSparseParcelableArray(ACTION_BAR_TAG);
+            if (actionBarStates != null) {
+                doPendingInvalidatePanelMenu();
+                mDecorContentParent.restoreToolbarHierarchyState(actionBarStates);
+            } else {
+                Log.w(TAG, "Missing saved instance states for action bar views! " +
+                        "State will not be restored.");
+            }
+        }
+!!!476034.java!!!	savePanelState(inout icicles : SparseArray<Parcelable>) : void
+        PanelFeatureState[] panels = mPanels;
+        if (panels == null) {
+            return;
+        }
+
+        for (int curFeatureId = panels.length - 1; curFeatureId >= 0; curFeatureId--) {
+            if (panels[curFeatureId] != null) {
+                icicles.put(curFeatureId, panels[curFeatureId].onSaveInstanceState());
+            }
+        }
+!!!476162.java!!!	restorePanelState(inout icicles : SparseArray<Parcelable>) : void
+        PanelFeatureState st;
+        int curFeatureId;
+        for (int i = icicles.size() - 1; i >= 0; i--) {
+            curFeatureId = icicles.keyAt(i);
+            st = getPanelState(curFeatureId, false /* required */);
+            if (st == null) {
+                // The panel must not have been required, and is currently not around, skip it
+                continue;
+            }
+
+            st.onRestoreInstanceState(icicles.get(curFeatureId));
+            invalidatePanelMenu(curFeatureId);
+        }
+
+        /*
+         * Implementation note: call openPanelsAfterRestore later to actually open the
+         * restored panels.
+         */
+!!!476290.java!!!	openPanelsAfterRestore() : void
+        PanelFeatureState[] panels = mPanels;
+
+        if (panels == null) {
+            return;
+        }
+
+        PanelFeatureState st;
+        for (int i = panels.length - 1; i >= 0; i--) {
+            st = panels[i];
+            // We restore the panel if it was last open; we skip it if it
+            // now is open, to avoid a race condition if the user immediately
+            // opens it when we are resuming.
+            if (st != null) {
+                st.applyFrozenState();
+                if (!st.isOpen && st.wasLastOpen) {
+                    st.isInExpandedMode = st.wasLastExpanded;
+                    openPanel(st, null);
+                }
+            }
+        }
+!!!483714.java!!!	generateDecor() : PhoneWindow::DecorView
+        return new DecorView(getContext(), -1);
+!!!483842.java!!!	setFeatureFromAttrs(in featureId : int, inout attrs : TypedArray, in drawableAttr : int, in alphaAttr : int) : void
+        Drawable d = attrs.getDrawable(drawableAttr);
+        if (d != null) {
+            requestFeature(featureId);
+            setFeatureDefaultDrawable(featureId, d);
+        }
+        if ((getFeatures() & (1 << featureId)) != 0) {
+            int alpha = attrs.getInt(alphaAttr, -1);
+            if (alpha >= 0) {
+                setFeatureDrawableAlpha(featureId, alpha);
+            }
+        }
+!!!483970.java!!!	generateLayout(inout decor : PhoneWindow::DecorView) : ViewGroup
+        // Apply data from current theme.
+
+        TypedArray a = getWindowStyle();
+
+        if (false) {
+            System.out.println("From style:");
+            String s = "Attrs:";
+            for (int i = 0; i < R.styleable.Window.length; i++) {
+                s = s + " " + Integer.toHexString(R.styleable.Window[i]) + "="
+                        + a.getString(i);
+            }
+            System.out.println(s);
+        }
+
+        mIsFloating = a.getBoolean(R.styleable.Window_windowIsFloating, false);
+        int flagsToUpdate = (FLAG_LAYOUT_IN_SCREEN|FLAG_LAYOUT_INSET_DECOR)
+                & (~getForcedWindowFlags());
+        if (mIsFloating) {
+            setLayout(WRAP_CONTENT, WRAP_CONTENT);
+            setFlags(0, flagsToUpdate);
+        } else {
+            setFlags(FLAG_LAYOUT_IN_SCREEN|FLAG_LAYOUT_INSET_DECOR, flagsToUpdate);
+        }
+
+        if (a.getBoolean(R.styleable.Window_windowNoTitle, false)) {
+            requestFeature(FEATURE_NO_TITLE);
+        } else if (a.getBoolean(R.styleable.Window_windowActionBar, false)) {
+            // Don't allow an action bar if there is no title.
+            requestFeature(FEATURE_ACTION_BAR);
+        }
+
+        if (a.getBoolean(R.styleable.Window_windowActionBarOverlay, false)) {
+            requestFeature(FEATURE_ACTION_BAR_OVERLAY);
+        }
+
+        if (a.getBoolean(R.styleable.Window_windowActionModeOverlay, false)) {
+            requestFeature(FEATURE_ACTION_MODE_OVERLAY);
+        }
+
+        if (a.getBoolean(R.styleable.Window_windowSwipeToDismiss, false)) {
+            requestFeature(FEATURE_SWIPE_TO_DISMISS);
+        }
+
+        if (a.getBoolean(R.styleable.Window_windowFullscreen, false)) {
+            setFlags(FLAG_FULLSCREEN, FLAG_FULLSCREEN & (~getForcedWindowFlags()));
+        }
+
+        if (a.getBoolean(R.styleable.Window_windowTranslucentStatus,
+                false)) {
+            setFlags(FLAG_TRANSLUCENT_STATUS, FLAG_TRANSLUCENT_STATUS
+                    & (~getForcedWindowFlags()));
+        }
+
+        if (a.getBoolean(R.styleable.Window_windowTranslucentNavigation,
+                false)) {
+            setFlags(FLAG_TRANSLUCENT_NAVIGATION, FLAG_TRANSLUCENT_NAVIGATION
+                    & (~getForcedWindowFlags()));
+        }
+
+        if (a.getBoolean(R.styleable.Window_windowOverscan, false)) {
+            setFlags(FLAG_LAYOUT_IN_OVERSCAN, FLAG_LAYOUT_IN_OVERSCAN&(~getForcedWindowFlags()));
+        }
+
+        if (a.getBoolean(R.styleable.Window_windowShowWallpaper, false)) {
+            setFlags(FLAG_SHOW_WALLPAPER, FLAG_SHOW_WALLPAPER&(~getForcedWindowFlags()));
+        }
+
+        if (a.getBoolean(R.styleable.Window_windowEnableSplitTouch,
+                getContext().getApplicationInfo().targetSdkVersion
+                        >= android.os.Build.VERSION_CODES.HONEYCOMB)) {
+            setFlags(FLAG_SPLIT_TOUCH, FLAG_SPLIT_TOUCH&(~getForcedWindowFlags()));
+        }
+
+        a.getValue(R.styleable.Window_windowMinWidthMajor, mMinWidthMajor);
+        a.getValue(R.styleable.Window_windowMinWidthMinor, mMinWidthMinor);
+        if (a.hasValue(R.styleable.Window_windowFixedWidthMajor)) {
+            if (mFixedWidthMajor == null) mFixedWidthMajor = new TypedValue();
+            a.getValue(R.styleable.Window_windowFixedWidthMajor,
+                    mFixedWidthMajor);
+        }
+        if (a.hasValue(R.styleable.Window_windowFixedWidthMinor)) {
+            if (mFixedWidthMinor == null) mFixedWidthMinor = new TypedValue();
+            a.getValue(R.styleable.Window_windowFixedWidthMinor,
+                    mFixedWidthMinor);
+        }
+        if (a.hasValue(R.styleable.Window_windowFixedHeightMajor)) {
+            if (mFixedHeightMajor == null) mFixedHeightMajor = new TypedValue();
+            a.getValue(R.styleable.Window_windowFixedHeightMajor,
+                    mFixedHeightMajor);
+        }
+        if (a.hasValue(R.styleable.Window_windowFixedHeightMinor)) {
+            if (mFixedHeightMinor == null) mFixedHeightMinor = new TypedValue();
+            a.getValue(R.styleable.Window_windowFixedHeightMinor,
+                    mFixedHeightMinor);
+        }
+        if (a.getBoolean(R.styleable.Window_windowContentTransitions, false)) {
+            requestFeature(FEATURE_CONTENT_TRANSITIONS);
+        }
+        if (a.getBoolean(R.styleable.Window_windowActivityTransitions, false)) {
+            requestFeature(FEATURE_ACTIVITY_TRANSITIONS);
+        }
+
+        final WindowManager windowService = (WindowManager) getContext().getSystemService(
+                Context.WINDOW_SERVICE);
+        if (windowService != null) {
+            final Display display = windowService.getDefaultDisplay();
+            final boolean shouldUseBottomOutset =
+                    display.getDisplayId() == Display.DEFAULT_DISPLAY
+                            || (getForcedWindowFlags() & FLAG_FULLSCREEN) != 0;
+            if (shouldUseBottomOutset && a.hasValue(R.styleable.Window_windowOutsetBottom)) {
+                if (mOutsetBottom == null) mOutsetBottom = new TypedValue();
+                a.getValue(R.styleable.Window_windowOutsetBottom,
+                        mOutsetBottom);
+            }
+        }
+
+        final Context context = getContext();
+        final int targetSdk = context.getApplicationInfo().targetSdkVersion;
+        final boolean targetPreHoneycomb = targetSdk < android.os.Build.VERSION_CODES.HONEYCOMB;
+        final boolean targetPreIcs = targetSdk < android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+        final boolean targetPreL = targetSdk < android.os.Build.VERSION_CODES.LOLLIPOP;
+        final boolean targetHcNeedsOptions = context.getResources().getBoolean(
+                R.bool.target_honeycomb_needs_options_menu);
+        final boolean noActionBar = !hasFeature(FEATURE_ACTION_BAR) || hasFeature(FEATURE_NO_TITLE);
+
+        if (targetPreHoneycomb || (targetPreIcs && targetHcNeedsOptions && noActionBar)) {
+            addFlags(WindowManager.LayoutParams.FLAG_NEEDS_MENU_KEY);
+        } else {
+            clearFlags(WindowManager.LayoutParams.FLAG_NEEDS_MENU_KEY);
+        }
+
+        // Non-floating windows on high end devices must put up decor beneath the system bars and
+        // therefore must know about visibility changes of those.
+        if (!mIsFloating && ActivityManager.isHighEndGfx()) {
+            if (!targetPreL && a.getBoolean(
+                    R.styleable.Window_windowDrawsSystemBarBackgrounds,
+                    false)) {
+                setFlags(FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS,
+                        FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS & ~getForcedWindowFlags());
+            }
+        }
+        if (!mForcedStatusBarColor) {
+            mStatusBarColor = a.getColor(R.styleable.Window_statusBarColor, 0xFF000000);
+        }
+        if (!mForcedNavigationBarColor) {
+            mNavigationBarColor = a.getColor(R.styleable.Window_navigationBarColor, 0xFF000000);
+        }
+
+        if (mAlwaysReadCloseOnTouchAttr || getContext().getApplicationInfo().targetSdkVersion
+                >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+            if (a.getBoolean(
+                    R.styleable.Window_windowCloseOnTouchOutside,
+                    false)) {
+                setCloseOnTouchOutsideIfNotSet(true);
+            }
+        }
+
+        WindowManager.LayoutParams params = getAttributes();
+
+        if (!hasSoftInputMode()) {
+            params.softInputMode = a.getInt(
+                    R.styleable.Window_windowSoftInputMode,
+                    params.softInputMode);
+        }
+
+        if (a.getBoolean(R.styleable.Window_backgroundDimEnabled,
+                mIsFloating)) {
+            /* All dialogs should have the window dimmed */
+            if ((getForcedWindowFlags()&WindowManager.LayoutParams.FLAG_DIM_BEHIND) == 0) {
+                params.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+            }
+            if (!haveDimAmount()) {
+                params.dimAmount = a.getFloat(
+                        android.R.styleable.Window_backgroundDimAmount, 0.5f);
+            }
+        }
+
+        if (params.windowAnimations == 0) {
+            params.windowAnimations = a.getResourceId(
+                    R.styleable.Window_windowAnimationStyle, 0);
+        }
+
+        // The rest are only done if this window is not embedded; otherwise,
+        // the values are inherited from our container.
+        if (getContainer() == null) {
+            if (mBackgroundDrawable == null) {
+                if (mBackgroundResource == 0) {
+                    mBackgroundResource = a.getResourceId(
+                            R.styleable.Window_windowBackground, 0);
+                }
+                if (mFrameResource == 0) {
+                    mFrameResource = a.getResourceId(R.styleable.Window_windowFrame, 0);
+                }
+                mBackgroundFallbackResource = a.getResourceId(
+                        R.styleable.Window_windowBackgroundFallback, 0);
+                if (false) {
+                    System.out.println("Background: "
+                            + Integer.toHexString(mBackgroundResource) + " Frame: "
+                            + Integer.toHexString(mFrameResource));
+                }
+            }
+            mElevation = a.getDimension(R.styleable.Window_windowElevation, 0);
+            mClipToOutline = a.getBoolean(R.styleable.Window_windowClipToOutline, false);
+            mTextColor = a.getColor(R.styleable.Window_textColor, Color.TRANSPARENT);
+        }
+
+        // Inflate the window decor.
+
+        int layoutResource;
+        int features = getLocalFeatures();
+        // System.out.println("Features: 0x" + Integer.toHexString(features));
+        if ((features & (1 << FEATURE_SWIPE_TO_DISMISS)) != 0) {
+            layoutResource = R.layout.screen_swipe_dismiss;
+        } else if ((features & ((1 << FEATURE_LEFT_ICON) | (1 << FEATURE_RIGHT_ICON))) != 0) {
+            if (mIsFloating) {
+                TypedValue res = new TypedValue();
+                getContext().getTheme().resolveAttribute(
+                        R.attr.dialogTitleIconsDecorLayout, res, true);
+                layoutResource = res.resourceId;
+            } else {
+                layoutResource = R.layout.screen_title_icons;
+            }
+            // XXX Remove this once action bar supports these features.
+            removeFeature(FEATURE_ACTION_BAR);
+            // System.out.println("Title Icons!");
+        } else if ((features & ((1 << FEATURE_PROGRESS) | (1 << FEATURE_INDETERMINATE_PROGRESS))) != 0
+                && (features & (1 << FEATURE_ACTION_BAR)) == 0) {
+            // Special case for a window with only a progress bar (and title).
+            // XXX Need to have a no-title version of embedded windows.
+            layoutResource = R.layout.screen_progress;
+            // System.out.println("Progress!");
+        } else if ((features & (1 << FEATURE_CUSTOM_TITLE)) != 0) {
+            // Special case for a window with a custom title.
+            // If the window is floating, we need a dialog layout
+            if (mIsFloating) {
+                TypedValue res = new TypedValue();
+                getContext().getTheme().resolveAttribute(
+                        R.attr.dialogCustomTitleDecorLayout, res, true);
+                layoutResource = res.resourceId;
+            } else {
+                layoutResource = R.layout.screen_custom_title;
+            }
+            // XXX Remove this once action bar supports these features.
+            removeFeature(FEATURE_ACTION_BAR);
+        } else if ((features & (1 << FEATURE_NO_TITLE)) == 0) {
+            // If no other features and not embedded, only need a title.
+            // If the window is floating, we need a dialog layout
+            if (mIsFloating) {
+                TypedValue res = new TypedValue();
+                getContext().getTheme().resolveAttribute(
+                        R.attr.dialogTitleDecorLayout, res, true);
+                layoutResource = res.resourceId;
+            } else if ((features & (1 << FEATURE_ACTION_BAR)) != 0) {
+                layoutResource = a.getResourceId(
+                        R.styleable.Window_windowActionBarFullscreenDecorLayout,
+                        R.layout.screen_action_bar);
+            } else {
+                layoutResource = R.layout.screen_title;
+            }
+            // System.out.println("Title!");
+        } else if ((features & (1 << FEATURE_ACTION_MODE_OVERLAY)) != 0) {
+            layoutResource = R.layout.screen_simple_overlay_action_mode;
+        } else {
+            // Embedded, so no decoration is needed.
+            layoutResource = R.layout.screen_simple;
+            // System.out.println("Simple!");
+        }
+
+        mDecor.startChanging();
+
+        View in = mLayoutInflater.inflate(layoutResource, null);
+        decor.addView(in, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+        mContentRoot = (ViewGroup) in;
+
+        ViewGroup contentParent = (ViewGroup)findViewById(ID_ANDROID_CONTENT);
+        if (contentParent == null) {
+            throw new RuntimeException("Window couldn't find content container view");
+        }
+
+        if ((features & (1 << FEATURE_INDETERMINATE_PROGRESS)) != 0) {
+            ProgressBar progress = getCircularProgressBar(false);
+            if (progress != null) {
+                progress.setIndeterminate(true);
+            }
+        }
+
+        if ((features & (1 << FEATURE_SWIPE_TO_DISMISS)) != 0) {
+            registerSwipeCallbacks();
+        }
+
+        // Remaining setup -- of background and title -- that only applies
+        // to top-level windows.
+        if (getContainer() == null) {
+            final Drawable background;
+            if (mBackgroundResource != 0) {
+                background = getContext().getDrawable(mBackgroundResource);
+            } else {
+                background = mBackgroundDrawable;
+            }
+            mDecor.setWindowBackground(background);
+
+            final Drawable frame;
+            if (mFrameResource != 0) {
+                frame = getContext().getDrawable(mFrameResource);
+            } else {
+                frame = null;
+            }
+            mDecor.setWindowFrame(frame);
+
+            mDecor.setElevation(mElevation);
+            mDecor.setClipToOutline(mClipToOutline);
+
+            if (mTitle != null) {
+                setTitle(mTitle);
+            }
+
+            if (mTitleColor == 0) {
+                mTitleColor = mTextColor;
+            }
+            setTitleColor(mTitleColor);
+        }
+
+        mDecor.finishChanging();
+
+        return contentParent;
+!!!484098.java!!!	alwaysReadCloseOnTouchAttr() : void
+        mAlwaysReadCloseOnTouchAttr = true;
+!!!484226.java!!!	installDecor() : void
+        if (mDecor == null) {
+            mDecor = generateDecor();
+            mDecor.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
+            mDecor.setIsRootNamespace(true);
+            if (!mInvalidatePanelMenuPosted && mInvalidatePanelMenuFeatures != 0) {
+                mDecor.postOnAnimation(mInvalidatePanelMenuRunnable);
+            }
+        }
+        if (mContentParent == null) {
+            mContentParent = generateLayout(mDecor);
+
+            // Set up decor part of UI to ignore fitsSystemWindows if appropriate.
+            mDecor.makeOptionalFitsSystemWindows();
+
+            final DecorContentParent decorContentParent = (DecorContentParent) mDecor.findViewById(
+                    R.id.decor_content_parent);
+
+            if (decorContentParent != null) {
+                mDecorContentParent = decorContentParent;
+                mDecorContentParent.setWindowCallback(getCallback());
+                if (mDecorContentParent.getTitle() == null) {
+                    mDecorContentParent.setWindowTitle(mTitle);
+                }
+
+                final int localFeatures = getLocalFeatures();
+                for (int i = 0; i < FEATURE_MAX; i++) {
+                    if ((localFeatures & (1 << i)) != 0) {
+                        mDecorContentParent.initFeature(i);
+                    }
+                }
+
+                mDecorContentParent.setUiOptions(mUiOptions);
+
+                if ((mResourcesSetFlags & FLAG_RESOURCE_SET_ICON) != 0 ||
+                        (mIconRes != 0 && !mDecorContentParent.hasIcon())) {
+                    mDecorContentParent.setIcon(mIconRes);
+                } else if ((mResourcesSetFlags & FLAG_RESOURCE_SET_ICON) == 0 &&
+                        mIconRes == 0 && !mDecorContentParent.hasIcon()) {
+                    mDecorContentParent.setIcon(
+                            getContext().getPackageManager().getDefaultActivityIcon());
+                    mResourcesSetFlags |= FLAG_RESOURCE_SET_ICON_FALLBACK;
+                }
+                if ((mResourcesSetFlags & FLAG_RESOURCE_SET_LOGO) != 0 ||
+                        (mLogoRes != 0 && !mDecorContentParent.hasLogo())) {
+                    mDecorContentParent.setLogo(mLogoRes);
+                }
+
+                // Invalidate if the panel menu hasn't been created before this.
+                // Panel menu invalidation is deferred avoiding application onCreateOptionsMenu
+                // being called in the middle of onCreate or similar.
+                // A pending invalidation will typically be resolved before the posted message
+                // would run normally in order to satisfy instance state restoration.
+                PanelFeatureState st = getPanelState(FEATURE_OPTIONS_PANEL, false);
+                if (!isDestroyed() && (st == null || st.menu == null)) {
+                    invalidatePanelMenu(FEATURE_ACTION_BAR);
+                }
+            } else {
+                mTitleView = (TextView)findViewById(R.id.title);
+                if (mTitleView != null) {
+                    mTitleView.setLayoutDirection(mDecor.getLayoutDirection());
+                    if ((getLocalFeatures() & (1 << FEATURE_NO_TITLE)) != 0) {
+                        View titleContainer = findViewById(
+                                R.id.title_container);
+                        if (titleContainer != null) {
+                            titleContainer.setVisibility(View.GONE);
+                        } else {
+                            mTitleView.setVisibility(View.GONE);
+                        }
+                        if (mContentParent instanceof FrameLayout) {
+                            ((FrameLayout)mContentParent).setForeground(null);
+                        }
+                    } else {
+                        mTitleView.setText(mTitle);
+                    }
+                }
+            }
+
+            if (mDecor.getBackground() == null && mBackgroundFallbackResource != 0) {
+                mDecor.setBackgroundFallback(mBackgroundFallbackResource);
+            }
+
+            // Only inflate or create a new TransitionManager if the caller hasn't
+            // already set a custom one.
+            if (hasFeature(FEATURE_ACTIVITY_TRANSITIONS)) {
+                if (mTransitionManager == null) {
+                    final int transitionRes = getWindowStyle().getResourceId(
+                            R.styleable.Window_windowContentTransitionManager,
+                            0);
+                    if (transitionRes != 0) {
+                        final TransitionInflater inflater = TransitionInflater.from(getContext());
+                        mTransitionManager = inflater.inflateTransitionManager(transitionRes,
+                                mContentParent);
+                    } else {
+                        mTransitionManager = new TransitionManager();
+                    }
+                }
+
+                mEnterTransition = getTransition(mEnterTransition, null,
+                        R.styleable.Window_windowEnterTransition);
+                mReturnTransition = getTransition(mReturnTransition, USE_DEFAULT_TRANSITION,
+                        R.styleable.Window_windowReturnTransition);
+                mExitTransition = getTransition(mExitTransition, null,
+                        R.styleable.Window_windowExitTransition);
+                mReenterTransition = getTransition(mReenterTransition, USE_DEFAULT_TRANSITION,
+                        R.styleable.Window_windowReenterTransition);
+                mSharedElementEnterTransition = getTransition(mSharedElementEnterTransition, null,
+                        R.styleable.Window_windowSharedElementEnterTransition);
+                mSharedElementReturnTransition = getTransition(mSharedElementReturnTransition,
+                        USE_DEFAULT_TRANSITION,
+                        R.styleable.Window_windowSharedElementReturnTransition);
+                mSharedElementExitTransition = getTransition(mSharedElementExitTransition, null,
+                        R.styleable.Window_windowSharedElementExitTransition);
+                mSharedElementReenterTransition = getTransition(mSharedElementReenterTransition,
+                        USE_DEFAULT_TRANSITION,
+                        R.styleable.Window_windowSharedElementReenterTransition);
+                if (mAllowEnterTransitionOverlap == null) {
+                    mAllowEnterTransitionOverlap = getWindowStyle().getBoolean(
+                            R.styleable.Window_windowAllowEnterTransitionOverlap, true);
+                }
+                if (mAllowReturnTransitionOverlap == null) {
+                    mAllowReturnTransitionOverlap = getWindowStyle().getBoolean(
+                            R.styleable.Window_windowAllowReturnTransitionOverlap, true);
+                }
+                if (mBackgroundFadeDurationMillis < 0) {
+                    mBackgroundFadeDurationMillis = getWindowStyle().getInteger(
+                            R.styleable.Window_windowTransitionBackgroundFadeDuration,
+                            DEFAULT_BACKGROUND_FADE_DURATION_MS);
+                }
+                if (mSharedElementsUseOverlay == null) {
+                    mSharedElementsUseOverlay = getWindowStyle().getBoolean(
+                            R.styleable.Window_windowSharedElementsUseOverlay, true);
+                }
+            }
+        }
+!!!484354.java!!!	getTransition(inout currentValue : Transition, inout defaultValue : Transition, in id : int) : Transition
+        if (currentValue != defaultValue) {
+            return currentValue;
+        }
+        int transitionId = getWindowStyle().getResourceId(id, -1);
+        Transition transition = defaultValue;
+        if (transitionId != -1 && transitionId != R.transition.no_transition) {
+            TransitionInflater inflater = TransitionInflater.from(getContext());
+            transition = inflater.inflateTransition(transitionId);
+            if (transition instanceof TransitionSet &&
+                    ((TransitionSet)transition).getTransitionCount() == 0) {
+                transition = null;
+            }
+        }
+        return transition;
+!!!484482.java!!!	loadImageURI(inout uri : Uri) : Drawable
+        try {
+            return Drawable.createFromStream(
+                    getContext().getContentResolver().openInputStream(uri), null);
+        } catch (Exception e) {
+            Log.w(TAG, "Unable to open content: " + uri);
+        }
+        return null;
+!!!484610.java!!!	getDrawableState(in featureId : int, inout required : boolean) : PhoneWindow::DrawableFeatureState
+        if ((getFeatures() & (1 << featureId)) == 0) {
+            if (!required) {
+                return null;
+            }
+            throw new RuntimeException("The feature has not been requested");
+        }
+
+        DrawableFeatureState[] ar;
+        if ((ar = mDrawables) == null || ar.length <= featureId) {
+            DrawableFeatureState[] nar = new DrawableFeatureState[featureId + 1];
+            if (ar != null) {
+                System.arraycopy(ar, 0, nar, 0, ar.length);
+            }
+            mDrawables = ar = nar;
+        }
+
+        DrawableFeatureState st = ar[featureId];
+        if (st == null) {
+            ar[featureId] = st = new DrawableFeatureState(featureId);
+        }
+        return st;
+!!!484738.java!!!	getPanelState(in featureId : int, inout required : boolean) : PhoneWindow::PanelFeatureState
+        return getPanelState(featureId, required, null);
+!!!484866.java!!!	getPanelState(in featureId : int, inout required : boolean, inout convertPanelState : PhoneWindow::PanelFeatureState) : PhoneWindow::PanelFeatureState
+        if ((getFeatures() & (1 << featureId)) == 0) {
+            if (!required) {
+                return null;
+            }
+            throw new RuntimeException("The feature has not been requested");
+        }
+
+        PanelFeatureState[] ar;
+        if ((ar = mPanels) == null || ar.length <= featureId) {
+            PanelFeatureState[] nar = new PanelFeatureState[featureId + 1];
+            if (ar != null) {
+                System.arraycopy(ar, 0, nar, 0, ar.length);
+            }
+            mPanels = ar = nar;
+        }
+
+        PanelFeatureState st = ar[featureId];
+        if (st == null) {
+            ar[featureId] = st = (convertPanelState != null)
+                    ? convertPanelState
+                    : new PanelFeatureState(featureId);
+        }
+        return st;
+!!!484994.java!!!	setChildDrawable(in featureId : int, inout drawable : Drawable) : void
+        DrawableFeatureState st = getDrawableState(featureId, true);
+        st.child = drawable;
+        updateDrawable(featureId, st, false);
+!!!485122.java!!!	setChildInt(in featureId : int, in value : int) : void
+        updateInt(featureId, value, false);
+!!!485250.java!!!	isShortcutKey(in keyCode : int, inout event : KeyEvent) : boolean
+        PanelFeatureState st = getPanelState(FEATURE_OPTIONS_PANEL, true);
+        return st.menu != null && st.menu.isShortcutKey(keyCode, event);
+!!!485378.java!!!	updateDrawable(in featureId : int, inout st : PhoneWindow::DrawableFeatureState, inout fromResume : boolean) : void
+        // Do nothing if the decor is not yet installed... an update will
+        // need to be forced when we eventually become active.
+        if (mContentParent == null) {
+            return;
+        }
+
+        final int featureMask = 1 << featureId;
+
+        if ((getFeatures() & featureMask) == 0 && !fromResume) {
+            return;
+        }
+
+        Drawable drawable = null;
+        if (st != null) {
+            drawable = st.child;
+            if (drawable == null)
+                drawable = st.local;
+            if (drawable == null)
+                drawable = st.def;
+        }
+        if ((getLocalFeatures() & featureMask) == 0) {
+            if (getContainer() != null) {
+                if (isActive() || fromResume) {
+                    getContainer().setChildDrawable(featureId, drawable);
+                }
+            }
+        } else if (st != null && (st.cur != drawable || st.curAlpha != st.alpha)) {
+            // System.out.println("Drawable changed: old=" + st.cur
+            // + ", new=" + drawable);
+            st.cur = drawable;
+            st.curAlpha = st.alpha;
+            onDrawableChanged(featureId, drawable, st.alpha);
+        }
+!!!485506.java!!!	updateInt(in featureId : int, in value : int, inout fromResume : boolean) : void
+
+        // Do nothing if the decor is not yet installed... an update will
+        // need to be forced when we eventually become active.
+        if (mContentParent == null) {
+            return;
+        }
+
+        final int featureMask = 1 << featureId;
+
+        if ((getFeatures() & featureMask) == 0 && !fromResume) {
+            return;
+        }
+
+        if ((getLocalFeatures() & featureMask) == 0) {
+            if (getContainer() != null) {
+                getContainer().setChildInt(featureId, value);
+            }
+        } else {
+            onIntChanged(featureId, value);
+        }
+!!!485634.java!!!	getLeftIconView() : ImageView
+        if (mLeftIconView != null) {
+            return mLeftIconView;
+        }
+        if (mContentParent == null) {
+            installDecor();
+        }
+        return (mLeftIconView = (ImageView)findViewById(R.id.left_icon));
+!!!485762.java!!!	dispatchWindowAttributesChanged(inout attrs : WindowManager.LayoutParams) : void
+        super.dispatchWindowAttributesChanged(attrs);
+        if (mDecor != null) {
+            mDecor.updateColorViews(null /* insets */);
+        }
+!!!485890.java!!!	getCircularProgressBar(inout shouldInstallDecor : boolean) : ProgressBar
+        if (mCircularProgressBar != null) {
+            return mCircularProgressBar;
+        }
+        if (mContentParent == null && shouldInstallDecor) {
+            installDecor();
+        }
+        mCircularProgressBar = (ProgressBar) findViewById(R.id.progress_circular);
+        if (mCircularProgressBar != null) {
+            mCircularProgressBar.setVisibility(View.INVISIBLE);
+        }
+        return mCircularProgressBar;
+!!!486018.java!!!	getHorizontalProgressBar(inout shouldInstallDecor : boolean) : ProgressBar
+        if (mHorizontalProgressBar != null) {
+            return mHorizontalProgressBar;
+        }
+        if (mContentParent == null && shouldInstallDecor) {
+            installDecor();
+        }
+        mHorizontalProgressBar = (ProgressBar) findViewById(R.id.progress_horizontal);
+        if (mHorizontalProgressBar != null) {
+            mHorizontalProgressBar.setVisibility(View.INVISIBLE);
+        }
+        return mHorizontalProgressBar;
+!!!486146.java!!!	getRightIconView() : ImageView
+        if (mRightIconView != null) {
+            return mRightIconView;
+        }
+        if (mContentParent == null) {
+            installDecor();
+        }
+        return (mRightIconView = (ImageView)findViewById(R.id.right_icon));
+!!!486274.java!!!	registerSwipeCallbacks() : void
+        SwipeDismissLayout swipeDismiss =
+                (SwipeDismissLayout) findViewById(R.id.content);
+        swipeDismiss.setOnDismissedListener(new SwipeDismissLayout.OnDismissedListener() {
+            @Override
+            public void onDismissed(SwipeDismissLayout layout) {
+                dispatchOnWindowDismissed();
+            }
+        });
+        swipeDismiss.setOnSwipeProgressChangedListener(
+                new SwipeDismissLayout.OnSwipeProgressChangedListener() {
+                    private static final float ALPHA_DECREASE = 0.5f;
+                    private boolean mIsTranslucent = false;
+                    @Override
+                    public void onSwipeProgressChanged(
+                            SwipeDismissLayout layout, float progress, float translate) {
+                        WindowManager.LayoutParams newParams = getAttributes();
+                        newParams.x = (int) translate;
+                        newParams.alpha = 1 - (progress * ALPHA_DECREASE);
+                        setAttributes(newParams);
+
+                        int flags = 0;
+                        if (newParams.x == 0) {
+                            flags = FLAG_FULLSCREEN;
+                        } else {
+                            flags = FLAG_LAYOUT_NO_LIMITS;
+                        }
+                        setFlags(flags, FLAG_FULLSCREEN | FLAG_LAYOUT_NO_LIMITS);
+                    }
+
+                    @Override
+                    public void onSwipeCancelled(SwipeDismissLayout layout) {
+                        WindowManager.LayoutParams newParams = getAttributes();
+                        newParams.x = 0;
+                        newParams.alpha = 1;
+                        setAttributes(newParams);
+                        setFlags(FLAG_FULLSCREEN, FLAG_FULLSCREEN | FLAG_LAYOUT_NO_LIMITS);
+                    }
+                });
+!!!486402.java!!!	callOnPanelClosed(in featureId : int, inout panel : PhoneWindow::PanelFeatureState, inout menu : Menu) : void
+        final Callback cb = getCallback();
+        if (cb == null)
+            return;
+
+        // Try to get a menu
+        if (menu == null) {
+            // Need a panel to grab the menu, so try to get that
+            if (panel == null) {
+                if ((featureId >= 0) && (featureId < mPanels.length)) {
+                    panel = mPanels[featureId];
+                }
+            }
+
+            if (panel != null) {
+                // menu still may be null, which is okay--we tried our best
+                menu = panel.menu;
+            }
+        }
+
+        // If the panel is not open, do not callback
+        if ((panel != null) && (!panel.isOpen))
+            return;
+
+        if (!isDestroyed()) {
+            cb.onPanelClosed(featureId, menu);
+        }
+!!!486530.java!!!	launchDefaultSearch() : boolean
+        boolean result;
+        final Callback cb = getCallback();
+        if (cb == null || isDestroyed()) {
+            result = false;
+        } else {
+            sendCloseSystemWindows("search");
+            result = cb.onSearchRequested();
+        }
+        if (!result && (getContext().getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_TELEVISION) {
+            // On TVs, if the app doesn't implement search, we want to launch assist.
+            return ((SearchManager)getContext().getSystemService(Context.SEARCH_SERVICE))
+                    .launchAssistAction(0, null, UserHandle.myUserId());
+        }
+        return result;
+!!!486658.java!!!	setVolumeControlStream(in streamType : int) : void
+        mVolumeControlStreamType = streamType;
+!!!486786.java!!!	getVolumeControlStream() : int
+        return mVolumeControlStreamType;
+!!!486914.java!!!	setMediaController(inout controller : MediaController) : void
+        mMediaController = controller;
+!!!487042.java!!!	getMediaController() : MediaController
+        return mMediaController;
+!!!487170.java!!!	isTranslucent() : boolean
+        TypedArray a = getWindowStyle();
+        return a.getBoolean(a.getResourceId(
+                R.styleable.Window_windowIsTranslucent, 0), false);
+!!!487298.java!!!	setEnterTransition(inout enterTransition : Transition) : void
+        mEnterTransition = enterTransition;
+!!!487426.java!!!	setReturnTransition(inout transition : Transition) : void
+        mReturnTransition = transition;
+!!!487554.java!!!	setExitTransition(inout exitTransition : Transition) : void
+        mExitTransition = exitTransition;
+!!!487682.java!!!	setReenterTransition(inout transition : Transition) : void
+        mReenterTransition = transition;
+!!!487810.java!!!	setSharedElementEnterTransition(inout sharedElementEnterTransition : Transition) : void
+        mSharedElementEnterTransition = sharedElementEnterTransition;
+!!!487938.java!!!	setSharedElementReturnTransition(inout transition : Transition) : void
+        mSharedElementReturnTransition = transition;
+!!!488066.java!!!	setSharedElementExitTransition(inout sharedElementExitTransition : Transition) : void
+        mSharedElementExitTransition = sharedElementExitTransition;
+!!!488194.java!!!	setSharedElementReenterTransition(inout transition : Transition) : void
+        mSharedElementReenterTransition = transition;
+!!!488322.java!!!	getEnterTransition() : Transition
+        return mEnterTransition;
+!!!488450.java!!!	getReturnTransition() : Transition
+        return mReturnTransition == USE_DEFAULT_TRANSITION ? getEnterTransition()
+                : mReturnTransition;
+!!!488578.java!!!	getExitTransition() : Transition
+        return mExitTransition;
+!!!488706.java!!!	getReenterTransition() : Transition
+        return mReenterTransition == USE_DEFAULT_TRANSITION ? getExitTransition()
+                : mReenterTransition;
+!!!488834.java!!!	getSharedElementEnterTransition() : Transition
+        return mSharedElementEnterTransition;
+!!!488962.java!!!	getSharedElementReturnTransition() : Transition
+        return mSharedElementReturnTransition == USE_DEFAULT_TRANSITION
+                ? getSharedElementEnterTransition() : mSharedElementReturnTransition;
+!!!489090.java!!!	getSharedElementExitTransition() : Transition
+        return mSharedElementExitTransition;
+!!!489218.java!!!	getSharedElementReenterTransition() : Transition
+        return mSharedElementReenterTransition == USE_DEFAULT_TRANSITION
+                ? getSharedElementExitTransition() : mSharedElementReenterTransition;
+!!!489346.java!!!	setAllowEnterTransitionOverlap(inout allow : boolean) : void
+        mAllowEnterTransitionOverlap = allow;
+!!!489474.java!!!	getAllowEnterTransitionOverlap() : boolean
+        return (mAllowEnterTransitionOverlap == null) ? true : mAllowEnterTransitionOverlap;
+!!!489602.java!!!	setAllowReturnTransitionOverlap(inout allowExitTransitionOverlap : boolean) : void
+        mAllowReturnTransitionOverlap = allowExitTransitionOverlap;
+!!!489730.java!!!	getAllowReturnTransitionOverlap() : boolean
+        return (mAllowReturnTransitionOverlap == null) ? true : mAllowReturnTransitionOverlap;
+!!!489858.java!!!	getTransitionBackgroundFadeDuration() : long
+        return (mBackgroundFadeDurationMillis < 0) ? DEFAULT_BACKGROUND_FADE_DURATION_MS
+                : mBackgroundFadeDurationMillis;
+!!!489986.java!!!	setTransitionBackgroundFadeDuration(in fadeDurationMillis : long) : void
+        if (fadeDurationMillis < 0) {
+            throw new IllegalArgumentException("negative durations are not allowed");
+        }
+        mBackgroundFadeDurationMillis = fadeDurationMillis;
+!!!490114.java!!!	setSharedElementsUseOverlay(inout sharedElementsUseOverlay : boolean) : void
+        mSharedElementsUseOverlay = sharedElementsUseOverlay;
+!!!490242.java!!!	getSharedElementsUseOverlay() : boolean
+        return (mSharedElementsUseOverlay == null) ? true : mSharedElementsUseOverlay;
+!!!493570.java!!!	sendCloseSystemWindows() : void
+        PhoneWindowManager.sendCloseSystemWindows(getContext(), null);
+!!!493698.java!!!	sendCloseSystemWindows(in reason : String) : void
+        PhoneWindowManager.sendCloseSystemWindows(getContext(), reason);
+!!!493826.java!!!	getStatusBarColor() : int
+        return mStatusBarColor;
+!!!493954.java!!!	setStatusBarColor(in color : int) : void
+        mStatusBarColor = color;
+        mForcedStatusBarColor = true;
+        if (mDecor != null) {
+            mDecor.updateColorViews(null);
+        }
+!!!494082.java!!!	getNavigationBarColor() : int
+        return mNavigationBarColor;
+!!!494210.java!!!	setNavigationBarColor(in color : int) : void
+        mNavigationBarColor = color;
+        mForcedNavigationBarColor = true;
+        if (mDecor != null) {
+            mDecor.updateColorViews(null);
+        }

@@ -1,0 +1,17 @@
+class RestoreSet
+!!!1814530.java!!!	RestoreSet()
+        // Leave everything zero / null
+!!!1814658.java!!!	RestoreSet(in _name : String, in _dev : String, in _token : long)
+        name = _name;
+        device = _dev;
+        token = _token;
+!!!1814786.java!!!	describeContents() : int
+        return 0;
+!!!1814914.java!!!	writeToParcel(inout out : Parcel, in flags : int) : void
+        out.writeString(name);
+        out.writeString(device);
+        out.writeLong(token);
+!!!1815042.java!!!	RestoreSet(inout in : Parcel)
+        name = in.readString();
+        device = in.readString();
+        token = in.readLong();

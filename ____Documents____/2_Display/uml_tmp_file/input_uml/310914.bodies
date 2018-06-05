@@ -1,0 +1,20 @@
+class RestoreDescription
+!!!1811714.java!!!	toString() : String
+        return "RestoreDescription{" + mPackageName + " : "
+                + ((mDataType == TYPE_KEY_VALUE) ? "KEY_VALUE" : "STREAM")
+                + '}';
+!!!1811842.java!!!	RestoreDescription(in packageName : String, in dataType : int)
+        mPackageName = packageName;
+        mDataType = dataType;
+!!!1811970.java!!!	getPackageName() : String
+        return mPackageName;
+!!!1812098.java!!!	getDataType() : int
+        return mDataType;
+!!!1812226.java!!!	describeContents() : int
+        return 0;
+!!!1812354.java!!!	writeToParcel(inout out : Parcel, in flags : int) : void
+        out.writeString(mPackageName);
+        out.writeInt(mDataType);
+!!!1812482.java!!!	RestoreDescription(inout in : Parcel)
+        mPackageName = in.readString();
+        mDataType = in.readInt();

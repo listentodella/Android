@@ -1,0 +1,41 @@
+class Description
+!!!222210.cpp!!!	Description()
+    mPlaneAlpha = 1.0f;
+    mPremultipliedAlpha = false;
+    mOpaque = true;
+    mTextureEnabled = false;
+    mColorMatrixEnabled = false;
+
+    memset(mColor, 0, sizeof(mColor));
+!!!222466.cpp!!!	setPlaneAlpha(in planeAlpha : GLclampf) : void
+    if (planeAlpha != mPlaneAlpha) {
+        mUniformsDirty = true;
+        mPlaneAlpha = planeAlpha;
+    }
+!!!222594.cpp!!!	setPremultipliedAlpha(in premultipliedAlpha : bool) : void
+    if (premultipliedAlpha != mPremultipliedAlpha) {
+        mPremultipliedAlpha = premultipliedAlpha;
+    }
+!!!222722.cpp!!!	setOpaque(in opaque : bool) : void
+    if (opaque != mOpaque) {
+        mOpaque = opaque;
+    }
+!!!222850.cpp!!!	setTexture(in texture : Texture) : void
+    mTexture = texture;
+    mTextureEnabled = true;
+    mUniformsDirty = true;
+!!!222978.cpp!!!	disableTexture() : void
+    mTextureEnabled = false;
+!!!223106.cpp!!!	setColor(in red : GLclampf, in green : GLclampf, in blue : GLclampf, in alpha : GLclampf) : void
+    mColor[0] = red;
+    mColor[1] = green;
+    mColor[2] = blue;
+    mColor[3] = alpha;
+    mUniformsDirty = true;
+!!!223234.cpp!!!	setProjectionMatrix(in mtx : mat4) : void
+    mProjectionMatrix = mtx;
+    mUniformsDirty = true;
+!!!223362.cpp!!!	setColorMatrix(in mtx : mat4) : void
+    const mat4 identity;
+    mColorMatrix = mtx;
+    mColorMatrixEnabled = (mtx != identity);

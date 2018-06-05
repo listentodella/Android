@@ -1,0 +1,144 @@
+class UsageEvents
+!!!1825666.java!!!	UsageEvents(inout in : Parcel)
+        mEventCount = in.readInt();
+        mIndex = in.readInt();
+        if (mEventCount > 0) {
+            mStringPool = in.createStringArray();
+
+            final int listByteLength = in.readInt();
+            final int positionInParcel = in.readInt();
+            mParcel = Parcel.obtain();
+            mParcel.setDataPosition(0);
+            mParcel.appendFrom(in, in.dataPosition(), listByteLength);
+            mParcel.setDataSize(mParcel.dataPosition());
+            mParcel.setDataPosition(positionInParcel);
+        }
+!!!1825794.java!!!	UsageEvents()
+        mEventCount = 0;
+!!!1825922.java!!!	UsageEvents(inout events : List<Event>, inout stringPool : String)
+        mStringPool = stringPool;
+        mEventCount = events.size();
+        mEventsToWrite = events;
+!!!1826050.java!!!	hasNextEvent() : boolean
+        return mIndex < mEventCount;
+!!!1826178.java!!!	getNextEvent(inout eventOut : UsageEvents::Event) : boolean
+        if (mIndex >= mEventCount) {
+            return false;
+        }
+
+        readEventFromParcel(mParcel, eventOut);
+
+        mIndex++;
+        if (mIndex >= mEventCount) {
+            mParcel.recycle();
+            mParcel = null;
+        }
+        return true;
+!!!1826306.java!!!	resetToStart() : void
+        mIndex = 0;
+        if (mParcel != null) {
+            mParcel.setDataPosition(0);
+        }
+!!!1826434.java!!!	findStringIndex(in str : String) : int
+        final int index = Arrays.binarySearch(mStringPool, str);
+        if (index < 0) {
+            throw new IllegalStateException("String '" + str + "' is not in the string pool");
+        }
+        return index;
+!!!1826562.java!!!	writeEventToParcel(inout event : UsageEvents::Event, inout p : Parcel, in flags : int) : void
+        final int packageIndex;
+        if (event.mPackage != null) {
+            packageIndex = findStringIndex(event.mPackage);
+        } else {
+            packageIndex = -1;
+        }
+
+        final int classIndex;
+        if (event.mClass != null) {
+            classIndex = findStringIndex(event.mClass);
+        } else {
+            classIndex = -1;
+        }
+        p.writeInt(packageIndex);
+        p.writeInt(classIndex);
+        p.writeInt(event.mEventType);
+        p.writeLong(event.mTimeStamp);
+
+        if (event.mEventType == Event.CONFIGURATION_CHANGE) {
+            event.mConfiguration.writeToParcel(p, flags);
+        }
+!!!1826690.java!!!	readEventFromParcel(inout p : Parcel, inout eventOut : UsageEvents::Event) : void
+        final int packageIndex = p.readInt();
+        if (packageIndex >= 0) {
+            eventOut.mPackage = mStringPool[packageIndex];
+        } else {
+            eventOut.mPackage = null;
+        }
+
+        final int classIndex = p.readInt();
+        if (classIndex >= 0) {
+            eventOut.mClass = mStringPool[classIndex];
+        } else {
+            eventOut.mClass = null;
+        }
+        eventOut.mEventType = p.readInt();
+        eventOut.mTimeStamp = p.readLong();
+
+        // Extract the configuration for configuration change events.
+        if (eventOut.mEventType == Event.CONFIGURATION_CHANGE) {
+            eventOut.mConfiguration = Configuration.CREATOR.createFromParcel(p);
+        } else {
+            eventOut.mConfiguration = null;
+        }
+!!!1826818.java!!!	describeContents() : int
+        return 0;
+!!!1826946.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        dest.writeInt(mEventCount);
+        dest.writeInt(mIndex);
+        if (mEventCount > 0) {
+            dest.writeStringArray(mStringPool);
+
+            if (mEventsToWrite != null) {
+                // Write out the events
+                Parcel p = Parcel.obtain();
+                try {
+                    p.setDataPosition(0);
+                    for (int i = 0; i < mEventCount; i++) {
+                        final Event event = mEventsToWrite.get(i);
+                        writeEventToParcel(event, p, flags);
+                    }
+
+                    final int listByteLength = p.dataPosition();
+
+                    // Write the total length of the data.
+                    dest.writeInt(listByteLength);
+
+                    // Write our current position into the data.
+                    dest.writeInt(0);
+
+                    // Write the data.
+                    dest.appendFrom(p, 0, listByteLength);
+                } finally {
+                    p.recycle();
+                }
+
+            } else if (mParcel != null) {
+                // Write the total length of the data.
+                dest.writeInt(mParcel.dataSize());
+
+                // Write out current position into the data.
+                dest.writeInt(mParcel.dataPosition());
+
+                // Write the data.
+                dest.appendFrom(mParcel, 0, mParcel.dataSize());
+            } else {
+                throw new IllegalStateException(
+                        "Either mParcel or mEventsToWrite must not be null");
+            }
+        }
+!!!1827074.java!!!	finalize() : void
+        super.finalize();
+        if (mParcel != null) {
+            mParcel.recycle();
+            mParcel = null;
+        }

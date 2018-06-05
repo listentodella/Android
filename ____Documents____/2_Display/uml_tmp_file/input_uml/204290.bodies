@@ -1,0 +1,52 @@
+class ShortcutManager
+!!!527362.java!!!	ShortcutManager(inout context : Context, inout handler : Handler)
+        super(handler);
+        
+        mContext = context;
+        mShortcutIntents = new SparseArray<Intent>();
+!!!527490.java!!!	observe() : void
+        mCursor = mContext.getContentResolver().query(
+                Settings.Bookmarks.CONTENT_URI, sProjection, null, null, null);
+        mCursor.registerContentObserver(this);
+        updateShortcuts();
+!!!527618.java!!!	onChange(inout selfChange : boolean) : void
+        updateShortcuts();
+!!!527746.java!!!	updateShortcuts() : void
+        Cursor c = mCursor;
+        if (!c.requery()) {
+            Log.e(TAG, "ShortcutObserver could not re-query shortcuts.");
+            return;
+        }
+
+        mShortcutIntents.clear();
+        while (c.moveToNext()) {
+            int shortcut = c.getInt(COLUMN_SHORTCUT);
+            if (shortcut == 0) continue;
+            String intentURI = c.getString(COLUMN_INTENT);
+            Intent intent = null;
+            try {
+                intent = Intent.getIntent(intentURI);
+            } catch (URISyntaxException e) {
+                Log.w(TAG, "Intent URI for shortcut invalid.", e);
+            }
+            if (intent == null) continue;
+            mShortcutIntents.put(shortcut, intent);
+        }
+!!!527874.java!!!	getIntent(inout kcm : KeyCharacterMap, in keyCode : int, in metaState : int) : Intent
+        Intent intent = null;
+
+        // First try the exact keycode (with modifiers).
+        int shortcut = kcm.get(keyCode, metaState);
+        if (shortcut != 0) {
+            intent = mShortcutIntents.get(shortcut);
+        }
+
+        // Next try the primary character on that key.
+        if (intent == null) {
+            shortcut = Character.toLowerCase(kcm.getDisplayLabel(keyCode));
+            if (shortcut != 0) {
+                intent = mShortcutIntents.get(shortcut);
+            }
+        }
+
+        return intent;

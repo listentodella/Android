@@ -1,0 +1,8 @@
+class InternalListener
+!!!1173890.java!!!	InternalListener(inout spellCheckerSessionListenerImpl : SpellCheckerSession::SpellCheckerSessionListenerImpl)
+            mParentSpellCheckerSessionListenerImpl = spellCheckerSessionListenerImpl;
+!!!1174018.java!!!	onServiceConnected(inout session : ISpellCheckerSession) : void
+            if (DBG) {
+                Log.w(TAG, "SpellCheckerSession connected.");
+            }
+            mParentSpellCheckerSessionListenerImpl.onServiceConnected(session);

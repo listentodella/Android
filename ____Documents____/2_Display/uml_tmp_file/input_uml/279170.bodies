@@ -1,0 +1,447 @@
+class ApplicationThread
+!!!1438210.java!!!	updatePendingConfiguration(inout config : Configuration) : void
+            synchronized (mResourcesManager) {
+                if (mPendingConfiguration == null ||
+                        mPendingConfiguration.isOtherSeqNewer(config)) {
+                    mPendingConfiguration = config;
+                }
+            }
+!!!1438338.java!!!	schedulePauseActivity(inout token : IBinder, inout finished : boolean, inout userLeaving : boolean, in configChanges : int, inout dontReport : boolean) : void
+            sendMessage(
+                    finished ? H.PAUSE_ACTIVITY_FINISHING : H.PAUSE_ACTIVITY,
+                    token,
+                    (userLeaving ? 1 : 0) | (dontReport ? 2 : 0),
+                    configChanges);
+!!!1438466.java!!!	scheduleStopActivity(inout token : IBinder, inout showWindow : boolean, in configChanges : int) : void
+           sendMessage(
+                showWindow ? H.STOP_ACTIVITY_SHOW : H.STOP_ACTIVITY_HIDE,
+                token, 0, configChanges);
+!!!1438594.java!!!	scheduleWindowVisibility(inout token : IBinder, inout showWindow : boolean) : void
+            sendMessage(
+                showWindow ? H.SHOW_WINDOW : H.HIDE_WINDOW,
+                token);
+!!!1438722.java!!!	scheduleSleeping(inout token : IBinder, inout sleeping : boolean) : void
+            sendMessage(H.SLEEPING, token, sleeping ? 1 : 0);
+!!!1438850.java!!!	scheduleResumeActivity(inout token : IBinder, in processState : int, inout isForward : boolean, inout resumeArgs : Bundle) : void
+            updateProcessState(processState, false);
+            sendMessage(H.RESUME_ACTIVITY, token, isForward ? 1 : 0);
+!!!1438978.java!!!	scheduleSendResult(inout token : IBinder, inout results : List<ResultInfo>) : void
+            ResultData res = new ResultData();
+            res.token = token;
+            res.results = results;
+            sendMessage(H.SEND_RESULT, res);
+!!!1439106.java!!!	scheduleLaunchActivity(inout intent : Intent, inout token : IBinder, in ident : int, inout info : ActivityInfo, inout curConfig : Configuration, inout compatInfo : CompatibilityInfo, inout voiceInteractor : IVoiceInteractor, in procState : int, inout state : Bundle, inout persistentState : PersistableBundle, inout pendingResults : List<ResultInfo>, inout pendingNewIntents : List<Intent>, inout notResumed : boolean, inout isForward : boolean, inout profilerInfo : ProfilerInfo) : void
+
+            updateProcessState(procState, false);
+
+            ActivityClientRecord r = new ActivityClientRecord();
+
+            r.token = token;
+            r.ident = ident;
+            r.intent = intent;
+            r.voiceInteractor = voiceInteractor;
+            r.activityInfo = info;
+            r.compatInfo = compatInfo;
+            r.state = state;
+            r.persistentState = persistentState;
+
+            r.pendingResults = pendingResults;
+            r.pendingIntents = pendingNewIntents;
+
+            r.startsNotResumed = notResumed;
+            r.isForward = isForward;
+
+            r.profilerInfo = profilerInfo;
+
+            updatePendingConfiguration(curConfig);
+
+            sendMessage(H.LAUNCH_ACTIVITY, r);
+!!!1439234.java!!!	scheduleRelaunchActivity(inout token : IBinder, inout pendingResults : List<ResultInfo>, inout pendingNewIntents : List<Intent>, in configChanges : int, inout notResumed : boolean, inout config : Configuration) : void
+            requestRelaunchActivity(token, pendingResults, pendingNewIntents,
+                    configChanges, notResumed, config, true);
+!!!1439362.java!!!	scheduleNewIntent(inout intents : List<Intent>, inout token : IBinder) : void
+            NewIntentData data = new NewIntentData();
+            data.intents = intents;
+            data.token = token;
+
+            sendMessage(H.NEW_INTENT, data);
+!!!1439490.java!!!	scheduleDestroyActivity(inout token : IBinder, inout finishing : boolean, in configChanges : int) : void
+            sendMessage(H.DESTROY_ACTIVITY, token, finishing ? 1 : 0,
+                    configChanges);
+!!!1439618.java!!!	scheduleReceiver(inout intent : Intent, inout info : ActivityInfo, inout compatInfo : CompatibilityInfo, in resultCode : int, in data : String, inout extras : Bundle, inout sync : boolean, in sendingUser : int, in processState : int) : void
+            updateProcessState(processState, false);
+            ReceiverData r = new ReceiverData(intent, resultCode, data, extras,
+                    sync, false, mAppThread.asBinder(), sendingUser);
+            r.info = info;
+            r.compatInfo = compatInfo;
+            sendMessage(H.RECEIVER, r);
+!!!1439746.java!!!	scheduleCreateBackupAgent(inout app : ApplicationInfo, inout compatInfo : CompatibilityInfo, in backupMode : int) : void
+            CreateBackupAgentData d = new CreateBackupAgentData();
+            d.appInfo = app;
+            d.compatInfo = compatInfo;
+            d.backupMode = backupMode;
+
+            sendMessage(H.CREATE_BACKUP_AGENT, d);
+!!!1439874.java!!!	scheduleDestroyBackupAgent(inout app : ApplicationInfo, inout compatInfo : CompatibilityInfo) : void
+            CreateBackupAgentData d = new CreateBackupAgentData();
+            d.appInfo = app;
+            d.compatInfo = compatInfo;
+
+            sendMessage(H.DESTROY_BACKUP_AGENT, d);
+!!!1440002.java!!!	scheduleCreateService(inout token : IBinder, inout info : ServiceInfo, inout compatInfo : CompatibilityInfo, in processState : int) : void
+            updateProcessState(processState, false);
+            CreateServiceData s = new CreateServiceData();
+            s.token = token;
+            s.info = info;
+            s.compatInfo = compatInfo;
+
+            sendMessage(H.CREATE_SERVICE, s);
+!!!1440130.java!!!	scheduleBindService(inout token : IBinder, inout intent : Intent, inout rebind : boolean, in processState : int) : void
+            updateProcessState(processState, false);
+            BindServiceData s = new BindServiceData();
+            s.token = token;
+            s.intent = intent;
+            s.rebind = rebind;
+
+            if (DEBUG_SERVICE)
+                Slog.v(TAG, "scheduleBindService token=" + token + " intent=" + intent + " uid="
+                        + Binder.getCallingUid() + " pid=" + Binder.getCallingPid());
+            sendMessage(H.BIND_SERVICE, s);
+!!!1440258.java!!!	scheduleUnbindService(inout token : IBinder, inout intent : Intent) : void
+            BindServiceData s = new BindServiceData();
+            s.token = token;
+            s.intent = intent;
+
+            sendMessage(H.UNBIND_SERVICE, s);
+!!!1440386.java!!!	scheduleServiceArgs(inout token : IBinder, inout taskRemoved : boolean, in startId : int, in flags : int, inout args : Intent) : void
+            ServiceArgsData s = new ServiceArgsData();
+            s.token = token;
+            s.taskRemoved = taskRemoved;
+            s.startId = startId;
+            s.flags = flags;
+            s.args = args;
+
+            sendMessage(H.SERVICE_ARGS, s);
+!!!1440514.java!!!	scheduleStopService(inout token : IBinder) : void
+            sendMessage(H.STOP_SERVICE, token);
+!!!1440642.java!!!	bindApplication(in processName : String, inout appInfo : ApplicationInfo, inout providers : List<ProviderInfo>, inout instrumentationName : ComponentName, inout profilerInfo : ProfilerInfo, inout instrumentationArgs : Bundle, inout instrumentationWatcher : IInstrumentationWatcher, inout instrumentationUiConnection : IUiAutomationConnection, in debugMode : int, inout enableOpenGlTrace : boolean, inout isRestrictedBackupMode : boolean, inout persistent : boolean, inout config : Configuration, inout compatInfo : CompatibilityInfo, inout services : Map<String, IBinder>, inout coreSettings : Bundle) : void
+
+            if (services != null) {
+                // Setup the service cache in the ServiceManager
+                ServiceManager.initServiceCache(services);
+            }
+
+            setCoreSettings(coreSettings);
+
+            /*
+             * Two possible indications that this package could be
+             * sharing its runtime with other packages:
+             *
+             * 1.) the sharedUserId attribute is set in the manifest,
+             *     indicating a request to share a VM with other
+             *     packages with the same sharedUserId.
+             *
+             * 2.) the application element of the manifest has an
+             *     attribute specifying a non-default process name,
+             *     indicating the desire to run in another packages VM.
+             *
+             * If sharing is enabled we do not have a unique application
+             * in a process and therefore cannot rely on the package
+             * name inside the runtime.
+             */
+            IPackageManager pm = getPackageManager();
+            android.content.pm.PackageInfo pi = null;
+            try {
+                pi = pm.getPackageInfo(appInfo.packageName, 0, UserHandle.myUserId());
+            } catch (RemoteException e) {
+            }
+            if (pi != null) {
+                boolean sharedUserIdSet = (pi.sharedUserId != null);
+                boolean processNameNotDefault =
+                (pi.applicationInfo != null &&
+                 !appInfo.packageName.equals(pi.applicationInfo.processName));
+                boolean sharable = (sharedUserIdSet || processNameNotDefault);
+
+                // Tell the VMRuntime about the application, unless it is shared
+                // inside a process.
+                if (!sharable) {
+                    VMRuntime.registerAppInfo(appInfo.packageName, appInfo.dataDir,
+                                            appInfo.processName);
+                }
+            }
+
+            AppBindData data = new AppBindData();
+            data.processName = processName;
+            data.appInfo = appInfo;
+            data.providers = providers;
+            data.instrumentationName = instrumentationName;
+            data.instrumentationArgs = instrumentationArgs;
+            data.instrumentationWatcher = instrumentationWatcher;
+            data.instrumentationUiAutomationConnection = instrumentationUiConnection;
+            data.debugMode = debugMode;
+            data.enableOpenGlTrace = enableOpenGlTrace;
+            data.restrictedBackupMode = isRestrictedBackupMode;
+            data.persistent = persistent;
+            data.config = config;
+            data.compatInfo = compatInfo;
+            data.initProfilerInfo = profilerInfo;
+            sendMessage(H.BIND_APPLICATION, data);
+!!!1440770.java!!!	scheduleExit() : void
+            sendMessage(H.EXIT_APPLICATION, null);
+!!!1440898.java!!!	scheduleSuicide() : void
+            sendMessage(H.SUICIDE, null);
+!!!1441026.java!!!	scheduleConfigurationChanged(inout config : Configuration) : void
+            updatePendingConfiguration(config);
+            sendMessage(H.CONFIGURATION_CHANGED, config);
+!!!1441154.java!!!	updateTimeZone() : void
+            TimeZone.setDefault(null);
+!!!1441282.java!!!	clearDnsCache() : void
+            // a non-standard API to get this to libcore
+            InetAddress.clearDnsCache();
+            // Allow libcore to perform the necessary actions as it sees fit upon a network
+            // configuration change.
+            NetworkEventDispatcher.getInstance().onNetworkConfigurationChanged();
+!!!1441410.java!!!	setHttpProxy(in host : String, in port : String, in exclList : String, inout pacFileUrl : Uri) : void
+            Proxy.setHttpProxySystemProperty(host, port, exclList, pacFileUrl);
+!!!1441538.java!!!	processInBackground() : void
+            mH.removeMessages(H.GC_WHEN_IDLE);
+            mH.sendMessage(mH.obtainMessage(H.GC_WHEN_IDLE));
+!!!1441666.java!!!	dumpService(inout fd : FileDescriptor, inout servicetoken : IBinder, inout args : String) : void
+            DumpComponentInfo data = new DumpComponentInfo();
+            try {
+                data.fd = ParcelFileDescriptor.dup(fd);
+                data.token = servicetoken;
+                data.args = args;
+                sendMessage(H.DUMP_SERVICE, data, 0, 0, true /*async*/);
+            } catch (IOException e) {
+                Slog.w(TAG, "dumpService failed", e);
+            }
+!!!1441794.java!!!	scheduleRegisteredReceiver(inout receiver : IIntentReceiver, inout intent : Intent, in resultCode : int, in dataStr : String, inout extras : Bundle, inout ordered : boolean, inout sticky : boolean, in sendingUser : int, in processState : int) : void
+            updateProcessState(processState, false);
+            receiver.performReceive(intent, resultCode, dataStr, extras, ordered,
+                    sticky, sendingUser);
+!!!1441922.java!!!	scheduleLowMemory() : void
+            sendMessage(H.LOW_MEMORY, null);
+!!!1442050.java!!!	scheduleActivityConfigurationChanged(inout token : IBinder) : void
+            sendMessage(H.ACTIVITY_CONFIGURATION_CHANGED, token);
+!!!1442178.java!!!	profilerControl(inout start : boolean, inout profilerInfo : ProfilerInfo, in profileType : int) : void
+            sendMessage(H.PROFILER_CONTROL, profilerInfo, start ? 1 : 0, profileType);
+!!!1442306.java!!!	dumpHeap(inout managed : boolean, in path : String, inout fd : ParcelFileDescriptor) : void
+            DumpHeapData dhd = new DumpHeapData();
+            dhd.path = path;
+            dhd.fd = fd;
+            sendMessage(H.DUMP_HEAP, dhd, managed ? 1 : 0, 0, true /*async*/);
+!!!1442434.java!!!	setSchedulingGroup(in group : int) : void
+            // Note: do this immediately, since going into the foreground
+            // should happen regardless of what pending work we have to do
+            // and the activity manager will wait for us to report back that
+            // we are done before sending us to the background.
+            try {
+                Process.setProcessGroup(Process.myPid(), group);
+            } catch (Exception e) {
+                Slog.w(TAG, "Failed setting process group to " + group, e);
+            }
+!!!1442562.java!!!	dispatchPackageBroadcast(in cmd : int, inout packages : String) : void
+            sendMessage(H.DISPATCH_PACKAGE_BROADCAST, packages, cmd);
+!!!1442690.java!!!	scheduleCrash(in msg : String) : void
+            sendMessage(H.SCHEDULE_CRASH, msg);
+!!!1442818.java!!!	dumpActivity(inout fd : FileDescriptor, inout activitytoken : IBinder, in prefix : String, inout args : String) : void
+            DumpComponentInfo data = new DumpComponentInfo();
+            try {
+                data.fd = ParcelFileDescriptor.dup(fd);
+                data.token = activitytoken;
+                data.prefix = prefix;
+                data.args = args;
+                sendMessage(H.DUMP_ACTIVITY, data, 0, 0, true /*async*/);
+            } catch (IOException e) {
+                Slog.w(TAG, "dumpActivity failed", e);
+            }
+!!!1442946.java!!!	dumpProvider(inout fd : FileDescriptor, inout providertoken : IBinder, inout args : String) : void
+            DumpComponentInfo data = new DumpComponentInfo();
+            try {
+                data.fd = ParcelFileDescriptor.dup(fd);
+                data.token = providertoken;
+                data.args = args;
+                sendMessage(H.DUMP_PROVIDER, data, 0, 0, true /*async*/);
+            } catch (IOException e) {
+                Slog.w(TAG, "dumpProvider failed", e);
+            }
+!!!1443074.java!!!	dumpMemInfo(inout fd : FileDescriptor, inout mem : Debug.MemoryInfo, inout checkin : boolean, inout dumpFullInfo : boolean, inout dumpDalvik : boolean, inout args : String) : void
+            FileOutputStream fout = new FileOutputStream(fd);
+            PrintWriter pw = new FastPrintWriter(fout);
+            try {
+                dumpMemInfo(pw, mem, checkin, dumpFullInfo, dumpDalvik);
+            } finally {
+                pw.flush();
+            }
+!!!1443202.java!!!	dumpMemInfo(inout pw : PrintWriter, inout memInfo : Debug.MemoryInfo, inout checkin : boolean, inout dumpFullInfo : boolean, inout dumpDalvik : boolean) : void
+            long nativeMax = Debug.getNativeHeapSize() / 1024;
+            long nativeAllocated = Debug.getNativeHeapAllocatedSize() / 1024;
+            long nativeFree = Debug.getNativeHeapFreeSize() / 1024;
+
+            Runtime runtime = Runtime.getRuntime();
+
+            long dalvikMax = runtime.totalMemory() / 1024;
+            long dalvikFree = runtime.freeMemory() / 1024;
+            long dalvikAllocated = dalvikMax - dalvikFree;
+            long viewInstanceCount = ViewDebug.getViewInstanceCount();
+            long viewRootInstanceCount = ViewDebug.getViewRootImplCount();
+            long appContextInstanceCount = Debug.countInstancesOfClass(ContextImpl.class);
+            long activityInstanceCount = Debug.countInstancesOfClass(Activity.class);
+            int globalAssetCount = AssetManager.getGlobalAssetCount();
+            int globalAssetManagerCount = AssetManager.getGlobalAssetManagerCount();
+            int binderLocalObjectCount = Debug.getBinderLocalObjectCount();
+            int binderProxyObjectCount = Debug.getBinderProxyObjectCount();
+            int binderDeathObjectCount = Debug.getBinderDeathObjectCount();
+            long openSslSocketCount = Debug.countInstancesOfClass(OpenSSLSocketImpl.class);
+            SQLiteDebug.PagerStats stats = SQLiteDebug.getDatabaseInfo();
+
+            dumpMemInfoTable(pw, memInfo, checkin, dumpFullInfo, dumpDalvik, Process.myPid(),
+                    (mBoundApplication != null) ? mBoundApplication.processName : "unknown",
+                    nativeMax, nativeAllocated, nativeFree,
+                    dalvikMax, dalvikAllocated, dalvikFree);
+
+            if (checkin) {
+                // NOTE: if you change anything significant below, also consider changing
+                // ACTIVITY_THREAD_CHECKIN_VERSION.
+
+                // Object counts
+                pw.print(viewInstanceCount); pw.print(',');
+                pw.print(viewRootInstanceCount); pw.print(',');
+                pw.print(appContextInstanceCount); pw.print(',');
+                pw.print(activityInstanceCount); pw.print(',');
+
+                pw.print(globalAssetCount); pw.print(',');
+                pw.print(globalAssetManagerCount); pw.print(',');
+                pw.print(binderLocalObjectCount); pw.print(',');
+                pw.print(binderProxyObjectCount); pw.print(',');
+
+                pw.print(binderDeathObjectCount); pw.print(',');
+                pw.print(openSslSocketCount); pw.print(',');
+
+                // SQL
+                pw.print(stats.memoryUsed / 1024); pw.print(',');
+                pw.print(stats.memoryUsed / 1024); pw.print(',');
+                pw.print(stats.pageCacheOverflow / 1024); pw.print(',');
+                pw.print(stats.largestMemAlloc / 1024);
+                for (int i = 0; i < stats.dbStats.size(); i++) {
+                    DbStats dbStats = stats.dbStats.get(i);
+                    pw.print(','); pw.print(dbStats.dbName);
+                    pw.print(','); pw.print(dbStats.pageSize);
+                    pw.print(','); pw.print(dbStats.dbSize);
+                    pw.print(','); pw.print(dbStats.lookaside);
+                    pw.print(','); pw.print(dbStats.cache);
+                    pw.print(','); pw.print(dbStats.cache);
+                }
+                pw.println();
+
+                return;
+            }
+
+            pw.println(" ");
+            pw.println(" Objects");
+            printRow(pw, TWO_COUNT_COLUMNS, "Views:", viewInstanceCount, "ViewRootImpl:",
+                    viewRootInstanceCount);
+
+            printRow(pw, TWO_COUNT_COLUMNS, "AppContexts:", appContextInstanceCount,
+                    "Activities:", activityInstanceCount);
+
+            printRow(pw, TWO_COUNT_COLUMNS, "Assets:", globalAssetCount,
+                    "AssetManagers:", globalAssetManagerCount);
+
+            printRow(pw, TWO_COUNT_COLUMNS, "Local Binders:", binderLocalObjectCount,
+                    "Proxy Binders:", binderProxyObjectCount);
+            printRow(pw, ONE_COUNT_COLUMN, "Death Recipients:", binderDeathObjectCount);
+
+            printRow(pw, ONE_COUNT_COLUMN, "OpenSSL Sockets:", openSslSocketCount);
+
+            // SQLite mem info
+            pw.println(" ");
+            pw.println(" SQL");
+            printRow(pw, ONE_COUNT_COLUMN, "MEMORY_USED:", stats.memoryUsed / 1024);
+            printRow(pw, TWO_COUNT_COLUMNS, "PAGECACHE_OVERFLOW:",
+                    stats.pageCacheOverflow / 1024, "MALLOC_SIZE:", stats.largestMemAlloc / 1024);
+            pw.println(" ");
+            int N = stats.dbStats.size();
+            if (N > 0) {
+                pw.println(" DATABASES");
+                printRow(pw, "  %8s %8s %14s %14s  %s", "pgsz", "dbsz", "Lookaside(b)", "cache",
+                        "Dbname");
+                for (int i = 0; i < N; i++) {
+                    DbStats dbStats = stats.dbStats.get(i);
+                    printRow(pw, DB_INFO_FORMAT,
+                            (dbStats.pageSize > 0) ? String.valueOf(dbStats.pageSize) : " ",
+                            (dbStats.dbSize > 0) ? String.valueOf(dbStats.dbSize) : " ",
+                            (dbStats.lookaside > 0) ? String.valueOf(dbStats.lookaside) : " ",
+                            dbStats.cache, dbStats.dbName);
+                }
+            }
+
+            // Asset details.
+            String assetAlloc = AssetManager.getAssetAllocations();
+            if (assetAlloc != null) {
+                pw.println(" ");
+                pw.println(" Asset Allocations");
+                pw.print(assetAlloc);
+            }
+!!!1443330.java!!!	dumpGfxInfo(inout fd : FileDescriptor, inout args : String) : void
+            dumpGraphicsInfo(fd);
+            WindowManagerGlobal.getInstance().dumpGfxInfo(fd);
+!!!1443458.java!!!	dumpDbInfo(inout fd : FileDescriptor, inout args : String) : void
+            PrintWriter pw = new FastPrintWriter(new FileOutputStream(fd));
+            PrintWriterPrinter printer = new PrintWriterPrinter(pw);
+            SQLiteDebug.dump(printer, args);
+            pw.flush();
+!!!1443586.java!!!	unstableProviderDied(inout provider : IBinder) : void
+            sendMessage(H.UNSTABLE_PROVIDER_DIED, provider);
+!!!1443714.java!!!	requestAssistContextExtras(inout activityToken : IBinder, inout requestToken : IBinder, in requestType : int) : void
+            RequestAssistContextExtras cmd = new RequestAssistContextExtras();
+            cmd.activityToken = activityToken;
+            cmd.requestToken = requestToken;
+            cmd.requestType = requestType;
+            sendMessage(H.REQUEST_ASSIST_CONTEXT_EXTRAS, cmd);
+!!!1443842.java!!!	setCoreSettings(inout coreSettings : Bundle) : void
+            sendMessage(H.SET_CORE_SETTINGS, coreSettings);
+!!!1443970.java!!!	updatePackageCompatibilityInfo(in pkg : String, inout info : CompatibilityInfo) : void
+            UpdateCompatibilityData ucd = new UpdateCompatibilityData();
+            ucd.pkg = pkg;
+            ucd.info = info;
+            sendMessage(H.UPDATE_PACKAGE_COMPATIBILITY_INFO, ucd);
+!!!1444098.java!!!	scheduleTrimMemory(in level : int) : void
+            sendMessage(H.TRIM_MEMORY, null, level);
+!!!1444226.java!!!	scheduleTranslucentConversionComplete(inout token : IBinder, inout drawComplete : boolean) : void
+            sendMessage(H.TRANSLUCENT_CONVERSION_COMPLETE, token, drawComplete ? 1 : 0);
+!!!1444354.java!!!	scheduleOnNewActivityOptions(inout token : IBinder, inout options : ActivityOptions) : void
+            sendMessage(H.ON_NEW_ACTIVITY_OPTIONS,
+                    new Pair<IBinder, ActivityOptions>(token, options));
+!!!1444482.java!!!	setProcessState(in state : int) : void
+            updateProcessState(state, true);
+!!!1444610.java!!!	updateProcessState(in processState : int, inout fromIpc : boolean) : void
+            synchronized (this) {
+                if (mLastProcessState != processState) {
+                    mLastProcessState = processState;
+                    // Update Dalvik state based on ActivityManager.PROCESS_STATE_* constants.
+                    final int DALVIK_PROCESS_STATE_JANK_PERCEPTIBLE = 0;
+                    final int DALVIK_PROCESS_STATE_JANK_IMPERCEPTIBLE = 1;
+                    int dalvikProcessState = DALVIK_PROCESS_STATE_JANK_IMPERCEPTIBLE;
+                    // TODO: Tune this since things like gmail sync are important background but not jank perceptible.
+                    if (processState <= ActivityManager.PROCESS_STATE_IMPORTANT_FOREGROUND) {
+                        dalvikProcessState = DALVIK_PROCESS_STATE_JANK_PERCEPTIBLE;
+                    }
+                    VMRuntime.getRuntime().updateProcessState(dalvikProcessState);
+                    if (false) {
+                        Slog.i(TAG, "******************* PROCESS STATE CHANGED TO: " + processState
+                                + (fromIpc ? " (from ipc": ""));
+                    }
+                }
+            }
+!!!1444738.java!!!	scheduleInstallProvider(inout provider : ProviderInfo) : void
+            sendMessage(H.INSTALL_PROVIDER, provider);
+!!!1444866.java!!!	updateTimePrefs(inout is24Hour : boolean) : void
+            DateFormat.set24HourTimePref(is24Hour);
+!!!1444994.java!!!	scheduleCancelVisibleBehind(inout token : IBinder) : void
+            sendMessage(H.CANCEL_VISIBLE_BEHIND, token);
+!!!1445122.java!!!	scheduleBackgroundVisibleBehindChanged(inout token : IBinder, inout visible : boolean) : void
+            sendMessage(H.BACKGROUND_VISIBLE_BEHIND_CHANGED, token, visible ? 1 : 0);
+!!!1445250.java!!!	scheduleEnterAnimationComplete(inout token : IBinder) : void
+            sendMessage(H.ENTER_ANIMATION_COMPLETE, token);

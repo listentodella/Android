@@ -1,0 +1,55 @@
+class RemoteInput
+!!!1721474.java!!!	RemoteInput(in resultKey : String, inout label : CharSequence, inout choices : CharSequence, in flags : int, inout extras : Bundle)
+        this.mResultKey = resultKey;
+        this.mLabel = label;
+        this.mChoices = choices;
+        this.mFlags = flags;
+        this.mExtras = extras;
+!!!1721602.java!!!	getResultKey() : String
+        return mResultKey;
+!!!1721730.java!!!	getLabel() : CharSequence
+        return mLabel;
+!!!1721858.java!!!	getChoices() : CharSequence
+        return mChoices;
+!!!1721986.java!!!	getAllowFreeFormInput() : boolean
+        return (mFlags & FLAG_ALLOW_FREE_FORM_INPUT) != 0;
+!!!1722114.java!!!	getExtras() : Bundle
+        return mExtras;
+!!!1723266.java!!!	RemoteInput(inout in : Parcel)
+        mResultKey = in.readString();
+        mLabel = in.readCharSequence();
+        mChoices = in.readCharSequenceArray();
+        mFlags = in.readInt();
+        mExtras = in.readBundle();
+!!!1723394.java!!!	getResultsFromIntent(inout intent : Intent) : Bundle
+        ClipData clipData = intent.getClipData();
+        if (clipData == null) {
+            return null;
+        }
+        ClipDescription clipDescription = clipData.getDescription();
+        if (!clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_INTENT)) {
+            return null;
+        }
+        if (clipDescription.getLabel().equals(RESULTS_CLIP_LABEL)) {
+            return clipData.getItemAt(0).getIntent().getExtras().getParcelable(EXTRA_RESULTS_DATA);
+        }
+        return null;
+!!!1723522.java!!!	addResultsToIntent(inout remoteInputs : RemoteInput, inout intent : Intent, inout results : Bundle) : void
+        Bundle resultsBundle = new Bundle();
+        for (RemoteInput remoteInput : remoteInputs) {
+            Object result = results.get(remoteInput.getResultKey());
+            if (result instanceof CharSequence) {
+                resultsBundle.putCharSequence(remoteInput.getResultKey(), (CharSequence) result);
+            }
+        }
+        Intent clipIntent = new Intent();
+        clipIntent.putExtra(EXTRA_RESULTS_DATA, resultsBundle);
+        intent.setClipData(ClipData.newIntent(RESULTS_CLIP_LABEL, clipIntent));
+!!!1723650.java!!!	describeContents() : int
+        return 0;
+!!!1723778.java!!!	writeToParcel(inout out : Parcel, in flags : int) : void
+        out.writeString(mResultKey);
+        out.writeCharSequence(mLabel);
+        out.writeCharSequenceArray(mChoices);
+        out.writeInt(mFlags);
+        out.writeBundle(mExtras);

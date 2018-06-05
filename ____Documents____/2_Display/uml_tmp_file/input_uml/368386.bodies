@@ -1,0 +1,7 @@
+class ChangeObserver
+!!!2164098.java!!!	ChangeObserver()
+            super(new Handler());
+!!!2164226.java!!!	deliverSelfNotifications() : boolean
+            return true;
+!!!2164354.java!!!	onChange(inout selfChange : boolean) : void
+            onContentChanged();

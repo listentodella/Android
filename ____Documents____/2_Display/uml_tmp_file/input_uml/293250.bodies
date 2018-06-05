@@ -1,0 +1,73 @@
+class ActivityMonitor
+!!!1625090.java!!!	ActivityMonitor(inout which : IntentFilter, inout result : Instrumentation::ActivityResult, inout block : boolean)
+            mWhich = which;
+            mClass = null;
+            mResult = result;
+            mBlock = block;
+!!!1625218.java!!!	ActivityMonitor(in cls : String, inout result : Instrumentation::ActivityResult, inout block : boolean)
+            mWhich = null;
+            mClass = cls;
+            mResult = result;
+            mBlock = block;
+!!!1625346.java!!!	getFilter() : IntentFilter
+            return mWhich;
+!!!1625474.java!!!	getResult() : Instrumentation::ActivityResult
+            return mResult;
+!!!1625602.java!!!	isBlocking() : boolean
+            return mBlock;
+!!!1625730.java!!!	getHits() : int
+            return mHits;
+!!!1625858.java!!!	getLastActivity() : Activity
+            return mLastActivity;
+!!!1625986.java!!!	waitForActivity() : Activity
+            synchronized (this) {
+                while (mLastActivity == null) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+                Activity res = mLastActivity;
+                mLastActivity = null;
+                return res;
+            }
+!!!1626114.java!!!	waitForActivityWithTimeout(in timeOut : long) : Activity
+            synchronized (this) {
+                if (mLastActivity == null) {
+                    try {
+                        wait(timeOut);
+                    } catch (InterruptedException e) {
+                    }
+                }
+                if (mLastActivity == null) {
+                    return null;
+                } else {
+                    Activity res = mLastActivity;
+                    mLastActivity = null;
+                    return res;
+                }
+            }
+!!!1626242.java!!!	match(inout who : Context, inout activity : Activity, inout intent : Intent) : boolean
+            synchronized (this) {
+                if (mWhich != null
+                    && mWhich.match(who.getContentResolver(), intent,
+                                    true, "Instrumentation") < 0) {
+                    return false;
+                }
+                if (mClass != null) {
+                    String cls = null;
+                    if (activity != null) {
+                        cls = activity.getClass().getName();
+                    } else if (intent.getComponent() != null) {
+                        cls = intent.getComponent().getClassName();
+                    }
+                    if (cls == null || !mClass.equals(cls)) {
+                        return false;
+                    }
+                }
+                if (activity != null) {
+                    mLastActivity = activity;
+                    notifyAll();
+                }
+                return true;
+            }

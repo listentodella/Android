@@ -1,0 +1,6 @@
+class ConfirmationRequest
+!!!1758338.java!!!	ConfirmationRequest(inout prompt : CharSequence, inout extras : Bundle)
+            mPrompt = prompt;
+            mExtras = extras;
+!!!1758594.java!!!	submit(inout interactor : IVoiceInteractor, in packageName : String, inout callback : IVoiceInteractorCallback) : IVoiceInteractorRequest
+            return interactor.startConfirmation(packageName, callback, mPrompt, mExtras);

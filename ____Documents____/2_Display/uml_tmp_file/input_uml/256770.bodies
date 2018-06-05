@@ -1,0 +1,41 @@
+class AnimationController
+!!!1186562.java!!!	AnimationController(inout context : Context, inout looper : Looper)
+                        super(looper);
+                        mShowHideFrameAnimator = ObjectAnimator.ofInt(ViewportWindow.this,
+                                PROPERTY_NAME_ALPHA, MIN_ALPHA, MAX_ALPHA);
+
+                        Interpolator interpolator = new DecelerateInterpolator(2.5f);
+                        final long longAnimationDuration = context.getResources().getInteger(
+                                com.android.internal.R.integer.config_longAnimTime);
+
+                        mShowHideFrameAnimator.setInterpolator(interpolator);
+                        mShowHideFrameAnimator.setDuration(longAnimationDuration);
+!!!1186690.java!!!	onFrameShownStateChanged(inout shown : boolean, inout animate : boolean) : void
+                        obtainMessage(MSG_FRAME_SHOWN_STATE_CHANGED,
+                                shown ? 1 : 0, animate ? 1 : 0).sendToTarget();
+!!!1186818.java!!!	handleMessage(inout message : Message) : void
+                        switch (message.what) {
+                            case MSG_FRAME_SHOWN_STATE_CHANGED: {
+                                final boolean shown = message.arg1 == 1;
+                                final boolean animate = message.arg2 == 1;
+
+                                if (animate) {
+                                    if (mShowHideFrameAnimator.isRunning()) {
+                                        mShowHideFrameAnimator.reverse();
+                                    } else {
+                                        if (shown) {
+                                            mShowHideFrameAnimator.start();
+                                        } else {
+                                            mShowHideFrameAnimator.reverse();
+                                        }
+                                    }
+                                } else {
+                                    mShowHideFrameAnimator.cancel();
+                                    if (shown) {
+                                        setAlpha(MAX_ALPHA);
+                                    } else {
+                                        setAlpha(MIN_ALPHA);
+                                    }
+                                }
+                            } break;
+                        }

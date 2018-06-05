@@ -1,0 +1,125 @@
+class WindowInsets
+!!!1026434.java!!!	WindowInsets(inout systemWindowInsets : Rect, inout windowDecorInsets : Rect, inout stableInsets : Rect, inout isRound : boolean)
+        mSystemWindowInsetsConsumed = systemWindowInsets == null;
+        mSystemWindowInsets = mSystemWindowInsetsConsumed ? EMPTY_RECT : systemWindowInsets;
+
+        mWindowDecorInsetsConsumed = windowDecorInsets == null;
+        mWindowDecorInsets = mWindowDecorInsetsConsumed ? EMPTY_RECT : windowDecorInsets;
+
+        mStableInsetsConsumed = stableInsets == null;
+        mStableInsets = mStableInsetsConsumed ? EMPTY_RECT : stableInsets;
+
+        mIsRound = isRound;
+!!!1026562.java!!!	WindowInsets(inout src : WindowInsets)
+        mSystemWindowInsets = src.mSystemWindowInsets;
+        mWindowDecorInsets = src.mWindowDecorInsets;
+        mStableInsets = src.mStableInsets;
+        mSystemWindowInsetsConsumed = src.mSystemWindowInsetsConsumed;
+        mWindowDecorInsetsConsumed = src.mWindowDecorInsetsConsumed;
+        mStableInsetsConsumed = src.mStableInsetsConsumed;
+        mIsRound = src.mIsRound;
+!!!1026690.java!!!	WindowInsets(inout systemWindowInsets : Rect)
+        this(systemWindowInsets, null, null, false);
+!!!1026818.java!!!	getSystemWindowInsets() : Rect
+        if (mTempRect == null) {
+            mTempRect = new Rect();
+        }
+        if (mSystemWindowInsets != null) {
+            mTempRect.set(mSystemWindowInsets);
+        } else {
+            // If there were no system window insets, this is just empty.
+            mTempRect.setEmpty();
+        }
+        return mTempRect;
+!!!1026946.java!!!	getSystemWindowInsetLeft() : int
+        return mSystemWindowInsets.left;
+!!!1027074.java!!!	getSystemWindowInsetTop() : int
+        return mSystemWindowInsets.top;
+!!!1027202.java!!!	getSystemWindowInsetRight() : int
+        return mSystemWindowInsets.right;
+!!!1027330.java!!!	getSystemWindowInsetBottom() : int
+        return mSystemWindowInsets.bottom;
+!!!1027458.java!!!	getWindowDecorInsetLeft() : int
+        return mWindowDecorInsets.left;
+!!!1027586.java!!!	getWindowDecorInsetTop() : int
+        return mWindowDecorInsets.top;
+!!!1027714.java!!!	getWindowDecorInsetRight() : int
+        return mWindowDecorInsets.right;
+!!!1027842.java!!!	getWindowDecorInsetBottom() : int
+        return mWindowDecorInsets.bottom;
+!!!1027970.java!!!	hasSystemWindowInsets() : boolean
+        return mSystemWindowInsets.left != 0 || mSystemWindowInsets.top != 0 ||
+                mSystemWindowInsets.right != 0 || mSystemWindowInsets.bottom != 0;
+!!!1028098.java!!!	hasWindowDecorInsets() : boolean
+        return mWindowDecorInsets.left != 0 || mWindowDecorInsets.top != 0 ||
+                mWindowDecorInsets.right != 0 || mWindowDecorInsets.bottom != 0;
+!!!1028226.java!!!	hasInsets() : boolean
+        return hasSystemWindowInsets() || hasWindowDecorInsets();
+!!!1028354.java!!!	isConsumed() : boolean
+        return mSystemWindowInsetsConsumed && mWindowDecorInsetsConsumed && mStableInsetsConsumed;
+!!!1028482.java!!!	isRound() : boolean
+        return mIsRound;
+!!!1028610.java!!!	consumeSystemWindowInsets() : WindowInsets
+        final WindowInsets result = new WindowInsets(this);
+        result.mSystemWindowInsets = EMPTY_RECT;
+        result.mSystemWindowInsetsConsumed = true;
+        return result;
+!!!1028738.java!!!	consumeSystemWindowInsets(inout left : boolean, inout top : boolean, inout right : boolean, inout bottom : boolean) : WindowInsets
+        if (left || top || right || bottom) {
+            final WindowInsets result = new WindowInsets(this);
+            result.mSystemWindowInsets = new Rect(
+                    left ? 0 : mSystemWindowInsets.left,
+                    top ? 0 : mSystemWindowInsets.top,
+                    right ? 0 : mSystemWindowInsets.right,
+                    bottom ? 0 : mSystemWindowInsets.bottom);
+            return result;
+        }
+        return this;
+!!!1028866.java!!!	replaceSystemWindowInsets(in left : int, in top : int, in right : int, in bottom : int) : WindowInsets
+        final WindowInsets result = new WindowInsets(this);
+        result.mSystemWindowInsets = new Rect(left, top, right, bottom);
+        return result;
+!!!1028994.java!!!	replaceSystemWindowInsets(inout systemWindowInsets : Rect) : WindowInsets
+        final WindowInsets result = new WindowInsets(this);
+        result.mSystemWindowInsets = new Rect(systemWindowInsets);
+        return result;
+!!!1029122.java!!!	consumeWindowDecorInsets() : WindowInsets
+        final WindowInsets result = new WindowInsets(this);
+        result.mWindowDecorInsets.set(0, 0, 0, 0);
+        result.mWindowDecorInsetsConsumed = true;
+        return result;
+!!!1029250.java!!!	consumeWindowDecorInsets(inout left : boolean, inout top : boolean, inout right : boolean, inout bottom : boolean) : WindowInsets
+        if (left || top || right || bottom) {
+            final WindowInsets result = new WindowInsets(this);
+            result.mWindowDecorInsets = new Rect(left ? 0 : mWindowDecorInsets.left,
+                    top ? 0 : mWindowDecorInsets.top,
+                    right ? 0 : mWindowDecorInsets.right,
+                    bottom ? 0 : mWindowDecorInsets.bottom);
+            return result;
+        }
+        return this;
+!!!1029378.java!!!	replaceWindowDecorInsets(in left : int, in top : int, in right : int, in bottom : int) : WindowInsets
+        final WindowInsets result = new WindowInsets(this);
+        result.mWindowDecorInsets = new Rect(left, top, right, bottom);
+        return result;
+!!!1029506.java!!!	getStableInsetTop() : int
+        return mStableInsets.top;
+!!!1029634.java!!!	getStableInsetLeft() : int
+        return mStableInsets.left;
+!!!1029762.java!!!	getStableInsetRight() : int
+        return mStableInsets.right;
+!!!1029890.java!!!	getStableInsetBottom() : int
+        return mStableInsets.bottom;
+!!!1030018.java!!!	hasStableInsets() : boolean
+        return mStableInsets.top != 0 || mStableInsets.left != 0 || mStableInsets.right != 0
+                || mStableInsets.bottom != 0;
+!!!1030146.java!!!	consumeStableInsets() : WindowInsets
+        final WindowInsets result = new WindowInsets(this);
+        result.mStableInsets = EMPTY_RECT;
+        result.mStableInsetsConsumed = true;
+        return result;
+!!!1030274.java!!!	toString() : String
+        return "WindowInsets{systemWindowInsets=" + mSystemWindowInsets
+                + " windowDecorInsets=" + mWindowDecorInsets
+                + " stableInsets=" + mStableInsets +
+                (isRound() ? " round}" : "}");

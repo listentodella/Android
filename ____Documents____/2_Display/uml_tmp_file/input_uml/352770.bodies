@@ -1,0 +1,508 @@
+class AbsSeekBar
+!!!1974018.java!!!	AbsSeekBar(inout context : Context)
+        super(context);
+!!!1974146.java!!!	AbsSeekBar(inout context : Context, inout attrs : AttributeSet)
+        super(context, attrs);
+!!!1974274.java!!!	AbsSeekBar(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!1974402.java!!!	AbsSeekBar(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        TypedArray a = context.obtainStyledAttributes(
+                attrs, com.android.internal.R.styleable.SeekBar, defStyleAttr, defStyleRes);
+
+        final Drawable thumb = a.getDrawable(com.android.internal.R.styleable.SeekBar_thumb);
+        setThumb(thumb);
+
+        if (a.hasValue(R.styleable.SeekBar_thumbTintMode)) {
+            mThumbTintMode = Drawable.parseTintMode(a.getInt(
+                    R.styleable.SeekBar_thumbTintMode, -1), mThumbTintMode);
+            mHasThumbTintMode = true;
+        }
+
+        if (a.hasValue(R.styleable.SeekBar_thumbTint)) {
+            mThumbTintList = a.getColorStateList(R.styleable.SeekBar_thumbTint);
+            mHasThumbTint = true;
+        }
+
+        // Guess thumb offset if thumb != null, but allow layout to override.
+        final int thumbOffset = a.getDimensionPixelOffset(
+                com.android.internal.R.styleable.SeekBar_thumbOffset, getThumbOffset());
+        setThumbOffset(thumbOffset);
+
+        mSplitTrack = a.getBoolean(com.android.internal.R.styleable.SeekBar_splitTrack, false);
+        a.recycle();
+
+        a = context.obtainStyledAttributes(attrs,
+                com.android.internal.R.styleable.Theme, 0, 0);
+        mDisabledAlpha = a.getFloat(com.android.internal.R.styleable.Theme_disabledAlpha, 0.5f);
+        a.recycle();
+
+        applyThumbTint();
+
+        mScaledTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+!!!1974530.java!!!	setThumb(inout thumb : Drawable) : void
+        final boolean needUpdate;
+        // This way, calling setThumb again with the same bitmap will result in
+        // it recalcuating mThumbOffset (if for example it the bounds of the
+        // drawable changed)
+        if (mThumb != null && thumb != mThumb) {
+            mThumb.setCallback(null);
+            needUpdate = true;
+        } else {
+            needUpdate = false;
+        }
+
+        if (thumb != null) {
+            thumb.setCallback(this);
+            if (canResolveLayoutDirection()) {
+                thumb.setLayoutDirection(getLayoutDirection());
+            }
+
+            // Assuming the thumb drawable is symmetric, set the thumb offset
+            // such that the thumb will hang halfway off either edge of the
+            // progress bar.
+            mThumbOffset = thumb.getIntrinsicWidth() / 2;
+
+            // If we're updating get the new states
+            if (needUpdate &&
+                    (thumb.getIntrinsicWidth() != mThumb.getIntrinsicWidth()
+                        || thumb.getIntrinsicHeight() != mThumb.getIntrinsicHeight())) {
+                requestLayout();
+            }
+        }
+
+        mThumb = thumb;
+
+        applyThumbTint();
+        invalidate();
+
+        if (needUpdate) {
+            updateThumbAndTrackPos(getWidth(), getHeight());
+            if (thumb != null && thumb.isStateful()) {
+                // Note that if the states are different this won't work.
+                // For now, let's consider that an app bug.
+                int[] state = getDrawableState();
+                thumb.setState(state);
+            }
+        }
+!!!1974658.java!!!	getThumb() : Drawable
+        return mThumb;
+!!!1974786.java!!!	setThumbTintList(inout tint : ColorStateList) : void
+        mThumbTintList = tint;
+        mHasThumbTint = true;
+
+        applyThumbTint();
+!!!1974914.java!!!	getThumbTintList() : ColorStateList
+        return mThumbTintList;
+!!!1975042.java!!!	setThumbTintMode(inout tintMode : PorterDuff.Mode) : void
+        mThumbTintMode = tintMode;
+        mHasThumbTintMode = true;
+
+        applyThumbTint();
+!!!1975170.java!!!	getThumbTintMode() : PorterDuff.Mode
+        return mThumbTintMode;
+!!!1975298.java!!!	applyThumbTint() : void
+        if (mThumb != null && (mHasThumbTint || mHasThumbTintMode)) {
+            mThumb = mThumb.mutate();
+
+            if (mHasThumbTint) {
+                mThumb.setTintList(mThumbTintList);
+            }
+
+            if (mHasThumbTintMode) {
+                mThumb.setTintMode(mThumbTintMode);
+            }
+        }
+!!!1975426.java!!!	getThumbOffset() : int
+        return mThumbOffset;
+!!!1975554.java!!!	setThumbOffset(in thumbOffset : int) : void
+        mThumbOffset = thumbOffset;
+        invalidate();
+!!!1975682.java!!!	setSplitTrack(inout splitTrack : boolean) : void
+        mSplitTrack = splitTrack;
+        invalidate();
+!!!1975810.java!!!	getSplitTrack() : boolean
+        return mSplitTrack;
+!!!1975938.java!!!	setKeyProgressIncrement(in increment : int) : void
+        mKeyProgressIncrement = increment < 0 ? -increment : increment;
+!!!1976066.java!!!	getKeyProgressIncrement() : int
+        return mKeyProgressIncrement;
+!!!1976194.java!!!	setMax(in max : int) : void
+        super.setMax(max);
+
+        if ((mKeyProgressIncrement == 0) || (getMax() / mKeyProgressIncrement > 20)) {
+            // It will take the user too long to change this via keys, change it
+            // to something more reasonable
+            setKeyProgressIncrement(Math.max(1, Math.round((float) getMax() / 20)));
+        }
+!!!1976322.java!!!	verifyDrawable(inout who : Drawable) : boolean
+        return who == mThumb || super.verifyDrawable(who);
+!!!1976450.java!!!	jumpDrawablesToCurrentState() : void
+        super.jumpDrawablesToCurrentState();
+
+        if (mThumb != null) {
+            mThumb.jumpToCurrentState();
+        }
+!!!1976578.java!!!	drawableStateChanged() : void
+        super.drawableStateChanged();
+
+        final Drawable progressDrawable = getProgressDrawable();
+        if (progressDrawable != null) {
+            progressDrawable.setAlpha(isEnabled() ? NO_ALPHA : (int) (NO_ALPHA * mDisabledAlpha));
+        }
+
+        final Drawable thumb = mThumb;
+        if (thumb != null && thumb.isStateful()) {
+            thumb.setState(getDrawableState());
+        }
+!!!1976706.java!!!	drawableHotspotChanged(in x : float, in y : float) : void
+        super.drawableHotspotChanged(x, y);
+
+        if (mThumb != null) {
+            mThumb.setHotspot(x, y);
+        }
+!!!1976834.java!!!	onProgressRefresh(in scale : float, inout fromUser : boolean) : void
+        super.onProgressRefresh(scale, fromUser);
+
+        if (!isAnimationRunning()) {
+            setThumbPos(scale);
+        }
+!!!1976962.java!!!	onAnimatePosition(in scale : float, inout fromUser : boolean) : void
+        setThumbPos(scale);
+!!!1977090.java!!!	onSizeChanged(in w : int, in h : int, in oldw : int, in oldh : int) : void
+        super.onSizeChanged(w, h, oldw, oldh);
+
+        updateThumbAndTrackPos(w, h);
+!!!1977218.java!!!	updateThumbAndTrackPos(in w : int, in h : int) : void
+        final Drawable track = getCurrentDrawable();
+        final Drawable thumb = mThumb;
+
+        // The max height does not incorporate padding, whereas the height
+        // parameter does.
+        final int trackHeight = Math.min(mMaxHeight, h - mPaddingTop - mPaddingBottom);
+        final int thumbHeight = thumb == null ? 0 : thumb.getIntrinsicHeight();
+
+        // Apply offset to whichever item is taller.
+        final int trackOffset;
+        final int thumbOffset;
+        if (thumbHeight > trackHeight) {
+            trackOffset = (thumbHeight - trackHeight) / 2;
+            thumbOffset = 0;
+        } else {
+            trackOffset = 0;
+            thumbOffset = (trackHeight - thumbHeight) / 2;
+        }
+
+        if (track != null) {
+            track.setBounds(0, trackOffset, w - mPaddingRight - mPaddingLeft,
+                    h - mPaddingBottom - trackOffset - mPaddingTop);
+        }
+
+        if (thumb != null) {
+            setThumbPos(w, thumb, getScale(), thumbOffset);
+        }
+!!!1977346.java!!!	getScale() : float
+        final int max = getMax();
+        return max > 0 ? getProgress() / (float) max : 0;
+!!!1977474.java!!!	setThumbPos(in scale : float) : void
+        final Drawable thumb = mThumb;
+        if (thumb != null) {
+            setThumbPos(getWidth(), thumb, scale, Integer.MIN_VALUE);
+            // Since we draw translated, the drawable's bounds that it signals
+            // for invalidation won't be the actual bounds we want invalidated,
+            // so just invalidate this whole view.
+            invalidate();
+
+        }
+!!!1977602.java!!!	setThumbPos(in w : int, inout thumb : Drawable, in scale : float, in offset : int) : void
+        int available = w - mPaddingLeft - mPaddingRight;
+        final int thumbWidth = thumb.getIntrinsicWidth();
+        final int thumbHeight = thumb.getIntrinsicHeight();
+        available -= thumbWidth;
+
+        // The extra space for the thumb to move on the track
+        available += mThumbOffset * 2;
+
+        final int thumbPos = (int) (scale * available + 0.5f);
+
+        final int top, bottom;
+        if (offset == Integer.MIN_VALUE) {
+            final Rect oldBounds = thumb.getBounds();
+            top = oldBounds.top;
+            bottom = oldBounds.bottom;
+        } else {
+            top = offset;
+            bottom = offset + thumbHeight;
+        }
+
+        final int left = (isLayoutRtl() && mMirrorForRtl) ? available - thumbPos : thumbPos;
+        final int right = left + thumbWidth;
+
+        final Drawable background = getBackground();
+        if (background != null) {
+            final Rect bounds = thumb.getBounds();
+            final int offsetX = mPaddingLeft - mThumbOffset;
+            final int offsetY = mPaddingTop;
+            background.setHotspotBounds(left + offsetX, top + offsetY,
+                    right + offsetX, bottom + offsetY);
+        }
+
+        // Canvas will be translated, so 0,0 is where we start drawing
+        thumb.setBounds(left, top, right, bottom);
+!!!1977730.java!!!	onResolveDrawables(in layoutDirection : int) : void
+        super.onResolveDrawables(layoutDirection);
+
+        if (mThumb != null) {
+            mThumb.setLayoutDirection(layoutDirection);
+        }
+!!!1977858.java!!!	onDraw(inout canvas : Canvas) : void
+        super.onDraw(canvas);
+        drawThumb(canvas);
+
+!!!1977986.java!!!	drawTrack(inout canvas : Canvas) : void
+        final Drawable thumbDrawable = mThumb;
+        if (thumbDrawable != null && mSplitTrack) {
+            final Insets insets = thumbDrawable.getOpticalInsets();
+            final Rect tempRect = mTempRect;
+            thumbDrawable.copyBounds(tempRect);
+            tempRect.offset(mPaddingLeft - mThumbOffset, mPaddingTop);
+            tempRect.left += insets.left;
+            tempRect.right -= insets.right;
+
+            final int saveCount = canvas.save();
+            canvas.clipRect(tempRect, Op.DIFFERENCE);
+            super.drawTrack(canvas);
+            canvas.restoreToCount(saveCount);
+        } else {
+            super.drawTrack(canvas);
+        }
+!!!1978114.java!!!	drawThumb(inout canvas : Canvas) : void
+        if (mThumb != null) {
+            canvas.save();
+            // Translate the padding. For the x, we need to allow the thumb to
+            // draw in its extra space
+            canvas.translate(mPaddingLeft - mThumbOffset, mPaddingTop);
+            mThumb.draw(canvas);
+            canvas.restore();
+        }
+!!!1978242.java!!!	onMeasure(in widthMeasureSpec : int, in heightMeasureSpec : int) : void
+        Drawable d = getCurrentDrawable();
+
+        int thumbHeight = mThumb == null ? 0 : mThumb.getIntrinsicHeight();
+        int dw = 0;
+        int dh = 0;
+        if (d != null) {
+            dw = Math.max(mMinWidth, Math.min(mMaxWidth, d.getIntrinsicWidth()));
+            dh = Math.max(mMinHeight, Math.min(mMaxHeight, d.getIntrinsicHeight()));
+            dh = Math.max(thumbHeight, dh);
+        }
+        dw += mPaddingLeft + mPaddingRight;
+        dh += mPaddingTop + mPaddingBottom;
+
+        setMeasuredDimension(resolveSizeAndState(dw, widthMeasureSpec, 0),
+                resolveSizeAndState(dh, heightMeasureSpec, 0));
+!!!1978370.java!!!	onTouchEvent(inout event : MotionEvent) : boolean
+        if (!mIsUserSeekable || !isEnabled()) {
+            return false;
+        }
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                if (isInScrollingContainer()) {
+                    mTouchDownX = event.getX();
+                } else {
+                    setPressed(true);
+                    if (mThumb != null) {
+                        invalidate(mThumb.getBounds()); // This may be within the padding region
+                    }
+                    onStartTrackingTouch();
+                    trackTouchEvent(event);
+                    attemptClaimDrag();
+                }
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                if (mIsDragging) {
+                    trackTouchEvent(event);
+                } else {
+                    final float x = event.getX();
+                    if (Math.abs(x - mTouchDownX) > mScaledTouchSlop) {
+                        setPressed(true);
+                        if (mThumb != null) {
+                            invalidate(mThumb.getBounds()); // This may be within the padding region
+                        }
+                        onStartTrackingTouch();
+                        trackTouchEvent(event);
+                        attemptClaimDrag();
+                    }
+                }
+                break;
+
+            case MotionEvent.ACTION_UP:
+                if (mIsDragging) {
+                    trackTouchEvent(event);
+                    onStopTrackingTouch();
+                    setPressed(false);
+                } else {
+                    // Touch up when we never crossed the touch slop threshold should
+                    // be interpreted as a tap-seek to that location.
+                    onStartTrackingTouch();
+                    trackTouchEvent(event);
+                    onStopTrackingTouch();
+                }
+                // ProgressBar doesn't know to repaint the thumb drawable
+                // in its inactive state when the touch stops (because the
+                // value has not apparently changed)
+                invalidate();
+                break;
+
+            case MotionEvent.ACTION_CANCEL:
+                if (mIsDragging) {
+                    onStopTrackingTouch();
+                    setPressed(false);
+                }
+                invalidate(); // see above explanation
+                break;
+        }
+        return true;
+!!!1978498.java!!!	setHotspot(in x : float, in y : float) : void
+        final Drawable bg = getBackground();
+        if (bg != null) {
+            bg.setHotspot(x, y);
+        }
+!!!1978626.java!!!	trackTouchEvent(inout event : MotionEvent) : void
+        final int width = getWidth();
+        final int available = width - mPaddingLeft - mPaddingRight;
+        final int x = (int) event.getX();
+        float scale;
+        float progress = 0;
+        if (isLayoutRtl() && mMirrorForRtl) {
+            if (x > width - mPaddingRight) {
+                scale = 0.0f;
+            } else if (x < mPaddingLeft) {
+                scale = 1.0f;
+            } else {
+                scale = (float)(available - x + mPaddingLeft) / (float)available;
+                progress = mTouchProgressOffset;
+            }
+        } else {
+            if (x < mPaddingLeft) {
+                scale = 0.0f;
+            } else if (x > width - mPaddingRight) {
+                scale = 1.0f;
+            } else {
+                scale = (float)(x - mPaddingLeft) / (float)available;
+                progress = mTouchProgressOffset;
+            }
+        }
+        final int max = getMax();
+        progress += scale * max;
+
+        setHotspot(x, (int) event.getY());
+        setProgress((int) progress, true);
+!!!1978754.java!!!	attemptClaimDrag() : void
+        if (mParent != null) {
+            mParent.requestDisallowInterceptTouchEvent(true);
+        }
+!!!1978882.java!!!	onStartTrackingTouch() : void
+        mIsDragging = true;
+!!!1979010.java!!!	onStopTrackingTouch() : void
+        mIsDragging = false;
+!!!1979266.java!!!	onKeyDown(in keyCode : int, inout event : KeyEvent) : boolean
+        if (isEnabled()) {
+            int progress = getProgress();
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_DPAD_LEFT:
+                    if (progress <= 0) break;
+                    animateSetProgress(progress - mKeyProgressIncrement);
+                    onKeyChange();
+                    return true;
+
+                case KeyEvent.KEYCODE_DPAD_RIGHT:
+                    if (progress >= getMax()) break;
+                    animateSetProgress(progress + mKeyProgressIncrement);
+                    onKeyChange();
+                    return true;
+            }
+        }
+
+        return super.onKeyDown(keyCode, event);
+!!!1979394.java!!!	isAnimationRunning() : boolean
+        return mPositionAnimator != null && mPositionAnimator.isRunning();
+!!!1979522.java!!!	setProgress(in progress : int, inout fromUser : boolean) : void
+        if (isAnimationRunning()) {
+            mPositionAnimator.cancel();
+        }
+        super.setProgress(progress, fromUser);
+!!!1979650.java!!!	animateSetProgress(in progress : int) : void
+        float curProgress = isAnimationRunning() ? getAnimationPosition() : getProgress();
+
+        if (progress < 0) {
+            progress = 0;
+        } else if (progress > getMax()) {
+            progress = getMax();
+        }
+        setProgressValueOnly(progress);
+
+        mPositionAnimator = ObjectAnimator.ofFloat(this, "animationPosition", curProgress,
+                progress);
+        mPositionAnimator.setDuration(PROGRESS_ANIMATION_DURATION);
+        mPositionAnimator.setAutoCancel(true);
+        mPositionAnimator.start();
+!!!1979778.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(AbsSeekBar.class.getName());
+!!!1979906.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(AbsSeekBar.class.getName());
+
+        if (isEnabled()) {
+            final int progress = getProgress();
+            if (progress > 0) {
+                info.addAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
+            }
+            if (progress < getMax()) {
+                info.addAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+            }
+        }
+!!!1980034.java!!!	performAccessibilityAction(in action : int, inout arguments : Bundle) : boolean
+        if (super.performAccessibilityAction(action, arguments)) {
+            return true;
+        }
+        if (!isEnabled()) {
+            return false;
+        }
+        final int progress = getProgress();
+        final int increment = Math.max(1, Math.round((float) getMax() / 5));
+        switch (action) {
+            case AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD: {
+                if (progress <= 0) {
+                    return false;
+                }
+                setProgress(progress - increment, true);
+                onKeyChange();
+                return true;
+            }
+            case AccessibilityNodeInfo.ACTION_SCROLL_FORWARD: {
+                if (progress >= getMax()) {
+                    return false;
+                }
+                setProgress(progress + increment, true);
+                onKeyChange();
+                return true;
+            }
+        }
+        return false;
+!!!1980162.java!!!	onRtlPropertiesChanged(in layoutDirection : int) : void
+        super.onRtlPropertiesChanged(layoutDirection);
+
+        final Drawable thumb = mThumb;
+        if (thumb != null) {
+            setThumbPos(getWidth(), thumb, getScale(), Integer.MIN_VALUE);
+
+            // Since we draw translated, the drawable's bounds that it signals
+            // for invalidation won't be the actual bounds we want invalidated,
+            // so just invalidate this whole view.
+            invalidate();
+        }

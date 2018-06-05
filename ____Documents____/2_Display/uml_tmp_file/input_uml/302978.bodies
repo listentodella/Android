@@ -1,0 +1,37 @@
+class Builder
+!!!1722242.java!!!	Builder(in resultKey : String)
+            if (resultKey == null) {
+                throw new IllegalArgumentException("Result key can't be null");
+            }
+            mResultKey = resultKey;
+!!!1722370.java!!!	setLabel(inout label : CharSequence) : RemoteInput::Builder
+            mLabel = Notification.safeCharSequence(label);
+            return this;
+!!!1722498.java!!!	setChoices(inout choices : CharSequence) : RemoteInput::Builder
+            if (choices == null) {
+                mChoices = null;
+            } else {
+                mChoices = new CharSequence[choices.length];
+                for (int i = 0; i < choices.length; i++) {
+                    mChoices[i] = Notification.safeCharSequence(choices[i]);
+                }
+            }
+            return this;
+!!!1722626.java!!!	setAllowFreeFormInput(inout allowFreeFormInput : boolean) : RemoteInput::Builder
+            setFlag(mFlags, allowFreeFormInput);
+            return this;
+!!!1722754.java!!!	addExtras(inout extras : Bundle) : RemoteInput::Builder
+            if (extras != null) {
+                mExtras.putAll(extras);
+            }
+            return this;
+!!!1722882.java!!!	getExtras() : Bundle
+            return mExtras;
+!!!1723010.java!!!	setFlag(in mask : int, inout value : boolean) : void
+            if (value) {
+                mFlags |= mask;
+            } else {
+                mFlags &= ~mask;
+            }
+!!!1723138.java!!!	build() : RemoteInput
+            return new RemoteInput(mResultKey, mLabel, mChoices, mFlags, mExtras);

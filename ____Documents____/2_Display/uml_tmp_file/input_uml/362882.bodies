@@ -1,0 +1,48 @@
+class CharWrapper
+!!!2106114.java!!!	CharWrapper(inout chars : char, in start : int, in len : int)
+            mChars = chars;
+            mStart = start;
+            mLength = len;
+!!!2106242.java!!!	set(inout chars : char, in start : int, in len : int) : void
+            mChars = chars;
+            mStart = start;
+            mLength = len;
+!!!2106370.java!!!	length() : int
+            return mLength;
+!!!2106498.java!!!	charAt(in off : int) : char
+            return mChars[off + mStart];
+!!!2106626.java!!!	toString() : String
+            return new String(mChars, mStart, mLength);
+!!!2106754.java!!!	subSequence(in start : int, in end : int) : CharSequence
+            if (start < 0 || end < 0 || start > mLength || end > mLength) {
+                throw new IndexOutOfBoundsException(start + ", " + end);
+            }
+
+            return new String(mChars, start + mStart, end - start);
+!!!2106882.java!!!	getChars(in start : int, in end : int, inout buf : char, in off : int) : void
+            if (start < 0 || end < 0 || start > mLength || end > mLength) {
+                throw new IndexOutOfBoundsException(start + ", " + end);
+            }
+
+            System.arraycopy(mChars, start + mStart, buf, off, end - start);
+!!!2107010.java!!!	drawText(inout c : Canvas, in start : int, in end : int, in x : float, in y : float, inout p : Paint) : void
+            c.drawText(mChars, start + mStart, end - start, x, y, p);
+!!!2107138.java!!!	drawTextRun(inout c : Canvas, in start : int, in end : int, in contextStart : int, in contextEnd : int, in x : float, in y : float, inout isRtl : boolean, inout p : Paint) : void
+            int count = end - start;
+            int contextCount = contextEnd - contextStart;
+            c.drawTextRun(mChars, start + mStart, count, contextStart + mStart,
+                    contextCount, x, y, isRtl, p);
+!!!2107266.java!!!	measureText(in start : int, in end : int, inout p : Paint) : float
+            return p.measureText(mChars, start + mStart, end - start);
+!!!2107394.java!!!	getTextWidths(in start : int, in end : int, inout widths : float, inout p : Paint) : int
+            return p.getTextWidths(mChars, start + mStart, end - start, widths);
+!!!2107522.java!!!	getTextRunAdvances(in start : int, in end : int, in contextStart : int, in contextEnd : int, inout isRtl : boolean, inout advances : float, in advancesIndex : int, inout p : Paint) : float
+            int count = end - start;
+            int contextCount = contextEnd - contextStart;
+            return p.getTextRunAdvances(mChars, start + mStart, count,
+                    contextStart + mStart, contextCount, isRtl, advances,
+                    advancesIndex);
+!!!2107650.java!!!	getTextRunCursor(in contextStart : int, in contextEnd : int, in dir : int, in offset : int, in cursorOpt : int, inout p : Paint) : int
+            int contextCount = contextEnd - contextStart;
+            return p.getTextRunCursor(mChars, contextStart + mStart,
+                    contextCount, dir, offset + mStart, cursorOpt);

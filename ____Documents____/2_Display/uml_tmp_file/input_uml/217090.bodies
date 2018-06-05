@@ -1,0 +1,39 @@
+class DispatcherState
+!!!599170.java!!!	reset() : void
+            if (DEBUG) Log.v(TAG, "Reset: " + this);
+            mDownKeyCode = 0;
+            mDownTarget = null;
+            mActiveLongPresses.clear();
+!!!599298.java!!!	reset(inout target : Object) : void
+            if (mDownTarget == target) {
+                if (DEBUG) Log.v(TAG, "Reset in " + target + ": " + this);
+                mDownKeyCode = 0;
+                mDownTarget = null;
+            }
+!!!599426.java!!!	startTracking(inout event : KeyEvent, inout target : Object) : void
+            if (event.getAction() != ACTION_DOWN) {
+                throw new IllegalArgumentException(
+                        "Can only start tracking on a down event");
+            }
+            if (DEBUG) Log.v(TAG, "Start trackingt in " + target + ": " + this);
+            mDownKeyCode = event.getKeyCode();
+            mDownTarget = target;
+!!!599554.java!!!	isTracking(inout event : KeyEvent) : boolean
+            return mDownKeyCode == event.getKeyCode();
+!!!599682.java!!!	performedLongPress(inout event : KeyEvent) : void
+            mActiveLongPresses.put(event.getKeyCode(), 1);
+!!!599810.java!!!	handleUpEvent(inout event : KeyEvent) : void
+            final int keyCode = event.getKeyCode();
+            if (DEBUG) Log.v(TAG, "Handle key up " + event + ": " + this);
+            int index = mActiveLongPresses.indexOfKey(keyCode);
+            if (index >= 0) {
+                if (DEBUG) Log.v(TAG, "  Index: " + index);
+                event.mFlags |= FLAG_CANCELED | FLAG_CANCELED_LONG_PRESS;
+                mActiveLongPresses.removeAt(index);
+            }
+            if (mDownKeyCode == keyCode) {
+                if (DEBUG) Log.v(TAG, "  Tracking!");
+                event.mFlags |= FLAG_TRACKING;
+                mDownKeyCode = 0;
+                mDownTarget = null;
+            }

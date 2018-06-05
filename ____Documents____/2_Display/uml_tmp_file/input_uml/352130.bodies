@@ -1,0 +1,150 @@
+class OverScroller
+!!!2372738.java!!!	OverScroller(inout context : Context)
+        this(context, null);
+!!!2372866.java!!!	OverScroller(inout context : Context, inout interpolator : Interpolator)
+        this(context, interpolator, true);
+!!!2372994.java!!!	OverScroller(inout context : Context, inout interpolator : Interpolator, inout flywheel : boolean)
+        if (interpolator == null) {
+            mInterpolator = new Scroller.ViscousFluidInterpolator();
+        } else {
+            mInterpolator = interpolator;
+        }
+        mFlywheel = flywheel;
+        mScrollerX = new SplineOverScroller(context);
+        mScrollerY = new SplineOverScroller(context);
+!!!2373122.java!!!	OverScroller(inout context : Context, inout interpolator : Interpolator, in bounceCoefficientX : float, in bounceCoefficientY : float)
+        this(context, interpolator, true);
+!!!2373250.java!!!	OverScroller(inout context : Context, inout interpolator : Interpolator, in bounceCoefficientX : float, in bounceCoefficientY : float, inout flywheel : boolean)
+        this(context, interpolator, flywheel);
+!!!2373378.java!!!	setInterpolator(inout interpolator : Interpolator) : void
+        if (interpolator == null) {
+            mInterpolator = new Scroller.ViscousFluidInterpolator();
+        } else {
+            mInterpolator = interpolator;
+        }
+!!!2373506.java!!!	setFriction(in friction : float) : void
+        mScrollerX.setFriction(friction);
+        mScrollerY.setFriction(friction);
+!!!2373634.java!!!	isFinished() : boolean
+        return mScrollerX.mFinished && mScrollerY.mFinished;
+!!!2373762.java!!!	forceFinished(inout finished : boolean) : void
+        mScrollerX.mFinished = mScrollerY.mFinished = finished;
+!!!2373890.java!!!	getCurrX() : int
+        return mScrollerX.mCurrentPosition;
+!!!2374018.java!!!	getCurrY() : int
+        return mScrollerY.mCurrentPosition;
+!!!2374146.java!!!	getCurrVelocity() : float
+        float squaredNorm = mScrollerX.mCurrVelocity * mScrollerX.mCurrVelocity;
+        squaredNorm += mScrollerY.mCurrVelocity * mScrollerY.mCurrVelocity;
+        return FloatMath.sqrt(squaredNorm);
+!!!2374274.java!!!	getStartX() : int
+        return mScrollerX.mStart;
+!!!2374402.java!!!	getStartY() : int
+        return mScrollerY.mStart;
+!!!2374530.java!!!	getFinalX() : int
+        return mScrollerX.mFinal;
+!!!2374658.java!!!	getFinalY() : int
+        return mScrollerY.mFinal;
+!!!2374786.java!!!	getDuration() : int
+        return Math.max(mScrollerX.mDuration, mScrollerY.mDuration);
+!!!2374914.java!!!	extendDuration(in extend : int) : void
+        mScrollerX.extendDuration(extend);
+        mScrollerY.extendDuration(extend);
+!!!2375042.java!!!	setFinalX(in newX : int) : void
+        mScrollerX.setFinalPosition(newX);
+!!!2375170.java!!!	setFinalY(in newY : int) : void
+        mScrollerY.setFinalPosition(newY);
+!!!2375298.java!!!	computeScrollOffset() : boolean
+        if (isFinished()) {
+            return false;
+        }
+
+        switch (mMode) {
+            case SCROLL_MODE:
+                long time = AnimationUtils.currentAnimationTimeMillis();
+                // Any scroller can be used for time, since they were started
+                // together in scroll mode. We use X here.
+                final long elapsedTime = time - mScrollerX.mStartTime;
+
+                final int duration = mScrollerX.mDuration;
+                if (elapsedTime < duration) {
+                    final float q = mInterpolator.getInterpolation(elapsedTime / (float) duration);
+                    mScrollerX.updateScroll(q);
+                    mScrollerY.updateScroll(q);
+                } else {
+                    abortAnimation();
+                }
+                break;
+
+            case FLING_MODE:
+                if (!mScrollerX.mFinished) {
+                    if (!mScrollerX.update()) {
+                        if (!mScrollerX.continueWhenFinished()) {
+                            mScrollerX.finish();
+                        }
+                    }
+                }
+
+                if (!mScrollerY.mFinished) {
+                    if (!mScrollerY.update()) {
+                        if (!mScrollerY.continueWhenFinished()) {
+                            mScrollerY.finish();
+                        }
+                    }
+                }
+
+                break;
+        }
+
+        return true;
+!!!2375426.java!!!	startScroll(in startX : int, in startY : int, in dx : int, in dy : int) : void
+        startScroll(startX, startY, dx, dy, DEFAULT_DURATION);
+!!!2375554.java!!!	startScroll(in startX : int, in startY : int, in dx : int, in dy : int, in duration : int) : void
+        mMode = SCROLL_MODE;
+        mScrollerX.startScroll(startX, dx, duration);
+        mScrollerY.startScroll(startY, dy, duration);
+!!!2375682.java!!!	springBack(in startX : int, in startY : int, in minX : int, in maxX : int, in minY : int, in maxY : int) : boolean
+        mMode = FLING_MODE;
+
+        // Make sure both methods are called.
+        final boolean spingbackX = mScrollerX.springback(startX, minX, maxX);
+        final boolean spingbackY = mScrollerY.springback(startY, minY, maxY);
+        return spingbackX || spingbackY;
+!!!2375810.java!!!	fling(in startX : int, in startY : int, in velocityX : int, in velocityY : int, in minX : int, in maxX : int, in minY : int, in maxY : int) : void
+        fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY, 0, 0);
+!!!2375938.java!!!	fling(in startX : int, in startY : int, in velocityX : int, in velocityY : int, in minX : int, in maxX : int, in minY : int, in maxY : int, in overX : int, in overY : int) : void
+        // Continue a scroll or fling in progress
+        if (mFlywheel && !isFinished()) {
+            float oldVelocityX = mScrollerX.mCurrVelocity;
+            float oldVelocityY = mScrollerY.mCurrVelocity;
+            if (Math.signum(velocityX) == Math.signum(oldVelocityX) &&
+                    Math.signum(velocityY) == Math.signum(oldVelocityY)) {
+                velocityX += oldVelocityX;
+                velocityY += oldVelocityY;
+            }
+        }
+
+        mMode = FLING_MODE;
+        mScrollerX.fling(startX, velocityX, minX, maxX, overX);
+        mScrollerY.fling(startY, velocityY, minY, maxY, overY);
+!!!2376066.java!!!	notifyHorizontalEdgeReached(in startX : int, in finalX : int, in overX : int) : void
+        mScrollerX.notifyEdgeReached(startX, finalX, overX);
+!!!2376194.java!!!	notifyVerticalEdgeReached(in startY : int, in finalY : int, in overY : int) : void
+        mScrollerY.notifyEdgeReached(startY, finalY, overY);
+!!!2376322.java!!!	isOverScrolled() : boolean
+        return ((!mScrollerX.mFinished &&
+                mScrollerX.mState != SplineOverScroller.SPLINE) ||
+                (!mScrollerY.mFinished &&
+                        mScrollerY.mState != SplineOverScroller.SPLINE));
+!!!2376450.java!!!	abortAnimation() : void
+        mScrollerX.finish();
+        mScrollerY.finish();
+!!!2376578.java!!!	timePassed() : int
+        final long time = AnimationUtils.currentAnimationTimeMillis();
+        final long startTime = Math.min(mScrollerX.mStartTime, mScrollerY.mStartTime);
+        return (int) (time - startTime);
+!!!2376706.java!!!	isScrollingInDirection(in xvel : float, in yvel : float) : boolean
+        final int dx = mScrollerX.mFinal - mScrollerX.mStart;
+        final int dy = mScrollerY.mFinal - mScrollerY.mStart;
+        return !isFinished() && Math.signum(xvel) == Math.signum(dx) &&
+                Math.signum(yvel) == Math.signum(dy);

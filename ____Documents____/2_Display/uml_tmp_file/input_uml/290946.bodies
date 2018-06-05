@@ -1,0 +1,79 @@
+class DatePickerDialog
+!!!1582338.java!!!	DatePickerDialog(inout context : Context, inout callBack : DatePickerDialog::OnDateSetListener, in year : int, in monthOfYear : int, in dayOfMonth : int)
+        this(context, 0, callBack, year, monthOfYear, dayOfMonth);
+!!!1582466.java!!!	resolveDialogTheme(inout context : Context, in resid : int) : int
+        if (resid == 0) {
+            final TypedValue outValue = new TypedValue();
+            context.getTheme().resolveAttribute(R.attr.datePickerDialogTheme, outValue, true);
+            return outValue.resourceId;
+        } else {
+            return resid;
+        }
+!!!1582594.java!!!	DatePickerDialog(inout context : Context, in theme : int, inout listener : DatePickerDialog::OnDateSetListener, in year : int, in monthOfYear : int, in dayOfMonth : int)
+        super(context, resolveDialogTheme(context, theme));
+
+        mDateSetListener = listener;
+        mCalendar = Calendar.getInstance();
+
+        final Context themeContext = getContext();
+        final LayoutInflater inflater = LayoutInflater.from(themeContext);
+        final View view = inflater.inflate(R.layout.date_picker_dialog, null);
+        setView(view);
+        setButton(BUTTON_POSITIVE, themeContext.getString(R.string.ok), this);
+        setButton(BUTTON_NEGATIVE, themeContext.getString(R.string.cancel), this);
+        setButtonPanelLayoutHint(LAYOUT_HINT_SIDE);
+
+        mDatePicker = (DatePicker) view.findViewById(R.id.datePicker);
+        mDatePicker.init(year, monthOfYear, dayOfMonth, this);
+        mDatePicker.setValidationCallback(mValidationCallback);
+!!!1582722.java!!!	onDateChanged(inout view : DatePicker, in year : int, in month : int, in day : int) : void
+        mDatePicker.init(year, month, day, this);
+        updateTitle(year, month, day);
+!!!1582850.java!!!	onClick(inout dialog : DialogInterface, in which : int) : void
+        switch (which) {
+            case BUTTON_POSITIVE:
+                if (mDateSetListener != null) {
+                    mDateSetListener.onDateSet(mDatePicker, mDatePicker.getYear(),
+                            mDatePicker.getMonth(), mDatePicker.getDayOfMonth());
+                }
+                break;
+            case BUTTON_NEGATIVE:
+                cancel();
+                break;
+        }
+!!!1582978.java!!!	getDatePicker() : DatePicker
+        return mDatePicker;
+!!!1583106.java!!!	updateDate(in year : int, in monthOfYear : int, in dayOfMonth : int) : void
+        mDatePicker.updateDate(year, monthOfYear, dayOfMonth);
+!!!1583234.java!!!	updateTitle(in year : int, in month : int, in day : int) : void
+        if (!mDatePicker.getCalendarViewShown()) {
+            mCalendar.set(Calendar.YEAR, year);
+            mCalendar.set(Calendar.MONTH, month);
+            mCalendar.set(Calendar.DAY_OF_MONTH, day);
+            String title = DateUtils.formatDateTime(mContext,
+                    mCalendar.getTimeInMillis(),
+                    DateUtils.FORMAT_SHOW_DATE
+                    | DateUtils.FORMAT_SHOW_WEEKDAY
+                    | DateUtils.FORMAT_SHOW_YEAR
+                    | DateUtils.FORMAT_ABBREV_MONTH
+                    | DateUtils.FORMAT_ABBREV_WEEKDAY);
+            setTitle(title);
+            mTitleNeedsUpdate = true;
+        } else {
+            if (mTitleNeedsUpdate) {
+                mTitleNeedsUpdate = false;
+                setTitle(R.string.date_picker_dialog_title);
+            }
+        }
+!!!1583362.java!!!	onSaveInstanceState() : Bundle
+        final Bundle state = super.onSaveInstanceState();
+        state.putInt(YEAR, mDatePicker.getYear());
+        state.putInt(MONTH, mDatePicker.getMonth());
+        state.putInt(DAY, mDatePicker.getDayOfMonth());
+        return state;
+!!!1583490.java!!!	onRestoreInstanceState(inout savedInstanceState : Bundle) : void
+        super.onRestoreInstanceState(savedInstanceState);
+        final int year = savedInstanceState.getInt(YEAR);
+        final int month = savedInstanceState.getInt(MONTH);
+        final int day = savedInstanceState.getInt(DAY);
+        mDatePicker.init(year, month, day, this);

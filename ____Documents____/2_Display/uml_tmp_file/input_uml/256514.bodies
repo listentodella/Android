@@ -1,0 +1,169 @@
+class MagnifiedViewport
+!!!1184002.java!!!	MagnifiedViewport()
+                mWindowManager = (WindowManager) mContext.getSystemService(Service.WINDOW_SERVICE);
+                mBorderWidth = TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, DEFAUTLT_BORDER_WIDTH_DIP,
+                                mContext.getResources().getDisplayMetrics());
+                mHalfBorderWidth = (int) Math.ceil(mBorderWidth / 2);
+                mDrawBorderInset = (int) mBorderWidth / 2;
+                mWindow = new ViewportWindow(mContext);
+                recomputeBoundsLocked();
+!!!1184130.java!!!	updateMagnificationSpecLocked(inout spec : MagnificationSpec) : void
+                if (spec != null) {
+                    mMagnificationSpec.initialize(spec.scale, spec.offsetX, spec.offsetY);
+                } else {
+                    mMagnificationSpec.clear();
+                }
+                // If this message is pending we are in a rotation animation and do not want
+                // to show the border. We will do so when the pending message is handled.
+                if (!mHandler.hasMessages(
+                        MyHandler.MESSAGE_SHOW_MAGNIFIED_REGION_BOUNDS_IF_NEEDED)) {
+                    setMagnifiedRegionBorderShownLocked(isMagnifyingLocked(), true);
+                }
+!!!1184258.java!!!	recomputeBoundsLocked() : void
+                mWindowManager.getDefaultDisplay().getRealSize(mTempPoint);
+                final int screenWidth = mTempPoint.x;
+                final int screenHeight = mTempPoint.y;
+
+                Region magnifiedBounds = mMagnifiedBounds;
+                magnifiedBounds.set(0, 0, 0, 0);
+
+                Region availableBounds = mTempRegion1;
+                availableBounds.set(0, 0, screenWidth, screenHeight);
+
+                Region nonMagnifiedBounds = mTempRegion4;
+                nonMagnifiedBounds.set(0, 0, 0, 0);
+
+                SparseArray<WindowState> visibleWindows = mTempWindowStates;
+                visibleWindows.clear();
+                populateWindowsOnScreenLocked(visibleWindows);
+
+                final int visibleWindowCount = visibleWindows.size();
+                for (int i = visibleWindowCount - 1; i >= 0; i--) {
+                    WindowState windowState = visibleWindows.valueAt(i);
+                    if (windowState.mAttrs.type == WindowManager
+                            .LayoutParams.TYPE_MAGNIFICATION_OVERLAY) {
+                        continue;
+                    }
+
+                    Region windowBounds = mTempRegion2;
+                    Matrix matrix = mTempMatrix;
+                    populateTransformationMatrixLocked(windowState, matrix);
+                    RectF windowFrame = mTempRectF;
+
+                    if (mWindowManagerService.mPolicy.canMagnifyWindow(windowState.mAttrs.type)) {
+                        windowFrame.set(windowState.mFrame);
+                        windowFrame.offset(-windowFrame.left, -windowFrame.top);
+                        matrix.mapRect(windowFrame);
+                        windowBounds.set((int) windowFrame.left, (int) windowFrame.top,
+                                (int) windowFrame.right, (int) windowFrame.bottom);
+                        magnifiedBounds.op(windowBounds, Region.Op.UNION);
+                        magnifiedBounds.op(availableBounds, Region.Op.INTERSECT);
+                    } else {
+                        Region touchableRegion = mTempRegion3;
+                        windowState.getTouchableRegion(touchableRegion);
+                        Rect touchableFrame = mTempRect1;
+                        touchableRegion.getBounds(touchableFrame);
+                        windowFrame.set(touchableFrame);
+                        windowFrame.offset(-windowState.mFrame.left, -windowState.mFrame.top);
+                        matrix.mapRect(windowFrame);
+                        windowBounds.set((int) windowFrame.left, (int) windowFrame.top,
+                                (int) windowFrame.right, (int) windowFrame.bottom);
+                        nonMagnifiedBounds.op(windowBounds, Region.Op.UNION);
+                        windowBounds.op(magnifiedBounds, Region.Op.DIFFERENCE);
+                        availableBounds.op(windowBounds, Region.Op.DIFFERENCE);
+                    }
+
+                    Region accountedBounds = mTempRegion2;
+                    accountedBounds.set(magnifiedBounds);
+                    accountedBounds.op(nonMagnifiedBounds, Region.Op.UNION);
+                    accountedBounds.op(0, 0, screenWidth, screenHeight, Region.Op.INTERSECT);
+
+                    if (accountedBounds.isRect()) {
+                        Rect accountedFrame = mTempRect1;
+                        accountedBounds.getBounds(accountedFrame);
+                        if (accountedFrame.width() == screenWidth
+                                && accountedFrame.height() == screenHeight) {
+                            break;
+                        }
+                    }
+                }
+
+                visibleWindows.clear();
+
+                magnifiedBounds.op(mDrawBorderInset, mDrawBorderInset,
+                        screenWidth - mDrawBorderInset, screenHeight - mDrawBorderInset,
+                        Region.Op.INTERSECT);
+
+                if (!mOldMagnifiedBounds.equals(magnifiedBounds)) {
+                    Region bounds = Region.obtain();
+                    bounds.set(magnifiedBounds);
+                    mHandler.obtainMessage(MyHandler.MESSAGE_NOTIFY_MAGNIFIED_BOUNDS_CHANGED,
+                            bounds).sendToTarget();
+
+                    mWindow.setBounds(magnifiedBounds);
+                    Rect dirtyRect = mTempRect1;
+                    if (mFullRedrawNeeded) {
+                        mFullRedrawNeeded = false;
+                        dirtyRect.set(mDrawBorderInset, mDrawBorderInset,
+                                screenWidth - mDrawBorderInset, screenHeight - mDrawBorderInset);
+                        mWindow.invalidate(dirtyRect);
+                    } else {
+                        Region dirtyRegion = mTempRegion3;
+                        dirtyRegion.set(magnifiedBounds);
+                        dirtyRegion.op(mOldMagnifiedBounds, Region.Op.UNION);
+                        dirtyRegion.op(nonMagnifiedBounds, Region.Op.INTERSECT);
+                        dirtyRegion.getBounds(dirtyRect);
+                        mWindow.invalidate(dirtyRect);
+                    }
+
+                    mOldMagnifiedBounds.set(magnifiedBounds);
+                }
+!!!1184386.java!!!	onRotationChangedLocked() : void
+                // If we are magnifying, hide the magnified border window immediately so
+                // the user does not see strange artifacts during rotation. The screenshot
+                // used for rotation has already the border. After the rotation is complete
+                // we will show the border.
+                if (isMagnifyingLocked()) {
+                    setMagnifiedRegionBorderShownLocked(false, false);
+                    final long delay = (long) (mLongAnimationDuration
+                            * mWindowManagerService.getWindowAnimationScaleLocked());
+                    Message message = mHandler.obtainMessage(
+                            MyHandler.MESSAGE_SHOW_MAGNIFIED_REGION_BOUNDS_IF_NEEDED);
+                    mHandler.sendMessageDelayed(message, delay);
+                }
+                recomputeBoundsLocked();
+                mWindow.updateSize();
+!!!1184514.java!!!	setMagnifiedRegionBorderShownLocked(inout shown : boolean, inout animate : boolean) : void
+                if (shown) {
+                    mFullRedrawNeeded = true;
+                    mOldMagnifiedBounds.set(0, 0, 0, 0);
+                }
+                mWindow.setShown(shown, animate);
+!!!1184642.java!!!	getMagnifiedFrameInContentCoordsLocked(inout rect : Rect) : void
+                MagnificationSpec spec = mMagnificationSpec;
+                mMagnifiedBounds.getBounds(rect);
+                rect.offset((int) -spec.offsetX, (int) -spec.offsetY);
+                rect.scale(1.0f / spec.scale);
+!!!1184770.java!!!	isMagnifyingLocked() : boolean
+                return mMagnificationSpec.scale > 1.0f;
+!!!1184898.java!!!	getMagnificationSpecLocked() : MagnificationSpec
+                return mMagnificationSpec;
+!!!1185026.java!!!	drawWindowIfNeededLocked() : void
+                recomputeBoundsLocked();
+                mWindow.drawIfNeeded();
+!!!1185154.java!!!	destroyWindow() : void
+                mWindow.releaseSurface();
+!!!1185282.java!!!	populateWindowsOnScreenLocked(inout outWindows : SparseArray<WindowState>) : void
+                DisplayContent displayContent = mWindowManagerService
+                        .getDefaultDisplayContentLocked();
+                WindowList windowList = displayContent.getWindowList();
+                final int windowCount = windowList.size();
+                for (int i = 0; i < windowCount; i++) {
+                    WindowState windowState = windowList.get(i);
+                    if ((windowState.isOnScreen() || windowState.mAttrs.type == WindowManager
+                            .LayoutParams.TYPE_UNIVERSE_BACKGROUND)
+                            && !windowState.mWinAnimator.mEnterAnimationPending) {
+                        outWindows.put(windowState.mLayer, windowState);
+                    }
+                }

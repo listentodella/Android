@@ -1,0 +1,3 @@
+class DisplayData
+!!!215682.cpp!!!	~DisplayData()
+    free(list);

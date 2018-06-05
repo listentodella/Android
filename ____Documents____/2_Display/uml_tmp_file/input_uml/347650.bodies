@@ -1,0 +1,23 @@
+class BaseAdapter
+!!!1911042.java!!!	hasStableIds() : boolean
+        return false;
+!!!1911170.java!!!	registerDataSetObserver(inout observer : DataSetObserver) : void
+        mDataSetObservable.registerObserver(observer);
+!!!1911298.java!!!	unregisterDataSetObserver(inout observer : DataSetObserver) : void
+        mDataSetObservable.unregisterObserver(observer);
+!!!1911426.java!!!	notifyDataSetChanged() : void
+        mDataSetObservable.notifyChanged();
+!!!1911554.java!!!	notifyDataSetInvalidated() : void
+        mDataSetObservable.notifyInvalidated();
+!!!1911682.java!!!	areAllItemsEnabled() : boolean
+        return true;
+!!!1911810.java!!!	isEnabled(in position : int) : boolean
+        return true;
+!!!1911938.java!!!	getDropDownView(in position : int, inout convertView : View, inout parent : ViewGroup) : View
+        return getView(position, convertView, parent);
+!!!1912066.java!!!	getItemViewType(in position : int) : int
+        return 0;
+!!!1912194.java!!!	getViewTypeCount() : int
+        return 1;
+!!!1912322.java!!!	isEmpty() : boolean
+        return getCount() == 0;

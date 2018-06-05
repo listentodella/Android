@@ -1,0 +1,5 @@
+class AccelerateDecelerateInterpolator
+!!!1105026.java!!!	getInterpolation(in input : float) : float
+        return (float)(Math.cos((input + 1) * Math.PI) / 2.0f) + 0.5f;
+!!!1105154.java!!!	createNativeInterpolator() : long
+        return NativeInterpolatorFactoryHelper.createAccelerateDecelerateInterpolator();

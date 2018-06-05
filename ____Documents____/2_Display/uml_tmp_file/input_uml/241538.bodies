@@ -1,0 +1,14 @@
+class WindowInputEventReceiver
+!!!971266.java!!!	WindowInputEventReceiver(inout inputChannel : InputChannel, inout looper : Looper)
+            super(inputChannel, looper);
+!!!971394.java!!!	onInputEvent(inout event : InputEvent) : void
+            enqueueInputEvent(event, this, 0, true);
+!!!971522.java!!!	onBatchedInputEventPending() : void
+            if (mUnbufferedInputDispatch) {
+                super.onBatchedInputEventPending();
+            } else {
+                scheduleConsumeBatchedInput();
+            }
+!!!971650.java!!!	dispose() : void
+            unscheduleConsumeBatchedInput();
+            super.dispose();

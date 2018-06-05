@@ -1,0 +1,41 @@
+class MeasureSpec
+!!!690306.java!!!	makeMeasureSpec(in size : int, in mode : int) : int
+            if (sUseBrokenMakeMeasureSpec) {
+                return size + mode;
+            } else {
+                return (size & ~MODE_MASK) | (mode & MODE_MASK);
+            }
+!!!690434.java!!!	getMode(in measureSpec : int) : int
+            return (measureSpec & MODE_MASK);
+!!!690562.java!!!	getSize(in measureSpec : int) : int
+            return (measureSpec & ~MODE_MASK);
+!!!690690.java!!!	adjust(in measureSpec : int, in delta : int) : int
+            final int mode = getMode(measureSpec);
+            if (mode == UNSPECIFIED) {
+                // No need to adjust size for UNSPECIFIED mode.
+                return makeMeasureSpec(0, UNSPECIFIED);
+            }
+            int size = getSize(measureSpec) + delta;
+            if (size < 0) {
+                Log.e(VIEW_LOG_TAG, "MeasureSpec.adjust: new size would be negative! (" + size +
+                        ") spec: " + toString(measureSpec) + " delta: " + delta);
+                size = 0;
+            }
+            return makeMeasureSpec(size, mode);
+!!!690818.java!!!	toString(in measureSpec : int) : String
+            int mode = getMode(measureSpec);
+            int size = getSize(measureSpec);
+
+            StringBuilder sb = new StringBuilder("MeasureSpec: ");
+
+            if (mode == UNSPECIFIED)
+                sb.append("UNSPECIFIED ");
+            else if (mode == EXACTLY)
+                sb.append("EXACTLY ");
+            else if (mode == AT_MOST)
+                sb.append("AT_MOST ");
+            else
+                sb.append(mode).append(" ");
+
+            sb.append(size);
+            return sb.toString();

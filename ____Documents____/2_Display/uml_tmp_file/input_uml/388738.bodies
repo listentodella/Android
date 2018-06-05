@@ -1,0 +1,156 @@
+class ScrollBarDrawable
+!!!2405506.java!!!	setAlwaysDrawHorizontalTrack(inout alwaysDrawTrack : boolean) : void
+        mAlwaysDrawHorizontalTrack = alwaysDrawTrack;
+!!!2405634.java!!!	setAlwaysDrawVerticalTrack(inout alwaysDrawTrack : boolean) : void
+        mAlwaysDrawVerticalTrack = alwaysDrawTrack;
+!!!2405762.java!!!	getAlwaysDrawVerticalTrack() : boolean
+        return mAlwaysDrawVerticalTrack;
+!!!2405890.java!!!	getAlwaysDrawHorizontalTrack() : boolean
+        return mAlwaysDrawHorizontalTrack;
+!!!2406018.java!!!	setParameters(in range : int, in offset : int, in extent : int, inout vertical : boolean) : void
+        if (mVertical != vertical) {
+            mChanged = true;
+        }
+
+        if (mRange != range || mOffset != offset || mExtent != extent) {
+            mRangeChanged = true;
+        }
+
+        mRange = range;
+        mOffset = offset;
+        mExtent = extent;
+        mVertical = vertical;
+!!!2406146.java!!!	draw(inout canvas : Canvas) : void
+        final boolean vertical = mVertical;
+        final int extent = mExtent;
+        final int range = mRange;
+
+        boolean drawTrack = true;
+        boolean drawThumb = true;
+        if (extent <= 0 || range <= extent) {
+            drawTrack = vertical ? mAlwaysDrawVerticalTrack : mAlwaysDrawHorizontalTrack;
+            drawThumb = false;
+        }
+
+        Rect r = getBounds();
+        if (canvas.quickReject(r.left, r.top, r.right, r.bottom, Canvas.EdgeType.AA)) {
+            return;
+        }
+        if (drawTrack) {
+            drawTrack(canvas, r, vertical);
+        }
+
+        if (drawThumb) {
+            int size = vertical ? r.height() : r.width();
+            int thickness = vertical ? r.width() : r.height();
+            int length = Math.round((float) size * extent / range);
+            int offset = Math.round((float) (size - length) * mOffset / (range - extent));
+
+            // avoid the tiny thumb
+            int minLength = thickness * 2;
+            if (length < minLength) {
+                length = minLength;
+            }
+            // avoid the too-big thumb
+            if (offset + length > size) {
+                offset = size - length;
+            }
+
+            drawThumb(canvas, r, offset, length, vertical);
+        }
+!!!2406274.java!!!	onBoundsChange(inout bounds : Rect) : void
+        super.onBoundsChange(bounds);
+        mChanged = true;
+!!!2406402.java!!!	drawTrack(inout canvas : Canvas, inout bounds : Rect, inout vertical : boolean) : void
+        Drawable track;
+        if (vertical) {
+            track = mVerticalTrack;
+        } else {
+            track = mHorizontalTrack;
+        }
+        if (track != null) {
+            if (mChanged) {
+                track.setBounds(bounds);
+            }
+            track.draw(canvas);
+        }
+!!!2406530.java!!!	drawThumb(inout canvas : Canvas, inout bounds : Rect, in offset : int, in length : int, inout vertical : boolean) : void
+        final Rect thumbRect = mTempBounds;
+        final boolean changed = mRangeChanged || mChanged;
+        if (changed) {
+            if (vertical) {
+                thumbRect.set(bounds.left,  bounds.top + offset,
+                        bounds.right, bounds.top + offset + length);
+            } else {
+                thumbRect.set(bounds.left + offset, bounds.top,
+                        bounds.left + offset + length, bounds.bottom);
+            }
+        }
+
+        if (vertical) {
+            if (mVerticalThumb != null) {
+                final Drawable thumb = mVerticalThumb;
+                if (changed) thumb.setBounds(thumbRect);
+                thumb.draw(canvas);
+            }
+        } else {
+            if (mHorizontalThumb != null) {
+                final Drawable thumb = mHorizontalThumb;
+                if (changed) thumb.setBounds(thumbRect);
+                thumb.draw(canvas);
+            }
+        }
+!!!2406658.java!!!	setVerticalThumbDrawable(inout thumb : Drawable) : void
+        if (thumb != null) {
+            mVerticalThumb = thumb;
+        }
+!!!2406786.java!!!	setVerticalTrackDrawable(inout track : Drawable) : void
+        mVerticalTrack = track;
+!!!2406914.java!!!	setHorizontalThumbDrawable(inout thumb : Drawable) : void
+        if (thumb != null) {
+            mHorizontalThumb = thumb;
+        }
+!!!2407042.java!!!	setHorizontalTrackDrawable(inout track : Drawable) : void
+        mHorizontalTrack = track;
+!!!2407170.java!!!	getSize(inout vertical : boolean) : int
+        if (vertical) {
+            return mVerticalTrack != null ? mVerticalTrack.getIntrinsicWidth() :
+                    mVerticalThumb != null ? mVerticalThumb.getIntrinsicWidth() : 0;
+        } else {
+            return mHorizontalTrack != null ? mHorizontalTrack.getIntrinsicHeight() :
+                    mHorizontalThumb != null ? mHorizontalThumb.getIntrinsicHeight() : 0;
+        }
+!!!2407298.java!!!	setAlpha(in alpha : int) : void
+        if (mVerticalTrack != null) {
+            mVerticalTrack.setAlpha(alpha);
+        }
+        if (mVerticalThumb != null) {
+            mVerticalThumb.setAlpha(alpha);
+        }
+        if (mHorizontalTrack != null) {
+            mHorizontalTrack.setAlpha(alpha);
+        }
+        if (mHorizontalThumb != null) {
+            mHorizontalThumb.setAlpha(alpha);
+        }
+!!!2407426.java!!!	getAlpha() : int
+        // All elements should have same alpha, just return one of them
+        return mVerticalThumb.getAlpha();
+!!!2407554.java!!!	setColorFilter(inout cf : ColorFilter) : void
+        if (mVerticalTrack != null) {
+            mVerticalTrack.setColorFilter(cf);
+        }
+        if (mVerticalThumb != null) {
+            mVerticalThumb.setColorFilter(cf);
+        }
+        if (mHorizontalTrack != null) {
+            mHorizontalTrack.setColorFilter(cf);
+        }
+        if (mHorizontalThumb != null) {
+            mHorizontalThumb.setColorFilter(cf);
+        }
+!!!2407682.java!!!	getOpacity() : int
+        return PixelFormat.TRANSLUCENT;
+!!!2407810.java!!!	toString() : String
+        return "ScrollBarDrawable: range=" + mRange + " offset=" + mOffset +
+               " extent=" + mExtent + (mVertical ? " V" : " H");

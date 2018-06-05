@@ -1,0 +1,409 @@
+class GLES20Canvas
+!!!701314.java!!!	isAvailable() : boolean
+        return sIsAvailable;
+!!!701442.java!!!	GLES20Canvas()
+        mOpaque = false;
+        mRenderer = nCreateDisplayListRenderer();
+        setupFinalizer();
+!!!701570.java!!!	setupFinalizer() : void
+        if (mRenderer == 0) {
+            throw new IllegalStateException("Could not create GLES20Canvas renderer");
+        } else {
+            mFinalizer = new CanvasFinalizer(mRenderer);
+        }
+!!!702338.java!!!	setProperty(in name : String, in value : String) : void
+        nSetProperty(name, value);
+!!!702594.java!!!	isOpaque() : boolean
+        return mOpaque;
+!!!702722.java!!!	getWidth() : int
+        return mWidth;
+!!!702850.java!!!	getHeight() : int
+        return mHeight;
+!!!702978.java!!!	getMaximumBitmapWidth() : int
+        return nGetMaximumTextureWidth();
+!!!703106.java!!!	getMaximumBitmapHeight() : int
+        return nGetMaximumTextureHeight();
+!!!703490.java!!!	getRenderer() : long
+        return mRenderer;
+!!!703618.java!!!	setViewport(in width : int, in height : int) : void
+        mWidth = width;
+        mHeight = height;
+
+        nSetViewport(mRenderer, width, height);
+!!!703874.java!!!	setHighContrastText(inout highContrastText : boolean) : void
+        nSetHighContrastText(mRenderer, highContrastText);
+!!!704130.java!!!	insertReorderBarrier() : void
+        nInsertReorderBarrier(mRenderer, true);
+!!!704258.java!!!	insertInorderBarrier() : void
+        nInsertReorderBarrier(mRenderer, false);
+!!!704514.java!!!	onPreDraw(inout dirty : Rect) : int
+        if (dirty != null) {
+            return nPrepareDirty(mRenderer, dirty.left, dirty.top, dirty.right, dirty.bottom,
+                    mOpaque);
+        } else {
+            return nPrepare(mRenderer, mOpaque);
+        }
+!!!704898.java!!!	onPostDraw() : void
+        nFinish(mRenderer);
+!!!705154.java!!!	callDrawGLFunction(in drawGLFunction : long) : int
+        return nCallDrawGLFunction(mRenderer, drawGLFunction);
+!!!705538.java!!!	drawRenderNode(inout renderNode : RenderNode, inout dirty : Rect, in flags : int) : int
+        return nDrawRenderNode(mRenderer, renderNode.getNativeDisplayList(), dirty, flags);
+!!!705794.java!!!	drawHardwareLayer(inout layer : HardwareLayer, in x : float, in y : float, inout paint : Paint) : void
+        layer.setLayerPaint(paint);
+        nDrawLayer(mRenderer, layer.getLayer(), x, y);
+!!!706050.java!!!	getInternalClipBounds() : Rect
+        if (mClipBounds == null) mClipBounds = new Rect();
+        return mClipBounds;
+!!!706178.java!!!	getPathBounds() : RectF
+        if (mPathBounds == null) mPathBounds = new RectF();
+        return mPathBounds;
+!!!706306.java!!!	getPointStorage() : float
+        if (mPoint == null) mPoint = new float[2];
+        return mPoint;
+!!!706434.java!!!	getLineStorage() : float
+        if (mLine == null) mLine = new float[4];
+        return mLine;
+!!!706562.java!!!	clipPath(inout path : Path) : boolean
+        return nClipPath(mRenderer, path.mNativePath, Region.Op.INTERSECT.nativeInt);
+!!!706690.java!!!	clipPath(inout path : Path, inout op : Region.Op) : boolean
+        return nClipPath(mRenderer, path.mNativePath, op.nativeInt);
+!!!706946.java!!!	clipRect(in left : float, in top : float, in right : float, in bottom : float) : boolean
+        return nClipRect(mRenderer, left, top, right, bottom, Region.Op.INTERSECT.nativeInt);
+!!!707202.java!!!	clipRect(in left : float, in top : float, in right : float, in bottom : float, inout op : Region.Op) : boolean
+        return nClipRect(mRenderer, left, top, right, bottom, op.nativeInt);
+!!!707330.java!!!	clipRect(in left : int, in top : int, in right : int, in bottom : int) : boolean
+        return nClipRect(mRenderer, left, top, right, bottom, Region.Op.INTERSECT.nativeInt);
+!!!707586.java!!!	clipRect(inout rect : Rect) : boolean
+        return nClipRect(mRenderer, rect.left, rect.top, rect.right, rect.bottom,
+                Region.Op.INTERSECT.nativeInt);
+!!!707714.java!!!	clipRect(inout rect : Rect, inout op : Region.Op) : boolean
+        return nClipRect(mRenderer, rect.left, rect.top, rect.right, rect.bottom, op.nativeInt);
+!!!707842.java!!!	clipRect(inout rect : RectF) : boolean
+        return nClipRect(mRenderer, rect.left, rect.top, rect.right, rect.bottom,
+                Region.Op.INTERSECT.nativeInt);
+!!!707970.java!!!	clipRect(inout rect : RectF, inout op : Region.Op) : boolean
+        return nClipRect(mRenderer, rect.left, rect.top, rect.right, rect.bottom, op.nativeInt);
+!!!708098.java!!!	clipRegion(inout region : Region) : boolean
+        return nClipRegion(mRenderer, region.mNativeRegion, Region.Op.INTERSECT.nativeInt);
+!!!708226.java!!!	clipRegion(inout region : Region, inout op : Region.Op) : boolean
+        return nClipRegion(mRenderer, region.mNativeRegion, op.nativeInt);
+!!!708482.java!!!	getClipBounds(inout bounds : Rect) : boolean
+        return nGetClipBounds(mRenderer, bounds);
+!!!708738.java!!!	quickReject(in left : float, in top : float, in right : float, in bottom : float, inout type : EdgeType) : boolean
+        return nQuickReject(mRenderer, left, top, right, bottom);
+!!!708994.java!!!	quickReject(inout path : Path, inout type : EdgeType) : boolean
+        RectF pathBounds = getPathBounds();
+        path.computeBounds(pathBounds, true);
+        return nQuickReject(mRenderer, pathBounds.left, pathBounds.top,
+                pathBounds.right, pathBounds.bottom);
+!!!709122.java!!!	quickReject(inout rect : RectF, inout type : EdgeType) : boolean
+        return nQuickReject(mRenderer, rect.left, rect.top, rect.right, rect.bottom);
+!!!709250.java!!!	translate(in dx : float, in dy : float) : void
+        if (dx != 0.0f || dy != 0.0f) nTranslate(mRenderer, dx, dy);
+!!!709506.java!!!	skew(in sx : float, in sy : float) : void
+        nSkew(mRenderer, sx, sy);
+!!!709762.java!!!	rotate(in degrees : float) : void
+        nRotate(mRenderer, degrees);
+!!!710018.java!!!	scale(in sx : float, in sy : float) : void
+        nScale(mRenderer, sx, sy);
+!!!710274.java!!!	setMatrix(inout matrix : Matrix) : void
+        nSetMatrix(mRenderer, matrix == null ? 0 : matrix.native_instance);
+!!!710530.java!!!	getMatrix(inout matrix : Matrix) : void
+        nGetMatrix(mRenderer, matrix.native_instance);
+!!!710786.java!!!	concat(inout matrix : Matrix) : void
+        if (matrix != null) nConcatMatrix(mRenderer, matrix.native_instance);
+!!!711042.java!!!	save() : int
+        return nSave(mRenderer, Canvas.CLIP_SAVE_FLAG | Canvas.MATRIX_SAVE_FLAG);
+!!!711170.java!!!	save(in saveFlags : int) : int
+        return nSave(mRenderer, saveFlags);
+!!!711426.java!!!	saveLayer(inout bounds : RectF, inout paint : Paint, in saveFlags : int) : int
+        if (bounds != null) {
+            return saveLayer(bounds.left, bounds.top, bounds.right, bounds.bottom, paint, saveFlags);
+        }
+
+        final long nativePaint = paint == null ? 0 : paint.mNativePaint;
+        return nSaveLayer(mRenderer, nativePaint, saveFlags);
+!!!711682.java!!!	saveLayer(in left : float, in top : float, in right : float, in bottom : float, inout paint : Paint, in saveFlags : int) : int
+        if (left < right && top < bottom) {
+            final long nativePaint = paint == null ? 0 : paint.mNativePaint;
+            return nSaveLayer(mRenderer, left, top, right, bottom, nativePaint, saveFlags);
+        }
+        return save(saveFlags);
+!!!711938.java!!!	saveLayerAlpha(inout bounds : RectF, in alpha : int, in saveFlags : int) : int
+        if (bounds != null) {
+            return saveLayerAlpha(bounds.left, bounds.top, bounds.right, bounds.bottom,
+                    alpha, saveFlags);
+        }
+        return nSaveLayerAlpha(mRenderer, alpha, saveFlags);
+!!!712194.java!!!	saveLayerAlpha(in left : float, in top : float, in right : float, in bottom : float, in alpha : int, in saveFlags : int) : int
+        if (left < right && top < bottom) {
+            return nSaveLayerAlpha(mRenderer, left, top, right, bottom, alpha, saveFlags);
+        }
+        return save(saveFlags);
+!!!712450.java!!!	restore() : void
+        nRestore(mRenderer);
+!!!712706.java!!!	restoreToCount(in saveCount : int) : void
+        nRestoreToCount(mRenderer, saveCount);
+!!!712962.java!!!	getSaveCount() : int
+        return nGetSaveCount(mRenderer);
+!!!713218.java!!!	setDrawFilter(inout filter : DrawFilter) : void
+        mFilter = filter;
+        if (filter == null) {
+            nResetPaintFilter(mRenderer);
+        } else if (filter instanceof PaintFlagsDrawFilter) {
+            PaintFlagsDrawFilter flagsFilter = (PaintFlagsDrawFilter) filter;
+            nSetupPaintFilter(mRenderer, flagsFilter.clearBits, flagsFilter.setBits);
+        }
+!!!713602.java!!!	getDrawFilter() : DrawFilter
+        return mFilter;
+!!!713730.java!!!	drawArc(in left : float, in top : float, in right : float, in bottom : float, in startAngle : float, in sweepAngle : float, inout useCenter : boolean, inout paint : Paint) : void
+        nDrawArc(mRenderer, left, top, right, bottom,
+                startAngle, sweepAngle, useCenter, paint.mNativePaint);
+!!!713986.java!!!	drawARGB(in a : int, in r : int, in g : int, in b : int) : void
+        drawColor((a & 0xFF) << 24 | (r & 0xFF) << 16 | (g & 0xFF) << 8 | (b & 0xFF));
+!!!714114.java!!!	drawPatch(inout patch : NinePatch, inout dst : Rect, inout paint : Paint) : void
+        Bitmap bitmap = patch.getBitmap();
+        throwIfCannotDraw(bitmap);
+        final long nativePaint = paint == null ? 0 : paint.mNativePaint;
+        nDrawPatch(mRenderer, bitmap.mNativeBitmap, bitmap.mBuffer, patch.mNativeChunk,
+                dst.left, dst.top, dst.right, dst.bottom, nativePaint);
+!!!714242.java!!!	drawPatch(inout patch : NinePatch, inout dst : RectF, inout paint : Paint) : void
+        Bitmap bitmap = patch.getBitmap();
+        throwIfCannotDraw(bitmap);
+        final long nativePaint = paint == null ? 0 : paint.mNativePaint;
+        nDrawPatch(mRenderer, bitmap.mNativeBitmap, bitmap.mBuffer, patch.mNativeChunk,
+                dst.left, dst.top, dst.right, dst.bottom, nativePaint);
+!!!714498.java!!!	drawBitmap(inout bitmap : Bitmap, in left : float, in top : float, inout paint : Paint) : void
+        throwIfCannotDraw(bitmap);
+        final long nativePaint = paint == null ? 0 : paint.mNativePaint;
+        nDrawBitmap(mRenderer, bitmap.mNativeBitmap, bitmap.mBuffer, left, top, nativePaint);
+!!!714754.java!!!	drawBitmap(inout bitmap : Bitmap, inout matrix : Matrix, inout paint : Paint) : void
+        throwIfCannotDraw(bitmap);
+        final long nativePaint = paint == null ? 0 : paint.mNativePaint;
+        nDrawBitmap(mRenderer, bitmap.mNativeBitmap, bitmap.mBuffer,
+                matrix.native_instance, nativePaint);
+!!!715010.java!!!	drawBitmap(inout bitmap : Bitmap, inout src : Rect, inout dst : Rect, inout paint : Paint) : void
+        throwIfCannotDraw(bitmap);
+        final long nativePaint = paint == null ? 0 : paint.mNativePaint;
+
+        int left, top, right, bottom;
+        if (src == null) {
+            left = top = 0;
+            right = bitmap.getWidth();
+            bottom = bitmap.getHeight();
+        } else {
+            left = src.left;
+            right = src.right;
+            top = src.top;
+            bottom = src.bottom;
+        }
+
+        nDrawBitmap(mRenderer, bitmap.mNativeBitmap, bitmap.mBuffer, left, top, right, bottom,
+                dst.left, dst.top, dst.right, dst.bottom, nativePaint);
+!!!715138.java!!!	drawBitmap(inout bitmap : Bitmap, inout src : Rect, inout dst : RectF, inout paint : Paint) : void
+        throwIfCannotDraw(bitmap);
+        final long nativePaint = paint == null ? 0 : paint.mNativePaint;
+
+        float left, top, right, bottom;
+        if (src == null) {
+            left = top = 0;
+            right = bitmap.getWidth();
+            bottom = bitmap.getHeight();
+        } else {
+            left = src.left;
+            right = src.right;
+            top = src.top;
+            bottom = src.bottom;
+        }
+
+        nDrawBitmap(mRenderer, bitmap.mNativeBitmap, bitmap.mBuffer, left, top, right, bottom,
+                dst.left, dst.top, dst.right, dst.bottom, nativePaint);
+!!!715394.java!!!	drawBitmap(inout colors : int, in offset : int, in stride : int, in x : float, in y : float, in width : int, in height : int, inout hasAlpha : boolean, inout paint : Paint) : void
+        if (width < 0) {
+            throw new IllegalArgumentException("width must be >= 0");
+        }
+
+        if (height < 0) {
+            throw new IllegalArgumentException("height must be >= 0");
+        }
+
+        if (Math.abs(stride) < width) {
+            throw new IllegalArgumentException("abs(stride) must be >= width");
+        }
+
+        int lastScanline = offset + (height - 1) * stride;
+        int length = colors.length;
+
+        if (offset < 0 || (offset + width > length) || lastScanline < 0 ||
+                (lastScanline + width > length)) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        final long nativePaint = paint == null ? 0 : paint.mNativePaint;
+        nDrawBitmap(mRenderer, colors, offset, stride, x, y,
+                width, height, hasAlpha, nativePaint);
+!!!715650.java!!!	drawBitmap(inout colors : int, in offset : int, in stride : int, in x : int, in y : int, in width : int, in height : int, inout hasAlpha : boolean, inout paint : Paint) : void
+        drawBitmap(colors, offset, stride, (float) x, (float) y, width, height, hasAlpha, paint);
+!!!715778.java!!!	drawBitmapMesh(inout bitmap : Bitmap, in meshWidth : int, in meshHeight : int, inout verts : float, in vertOffset : int, inout colors : int, in colorOffset : int, inout paint : Paint) : void
+        throwIfCannotDraw(bitmap);
+        if (meshWidth < 0 || meshHeight < 0 || vertOffset < 0 || colorOffset < 0) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        if (meshWidth == 0 || meshHeight == 0) {
+            return;
+        }
+
+        final int count = (meshWidth + 1) * (meshHeight + 1);
+        checkRange(verts.length, vertOffset, count * 2);
+
+        if (colors != null) {
+            checkRange(colors.length, colorOffset, count);
+        }
+
+        final long nativePaint = paint == null ? 0 : paint.mNativePaint;
+        nDrawBitmapMesh(mRenderer, bitmap.mNativeBitmap, bitmap.mBuffer, meshWidth, meshHeight,
+                verts, vertOffset, colors, colorOffset, nativePaint);
+!!!716034.java!!!	drawCircle(in cx : float, in cy : float, in radius : float, inout paint : Paint) : void
+        nDrawCircle(mRenderer, cx, cy, radius, paint.mNativePaint);
+!!!716290.java!!!	drawCircle(inout cx : CanvasProperty<Float>, inout cy : CanvasProperty<Float>, inout radius : CanvasProperty<Float>, inout paint : CanvasProperty<Paint>) : void
+        nDrawCircle(mRenderer, cx.getNativeContainer(), cy.getNativeContainer(),
+                radius.getNativeContainer(), paint.getNativeContainer());
+!!!716546.java!!!	drawRoundRect(inout left : CanvasProperty<Float>, inout top : CanvasProperty<Float>, inout right : CanvasProperty<Float>, inout bottom : CanvasProperty<Float>, inout rx : CanvasProperty<Float>, inout ry : CanvasProperty<Float>, inout paint : CanvasProperty<Paint>) : void
+        nDrawRoundRect(mRenderer, left.getNativeContainer(), top.getNativeContainer(),
+                right.getNativeContainer(), bottom.getNativeContainer(),
+                rx.getNativeContainer(), ry.getNativeContainer(),
+                paint.getNativeContainer());
+!!!716802.java!!!	drawColor(in color : int) : void
+        drawColor(color, PorterDuff.Mode.SRC_OVER);
+!!!716930.java!!!	drawColor(in color : int, inout mode : PorterDuff.Mode) : void
+        nDrawColor(mRenderer, color, mode.nativeInt);
+!!!717186.java!!!	drawLine(in startX : float, in startY : float, in stopX : float, in stopY : float, inout paint : Paint) : void
+        float[] line = getLineStorage();
+        line[0] = startX;
+        line[1] = startY;
+        line[2] = stopX;
+        line[3] = stopY;
+        drawLines(line, 0, 4, paint);
+!!!717314.java!!!	drawLines(inout pts : float, in offset : int, in count : int, inout paint : Paint) : void
+        if (count < 4) return;
+
+        if ((offset | count) < 0 || offset + count > pts.length) {
+            throw new IllegalArgumentException("The lines array must contain 4 elements per line.");
+        }
+        nDrawLines(mRenderer, pts, offset, count, paint.mNativePaint);
+!!!717570.java!!!	drawLines(inout pts : float, inout paint : Paint) : void
+        drawLines(pts, 0, pts.length, paint);
+!!!717698.java!!!	drawOval(in left : float, in top : float, in right : float, in bottom : float, inout paint : Paint) : void
+        nDrawOval(mRenderer, left, top, right, bottom, paint.mNativePaint);
+!!!717954.java!!!	drawPaint(inout paint : Paint) : void
+        final Rect r = getInternalClipBounds();
+        nGetClipBounds(mRenderer, r);
+        drawRect(r.left, r.top, r.right, r.bottom, paint);
+!!!718082.java!!!	drawPath(inout path : Path, inout paint : Paint) : void
+        if (path.isSimplePath) {
+            if (path.rects != null) {
+                nDrawRects(mRenderer, path.rects.mNativeRegion, paint.mNativePaint);
+            }
+        } else {
+            nDrawPath(mRenderer, path.mNativePath, paint.mNativePaint);
+        }
+!!!718466.java!!!	drawPicture(inout picture : Picture) : void
+        picture.endRecording();
+        // TODO: Implement rendering
+!!!718594.java!!!	drawPoint(in x : float, in y : float, inout paint : Paint) : void
+        float[] point = getPointStorage();
+        point[0] = x;
+        point[1] = y;
+        drawPoints(point, 0, 2, paint);
+!!!718722.java!!!	drawPoints(inout pts : float, inout paint : Paint) : void
+        drawPoints(pts, 0, pts.length, paint);
+!!!718850.java!!!	drawPoints(inout pts : float, in offset : int, in count : int, inout paint : Paint) : void
+        if (count < 2) return;
+
+        nDrawPoints(mRenderer, pts, offset, count, paint.mNativePaint);
+!!!719106.java!!!	drawRect(in left : float, in top : float, in right : float, in bottom : float, inout paint : Paint) : void
+        if (left == right || top == bottom) return;
+        nDrawRect(mRenderer, left, top, right, bottom, paint.mNativePaint);
+!!!719362.java!!!	drawRect(inout r : Rect, inout paint : Paint) : void
+        drawRect(r.left, r.top, r.right, r.bottom, paint);
+!!!719490.java!!!	drawRect(inout r : RectF, inout paint : Paint) : void
+        drawRect(r.left, r.top, r.right, r.bottom, paint);
+!!!719618.java!!!	drawRGB(in r : int, in g : int, in b : int) : void
+        drawColor(0xFF000000 | (r & 0xFF) << 16 | (g & 0xFF) << 8 | (b & 0xFF));
+!!!719746.java!!!	drawRoundRect(in left : float, in top : float, in right : float, in bottom : float, in rx : float, in ry : float, inout paint : Paint) : void
+        nDrawRoundRect(mRenderer, left, top, right, bottom, rx, ry, paint.mNativePaint);
+!!!720002.java!!!	drawText(inout text : char, in index : int, in count : int, in x : float, in y : float, inout paint : Paint) : void
+        if ((index | count | (index + count) | (text.length - index - count)) < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        nDrawText(mRenderer, text, index, count, x, y,
+                paint.mBidiFlags, paint.mNativePaint, paint.mNativeTypeface);
+!!!720258.java!!!	drawText(inout text : CharSequence, in start : int, in end : int, in x : float, in y : float, inout paint : Paint) : void
+        if (text instanceof String || text instanceof SpannedString ||
+                text instanceof SpannableString) {
+            nDrawText(mRenderer, text.toString(), start, end, x, y, paint.mBidiFlags,
+                    paint.mNativePaint, paint.mNativeTypeface);
+        } else if (text instanceof GraphicsOperations) {
+            ((GraphicsOperations) text).drawText(this, start, end, x, y, paint);
+        } else {
+            char[] buf = TemporaryBuffer.obtain(end - start);
+            TextUtils.getChars(text, start, end, buf, 0);
+            nDrawText(mRenderer, buf, 0, end - start, x, y,
+                    paint.mBidiFlags, paint.mNativePaint, paint.mNativeTypeface);
+            TemporaryBuffer.recycle(buf);
+        }
+!!!720386.java!!!	drawText(in text : String, in start : int, in end : int, in x : float, in y : float, inout paint : Paint) : void
+        if ((start | end | (end - start) | (text.length() - end)) < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        nDrawText(mRenderer, text, start, end, x, y,
+                paint.mBidiFlags, paint.mNativePaint, paint.mNativeTypeface);
+!!!720642.java!!!	drawText(in text : String, in x : float, in y : float, inout paint : Paint) : void
+        nDrawText(mRenderer, text, 0, text.length(), x, y,
+                paint.mBidiFlags, paint.mNativePaint, paint.mNativeTypeface);
+!!!720770.java!!!	drawTextOnPath(inout text : char, in index : int, in count : int, inout path : Path, in hOffset : float, in vOffset : float, inout paint : Paint) : void
+        if (index < 0 || index + count > text.length) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        nDrawTextOnPath(mRenderer, text, index, count, path.mNativePath, hOffset, vOffset,
+                paint.mBidiFlags, paint.mNativePaint, paint.mNativeTypeface);
+!!!721026.java!!!	drawTextOnPath(in text : String, inout path : Path, in hOffset : float, in vOffset : float, inout paint : Paint) : void
+        if (text.length() == 0) return;
+
+        nDrawTextOnPath(mRenderer, text, 0, text.length(), path.mNativePath, hOffset, vOffset,
+                paint.mBidiFlags, paint.mNativePaint, paint.mNativeTypeface);
+!!!721282.java!!!	drawTextRun(inout text : char, in index : int, in count : int, in contextIndex : int, in contextCount : int, in x : float, in y : float, inout isRtl : boolean, inout paint : Paint) : void
+        if ((index | count | text.length - index - count) < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        nDrawTextRun(mRenderer, text, index, count, contextIndex, contextCount, x, y, isRtl,
+                paint.mNativePaint, paint.mNativeTypeface);
+!!!721538.java!!!	drawTextRun(inout text : CharSequence, in start : int, in end : int, in contextStart : int, in contextEnd : int, in x : float, in y : float, inout isRtl : boolean, inout paint : Paint) : void
+        if ((start | end | end - start | text.length() - end) < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        if (text instanceof String || text instanceof SpannedString ||
+                text instanceof SpannableString) {
+            nDrawTextRun(mRenderer, text.toString(), start, end, contextStart,
+                    contextEnd, x, y, isRtl, paint.mNativePaint, paint.mNativeTypeface);
+        } else if (text instanceof GraphicsOperations) {
+            ((GraphicsOperations) text).drawTextRun(this, start, end,
+                    contextStart, contextEnd, x, y, isRtl, paint);
+        } else {
+            int contextLen = contextEnd - contextStart;
+            int len = end - start;
+            char[] buf = TemporaryBuffer.obtain(contextLen);
+            TextUtils.getChars(text, contextStart, contextEnd, buf, 0);
+            nDrawTextRun(mRenderer, buf, start - contextStart, len, 0, contextLen,
+                    x, y, isRtl, paint.mNativePaint, paint.mNativeTypeface);
+            TemporaryBuffer.recycle(buf);
+        }
+!!!721794.java!!!	drawVertices(inout mode : VertexMode, in vertexCount : int, inout verts : float, in vertOffset : int, inout texs : float, in texOffset : int, inout colors : int, in colorOffset : int, inout indices : short, in indexOffset : int, in indexCount : int, inout paint : Paint) : void
+        // TODO: Implement

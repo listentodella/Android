@@ -1,0 +1,3 @@
+class NotifyKeyArgs
+!!!202370.cpp!!!	notify(in listener : sp<InputListenerInterface>) : void
+    listener->notifyKey(this);

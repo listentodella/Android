@@ -1,0 +1,6 @@
+class SpellCheckerParams
+!!!1172226.java!!!	SpellCheckerParams(in what : int, inout textInfos : TextInfo, in suggestionsLimit : int, inout sequentialWords : boolean)
+                mWhat = what;
+                mTextInfos = textInfos;
+                mSuggestionsLimit = suggestionsLimit;
+                mSequentialWords = sequentialWords;

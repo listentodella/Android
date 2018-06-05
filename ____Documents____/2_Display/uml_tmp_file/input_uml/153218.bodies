@@ -1,0 +1,78 @@
+class MultiTouchInputMapperTest
+!!!284674.cpp!!!	prepareAxes(in axes : int) : void
+    if (axes & POSITION) {
+        mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_POSITION_X,
+                RAW_X_MIN, RAW_X_MAX, 0, 0);
+        mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_POSITION_Y,
+                RAW_Y_MIN, RAW_Y_MAX, 0, 0);
+    }
+    if (axes & TOUCH) {
+        mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_TOUCH_MAJOR,
+                RAW_TOUCH_MIN, RAW_TOUCH_MAX, 0, 0);
+        if (axes & MINOR) {
+            mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_TOUCH_MINOR,
+                    RAW_TOUCH_MIN, RAW_TOUCH_MAX, 0, 0);
+        }
+    }
+    if (axes & TOOL) {
+        mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_WIDTH_MAJOR,
+                RAW_TOOL_MIN, RAW_TOOL_MAX, 0, 0);
+        if (axes & MINOR) {
+            mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_WIDTH_MINOR,
+                    RAW_TOOL_MAX, RAW_TOOL_MAX, 0, 0);
+        }
+    }
+    if (axes & ORIENTATION) {
+        mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_ORIENTATION,
+                RAW_ORIENTATION_MIN, RAW_ORIENTATION_MAX, 0, 0);
+    }
+    if (axes & PRESSURE) {
+        mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_PRESSURE,
+                RAW_PRESSURE_MIN, RAW_PRESSURE_MAX, 0, 0);
+    }
+    if (axes & DISTANCE) {
+        mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_DISTANCE,
+                RAW_DISTANCE_MIN, RAW_DISTANCE_MAX, 0, 0);
+    }
+    if (axes & ID) {
+        mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_TRACKING_ID,
+                RAW_ID_MIN, RAW_ID_MAX, 0, 0);
+    }
+    if (axes & SLOT) {
+        mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_SLOT,
+                RAW_SLOT_MIN, RAW_SLOT_MAX, 0, 0);
+        mFakeEventHub->setAbsoluteAxisValue(DEVICE_ID, ABS_MT_SLOT, 0);
+    }
+    if (axes & TOOL_TYPE) {
+        mFakeEventHub->addAbsoluteAxis(DEVICE_ID, ABS_MT_TOOL_TYPE,
+                0, MT_TOOL_MAX, 0, 0);
+    }
+!!!284802.cpp!!!	processPosition(inout mapper : MultiTouchInputMapper, in x : int32_t, in y : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_POSITION_X, x);
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_POSITION_Y, y);
+!!!284930.cpp!!!	processTouchMajor(inout mapper : MultiTouchInputMapper, in touchMajor : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_TOUCH_MAJOR, touchMajor);
+!!!285058.cpp!!!	processTouchMinor(inout mapper : MultiTouchInputMapper, in touchMinor : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_TOUCH_MINOR, touchMinor);
+!!!285186.cpp!!!	processToolMajor(inout mapper : MultiTouchInputMapper, in toolMajor : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_WIDTH_MAJOR, toolMajor);
+!!!285314.cpp!!!	processToolMinor(inout mapper : MultiTouchInputMapper, in toolMinor : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_WIDTH_MINOR, toolMinor);
+!!!285442.cpp!!!	processOrientation(inout mapper : MultiTouchInputMapper, in orientation : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_ORIENTATION, orientation);
+!!!285570.cpp!!!	processPressure(inout mapper : MultiTouchInputMapper, in pressure : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_PRESSURE, pressure);
+!!!285698.cpp!!!	processDistance(inout mapper : MultiTouchInputMapper, in distance : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_DISTANCE, distance);
+!!!285826.cpp!!!	processId(inout mapper : MultiTouchInputMapper, in id : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_TRACKING_ID, id);
+!!!285954.cpp!!!	processSlot(inout mapper : MultiTouchInputMapper, in slot : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_SLOT, slot);
+!!!286082.cpp!!!	processToolType(inout mapper : MultiTouchInputMapper, in toolType : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_ABS, ABS_MT_TOOL_TYPE, toolType);
+!!!286210.cpp!!!	processKey(inout mapper : MultiTouchInputMapper, in code : int32_t, in value : int32_t) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_KEY, code, value);
+!!!286338.cpp!!!	processMTSync(inout mapper : MultiTouchInputMapper) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_SYN, SYN_MT_REPORT, 0);
+!!!286466.cpp!!!	processSync(inout mapper : MultiTouchInputMapper) : void
+    process(mapper, ARBITRARY_TIME, DEVICE_ID, EV_SYN, SYN_REPORT, 0);

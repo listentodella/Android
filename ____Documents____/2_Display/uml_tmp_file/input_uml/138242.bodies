@@ -1,0 +1,4 @@
+class ConfigurationChangedEntry
+!!!181762.cpp!!!	appendDescription(inout msg : String8) : void
+    msg.append("ConfigurationChangedEvent(), policyFlags=0x%08x",
+            policyFlags);

@@ -1,0 +1,9 @@
+format 76
+
+classinstancecanvas 128002 classinstance_ref 128002 // 
+  xyz 187 72 2000
+end
+classinstancecanvas 128130 classinstance_ref 128130 // 
+  xyz 292 169 2000 write_horizontally yes
+end
+end

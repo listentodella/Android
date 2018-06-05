@@ -1,0 +1,69 @@
+class PopupMenu
+!!!2379778.java!!!	PopupMenu(inout context : Context, inout anchor : View)
+        this(context, anchor, Gravity.NO_GRAVITY);
+!!!2379906.java!!!	PopupMenu(inout context : Context, inout anchor : View, in gravity : int)
+        // TODO Theme?
+        mContext = context;
+        mMenu = new MenuBuilder(context);
+        mMenu.setCallback(this);
+        mAnchor = anchor;
+        mPopup = new MenuPopupHelper(context, mMenu, anchor);
+        mPopup.setGravity(gravity);
+        mPopup.setCallback(this);
+!!!2380034.java!!!	getDragToOpenListener() : View::OnTouchListener
+        if (mDragListener == null) {
+            mDragListener = new ForwardingListener(mAnchor) {
+                @Override
+                protected boolean onForwardingStarted() {
+                    show();
+                    return true;
+                }
+
+                @Override
+                protected boolean onForwardingStopped() {
+                    dismiss();
+                    return true;
+                }
+
+                @Override
+                public ListPopupWindow getPopup() {
+                    // This will be null until show() is called.
+                    return mPopup.getPopup();
+                }
+            };
+        }
+
+        return mDragListener;
+!!!2380162.java!!!	getMenu() : Menu
+        return mMenu;
+!!!2380290.java!!!	getMenuInflater() : MenuInflater
+        return new MenuInflater(mContext);
+!!!2380418.java!!!	inflate(in menuRes : int) : void
+        getMenuInflater().inflate(menuRes, mMenu);
+!!!2380546.java!!!	show() : void
+        mPopup.show();
+!!!2380674.java!!!	dismiss() : void
+        mPopup.dismiss();
+!!!2380802.java!!!	setOnMenuItemClickListener(inout listener : PopupMenu::OnMenuItemClickListener) : void
+        mMenuItemClickListener = listener;
+!!!2380930.java!!!	setOnDismissListener(inout listener : PopupMenu::OnDismissListener) : void
+        mDismissListener = listener;
+!!!2381058.java!!!	onMenuItemSelected(inout menu : MenuBuilder, inout item : MenuItem) : boolean
+        if (mMenuItemClickListener != null) {
+            return mMenuItemClickListener.onMenuItemClick(item);
+        }
+        return false;
+!!!2381186.java!!!	onCloseMenu(inout menu : MenuBuilder, inout allMenusAreClosing : boolean) : void
+        if (mDismissListener != null) {
+            mDismissListener.onDismiss(this);
+        }
+!!!2381314.java!!!	onOpenSubMenu(inout subMenu : MenuBuilder) : boolean
+        if (subMenu == null) return false;
+
+        if (!subMenu.hasVisibleItems()) {
+            return true;
+        }
+
+        // Current menu will be dismissed by the normal helper, submenu will be shown in its place.
+        new MenuPopupHelper(mContext, subMenu, mAnchor).show();
+        return true;

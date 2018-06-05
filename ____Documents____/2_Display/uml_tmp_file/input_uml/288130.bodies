@@ -1,0 +1,3 @@
+class PackageInstallObserver
+!!!1709442.java!!!	getBinder() : IPackageInstallObserver2
+        return mBinder;

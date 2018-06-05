@@ -1,0 +1,407 @@
+format 76
+
+classinstance 129794 class_ref 144898 // SurfaceFlinger
+  name ""   xyz 342.3 31.4 2000 life_line_z 2000
+classinstance 154882 class_ref 146434 // DispSync
+  name ""   xyz 1202 36.6 2000 life_line_z 2000
+classinstance 155394 class_ref 147458 // DispSyncThread
+  name ""   xyz 1517.6 35.7 2000 life_line_z 2000
+classinstance 156290 class_ref 146178 // HWComposer
+  name ""   xyz 1782 43.3 2000 life_line_z 2000
+classinstance 156674 class_ref 222338 // HWComposer::VSyncThread
+  name ""   xyz 1896 106.8 2000 life_line_z 2000
+classinstance 157698 class_ref 160002 // DispSyncSource
+  name ""   xyz 985.8 32.6 2000 life_line_z 2000
+classinstance 158082 class_ref 148610 // EventThread
+  name ""   xyz 744 33.7 2000 life_line_z 2000
+classinstance 160258 class_ref 151298 // MessageQueue
+  name ""   xyz 461.9 31.8 2000 life_line_z 2000
+classinstance 161026 class_ref 222466 // EventThread::Connection
+  name ""   xyz 574 45.5 2000 life_line_z 2000
+classinstance 162818 class_ref 222594 // Looper
+  name ""   xyz 1354.4 39.4 2000 life_line_z 2000
+note 164354 "if (connection->count < 0) {
+    connection->count = 0;
+    mCondition.broadcast();
+}"
+  xyzwh 805.2 213 2000 178 76
+note 164482 "SurfaceFlinger's binder thread"
+  xyzwh 185.3 165.2 2000 197 37
+note 164994 "EventThread for  sf"
+  xyzwh 211.2 482.1 2000 153 38
+note 165378 "if (connection->count >= 0) {
+    waitForVSync = true;
+}"
+  xyzwh 803.5 518.9 2000 175 59
+note 165762 "// if (!timestamp && waitForVSync)"
+  xyzwh 949.5 593.2 2000 222 35
+note 166146 "mCallback = callback;  // callback is EventThread"
+  xyzwh 1227 636.2 2005 308 35
+note 167042 "EventListener listener;
+listener.mPhase = phase;
+listener.mCallback = callback;
+mEventListeners.push(listener);
+
+mCond.signal();"
+  xyzwh 1587.7 745.6 2000 213 117
+note 168578 "A3.
+mCond.waitRelative(mMutex, targetTime - now);"
+  xyzwh 1596.6 1340.6 2000 309 61
+note 169986 "mVSyncEvent[0].header.type = DisplayEventReceiver::DISPLAY_EVENT_VSYNC;
+mVSyncEvent[0].header.id = 0;
+mVSyncEvent[0].header.timestamp = timestamp;
+mVSyncEvent[0].vsync.count++;
+mCondition.broadcast();"
+  xyzwh 320.2 1612.6 2000 467 97
+note 170114 "DispSyncThread"
+  xyzwh 201 1199.1 2000 153 38
+note 170882 "SurfaceFlinger thread"
+  xyzwh 204.5 2819 2000 153 38
+note 171522 "// This will write to the fd of BitTube (Connection's BitTube)"
+  xyzwh 907.2 890.8 2000 353 35
+note 171650 "// before, flinger->init( ): mLooper->addFd(mEventTube->getFd(), 0, Looper::EVENT_INPUT, MessageQueue::cb_eventReceiver, this);
+// so:
+// get data from fd of BitTube (Connection's BitTube)
+// and call MessageQueue::cb_eventReceiver"
+  xyzwh 511.7 2874.2 2000 545 107
+classinstance 172290 class_ref 229122 // MessageQueue::Handler
+  name ""   xyz 830.4 62 2000 life_line_z 2000
+note 173186 "// Wake the poll loop "
+  xyzwh 923.3 3109.8 2020 141 36
+note 174082 "handleMessageTransaction();
+handleMessageInvalidate();
+signalRefresh();"
+  xyzwh 388.8 3236.1 2000 218 63
+classinstance 174338 class_ref 222338 // HWComposer::VSyncThread
+  name ""   xyz 505 4.5 2000 life_line_z 2000
+note 174850 "VSyncThread, S/W Vsync"
+  xyzwh 235.1 2161 2000 177 34
+note 174978 "struct timespec spec;
+spec.tv_sec  = next_vsync / 1000000000;
+spec.tv_nsec = next_vsync % 1000000000;
+
+int err;
+do {
+    err = clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &spec, NULL);
+} while (err<0 && errno == EINTR);"
+  xyzwh 602.4 2140.4 2005 472 148
+note 176130 "mPeriod = period;
+mPhase = phase;
+mCond.signal();"
+  xyzwh 1581.7 2421.3 2000 139 66
+durationcanvas 163202 classinstance_ref 129794 // :SurfaceFlinger
+  xyzwh 384 132 2010 11 157
+end
+durationcanvas 163586 classinstance_ref 160258 // :MessageQueue
+  xyzwh 507 154 2010 11 133
+end
+durationcanvas 163842 classinstance_ref 161026 // :EventThread::Connection
+  xyzwh 645 172 2010 11 117
+end
+durationcanvas 164098 classinstance_ref 158082 // :EventThread
+  xyzwh 780 192 2010 11 97
+end
+durationcanvas 164610 classinstance_ref 158082 // :EventThread
+  xyzwh 780 461.9 2010 11 513
+  overlappingdurationcanvas 165122
+    xyzwh 786 506.9 2020 11 363
+    overlappingdurationcanvas 165506
+      xyzwh 792 618 2030 11 245
+    end
+  end
+end
+durationcanvas 165890 classinstance_ref 157698 // :DispSyncSource
+  xyzwh 1032 645.1 2010 11 37
+end
+durationcanvas 166274 classinstance_ref 157698 // :DispSyncSource
+  xyzwh 1032 704.9 2010 11 167
+end
+durationcanvas 166530 classinstance_ref 154882 // :DispSync
+  xyzwh 1230 719.1 2010 11 150
+end
+durationcanvas 166786 classinstance_ref 155394 // :DispSyncThread
+  xyzwh 1564 735.3 2010 11 130
+end
+durationcanvas 167170 classinstance_ref 155394 // :DispSyncThread
+  xyzwh 1564 1171 2010 11 460
+  overlappingdurationcanvas 167554
+    xyzwh 1570 1202.1 2020 11 64
+    overlappingdurationcanvas 168066
+      xyzwh 1576 1235.9 2030 11 25
+    end
+  end
+  overlappingdurationcanvas 167810
+    xyzwh 1570 1301.1 2020 11 25
+  end
+  overlappingdurationcanvas 168706
+    xyzwh 1570 1441.1 2020 11 25
+  end
+  overlappingdurationcanvas 168962
+    xyzwh 1570 1506.1 2020 11 56
+  end
+end
+durationcanvas 169218 classinstance_ref 157698 // :DispSyncSource
+  xyzwh 1032 1519.1 2010 11 210
+  overlappingdurationcanvas 169474
+    xyzwh 1038 1565.9 2020 11 25
+  end
+end
+durationcanvas 169730 classinstance_ref 158082 // :EventThread
+  xyzwh 780 1596.9 2010 11 123
+end
+durationcanvas 170242 classinstance_ref 161026 // :EventThread::Connection
+  xyzwh 645 902 2010 11 37
+end
+durationcanvas 170498 classinstance_ref 129794 // :SurfaceFlinger
+  xyzwh 384 2792.2 2010 11 290
+  overlappingdurationcanvas 171010
+    xyzwh 390 2826 2020 11 249
+  end
+end
+durationcanvas 171266 classinstance_ref 160258 // :MessageQueue
+  xyzwh 507 2857.9 2010 11 300
+  overlappingdurationcanvas 171778
+    xyzwh 513 3018.8 2020 11 133
+    overlappingdurationcanvas 172034
+      xyzwh 519 3056.3 2030 11 88
+    end
+  end
+end
+durationcanvas 172418 classinstance_ref 172290 // :MessageQueue::Handler
+  xyzwh 901 3065.1 2010 11 57
+end
+durationcanvas 172674 classinstance_ref 162818 // :Looper
+  xyzwh 1375 3079 2010 11 103
+end
+durationcanvas 173314 classinstance_ref 172290 // :MessageQueue::Handler
+  xyzwh 901 3147 2010 11 167
+  overlappingdurationcanvas 173570
+    xyzwh 907 3185.1 2020 11 117
+  end
+end
+durationcanvas 173826 classinstance_ref 129794 // :SurfaceFlinger
+  xyzwh 384 3212.9 2010 11 90
+end
+durationcanvas 174466 classinstance_ref 174338 // :HWComposer::VSyncThread
+  xyzwh 585 2135.1 2010 11 337
+end
+durationcanvas 175106 classinstance_ref 129794 // :SurfaceFlinger
+  xyzwh 384 2309.9 2010 11 157
+end
+durationcanvas 175362 classinstance_ref 154882 // :DispSync
+  xyzwh 1230 2359.6 2010 11 139
+  overlappingdurationcanvas 175618
+    xyzwh 1236 2390 2020 11 101
+  end
+end
+durationcanvas 175874 classinstance_ref 155394 // :DispSyncThread
+  xyzwh 1564 2409 2010 11 83
+end
+lostfoundmsgsupport 163330 xyz 209.1 147.7 2015
+lostfoundmsgsupport 164738 xyz 204.6 477.7 2015
+lostfoundmsgsupport 167298 xyz 189.1 1187.7 2015
+lostfoundmsgsupport 170626 xyz 204.6 2807.7 2015
+lostfoundmsgsupport 174594 xyz 226 2150.8 2015
+msg 163458 found_synchronous
+  from lostfoundmsgsupport_ref 163330
+  to durationcanvas_ref 163202
+  yz 145 2015 explicitmsg "1. signalLayerUpdate"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 222 133
+msg 163714 synchronous
+  from durationcanvas_ref 163202
+  to durationcanvas_ref 163586
+  yz 165 2015 explicitmsg "A1. mEventQueue.invalidate()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 400 150
+msg 163970 synchronous
+  from durationcanvas_ref 163586
+  to durationcanvas_ref 163842
+  yz 185 2015 explicitmsg "B1. mEvents->requestNextVsync()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 530 171
+msg 164226 synchronous
+  from durationcanvas_ref 163842
+  to durationcanvas_ref 164098
+  yz 205 2015 explicitmsg "C1. mEventThread->requestNextVsync(this)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 661 193
+msg 164866 found_synchronous
+  from lostfoundmsgsupport_ref 164738
+  to durationcanvas_ref 164610
+  yz 475 2015 explicitmsg "2. threadLoop"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 206 460
+reflexivemsg 165250 synchronous
+  to durationcanvas_ref 165122
+  yz 506 2025 explicitmsg "A1. signalConnections = waitForEvent(&event)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 795 486
+reflexivemsg 165634 synchronous
+  to durationcanvas_ref 165506
+  yz 618 2035 explicitmsg "B1. enableVSyncLocked()"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 804 603
+msg 166018 synchronous
+  from durationcanvas_ref 165506
+  to durationcanvas_ref 165890
+  yz 658 2035 explicitmsg "C1. mVSyncSource->setCallback(static_cast<VSyncSource::Callback*>(this))"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 803 643
+msg 166402 synchronous
+  from durationcanvas_ref 165506
+  to durationcanvas_ref 166274
+  yz 715 2035 explicitmsg "C2. mVSyncSource->setVSyncEnabled(true)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 803 700
+msg 166658 synchronous
+  from durationcanvas_ref 166274
+  to durationcanvas_ref 166530
+  yz 732 2015 explicitmsg "D1. mDispSync->addEventListener(mPhaseOffset, static_cast<DispSync::Callback*>(this))"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1045 716
+msg 166914 synchronous
+  from durationcanvas_ref 166530
+  to durationcanvas_ref 166786
+  yz 748 2020 explicitmsg "E1. mThread->addEventListener(phase, callback)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1245 736
+msg 167426 found_synchronous
+  from lostfoundmsgsupport_ref 167298
+  to durationcanvas_ref 167170
+  yz 1185 2015 explicitmsg "3. threadLoop"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 200 1166
+reflexivemsg 167682 synchronous
+  to durationcanvas_ref 167554
+  yz 1202 2025 explicitmsg "A1. nextEventTime = computeNextEventTimeLocked(now);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1595 1183
+reflexivemsg 167938 synchronous
+  to durationcanvas_ref 167810
+  yz 1301 2025 explicitmsg "A2. targetTime = nextEventTime;"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1596 1283
+reflexivemsg 168194 synchronous
+  to durationcanvas_ref 168066
+  yz 1235 2035 explicitmsg "B1. computeListenerNextEventTimeLocked(mEventListeners[i], now);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1609 1220
+reflexivemsg 168834 synchronous
+  to durationcanvas_ref 168706
+  yz 1441 2025 explicitmsg "A4. callbackInvocations = gatherCallbackInvocationsLocked(now);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1601 1423
+reflexivemsg 169090 synchronous
+  to durationcanvas_ref 168962
+  yz 1506 2025 explicitmsg "A5. fireCallbackInvocations(callbackInvocations);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1598 1490
+msg 169346 synchronous
+  from durationcanvas_ref 168962
+  to durationcanvas_ref 169218
+  yz 1532 2030 explicitmsg "B1. callbacks[i].mCallback->onDispSyncEvent(callbacks[i].mEventTime);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1073 1520
+reflexivemsg 169602 synchronous
+  to durationcanvas_ref 169474
+  yz 1565 2025 explicitmsg "C1. callback = mCallback;  // callback is EventThread"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1047 1550
+msg 169858 synchronous
+  from durationcanvas_ref 169218
+  to durationcanvas_ref 169730
+  yz 1608 2015 explicitmsg "C2. callback->onVSyncEvent(when);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 816 1593
+msg 170370 synchronous
+  from durationcanvas_ref 164610
+  to durationcanvas_ref 170242
+  yz 915 2015 explicitmsg "A2.  status_t err = conn->postEvent(event);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 666 900
+msg 170754 found_synchronous
+  from lostfoundmsgsupport_ref 170626
+  to durationcanvas_ref 170498
+  yz 2805 2015 explicitmsg "5. run"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 218 2793
+reflexivemsg 171138 synchronous
+  to durationcanvas_ref 171010
+  yz 2826 2025 explicitmsg "A1. waitForEvent();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 397 2803
+msg 171394 synchronous
+  from durationcanvas_ref 171010
+  to durationcanvas_ref 171266
+  yz 2868 2025 explicitmsg "B1. mEventQueue.waitMessage();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 395 2856
+reflexivemsg 171906 synchronous
+  to durationcanvas_ref 171778
+  yz 3018 2025 explicitmsg "C1. cb_eventReceiver"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 518 3000
+reflexivemsg 172162 synchronous
+  to durationcanvas_ref 172034
+  yz 3056 2035 explicitmsg "D1. eventReceiver"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 528 3036
+msg 172546 synchronous
+  from durationcanvas_ref 172034
+  to durationcanvas_ref 172418
+  yz 3078 2035 explicitmsg "E1. mHandler->dispatchInvalidate();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 539 3066
+msg 172802 synchronous
+  from durationcanvas_ref 172418
+  to durationcanvas_ref 172674
+  yz 3092 2015 explicitmsg "F1. mQueue.mLooper->sendMessage(this, Message(MessageQueue::INVALIDATE));"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 894 3076
+msg 173442 asynchronous
+  from durationcanvas_ref 172674
+  to durationcanvas_ref 173314
+  yz 3158 2015 unspecifiedmsg
+  show_full_operations_definition default drawing_language default show_context_mode default
+reflexivemsg 173698 synchronous
+  to durationcanvas_ref 173570
+  yz 3185 2025 explicitmsg "G1. handleMessage"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 902 3173
+msg 173954 synchronous
+  from durationcanvas_ref 173570
+  to durationcanvas_ref 173826
+  yz 3225 2025 explicitmsg "H1. mQueue.mFlinger->onMessageReceived(message.what);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 387 3213
+msg 174722 found_synchronous
+  from lostfoundmsgsupport_ref 174594
+  to durationcanvas_ref 174466
+  yz 2148 2015 explicitmsg "4. threadLoop"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 246 2130
+msg 175234 synchronous
+  from durationcanvas_ref 174466
+  to durationcanvas_ref 175106
+  yz 2322 2015 explicitmsg "A1. mHwc.mEventHandler.onVSyncReceived(0, next_vsync);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 397 2306
+msg 175490 synchronous
+  from durationcanvas_ref 175106
+  to durationcanvas_ref 175362
+  yz 2372 2015 explicitmsg "B1. mPrimaryDispSync.addResyncSample(timestamp);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 409 2356
+reflexivemsg 175746 synchronous
+  to durationcanvas_ref 175618
+  yz 2390 2025 explicitmsg "C1. updateModelLocked();"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1246 2376
+msg 176002 synchronous
+  from durationcanvas_ref 175618
+  to durationcanvas_ref 175874
+  yz 2422 2025 explicitmsg "D1. mThread->updateModel(mPeriod, mPhase);"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 1265 2410
+end

@@ -1,0 +1,13 @@
+class ActionMode
+!!!545410.java!!!	setTag(inout tag : Object) : void
+        mTag = tag;
+!!!545538.java!!!	getTag() : Object
+        return mTag;
+!!!546178.java!!!	setTitleOptionalHint(inout titleOptional : boolean) : void
+        mTitleOptionalHint = titleOptional;
+!!!546306.java!!!	getTitleOptionalHint() : boolean
+        return mTitleOptionalHint;
+!!!546434.java!!!	isTitleOptional() : boolean
+        return false;
+!!!547586.java!!!	isUiFocusable() : boolean
+        return true;

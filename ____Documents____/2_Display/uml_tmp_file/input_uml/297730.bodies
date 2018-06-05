@@ -1,0 +1,8 @@
+class InnerConnection
+!!!1655810.java!!!	InnerConnection(inout sd : LoadedApk::ServiceDispatcher)
+                mDispatcher = new WeakReference<LoadedApk.ServiceDispatcher>(sd);
+!!!1655938.java!!!	connected(inout name : ComponentName, inout service : IBinder) : void
+                LoadedApk.ServiceDispatcher sd = mDispatcher.get();
+                if (sd != null) {
+                    sd.connected(name, service);
+                }

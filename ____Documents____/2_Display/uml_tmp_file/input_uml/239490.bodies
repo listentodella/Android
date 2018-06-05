@@ -1,0 +1,5 @@
+class ImeInputEventSender
+!!!959234.java!!!	ImeInputEventSender(inout inputChannel : InputChannel, inout looper : Looper)
+            super(inputChannel, looper);
+!!!959362.java!!!	onInputEventFinished(in seq : int, inout handled : boolean) : void
+            finishedInputEvent(seq, handled, false);

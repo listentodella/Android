@@ -1,0 +1,17 @@
+class Assoc
+!!!2308354.java!!!	Assoc(inout keyType : Class<K>, inout valueType : Class<V>)
+            this.keyType = keyType;
+            this.valueType = valueType;
+!!!2308482.java!!!	of(inout keyType : Class<K>, inout valueType : Class<V>) : GridLayout::Assoc
+            return new Assoc<K, V>(keyType, valueType);
+!!!2308610.java!!!	put(inout key : K, inout value : V) : void
+            add(Pair.create(key, value));
+!!!2308738.java!!!	pack() : GridLayout::PackedMap
+            int N = size();
+            K[] keys = (K[]) Array.newInstance(keyType, N);
+            V[] values = (V[]) Array.newInstance(valueType, N);
+            for (int i = 0; i < N; i++) {
+                keys[i] = get(i).first;
+                values[i] = get(i).second;
+            }
+            return new PackedMap<K, V>(keys, values);

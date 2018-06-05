@@ -1,0 +1,23 @@
+class Node
+!!!2529410.java!!!	Node(inout  : int...legalKeys)
+            mLegalKeys = legalKeys;
+            mChildren = new ArrayList<Node>();
+!!!2529538.java!!!	addChild(inout child : TimePickerSpinnerDelegate::Node) : void
+            mChildren.add(child);
+!!!2529666.java!!!	containsKey(in key : int) : boolean
+            for (int i = 0; i < mLegalKeys.length; i++) {
+                if (mLegalKeys[i] == key) {
+                    return true;
+                }
+            }
+            return false;
+!!!2529794.java!!!	canReach(in key : int) : TimePickerSpinnerDelegate::Node
+            if (mChildren == null) {
+                return null;
+            }
+            for (Node child : mChildren) {
+                if (child.containsKey(key)) {
+                    return child;
+                }
+            }
+            return null;

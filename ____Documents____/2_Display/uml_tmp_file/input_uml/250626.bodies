@@ -1,0 +1,15 @@
+class ClipRectAnimation
+!!!1122178.java!!!	ClipRectAnimation(inout fromClip : Rect, inout toClip : Rect)
+        if (fromClip == null || toClip == null) {
+            throw new RuntimeException("Expected non-null animation clip rects");
+        }
+        mFromRect.set(fromClip);
+        mToRect.set(toClip);
+!!!1122306.java!!!	applyTransformation(in it : float, inout tr : Transformation) : void
+        int l = mFromRect.left + (int) ((mToRect.left - mFromRect.left) * it);
+        int t = mFromRect.top + (int) ((mToRect.top - mFromRect.top) * it);
+        int r = mFromRect.right + (int) ((mToRect.right - mFromRect.right) * it);
+        int b = mFromRect.bottom + (int) ((mToRect.bottom - mFromRect.bottom) * it);
+        tr.setClipRect(l, t, r, b);
+!!!1122434.java!!!	willChangeTransformationMatrix() : boolean
+        return false;

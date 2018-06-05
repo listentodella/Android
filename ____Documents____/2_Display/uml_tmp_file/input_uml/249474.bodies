@@ -1,0 +1,29 @@
+class AccelerateInterpolator
+!!!1105282.java!!!	AccelerateInterpolator()
+        mFactor = 1.0f;
+        mDoubleFactor = 2.0;
+!!!1105410.java!!!	AccelerateInterpolator(in factor : float)
+        mFactor = factor;
+        mDoubleFactor = 2 * mFactor;
+!!!1105538.java!!!	AccelerateInterpolator(inout context : Context, inout attrs : AttributeSet)
+        this(context.getResources(), context.getTheme(), attrs);
+!!!1105666.java!!!	AccelerateInterpolator(inout res : Resources, inout theme : Theme, inout attrs : AttributeSet)
+        TypedArray a;
+        if (theme != null) {
+            a = theme.obtainStyledAttributes(attrs, R.styleable.AccelerateInterpolator, 0, 0);
+        } else {
+            a = res.obtainAttributes(attrs, R.styleable.AccelerateInterpolator);
+        }
+
+        mFactor = a.getFloat(R.styleable.AccelerateInterpolator_factor, 1.0f);
+        mDoubleFactor = 2 * mFactor;
+
+        a.recycle();
+!!!1105794.java!!!	getInterpolation(in input : float) : float
+        if (mFactor == 1.0f) {
+            return input * input;
+        } else {
+            return (float)Math.pow(input, mDoubleFactor);
+        }
+!!!1105922.java!!!	createNativeInterpolator() : long
+        return NativeInterpolatorFactoryHelper.createAccelerateInterpolator(mFactor);

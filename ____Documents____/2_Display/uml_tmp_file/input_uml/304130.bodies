@@ -1,0 +1,4 @@
+class MemoryCommitResult
+!!!1742338.java!!!	setDiskWriteResult(inout result : boolean) : void
+            writeToDiskResult = result;
+            writtenToDiskLatch.countDown();

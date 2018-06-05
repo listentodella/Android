@@ -1,0 +1,217 @@
+format 76
+"surfaceflinger" // surfaceflinger::surfaceflinger
+  revision 1
+  modified_by 2 "thisway_diy"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  cpp_h_dir "L:/android_projects/uml_tmp_file/surfaceflinger/"
+  cpp_src_dir "L:/android_projects/uml_tmp_file/surfaceflinger/"
+  classview 135298 "surfaceflinger"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 152194 "anonymous13"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " ---------------------------------------------------------------------------"
+      attribute 174466 "eTransactionNeeded"
+	public type class_ref 152194 // anonymous13
+	init_value " 0x01"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 174594 "eTraversalNeeded"
+	public type class_ref 152194 // anonymous13
+	init_value " 0x02"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 174722 "eDisplayTransactionNeeded"
+	public type class_ref 152194 // anonymous13
+	init_value " 0x04"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 174850 "eTransactionMask"
+	public type class_ref 152194 // anonymous13
+	init_value " 0x07
+"
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 152706 "anonymous14"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 174978 "EVENT_VSYNC"
+	public type class_ref 152706 // anonymous14
+	init_value " HWC_EVENT_VSYNC
+    "
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 152834 "anonymous15"
+      visibility package stereotype "enum"
+      cpp_decl "${comment}enum  {
+${items}
+};
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " This value is specified in number of frames.  Log frame stats at most
+ every half hour."
+      attribute 175106 "LOG_FRAME_STATS_PERIOD"
+	public type class_ref 152834 // anonymous15
+	init_value "  30*60*60 "
+	cpp_decl "  ${name}${value},${comment}"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+  end
+
+  deploymentview 135042 "surfaceflinger"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 143362 "SurfaceFlinger"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 152194 // anonymous13
+	class_ref 152706 // anonymous14
+	class_ref 152834 // anonymous15
+      end
+    end
+
+    artifact 146434 "main"
+      stereotype "source"
+      cpp_src "int main(int, char**) {
+    // When SF is launched in its own process, limit the number of
+    // binder threads to 4.
+    ProcessState::self()->setThreadPoolMaxThreadCount(4);
+
+    // start the thread pool
+    sp<ProcessState> ps(ProcessState::self());
+    ps->startThreadPool();
+
+    // instantiate surfaceflinger
+    sp<SurfaceFlinger> flinger = new SurfaceFlinger();
+
+#if defined(HAVE_PTHREADS)
+    setpriority(PRIO_PROCESS, 0, PRIORITY_URGENT_DISPLAY);
+#endif
+    set_sched_policy(0, SP_FOREGROUND);
+
+    // initialize before clients can connect
+    flinger->init();
+
+    // publish surface flinger
+    sp<IServiceManager> sm(defaultServiceManager());
+    sm->addService(String16(SurfaceFlinger::getServiceName()), flinger, false);
+
+    // run in this thread
+    flinger->run();
+
+    return 0;
+}
+"
+      associated_classes
+      end
+    end
+  end
+end

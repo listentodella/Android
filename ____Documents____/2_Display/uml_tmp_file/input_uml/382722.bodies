@@ -1,0 +1,8 @@
+class PopupDataSetObserver
+!!!2350594.java!!!	onChanged() : void
+            if (isShowing()) {
+                // Resize the popup to fit new content
+                show();
+            }
+!!!2350722.java!!!	onInvalidated() : void
+            dismiss();

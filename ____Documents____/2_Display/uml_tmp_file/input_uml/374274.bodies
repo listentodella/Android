@@ -1,0 +1,62 @@
+class PositionListener
+!!!2241410.java!!!	addSubscriber(inout positionListener : Editor::TextViewPositionListener, inout canMove : boolean) : void
+            if (mNumberOfListeners == 0) {
+                updatePosition();
+                ViewTreeObserver vto = mTextView.getViewTreeObserver();
+                vto.addOnPreDrawListener(this);
+            }
+
+            int emptySlotIndex = -1;
+            for (int i = 0; i < MAXIMUM_NUMBER_OF_LISTENERS; i++) {
+                TextViewPositionListener listener = mPositionListeners[i];
+                if (listener == positionListener) {
+                    return;
+                } else if (emptySlotIndex < 0 && listener == null) {
+                    emptySlotIndex = i;
+                }
+            }
+
+            mPositionListeners[emptySlotIndex] = positionListener;
+            mCanMove[emptySlotIndex] = canMove;
+            mNumberOfListeners++;
+!!!2241538.java!!!	removeSubscriber(inout positionListener : Editor::TextViewPositionListener) : void
+            for (int i = 0; i < MAXIMUM_NUMBER_OF_LISTENERS; i++) {
+                if (mPositionListeners[i] == positionListener) {
+                    mPositionListeners[i] = null;
+                    mNumberOfListeners--;
+                    break;
+                }
+            }
+
+            if (mNumberOfListeners == 0) {
+                ViewTreeObserver vto = mTextView.getViewTreeObserver();
+                vto.removeOnPreDrawListener(this);
+            }
+!!!2241666.java!!!	getPositionX() : int
+            return mPositionX;
+!!!2241794.java!!!	getPositionY() : int
+            return mPositionY;
+!!!2241922.java!!!	onPreDraw() : boolean
+            updatePosition();
+
+            for (int i = 0; i < MAXIMUM_NUMBER_OF_LISTENERS; i++) {
+                if (mPositionHasChanged || mScrollHasChanged || mCanMove[i]) {
+                    TextViewPositionListener positionListener = mPositionListeners[i];
+                    if (positionListener != null) {
+                        positionListener.updatePosition(mPositionX, mPositionY,
+                                mPositionHasChanged, mScrollHasChanged);
+                    }
+                }
+            }
+
+            mScrollHasChanged = false;
+            return true;
+!!!2242050.java!!!	updatePosition() : void
+            mTextView.getLocationInWindow(mTempCoords);
+
+            mPositionHasChanged = mTempCoords[0] != mPositionX || mTempCoords[1] != mPositionY;
+
+            mPositionX = mTempCoords[0];
+            mPositionY = mTempCoords[1];
+!!!2242178.java!!!	onScrollChanged() : void
+            mScrollHasChanged = true;

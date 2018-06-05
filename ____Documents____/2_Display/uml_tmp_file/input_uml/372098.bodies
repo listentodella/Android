@@ -1,0 +1,99 @@
+class DependencyGraph
+!!!2221058.java!!!	clear() : void
+            final ArrayList<Node> nodes = mNodes;
+            final int count = nodes.size();
+
+            for (int i = 0; i < count; i++) {
+                nodes.get(i).release();
+            }
+            nodes.clear();
+
+            mKeyNodes.clear();
+            mRoots.clear();
+!!!2221186.java!!!	add(inout view : View) : void
+            final int id = view.getId();
+            final Node node = Node.acquire(view);
+
+            if (id != View.NO_ID) {
+                mKeyNodes.put(id, node);
+            }
+
+            mNodes.add(node);
+!!!2221314.java!!!	getSortedViews(inout sorted : View, inout  : int...rules) : void
+            final ArrayDeque<Node> roots = findRoots(rules);
+            int index = 0;
+
+            Node node;
+            while ((node = roots.pollLast()) != null) {
+                final View view = node.view;
+                final int key = view.getId();
+
+                sorted[index++] = view;
+
+                final ArrayMap<Node, DependencyGraph> dependents = node.dependents;
+                final int count = dependents.size();
+                for (int i = 0; i < count; i++) {
+                    final Node dependent = dependents.keyAt(i);
+                    final SparseArray<Node> dependencies = dependent.dependencies;
+
+                    dependencies.remove(key);
+                    if (dependencies.size() == 0) {
+                        roots.add(dependent);
+                    }
+                }
+            }
+
+            if (index < sorted.length) {
+                throw new IllegalStateException("Circular dependencies cannot exist"
+                        + " in RelativeLayout");
+            }
+!!!2221442.java!!!	findRoots(inout rulesFilter : int) : RelativeLayout::DependencyGraph::Node
+            final SparseArray<Node> keyNodes = mKeyNodes;
+            final ArrayList<Node> nodes = mNodes;
+            final int count = nodes.size();
+
+            // Find roots can be invoked several times, so make sure to clear
+            // all dependents and dependencies before running the algorithm
+            for (int i = 0; i < count; i++) {
+                final Node node = nodes.get(i);
+                node.dependents.clear();
+                node.dependencies.clear();
+            }
+
+            // Builds up the dependents and dependencies for each node of the graph
+            for (int i = 0; i < count; i++) {
+                final Node node = nodes.get(i);
+
+                final LayoutParams layoutParams = (LayoutParams) node.view.getLayoutParams();
+                final int[] rules = layoutParams.mRules;
+                final int rulesCount = rulesFilter.length;
+
+                // Look only the the rules passed in parameter, this way we build only the
+                // dependencies for a specific set of rules
+                for (int j = 0; j < rulesCount; j++) {
+                    final int rule = rules[rulesFilter[j]];
+                    if (rule > 0) {
+                        // The node this node depends on
+                        final Node dependency = keyNodes.get(rule);
+                        // Skip unknowns and self dependencies
+                        if (dependency == null || dependency == node) {
+                            continue;
+                        }
+                        // Add the current node as a dependent
+                        dependency.dependents.put(node, this);
+                        // Add a dependency to the current node
+                        node.dependencies.put(rule, dependency);
+                    }
+                }
+            }
+
+            final ArrayDeque<Node> roots = mRoots;
+            roots.clear();
+
+            // Finds all the roots in the graph: all nodes with no dependencies
+            for (int i = 0; i < count; i++) {
+                final Node node = nodes.get(i);
+                if (node.dependencies.size() == 0) roots.addLast(node);
+            }
+
+            return roots;

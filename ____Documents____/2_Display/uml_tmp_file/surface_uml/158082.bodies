@@ -1,0 +1,32 @@
+class GLExtensions
+!!!228866.cpp!!!	initWithGLStrings(in vendor : GLubyte, in renderer : GLubyte, in version : GLubyte, in extensions : GLubyte) : void
+    mVendor     = (char const*)vendor;
+    mRenderer   = (char const*)renderer;
+    mVersion    = (char const*)version;
+    mExtensions = (char const*)extensions;
+
+    char const* curr = (char const*)extensions;
+    char const* head = curr;
+    do {
+        head = strchr(curr, ' ');
+        String8 s(curr, head ? head-curr : strlen(curr));
+        if (s.length()) {
+            mExtensionList.add(s);
+        }
+        curr = head+1;
+    } while (head);
+
+    if (hasExtension("GL_OES_framebuffer_object")) {
+        mHaveFramebufferObject = true;
+    }
+!!!228994.cpp!!!	getVendor() : char
+    return mVendor.string();
+!!!229122.cpp!!!	getRenderer() : char
+    return mRenderer.string();
+!!!229250.cpp!!!	getVersion() : char
+    return mVersion.string();
+!!!229378.cpp!!!	getExtension() : char
+    return mExtensions.string();
+!!!229506.cpp!!!	hasExtension(in extension : char) : bool
+    const String8 s(extension);
+    return mExtensionList.indexOf(s) >= 0;

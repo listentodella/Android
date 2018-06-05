@@ -1,0 +1,28 @@
+class LayoutParams
+!!!2006530.java!!!	LayoutParams(inout c : Context, inout attrs : AttributeSet)
+            super(c, attrs);
+            TypedArray a =
+                    c.obtainStyledAttributes(attrs, com.android.internal.R.styleable.LinearLayout_Layout);
+
+            weight = a.getFloat(com.android.internal.R.styleable.LinearLayout_Layout_layout_weight, 0);
+            gravity = a.getInt(com.android.internal.R.styleable.LinearLayout_Layout_layout_gravity, -1);
+
+            a.recycle();
+!!!2006658.java!!!	LayoutParams(in width : int, in height : int)
+            super(width, height);
+            weight = 0;
+!!!2006786.java!!!	LayoutParams(in width : int, in height : int, in weight : float)
+            super(width, height);
+            this.weight = weight;
+!!!2006914.java!!!	LayoutParams(inout p : ViewGroup::LayoutParams)
+            super(p);
+!!!2007042.java!!!	LayoutParams(inout source : ViewGroup::MarginLayoutParams)
+            super(source);
+!!!2007170.java!!!	LayoutParams(inout source : LinearLayout::LayoutParams)
+            super(source);
+
+            this.weight = source.weight;
+            this.gravity = source.gravity;
+!!!2007298.java!!!	debug(in output : String) : String
+            return output + "LinearLayout.LayoutParams={width=" + sizeToString(width) +
+                    ", height=" + sizeToString(height) + " weight=" + weight +  "}";

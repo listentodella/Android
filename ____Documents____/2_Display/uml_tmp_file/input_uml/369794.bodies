@@ -1,0 +1,18 @@
+class AbstractDatePickerDelegate
+!!!2178434.java!!!	AbstractDatePickerDelegate(inout delegator : DatePicker, inout context : Context)
+            mDelegator = delegator;
+            mContext = context;
+
+            // initialization based on locale
+            setCurrentLocale(Locale.getDefault());
+!!!2178562.java!!!	setCurrentLocale(inout locale : Locale) : void
+            if (locale.equals(mCurrentLocale)) {
+                return;
+            }
+            mCurrentLocale = locale;
+!!!2178690.java!!!	setValidationCallback(inout callback : DatePicker::ValidationCallback) : void
+            mValidationCallback = callback;
+!!!2178818.java!!!	onValidationChanged(inout valid : boolean) : void
+            if (mValidationCallback != null) {
+                mValidationCallback.onValidationChanged(valid);
+            }

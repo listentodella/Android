@@ -1,0 +1,23 @@
+class ImageSwitcher
+!!!2339330.java!!!	ImageSwitcher(inout context : Context)
+        super(context);
+!!!2339458.java!!!	ImageSwitcher(inout context : Context, inout attrs : AttributeSet)
+        super(context, attrs);
+!!!2339586.java!!!	setImageResource(in resid : int) : void
+        ImageView image = (ImageView)this.getNextView();
+        image.setImageResource(resid);
+        showNext();
+!!!2339714.java!!!	setImageURI(inout uri : Uri) : void
+        ImageView image = (ImageView)this.getNextView();
+        image.setImageURI(uri);
+        showNext();
+!!!2339842.java!!!	setImageDrawable(inout drawable : Drawable) : void
+        ImageView image = (ImageView)this.getNextView();
+        image.setImageDrawable(drawable);
+        showNext();
+!!!2339970.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(ImageSwitcher.class.getName());
+!!!2340098.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(ImageSwitcher.class.getName());

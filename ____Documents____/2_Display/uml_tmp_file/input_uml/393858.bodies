@@ -1,0 +1,25 @@
+class StackFrame
+!!!2468994.java!!!	StackFrame(inout context : Context)
+            super(context);
+!!!2469122.java!!!	setTransformAnimator(inout oa : ObjectAnimator) : void
+            transformAnimator = new WeakReference<ObjectAnimator>(oa);
+!!!2469250.java!!!	setSliderAnimator(inout oa : ObjectAnimator) : void
+            sliderAnimator = new WeakReference<ObjectAnimator>(oa);
+!!!2469378.java!!!	cancelTransformAnimator() : boolean
+            if (transformAnimator != null) {
+                ObjectAnimator oa = transformAnimator.get();
+                if (oa != null) {
+                    oa.cancel();
+                    return true;
+                }
+            }
+            return false;
+!!!2469506.java!!!	cancelSliderAnimator() : boolean
+            if (sliderAnimator != null) {
+                ObjectAnimator oa = sliderAnimator.get();
+                if (oa != null) {
+                    oa.cancel();
+                    return true;
+                }
+            }
+            return false;

@@ -1,0 +1,54 @@
+class BackupTransport
+!!!1804546.java!!!	getBinder() : IBinder
+        return mBinderImpl.asBinder();
+!!!1804674.java!!!	name() : String
+        throw new UnsupportedOperationException("Transport name() not implemented");
+!!!1804802.java!!!	configurationIntent() : Intent
+        return null;
+!!!1804930.java!!!	currentDestinationString() : String
+        throw new UnsupportedOperationException(
+                "Transport currentDestinationString() not implemented");
+!!!1805058.java!!!	dataManagementIntent() : Intent
+        return null;
+!!!1805186.java!!!	dataManagementLabel() : String
+        throw new UnsupportedOperationException(
+                "Transport dataManagementLabel() not implemented");
+!!!1805314.java!!!	transportDirName() : String
+        throw new UnsupportedOperationException(
+                "Transport transportDirName() not implemented");
+!!!1805442.java!!!	initializeDevice() : int
+        return BackupTransport.TRANSPORT_ERROR;
+!!!1805570.java!!!	clearBackupData(inout packageInfo : PackageInfo) : int
+        return BackupTransport.TRANSPORT_ERROR;
+!!!1805698.java!!!	finishBackup() : int
+        return BackupTransport.TRANSPORT_ERROR;
+!!!1805826.java!!!	requestBackupTime() : long
+        return 0;
+!!!1805954.java!!!	performBackup(inout packageInfo : PackageInfo, inout inFd : ParcelFileDescriptor) : int
+        return BackupTransport.TRANSPORT_ERROR;
+!!!1806082.java!!!	getAvailableRestoreSets() : RestoreSet
+        return null;
+!!!1806210.java!!!	getCurrentRestoreSet() : long
+        return 0;
+!!!1806338.java!!!	startRestore(in token : long, inout packages : PackageInfo) : int
+        return BackupTransport.TRANSPORT_ERROR;
+!!!1806466.java!!!	nextRestorePackage() : RestoreDescription
+        return null;
+!!!1806594.java!!!	getRestoreData(inout outFd : ParcelFileDescriptor) : int
+        return BackupTransport.TRANSPORT_ERROR;
+!!!1806722.java!!!	finishRestore() : void
+        throw new UnsupportedOperationException(
+                "Transport finishRestore() not implemented");
+!!!1806850.java!!!	requestFullBackupTime() : long
+        return 0;
+!!!1806978.java!!!	performFullBackup(inout targetPackage : PackageInfo, inout socket : ParcelFileDescriptor) : int
+        return BackupTransport.TRANSPORT_PACKAGE_REJECTED;
+!!!1807106.java!!!	sendBackupData(in numBytes : int) : int
+        return BackupTransport.TRANSPORT_ERROR;
+!!!1807234.java!!!	cancelFullBackup() : void
+        throw new UnsupportedOperationException(
+                "Transport cancelFullBackup() not implemented");
+!!!1807362.java!!!	getNextFullRestoreDataChunk(inout socket : ParcelFileDescriptor) : int
+        return 0;
+!!!1807490.java!!!	abortFullRestore() : int
+        return BackupTransport.TRANSPORT_OK;

@@ -1,0 +1,11 @@
+class ExtractedText
+!!!1149186.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        TextUtils.writeToParcel(text, dest, flags);
+        dest.writeInt(startOffset);
+        dest.writeInt(partialStartOffset);
+        dest.writeInt(partialEndOffset);
+        dest.writeInt(selectionStart);
+        dest.writeInt(selectionEnd);
+        dest.writeInt(this.flags);
+!!!1149314.java!!!	describeContents() : int
+        return 0;

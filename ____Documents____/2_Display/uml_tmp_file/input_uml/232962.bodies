@@ -1,0 +1,267 @@
+class TextureView
+!!!846082.java!!!	TextureView(inout context : Context)
+        super(context);
+        init();
+!!!846210.java!!!	TextureView(inout context : Context, inout attrs : AttributeSet)
+        super(context, attrs);
+        init();
+!!!846338.java!!!	TextureView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        super(context, attrs, defStyleAttr);
+        init();
+!!!846466.java!!!	TextureView(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+        init();
+!!!846594.java!!!	init() : void
+        mLayerPaint = new Paint();
+!!!846722.java!!!	isOpaque() : boolean
+        return mOpaque;
+!!!846850.java!!!	setOpaque(inout opaque : boolean) : void
+        if (opaque != mOpaque) {
+            mOpaque = opaque;
+            if (mLayer != null) {
+                updateLayerAndInvalidate();
+            }
+        }
+!!!846978.java!!!	onAttachedToWindow() : void
+        super.onAttachedToWindow();
+
+        if (!isHardwareAccelerated()) {
+            Log.w(LOG_TAG, "A TextureView or a subclass can only be "
+                    + "used with hardware acceleration enabled.");
+        }
+
+        if (mHadSurface) {
+            invalidate(true);
+            mHadSurface = false;
+        }
+!!!847106.java!!!	onDetachedFromWindowInternal() : void
+        destroySurface();
+        super.onDetachedFromWindowInternal();
+!!!847234.java!!!	destroySurface() : void
+        if (mLayer != null) {
+            mLayer.detachSurfaceTexture();
+
+            boolean shouldRelease = true;
+            if (mListener != null) {
+                shouldRelease = mListener.onSurfaceTextureDestroyed(mSurface);
+            }
+
+            synchronized (mNativeWindowLock) {
+                nDestroyNativeWindow();
+            }
+
+            mLayer.destroy();
+            if (shouldRelease) mSurface.release();
+            mSurface = null;
+            mLayer = null;
+
+            mHadSurface = true;
+        }
+!!!847362.java!!!	setLayerType(in layerType : int, inout paint : Paint) : void
+        if (paint != mLayerPaint) {
+            mLayerPaint = paint == null ? new Paint() : paint;
+            invalidate();
+        }
+!!!847490.java!!!	setLayerPaint(inout paint : Paint) : void
+        setLayerType(/* ignored */ 0, paint);
+!!!847618.java!!!	getLayerType() : int
+        return LAYER_TYPE_HARDWARE;
+!!!847746.java!!!	hasStaticLayer() : boolean
+        return true;
+!!!848002.java!!!	draw(inout canvas : Canvas) : void
+        // NOTE: Maintain this carefully (see View.java)
+        mPrivateFlags = (mPrivateFlags & ~PFLAG_DIRTY_MASK) | PFLAG_DRAWN;
+
+        applyUpdate();
+        applyTransformMatrix();
+!!!848258.java!!!	onSizeChanged(in w : int, in h : int, in oldw : int, in oldh : int) : void
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (mSurface != null) {
+            mSurface.setDefaultBufferSize(getWidth(), getHeight());
+            updateLayer();
+            if (mListener != null) {
+                mListener.onSurfaceTextureSizeChanged(mSurface, getWidth(), getHeight());
+            }
+        }
+!!!848386.java!!!	destroyHardwareResources() : void
+        super.destroyHardwareResources();
+        destroySurface();
+        invalidateParentCaches();
+        invalidate(true);
+!!!848514.java!!!	getHardwareLayer() : HardwareLayer
+        // NOTE: Maintain these two lines very carefully (see View.java)
+        mPrivateFlags |= PFLAG_DRAWN | PFLAG_DRAWING_CACHE_VALID;
+        mPrivateFlags &= ~PFLAG_DIRTY_MASK;
+
+        if (mLayer == null) {
+            if (mAttachInfo == null || mAttachInfo.mHardwareRenderer == null) {
+                return null;
+            }
+
+            mLayer = mAttachInfo.mHardwareRenderer.createTextureLayer();
+            if (!mUpdateSurface) {
+                // Create a new SurfaceTexture for the layer.
+                mSurface = new SurfaceTexture(false);
+                mLayer.setSurfaceTexture(mSurface);
+            }
+            mSurface.setDefaultBufferSize(getWidth(), getHeight());
+            nCreateNativeWindow(mSurface);
+
+            mSurface.setOnFrameAvailableListener(mUpdateListener, mAttachInfo.mHandler);
+
+            if (mListener != null && !mUpdateSurface) {
+                mListener.onSurfaceTextureAvailable(mSurface, getWidth(), getHeight());
+            }
+            mLayer.setLayerPaint(mLayerPaint);
+        }
+
+        if (mUpdateSurface) {
+            // Someone has requested that we use a specific SurfaceTexture, so
+            // tell mLayer about it and set the SurfaceTexture to use the
+            // current view size.
+            mUpdateSurface = false;
+
+            // Since we are updating the layer, force an update to ensure its
+            // parameters are correct (width, height, transform, etc.)
+            updateLayer();
+            mMatrixChanged = true;
+
+            mLayer.setSurfaceTexture(mSurface);
+            mSurface.setDefaultBufferSize(getWidth(), getHeight());
+        }
+
+        applyUpdate();
+        applyTransformMatrix();
+
+        return mLayer;
+!!!848642.java!!!	onVisibilityChanged(inout changedView : View, in visibility : int) : void
+        super.onVisibilityChanged(changedView, visibility);
+
+        if (mSurface != null) {
+            // When the view becomes invisible, stop updating it, it's a waste of CPU
+            // To cancel updates, the easiest thing to do is simply to remove the
+            // updates listener
+            if (visibility == VISIBLE) {
+                if (mLayer != null) {
+                    mSurface.setOnFrameAvailableListener(mUpdateListener, mAttachInfo.mHandler);
+                }
+                updateLayerAndInvalidate();
+            } else {
+                mSurface.setOnFrameAvailableListener(null);
+            }
+        }
+!!!848770.java!!!	updateLayer() : void
+        synchronized (mLock) {
+            mUpdateLayer = true;
+        }
+!!!848898.java!!!	updateLayerAndInvalidate() : void
+        synchronized (mLock) {
+            mUpdateLayer = true;
+        }
+        invalidate();
+!!!849026.java!!!	applyUpdate() : void
+        if (mLayer == null) {
+            return;
+        }
+
+        synchronized (mLock) {
+            if (mUpdateLayer) {
+                mUpdateLayer = false;
+            } else {
+                return;
+            }
+        }
+        
+        mLayer.prepare(getWidth(), getHeight(), mOpaque);
+        mLayer.updateSurfaceTexture();
+
+        if (mListener != null) {
+            mListener.onSurfaceTextureUpdated(mSurface);
+        }
+!!!849154.java!!!	setTransform(inout transform : Matrix) : void
+        mMatrix.set(transform);
+        mMatrixChanged = true;
+        invalidateParentIfNeeded();
+!!!849282.java!!!	getTransform(inout transform : Matrix) : Matrix
+        if (transform == null) {
+            transform = new Matrix();
+        }
+
+        transform.set(mMatrix);
+
+        return transform;
+!!!849410.java!!!	applyTransformMatrix() : void
+        if (mMatrixChanged && mLayer != null) {
+            mLayer.setTransform(mMatrix);
+            mMatrixChanged = false;
+        }
+!!!849538.java!!!	getBitmap() : Bitmap
+        return getBitmap(getWidth(), getHeight());
+!!!849666.java!!!	getBitmap(in width : int, in height : int) : Bitmap
+        if (isAvailable() && width > 0 && height > 0) {
+            return getBitmap(Bitmap.createBitmap(getResources().getDisplayMetrics(),
+                    width, height, Bitmap.Config.ARGB_8888));
+        }
+        return null;
+!!!849794.java!!!	getBitmap(inout bitmap : Bitmap) : Bitmap
+        if (bitmap != null && isAvailable()) {
+            applyUpdate();
+            applyTransformMatrix();
+
+            // This case can happen if the app invokes setSurfaceTexture() before
+            // we are able to create the hardware layer. We can safely initialize
+            // the layer here thanks to the validate() call at the beginning of
+            // this method
+            if (mLayer == null && mUpdateSurface) {
+                getHardwareLayer();
+            }
+
+            if (mLayer != null) {
+                mLayer.copyInto(bitmap);
+            }
+        }
+        return bitmap;
+!!!849922.java!!!	isAvailable() : boolean
+        return mSurface != null;
+!!!850050.java!!!	lockCanvas() : Canvas
+        return lockCanvas(null);
+!!!850178.java!!!	lockCanvas(inout dirty : Rect) : Canvas
+        if (!isAvailable()) return null;
+
+        if (mCanvas == null) {
+            mCanvas = new Canvas();
+        }
+
+        synchronized (mNativeWindowLock) {
+            if (!nLockCanvas(mNativeWindow, mCanvas, dirty)) {
+                return null;
+            }
+        }
+        mSaveCount = mCanvas.save();
+
+        return mCanvas;
+!!!850306.java!!!	unlockCanvasAndPost(inout canvas : Canvas) : void
+        if (mCanvas != null && canvas == mCanvas) {
+            canvas.restoreToCount(mSaveCount);
+            mSaveCount = 0;
+
+            synchronized (mNativeWindowLock) {
+                nUnlockCanvasAndPost(mNativeWindow, mCanvas);
+            }
+        }
+!!!850434.java!!!	getSurfaceTexture() : SurfaceTexture
+        return mSurface;
+!!!850562.java!!!	setSurfaceTexture(inout surfaceTexture : SurfaceTexture) : void
+        if (surfaceTexture == null) {
+            throw new NullPointerException("surfaceTexture must not be null");
+        }
+        if (mSurface != null) {
+            mSurface.release();
+        }
+        mSurface = surfaceTexture;
+        mUpdateSurface = true;
+        invalidateParentIfNeeded();
+!!!850690.java!!!	getSurfaceTextureListener() : TextureView::SurfaceTextureListener
+        return mListener;
+!!!850818.java!!!	setSurfaceTextureListener(inout listener : TextureView::SurfaceTextureListener) : void
+        mListener = listener;

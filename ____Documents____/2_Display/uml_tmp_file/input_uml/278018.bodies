@@ -1,0 +1,20 @@
+class ContentProviderHolder
+!!!1387266.java!!!	ContentProviderHolder(inout _info : ProviderInfo)
+            info = _info;
+!!!1387394.java!!!	describeContents() : int
+            return 0;
+!!!1387522.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+            info.writeToParcel(dest, 0);
+            if (provider != null) {
+                dest.writeStrongBinder(provider.asBinder());
+            } else {
+                dest.writeStrongBinder(null);
+            }
+            dest.writeStrongBinder(connection);
+            dest.writeInt(noReleaseNeeded ? 1:0);
+!!!1387650.java!!!	ContentProviderHolder(inout source : Parcel)
+            info = ProviderInfo.CREATOR.createFromParcel(source);
+            provider = ContentProviderNative.asInterface(
+                source.readStrongBinder());
+            connection = source.readStrongBinder();
+            noReleaseNeeded = source.readInt() != 0;

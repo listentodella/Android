@@ -1,0 +1,7 @@
+class LayoutParams
+!!!2291074.java!!!	LayoutParams(inout c : Context, inout attrs : AttributeSet)
+            super(c, attrs);
+!!!2291202.java!!!	LayoutParams(in w : int, in h : int)
+            super(w, h);
+!!!2291330.java!!!	LayoutParams(inout source : ViewGroup::LayoutParams)
+            super(source);

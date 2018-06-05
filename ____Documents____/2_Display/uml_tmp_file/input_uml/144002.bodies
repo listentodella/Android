@@ -1,0 +1,21 @@
+class CursorMotionAccumulator
+!!!224898.cpp!!!	CursorMotionAccumulator()
+    clearRelativeAxes();
+!!!225026.cpp!!!	reset(inout device : InputDevice) : void
+    clearRelativeAxes();
+!!!225154.cpp!!!	process(in rawEvent : RawEvent) : void
+    if (rawEvent->type == EV_REL) {
+        switch (rawEvent->code) {
+        case REL_X:
+            mRelX = rawEvent->value;
+            break;
+        case REL_Y:
+            mRelY = rawEvent->value;
+            break;
+        }
+    }
+!!!225282.cpp!!!	finishSync() : void
+    clearRelativeAxes();
+!!!225666.cpp!!!	clearRelativeAxes() : void
+    mRelX = 0;
+    mRelY = 0;

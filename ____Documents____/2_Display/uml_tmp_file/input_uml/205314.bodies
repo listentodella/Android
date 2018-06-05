@@ -1,0 +1,123 @@
+class SystemGesturesPointerEventListener
+!!!528002.java!!!	SystemGesturesPointerEventListener(inout context : Context, inout callbacks : SystemGesturesPointerEventListener::Callbacks)
+        mCallbacks = checkNull("callbacks", callbacks);
+        mSwipeStartThreshold = checkNull("context", context).getResources()
+                .getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height);
+        mSwipeDistanceThreshold = mSwipeStartThreshold;
+        if (DEBUG) Slog.d(TAG,  "mSwipeStartThreshold=" + mSwipeStartThreshold
+                + " mSwipeDistanceThreshold=" + mSwipeDistanceThreshold);
+!!!528130.java!!!	checkNull(in name : String, inout arg : T) : T
+        if (arg == null) {
+            throw new IllegalArgumentException(name + " must not be null");
+        }
+        return arg;
+!!!528258.java!!!	onPointerEvent(inout event : MotionEvent) : void
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                mSwipeFireable = true;
+                mDebugFireable = true;
+                mDownPointers = 0;
+                captureDown(event, 0);
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                captureDown(event, event.getActionIndex());
+                if (mDebugFireable) {
+                    mDebugFireable = event.getPointerCount() < 5;
+                    if (!mDebugFireable) {
+                        if (DEBUG) Slog.d(TAG, "Firing debug");
+                        mCallbacks.onDebug();
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (mSwipeFireable) {
+                    final int swipe = detectSwipe(event);
+                    mSwipeFireable = swipe == SWIPE_NONE;
+                    if (swipe == SWIPE_FROM_TOP) {
+                        if (DEBUG) Slog.d(TAG, "Firing onSwipeFromTop");
+                        mCallbacks.onSwipeFromTop();
+                    } else if (swipe == SWIPE_FROM_BOTTOM) {
+                        if (DEBUG) Slog.d(TAG, "Firing onSwipeFromBottom");
+                        mCallbacks.onSwipeFromBottom();
+                    } else if (swipe == SWIPE_FROM_RIGHT) {
+                        if (DEBUG) Slog.d(TAG, "Firing onSwipeFromRight");
+                        mCallbacks.onSwipeFromRight();
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                mSwipeFireable = false;
+                mDebugFireable = false;
+                break;
+            default:
+                if (DEBUG) Slog.d(TAG, "Ignoring " + event);
+        }
+!!!528386.java!!!	captureDown(inout event : MotionEvent, in pointerIndex : int) : void
+        final int pointerId = event.getPointerId(pointerIndex);
+        final int i = findIndex(pointerId);
+        if (DEBUG) Slog.d(TAG, "pointer " + pointerId +
+                " down pointerIndex=" + pointerIndex + " trackingIndex=" + i);
+        if (i != UNTRACKED_POINTER) {
+            mDownX[i] = event.getX(pointerIndex);
+            mDownY[i] = event.getY(pointerIndex);
+            mDownTime[i] = event.getEventTime();
+            if (DEBUG) Slog.d(TAG, "pointer " + pointerId +
+                    " down x=" + mDownX[i] + " y=" + mDownY[i]);
+        }
+!!!528514.java!!!	findIndex(in pointerId : int) : int
+        for (int i = 0; i < mDownPointers; i++) {
+            if (mDownPointerId[i] == pointerId) {
+                return i;
+            }
+        }
+        if (mDownPointers == MAX_TRACKED_POINTERS || pointerId == MotionEvent.INVALID_POINTER_ID) {
+            return UNTRACKED_POINTER;
+        }
+        mDownPointerId[mDownPointers++] = pointerId;
+        return mDownPointers - 1;
+!!!528642.java!!!	detectSwipe(inout move : MotionEvent) : int
+        final int historySize = move.getHistorySize();
+        final int pointerCount = move.getPointerCount();
+        for (int p = 0; p < pointerCount; p++) {
+            final int pointerId = move.getPointerId(p);
+            final int i = findIndex(pointerId);
+            if (i != UNTRACKED_POINTER) {
+                for (int h = 0; h < historySize; h++) {
+                    final long time = move.getHistoricalEventTime(h);
+                    final float x = move.getHistoricalX(p, h);
+                    final float y = move.getHistoricalY(p,  h);
+                    final int swipe = detectSwipe(i, time, x, y);
+                    if (swipe != SWIPE_NONE) {
+                        return swipe;
+                    }
+                }
+                final int swipe = detectSwipe(i, move.getEventTime(), move.getX(p), move.getY(p));
+                if (swipe != SWIPE_NONE) {
+                    return swipe;
+                }
+            }
+        }
+        return SWIPE_NONE;
+!!!528770.java!!!	detectSwipe(in i : int, in time : long, in x : float, in y : float) : int
+        final float fromX = mDownX[i];
+        final float fromY = mDownY[i];
+        final long elapsed = time - mDownTime[i];
+        if (DEBUG) Slog.d(TAG, "pointer " + mDownPointerId[i]
+                + " moved (" + fromX + "->" + x + "," + fromY + "->" + y + ") in " + elapsed);
+        if (fromY <= mSwipeStartThreshold
+                && y > fromY + mSwipeDistanceThreshold
+                && elapsed < SWIPE_TIMEOUT_MS) {
+            return SWIPE_FROM_TOP;
+        }
+        if (fromY >= screenHeight - mSwipeStartThreshold
+                && y < fromY - mSwipeDistanceThreshold
+                && elapsed < SWIPE_TIMEOUT_MS) {
+            return SWIPE_FROM_BOTTOM;
+        }
+        if (fromX >= screenWidth - mSwipeStartThreshold
+                && x < fromX - mSwipeDistanceThreshold
+                && elapsed < SWIPE_TIMEOUT_MS) {
+            return SWIPE_FROM_RIGHT;
+        }
+        return SWIPE_NONE;

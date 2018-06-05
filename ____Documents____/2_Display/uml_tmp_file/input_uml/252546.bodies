@@ -1,0 +1,105 @@
+class SparseRectFArray
+!!!1166210.java!!!	SparseRectFArray(in source : Parcel)
+        mKeys = source.createIntArray();
+        mCoordinates = source.createFloatArray();
+        mFlagsArray = source.createIntArray();
+!!!1166338.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        dest.writeIntArray(mKeys);
+        dest.writeFloatArray(mCoordinates);
+        dest.writeIntArray(mFlagsArray);
+!!!1166466.java!!!	hashCode() : int
+        // TODO: Improve the hash function.
+        if (mKeys == null || mKeys.length == 0) {
+            return 0;
+        }
+        int hash = mKeys.length;
+        // For performance reasons, only the first rectangle is used for the hash code now.
+        for (int i = 0; i < 4; i++) {
+            hash *= 31;
+            hash += mCoordinates[i];
+        }
+        hash *= 31;
+        hash += mFlagsArray[0];
+        return hash;
+!!!1166594.java!!!	equals(inout obj : Object) : boolean
+        if (obj == null) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof SparseRectFArray)) {
+            return false;
+        }
+        final SparseRectFArray that = (SparseRectFArray) obj;
+
+        return Arrays.equals(mKeys, that.mKeys) && Arrays.equals(mCoordinates, that.mCoordinates)
+                && Arrays.equals(mFlagsArray, that.mFlagsArray);
+!!!1166722.java!!!	toString() : String
+        if (mKeys == null || mCoordinates == null || mFlagsArray == null) {
+            return "SparseRectFArray{}";
+        }
+        final StringBuilder sb = new StringBuilder();
+        sb.append("SparseRectFArray{");
+        for (int i = 0; i < mKeys.length; i++) {
+            if (i != 0) {
+                sb.append(", ");
+            }
+            final int baseIndex = i * 4;
+            sb.append(mKeys[i]);
+            sb.append(":[");
+            sb.append(mCoordinates[baseIndex + 0]);
+            sb.append(",");
+            sb.append(mCoordinates[baseIndex + 1]);
+            sb.append("],[");
+            sb.append(mCoordinates[baseIndex + 2]);
+            sb.append(",");
+            sb.append(mCoordinates[baseIndex + 3]);
+            sb.append("]:flagsArray=");
+            sb.append(mFlagsArray[i]);
+        }
+        sb.append("}");
+        return sb.toString();
+!!!1167618.java!!!	SparseRectFArray(in builder : SparseRectFArray::SparseRectFArrayBuilder)
+        if (builder.mCount == 0) {
+            mKeys = null;
+            mCoordinates = null;
+            mFlagsArray = null;
+        } else {
+            mKeys = new int[builder.mCount];
+            mCoordinates = new float[builder.mCount * 4];
+            mFlagsArray = new int[builder.mCount];
+            System.arraycopy(builder.mKeys, 0, mKeys, 0, builder.mCount);
+            System.arraycopy(builder.mCoordinates, 0, mCoordinates, 0, builder.mCount * 4);
+            System.arraycopy(builder.mFlagsArray, 0, mFlagsArray, 0, builder.mCount);
+        }
+!!!1167746.java!!!	get(in index : int) : RectF
+        if (mKeys == null) {
+            return null;
+        }
+        if (index < 0) {
+            return null;
+        }
+        final int arrayIndex = Arrays.binarySearch(mKeys, index);
+        if (arrayIndex < 0) {
+            return null;
+        }
+        final int baseCoordIndex = arrayIndex * 4;
+        return new RectF(mCoordinates[baseCoordIndex],
+                mCoordinates[baseCoordIndex + 1],
+                mCoordinates[baseCoordIndex + 2],
+                mCoordinates[baseCoordIndex + 3]);
+!!!1167874.java!!!	getFlags(in index : int, in valueIfKeyNotFound : int) : int
+        if (mKeys == null) {
+            return valueIfKeyNotFound;
+        }
+        if (index < 0) {
+            return valueIfKeyNotFound;
+        }
+        final int arrayIndex = Arrays.binarySearch(mKeys, index);
+        if (arrayIndex < 0) {
+            return valueIfKeyNotFound;
+        }
+        return mFlagsArray[arrayIndex];
+!!!1168002.java!!!	describeContents() : int
+        return 0;

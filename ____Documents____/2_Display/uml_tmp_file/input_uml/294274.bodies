@@ -1,0 +1,22 @@
+class Idler
+!!!1634818.java!!!	Idler(inout callback : Runnable)
+            mCallback = callback;
+            mIdle = false;
+!!!1634946.java!!!	queueIdle() : boolean
+            if (mCallback != null) {
+                mCallback.run();
+            }
+            synchronized (this) {
+                mIdle = true;
+                notifyAll();
+            }
+            return false;
+!!!1635074.java!!!	waitForIdle() : void
+            synchronized (this) {
+                while (!mIdle) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }

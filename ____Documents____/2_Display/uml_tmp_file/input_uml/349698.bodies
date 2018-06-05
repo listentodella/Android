@@ -1,0 +1,206 @@
+class FlingRunnable
+!!!1947778.java!!!	FlingRunnable()
+            mScroller = new OverScroller(getContext());
+!!!1947906.java!!!	start(in initialVelocity : int) : void
+            int initialY = initialVelocity < 0 ? Integer.MAX_VALUE : 0;
+            mLastFlingY = initialY;
+            mScroller.setInterpolator(null);
+            mScroller.fling(0, initialY, 0, initialVelocity,
+                    0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
+            mTouchMode = TOUCH_MODE_FLING;
+            postOnAnimation(this);
+
+            if (PROFILE_FLINGING) {
+                if (!mFlingProfilingStarted) {
+                    Debug.startMethodTracing("AbsListViewFling");
+                    mFlingProfilingStarted = true;
+                }
+            }
+
+            if (mFlingStrictSpan == null) {
+                mFlingStrictSpan = StrictMode.enterCriticalSpan("AbsListView-fling");
+            }
+!!!1948034.java!!!	startSpringback() : void
+            if (mScroller.springBack(0, mScrollY, 0, 0, 0, 0)) {
+                mTouchMode = TOUCH_MODE_OVERFLING;
+                invalidate();
+                postOnAnimation(this);
+            } else {
+                mTouchMode = TOUCH_MODE_REST;
+                reportScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
+            }
+!!!1948162.java!!!	startOverfling(in initialVelocity : int) : void
+            mScroller.setInterpolator(null);
+            mScroller.fling(0, mScrollY, 0, initialVelocity, 0, 0,
+                    Integer.MIN_VALUE, Integer.MAX_VALUE, 0, getHeight());
+            mTouchMode = TOUCH_MODE_OVERFLING;
+            invalidate();
+            postOnAnimation(this);
+!!!1948290.java!!!	edgeReached(in delta : int) : void
+            mScroller.notifyVerticalEdgeReached(mScrollY, 0, mOverflingDistance);
+            final int overscrollMode = getOverScrollMode();
+            if (overscrollMode == OVER_SCROLL_ALWAYS ||
+                    (overscrollMode == OVER_SCROLL_IF_CONTENT_SCROLLS && !contentFits())) {
+                mTouchMode = TOUCH_MODE_OVERFLING;
+                final int vel = (int) mScroller.getCurrVelocity();
+                if (delta > 0) {
+                    mEdgeGlowTop.onAbsorb(vel);
+                } else {
+                    mEdgeGlowBottom.onAbsorb(vel);
+                }
+            } else {
+                mTouchMode = TOUCH_MODE_REST;
+                if (mPositionScroller != null) {
+                    mPositionScroller.stop();
+                }
+            }
+            invalidate();
+            postOnAnimation(this);
+!!!1948418.java!!!	startScroll(in distance : int, in duration : int, inout linear : boolean) : void
+            int initialY = distance < 0 ? Integer.MAX_VALUE : 0;
+            mLastFlingY = initialY;
+            mScroller.setInterpolator(linear ? sLinearInterpolator : null);
+            mScroller.startScroll(0, initialY, 0, distance, duration);
+            mTouchMode = TOUCH_MODE_FLING;
+            postOnAnimation(this);
+!!!1948546.java!!!	endFling() : void
+            mTouchMode = TOUCH_MODE_REST;
+
+            removeCallbacks(this);
+            removeCallbacks(mCheckFlywheel);
+
+            reportScrollStateChange(OnScrollListener.SCROLL_STATE_IDLE);
+            clearScrollingCache();
+            mScroller.abortAnimation();
+
+            if (mFlingStrictSpan != null) {
+                mFlingStrictSpan.finish();
+                mFlingStrictSpan = null;
+            }
+!!!1948674.java!!!	flywheelTouch() : void
+            postDelayed(mCheckFlywheel, FLYWHEEL_TIMEOUT);
+!!!1948802.java!!!	run() : void
+            switch (mTouchMode) {
+            default:
+                endFling();
+                return;
+
+            case TOUCH_MODE_SCROLL:
+                if (mScroller.isFinished()) {
+                    return;
+                }
+                // Fall through
+            case TOUCH_MODE_FLING: {
+                if (mDataChanged) {
+                    layoutChildren();
+                }
+
+                if (mItemCount == 0 || getChildCount() == 0) {
+                    endFling();
+                    return;
+                }
+
+                final OverScroller scroller = mScroller;
+                boolean more = scroller.computeScrollOffset();
+                final int y = scroller.getCurrY();
+
+                // Flip sign to convert finger direction to list items direction
+                // (e.g. finger moving down means list is moving towards the top)
+                int delta = mLastFlingY - y;
+
+                // Pretend that each frame of a fling scroll is a touch scroll
+                if (delta > 0) {
+                    // List is moving towards the top. Use first view as mMotionPosition
+                    mMotionPosition = mFirstPosition;
+                    final View firstView = getChildAt(0);
+                    mMotionViewOriginalTop = firstView.getTop();
+
+                    // Don't fling more than 1 screen
+                    delta = Math.min(getHeight() - mPaddingBottom - mPaddingTop - 1, delta);
+                } else {
+                    // List is moving towards the bottom. Use last view as mMotionPosition
+                    int offsetToLast = getChildCount() - 1;
+                    mMotionPosition = mFirstPosition + offsetToLast;
+
+                    final View lastView = getChildAt(offsetToLast);
+                    mMotionViewOriginalTop = lastView.getTop();
+
+                    // Don't fling more than 1 screen
+                    delta = Math.max(-(getHeight() - mPaddingBottom - mPaddingTop - 1), delta);
+                }
+
+                // Check to see if we have bumped into the scroll limit
+                View motionView = getChildAt(mMotionPosition - mFirstPosition);
+                int oldTop = 0;
+                if (motionView != null) {
+                    oldTop = motionView.getTop();
+                }
+
+                // Don't stop just because delta is zero (it could have been rounded)
+                final boolean atEdge = trackMotionScroll(delta, delta);
+                final boolean atEnd = atEdge && (delta != 0);
+                if (atEnd) {
+                    if (motionView != null) {
+                        // Tweak the scroll for how far we overshot
+                        int overshoot = -(delta - (motionView.getTop() - oldTop));
+                        overScrollBy(0, overshoot, 0, mScrollY, 0, 0,
+                                0, mOverflingDistance, false);
+                    }
+                    if (more) {
+                        edgeReached(delta);
+                    }
+                    break;
+                }
+
+                if (more && !atEnd) {
+                    if (atEdge) invalidate();
+                    mLastFlingY = y;
+                    postOnAnimation(this);
+                } else {
+                    endFling();
+
+                    if (PROFILE_FLINGING) {
+                        if (mFlingProfilingStarted) {
+                            Debug.stopMethodTracing();
+                            mFlingProfilingStarted = false;
+                        }
+
+                        if (mFlingStrictSpan != null) {
+                            mFlingStrictSpan.finish();
+                            mFlingStrictSpan = null;
+                        }
+                    }
+                }
+                break;
+            }
+
+            case TOUCH_MODE_OVERFLING: {
+                final OverScroller scroller = mScroller;
+                if (scroller.computeScrollOffset()) {
+                    final int scrollY = mScrollY;
+                    final int currY = scroller.getCurrY();
+                    final int deltaY = currY - scrollY;
+                    if (overScrollBy(0, deltaY, 0, scrollY, 0, 0,
+                            0, mOverflingDistance, false)) {
+                        final boolean crossDown = scrollY <= 0 && currY > 0;
+                        final boolean crossUp = scrollY >= 0 && currY < 0;
+                        if (crossDown || crossUp) {
+                            int velocity = (int) scroller.getCurrVelocity();
+                            if (crossUp) velocity = -velocity;
+
+                            // Don't flywheel from this; we're just continuing things.
+                            scroller.abortAnimation();
+                            start(velocity);
+                        } else {
+                            startSpringback();
+                        }
+                    } else {
+                        invalidate();
+                        postOnAnimation(this);
+                    }
+                } else {
+                    endFling();
+                }
+                break;
+            }
+            }

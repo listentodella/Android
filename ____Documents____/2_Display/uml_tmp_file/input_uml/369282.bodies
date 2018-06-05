@@ -1,0 +1,102 @@
+class DatePicker
+!!!2170882.java!!!	DatePicker(inout context : Context)
+        this(context, null);
+!!!2171010.java!!!	DatePicker(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, R.attr.datePickerStyle);
+!!!2171138.java!!!	DatePicker(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2171266.java!!!	DatePicker(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DatePicker,
+                defStyleAttr, defStyleRes);
+        final int mode = a.getInt(R.styleable.DatePicker_datePickerMode, MODE_SPINNER);
+        final int firstDayOfWeek = a.getInt(R.styleable.DatePicker_firstDayOfWeek, 0);
+        a.recycle();
+
+        switch (mode) {
+            case MODE_CALENDAR:
+                mDelegate = createCalendarUIDelegate(context, attrs, defStyleAttr, defStyleRes);
+                break;
+            case MODE_SPINNER:
+            default:
+                mDelegate = createSpinnerUIDelegate(context, attrs, defStyleAttr, defStyleRes);
+                break;
+        }
+
+        if (firstDayOfWeek != 0) {
+            setFirstDayOfWeek(firstDayOfWeek);
+        }
+!!!2171394.java!!!	createSpinnerUIDelegate(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int) : DatePicker::DatePickerDelegate
+        return new DatePickerSpinnerDelegate(this, context, attrs, defStyleAttr, defStyleRes);
+!!!2171522.java!!!	createCalendarUIDelegate(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int) : DatePicker::DatePickerDelegate
+        return new DatePickerCalendarDelegate(this, context, attrs, defStyleAttr,
+                defStyleRes);
+!!!2171650.java!!!	init(in year : int, in monthOfYear : int, in dayOfMonth : int, inout onDateChangedListener : DatePicker::OnDateChangedListener) : void
+        mDelegate.init(year, monthOfYear, dayOfMonth, onDateChangedListener);
+!!!2171778.java!!!	updateDate(in year : int, in month : int, in dayOfMonth : int) : void
+        mDelegate.updateDate(year, month, dayOfMonth);
+!!!2171906.java!!!	getYear() : int
+        return mDelegate.getYear();
+!!!2172034.java!!!	getMonth() : int
+        return mDelegate.getMonth();
+!!!2172162.java!!!	getDayOfMonth() : int
+        return mDelegate.getDayOfMonth();
+!!!2172290.java!!!	getMinDate() : long
+        return mDelegate.getMinDate().getTimeInMillis();
+!!!2172418.java!!!	setMinDate(in minDate : long) : void
+        mDelegate.setMinDate(minDate);
+!!!2172546.java!!!	getMaxDate() : long
+        return mDelegate.getMaxDate().getTimeInMillis();
+!!!2172674.java!!!	setMaxDate(in maxDate : long) : void
+        mDelegate.setMaxDate(maxDate);
+!!!2172802.java!!!	setValidationCallback(inout callback : DatePicker::ValidationCallback) : void
+        mDelegate.setValidationCallback(callback);
+!!!2172930.java!!!	setEnabled(inout enabled : boolean) : void
+        if (mDelegate.isEnabled() == enabled) {
+            return;
+        }
+        super.setEnabled(enabled);
+        mDelegate.setEnabled(enabled);
+!!!2173058.java!!!	isEnabled() : boolean
+        return mDelegate.isEnabled();
+!!!2173186.java!!!	dispatchPopulateAccessibilityEvent(inout event : AccessibilityEvent) : boolean
+        return mDelegate.dispatchPopulateAccessibilityEvent(event);
+!!!2173314.java!!!	onPopulateAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onPopulateAccessibilityEvent(event);
+        mDelegate.onPopulateAccessibilityEvent(event);
+!!!2173442.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        mDelegate.onInitializeAccessibilityEvent(event);
+!!!2173570.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        mDelegate.onInitializeAccessibilityNodeInfo(info);
+!!!2173698.java!!!	onConfigurationChanged(inout newConfig : Configuration) : void
+        super.onConfigurationChanged(newConfig);
+        mDelegate.onConfigurationChanged(newConfig);
+!!!2173826.java!!!	setFirstDayOfWeek(in firstDayOfWeek : int) : void
+        if (firstDayOfWeek < Calendar.SUNDAY || firstDayOfWeek > Calendar.SATURDAY) {
+            throw new IllegalArgumentException("firstDayOfWeek must be between 1 and 7");
+        }
+        mDelegate.setFirstDayOfWeek(firstDayOfWeek);
+!!!2173954.java!!!	getFirstDayOfWeek() : int
+        return mDelegate.getFirstDayOfWeek();
+!!!2174082.java!!!	getCalendarViewShown() : boolean
+        return mDelegate.getCalendarViewShown();
+!!!2174210.java!!!	getCalendarView() : CalendarView
+        return mDelegate.getCalendarView();
+!!!2174338.java!!!	setCalendarViewShown(inout shown : boolean) : void
+        mDelegate.setCalendarViewShown(shown);
+!!!2174466.java!!!	getSpinnersShown() : boolean
+        return mDelegate.getSpinnersShown();
+!!!2174594.java!!!	setSpinnersShown(inout shown : boolean) : void
+        mDelegate.setSpinnersShown(shown);
+!!!2174722.java!!!	dispatchRestoreInstanceState(inout container : SparseArray<Parcelable>) : void
+        dispatchThawSelfOnly(container);
+!!!2174850.java!!!	onSaveInstanceState() : Parcelable
+        Parcelable superState = super.onSaveInstanceState();
+        return mDelegate.onSaveInstanceState(superState);
+!!!2174978.java!!!	onRestoreInstanceState(inout state : Parcelable) : void
+        BaseSavedState ss = (BaseSavedState) state;
+        super.onRestoreInstanceState(ss.getSuperState());
+        mDelegate.onRestoreInstanceState(ss);

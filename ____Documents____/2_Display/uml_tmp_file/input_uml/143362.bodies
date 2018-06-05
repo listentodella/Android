@@ -1,0 +1,28 @@
+class ContextImpl
+!!!215682.cpp!!!	updateGlobalMetaState() : void
+    // lock is already held by the input loop
+    mReader->updateGlobalMetaStateLocked();
+!!!215810.cpp!!!	getGlobalMetaState() : int32_t
+    // lock is already held by the input loop
+    return mReader->getGlobalMetaStateLocked();
+!!!215938.cpp!!!	disableVirtualKeysUntil(in time : nsecs_t) : void
+    // lock is already held by the input loop
+    mReader->disableVirtualKeysUntilLocked(time);
+!!!216066.cpp!!!	shouldDropVirtualKey(in now : nsecs_t, inout device : InputDevice, in keyCode : int32_t, in scanCode : int32_t) : bool
+    // lock is already held by the input loop
+    return mReader->shouldDropVirtualKeyLocked(now, device, keyCode, scanCode);
+!!!216194.cpp!!!	fadePointer() : void
+    // lock is already held by the input loop
+    mReader->fadePointerLocked();
+!!!216322.cpp!!!	requestTimeoutAtTime(in when : nsecs_t) : void
+    // lock is already held by the input loop
+    mReader->requestTimeoutAtTimeLocked(when);
+!!!216450.cpp!!!	bumpGeneration() : int32_t
+    // lock is already held by the input loop
+    return mReader->bumpGenerationLocked();
+!!!216578.cpp!!!	getPolicy() : InputReaderPolicyInterface
+    return mReader->mPolicy.get();
+!!!216706.cpp!!!	getListener() : InputListenerInterface
+    return mReader->mQueuedListener.get();
+!!!216834.cpp!!!	getEventHub() : EventHubInterface
+    return mReader->mEventHub.get();

@@ -1,0 +1,4326 @@
+format 76
+"RenderEngine" // surfaceflinger::RenderEngine
+  revision 1
+  modified_by 2 "thisway_diy"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  cpp_h_dir "L:/android_projects/uml_tmp_file/surfaceflinger/RenderEngine/"
+  cpp_src_dir "L:/android_projects/uml_tmp_file/surfaceflinger/RenderEngine/"
+  cpp_namespace "android"
+  classview 135170 "RenderEngine"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default class_drawing_mode default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 150274 "Mesh"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      class 158338 "Primitive"
+	visibility package stereotype "enum"
+	cpp_decl "${comment}enum ${name} {
+${items}
+};
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 192898 "TRIANGLES"
+	  public type class_ref 158338 // Primitive
+	  init_value " 0x0004"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 193026 "TRIANGLE_STRIP"
+	  public type class_ref 158338 // Primitive
+	  init_value " 0x0005"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 193154 "TRIANGLE_FAN"
+	  public type class_ref 158338 // Primitive
+	  init_value " 0x0006        // GL_TRIANGLE_FAN
+    "
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      operation 229634 "Mesh"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 4
+	  param in name "primitive" type class_ref 158338 // Primitive
+	  param in name "vertexCount" explicit_type "size_t"
+	  param in name "vertexSize" explicit_type "size_t"
+	  param in name "texCoordSize" explicit_type "size_t"
+	    defaultvalue "0"
+	cpp_decl "    ${comment}${inline}${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}${)}
+    : mVertexCount(vertexCount), mVertexSize(vertexSize), mTexCoordsSize(texCoordSize),
+      mPrimitive(primitive)
+${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 229762 "~Mesh"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      class 158466 "VertexArray"
+	visibility package 
+	nformals 1
+	formal name "TYPE" type "typename" explicit_default_value ""
+	  explicit_extends ""
+	cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 151554 // <dependency>
+	  relation 151554 -_->
+	    stereotype "friend"
+	    a default
+	      cpp default "Generated"
+	      classrelation_ref 151554 // <dependency>
+	    b parent class_ref 150274 // Mesh
+	end
+
+	attribute 193282 "mData"
+	  private explicit_type "float"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 193410 "mStride"
+	  private explicit_type "size_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	operation 229890 "VertexArray"
+	  cpp_inline private explicit_return_type ""
+	  nparams 2
+	    param inout name "data" explicit_type "float"
+	    param in name "stride" explicit_type "size_t"
+	  cpp_decl "    ${comment}${inline}${name}${(}${t0} * ${p0}${v0}, ${t1} ${p1}${v1}${)}${volatile}${throw} : mData(data), mStride(stride) { };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 230018 "operator []"
+	  cpp_inline public explicit_return_type "TYPE"
+	  nparams 1
+	    param in name "index" explicit_type "size_t"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+            return *reinterpret_cast<TYPE*>(&mData[index*mStride]);
+        };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 230146 "operator []"
+	  const cpp_inline public explicit_return_type "TYPE"
+	  nparams 1
+	    param in name "index" explicit_type "size_t"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} & ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+            return *reinterpret_cast<TYPE const*>(&mData[index*mStride]);
+        };
+"
+	  
+	  
+	  
+	  
+	end
+      end
+
+      operation 230274 "getPositionArray"
+	stereotype "template"
+	cpp_inline public explicit_return_type "VertexArray<TYPE>"
+	nparams 0
+	cpp_decl "    ${comment}template<typename TYPE>
+  ${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} { return VertexArray<TYPE>(getPositions(), mStride); };
+"
+	
+	
+	
+	
+      end
+
+      operation 230402 "getTexCoordArray"
+	stereotype "template"
+	cpp_inline public explicit_return_type "VertexArray<TYPE>"
+	nparams 0
+	cpp_decl "    ${comment}template<typename TYPE>
+  ${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} { return VertexArray<TYPE>(getTexCoords(), mStride); };
+"
+	
+	
+	
+	
+      end
+
+      operation 230530 "getPrimitive"
+	preserve_cpp_body_indent const public return_type class_ref 158338 // Primitive
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 230658 "getPositions"
+	preserve_cpp_body_indent const public explicit_return_type "float"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}const ${type} * ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " returns a pointer to the vertices positions"
+      end
+
+      operation 230786 "getTexCoords"
+	preserve_cpp_body_indent const public explicit_return_type "float"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}const ${type} * ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " returns a pointer to the vertices  texture coordinates"
+      end
+
+      operation 230914 "getVertexCount"
+	preserve_cpp_body_indent const public explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " number of vertices in this mesh"
+      end
+
+      operation 231042 "getVertexSize"
+	preserve_cpp_body_indent const public explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " dimension of vertices"
+      end
+
+      operation 231170 "getTexCoordsSize"
+	preserve_cpp_body_indent const public explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " dimension of texture coordinates"
+      end
+
+      operation 231298 "getByteStride"
+	preserve_cpp_body_indent const public explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " return stride in bytes"
+      end
+
+      operation 231426 "getStride"
+	preserve_cpp_body_indent const public explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " return stride in floats"
+      end
+
+      operation 231554 "Mesh"
+	private explicit_return_type ""
+	nparams 1
+	  param in name "" type class_ref 150274 // Mesh
+	cpp_decl "    ${comment}${inline}${name}${(}const ${t0} & ${p0}${v0}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}const ${t0} & ${p0}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 231682 "operator ="
+	private return_type class_ref 150274 // Mesh
+	nparams 1
+	  param in name "" type class_ref 150274 // Mesh
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} & ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 231810 "operator ="
+	const private return_type class_ref 150274 // Mesh
+	nparams 1
+	  param in name "" type class_ref 150274 // Mesh
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} & ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}const ${type} & ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 231938 "getPositions"
+	preserve_cpp_body_indent private explicit_return_type "float"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} * ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 232066 "getTexCoords"
+	preserve_cpp_body_indent private explicit_return_type "float"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} * ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      attribute 193538 "mVertices"
+	private explicit_type "float"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 193666 "mVertexCount"
+	private explicit_type "size_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 193794 "mVertexSize"
+	private explicit_type "size_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 193922 "mTexCoordsSize"
+	private explicit_type "size_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 194050 "mStride"
+	private explicit_type "size_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      classrelation 151682 // mPrimitive (<directional composition>)
+	relation 151682 *-->
+	  a role_name "mPrimitive" private
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	    classrelation_ref 151682 // mPrimitive (<directional composition>)
+	  b parent class_ref 158338 // Primitive
+      end
+    end
+
+    class 150786 "Texture"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 198658 "mTextureName"
+	private explicit_type "uint32_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 198786 "mTextureTarget"
+	private explicit_type "uint32_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 198914 "mWidth"
+	private explicit_type "size_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 199042 "mHeight"
+	private explicit_type "size_t"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 199170 "mFiltering"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 199298 "mTextureMatrix"
+	private explicit_type "mat4"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      class 159490 "Target"
+	visibility package stereotype "enum"
+	cpp_decl "${comment}enum ${name} {
+${items}
+};
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 199426 "TEXTURE_2D"
+	  public type class_ref 159490 // Target
+	  init_value " 0x0DE1"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 199554 "TEXTURE_EXTERNAL"
+	  public type class_ref 159490 // Target
+	  init_value " 0x8D65 "
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      operation 240130 "Texture"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)} :
+    mTextureName(0), mTextureTarget(TEXTURE_2D),
+    mWidth(0), mHeight(0), mFiltering(false) ${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 240258 "Texture"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "textureTarget" type class_ref 159490 // Target
+	  param in name "textureName" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${inline}${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)} :
+            mTextureName(textureName), mTextureTarget(textureTarget),
+            mWidth(0), mHeight(0), mFiltering(false) ${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 240386 "~Texture"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 240514 "init"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 2
+	  param in name "textureTarget" type class_ref 159490 // Target
+	  param in name "textureName" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 240642 "setMatrix"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "matrix" explicit_type "float"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} * ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 240770 "setFiltering"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "enabled" explicit_type "bool"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 240898 "setDimensions"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 2
+	  param in name "width" explicit_type "size_t"
+	  param in name "height" explicit_type "size_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 241026 "getTextureName"
+	preserve_cpp_body_indent const public explicit_return_type "uint32_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 241154 "getTextureTarget"
+	preserve_cpp_body_indent const public explicit_return_type "uint32_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 241282 "getMatrix"
+	preserve_cpp_body_indent const public explicit_return_type "mat4"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} & ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}const ${type} & ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 241410 "getFiltering"
+	preserve_cpp_body_indent const public explicit_return_type "bool"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 241538 "getWidth"
+	preserve_cpp_body_indent const public explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 241666 "getHeight"
+	preserve_cpp_body_indent const public explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 157058 "Description"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * This holds the state of the rendering engine. This class is used
+ * to generate a corresponding GLSL program and set the appropriate
+ * uniform.
+ *
+ * Program and ProgramCache are friends and access the state directly"
+      classrelation 150402 // <dependency>
+	relation 150402 -_->
+	  stereotype "friend"
+	  a default
+	    cpp default "Generated"
+	    classrelation_ref 150402 // <dependency>
+	  b parent class_ref 157186 // Program
+      end
+
+      classrelation 150530 // <dependency>
+	relation 150530 -_->
+	  stereotype "friend"
+	  a default
+	    cpp default "Generated"
+	    classrelation_ref 150530 // <dependency>
+	  b parent class_ref 157314 // ProgramCache
+      end
+
+      attribute 189314 "mPlaneAlpha"
+	private explicit_type "GLclampf"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " value of the plane-alpha, between 0 and 1"
+      end
+
+      attribute 189442 "mPremultipliedAlpha"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " whether textures are premultiplied"
+      end
+
+      attribute 189570 "mOpaque"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " whether this layer is marked as opaque"
+      end
+
+      classrelation 150658 // mTexture (<directional composition>)
+	relation 150658 *-->
+	  a role_name "mTexture" private
+	    comment " Texture this layer uses"
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	    classrelation_ref 150658 // mTexture (<directional composition>)
+	  b parent class_ref 150786 // Texture
+      end
+
+      attribute 189698 "mTextureEnabled"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 189826 "mColor"
+	private explicit_type "GLclampf"
+	multiplicity "[4]"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${multiplicity}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " color used when texturing is disabled"
+      end
+
+      attribute 189954 "mProjectionMatrix"
+	private explicit_type "mat4"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " projection matrix"
+      end
+
+      attribute 190082 "mColorMatrixEnabled"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 190210 "mColorMatrix"
+	private explicit_type "mat4"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 222210 "Description"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)} :
+    mUniformsDirty(true) ${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 222338 "~Description"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 222466 "setPlaneAlpha"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "planeAlpha" explicit_type "GLclampf"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 222594 "setPremultipliedAlpha"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "premultipliedAlpha" explicit_type "bool"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 222722 "setOpaque"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "opaque" explicit_type "bool"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 222850 "setTexture"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "texture" type class_ref 150786 // Texture
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 222978 "disableTexture"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 223106 "setColor"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 4
+	  param in name "red" explicit_type "GLclampf"
+	  param in name "green" explicit_type "GLclampf"
+	  param in name "blue" explicit_type "GLclampf"
+	  param in name "alpha" explicit_type "GLclampf"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 223234 "setProjectionMatrix"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "mtx" explicit_type "mat4"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 223362 "setColorMatrix"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "mtx" explicit_type "mat4"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      attribute 190338 "mUniformsDirty"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+    end
+
+    class 157186 "Program"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * Abstracts a GLSL program comprising a vertex and fragment shader"
+      class 158594 "anonymous21"
+	visibility package stereotype "enum"
+	cpp_decl "${comment}enum  {
+${items}
+};
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 194178 "position"
+	  public type class_ref 158594 // anonymous21
+	  init_value "0"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 194306 "texCoords"
+	  public type class_ref 158594 // anonymous21
+	  init_value "1 "
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      operation 232194 "Program"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 3
+	  param in name "needs" type class_ref 158722 // Key
+	  param in name "vertex" explicit_type "char"
+	  param in name "fragment" explicit_type "char"
+	cpp_decl "    ${comment}${inline}${name}${(}const ${t0} & ${p0}${v0}, const ${t1} * ${p1}${v1}, const ${t2} * ${p2}${v2}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}const ${t0} & ${p0}, const ${t1} * ${p1}, const ${t2} * ${p2}${)}
+        : mInitialized(false) ${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 232322 "~Program"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 232450 "isValid"
+	preserve_cpp_body_indent const public explicit_return_type "bool"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " whether this object is usable "
+      end
+
+      operation 232578 "use"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Binds this program to the GLES context "
+      end
+
+      operation 232706 "getAttrib"
+	preserve_cpp_body_indent const public explicit_return_type "GLuint"
+	nparams 1
+	  param in name "name" explicit_type "char"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} * ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Returns the location of the specified attribute "
+      end
+
+      operation 232834 "getUniform"
+	preserve_cpp_body_indent const public explicit_return_type "GLint"
+	nparams 1
+	  param in name "name" explicit_type "char"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} * ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Returns the location of the specified uniform "
+      end
+
+      operation 232962 "setUniforms"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "desc" type class_ref 157058 // Description
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " set-up uniforms from the description "
+      end
+
+      operation 233090 "buildShader"
+	preserve_cpp_body_indent private explicit_return_type "GLuint"
+	nparams 2
+	  param in name "source" explicit_type "char"
+	  param in name "type" explicit_type "GLenum"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} * ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 233218 "dumpShader"
+	preserve_cpp_body_indent private explicit_return_type "String8"
+	nparams 2
+	  param inout name "result" explicit_type "String8"
+	  param in name "type" explicit_type "GLenum"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}${t0} & ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} & ${class}::${name}${(}${t0} & ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      attribute 194434 "mInitialized"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " whether the initialization succeeded"
+      end
+
+      attribute 194562 "mProgram"
+	private explicit_type "GLuint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " Name of the OpenGL program and shaders"
+      end
+
+      attribute 194690 "mVertexShader"
+	private explicit_type "GLuint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 194818 "mFragmentShader"
+	private explicit_type "GLuint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 194946 "mProjectionMatrixLoc"
+	private explicit_type "GLint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " location of the projection matrix uniform "
+      end
+
+      attribute 195074 "mColorMatrixLoc"
+	private explicit_type "GLint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " location of the color matrix uniform "
+      end
+
+      attribute 195202 "mTextureMatrixLoc"
+	private explicit_type "GLint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " location of the texture matrix uniform "
+      end
+
+      attribute 195330 "mSamplerLoc"
+	private explicit_type "GLint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " location of the sampler uniform "
+      end
+
+      attribute 195458 "mAlphaPlaneLoc"
+	private explicit_type "GLint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " location of the alpha plane uniform "
+      end
+
+      attribute 195586 "mColorLoc"
+	private explicit_type "GLint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment " location of the color uniform "
+      end
+    end
+
+    class 157314 "ProgramCache"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " * This class generates GLSL programs suitable to handle a given
+ * Description. It's responsible for figuring out what to
+ * generate from a Description.
+ * It also maintains a cache of these Programs."
+      class 158722 "Key"
+	visibility package 
+	cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 151938 // <dependency>
+	  relation 151938 -_->
+	    stereotype "friend"
+	    a default
+	      cpp default "Generated"
+	      classrelation_ref 151938 // <dependency>
+	    b parent class_ref 157314 // ProgramCache
+	end
+
+	class 158978 "key_t"
+	  visibility package stereotype "typedef" explicit_base_type "uint32_t"
+	  cpp_decl "${comment}typedef ${type} ${name};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_2_2 python_decl ""
+	  idl_decl ""
+	  explicit_switch_type ""
+	  
+	end
+
+	classrelation 152066 // mKey (<directional composition>)
+	  relation 152066 *-->
+	    a role_name "mKey" private
+	      cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	      classrelation_ref 152066 // mKey (<directional composition>)
+	    b parent class_ref 158978 // key_t
+	end
+
+	class 159106 "anonymous22"
+	  visibility package stereotype "enum"
+	  cpp_decl "${comment}enum  {
+${items}
+};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_2_2 python_decl ""
+	  idl_decl ""
+	  explicit_switch_type ""
+	  
+	  attribute 195714 "BLEND_PREMULT"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000001"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 195842 "BLEND_NORMAL"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000000"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 195970 "BLEND_MASK"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000001"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 196098 "OPACITY_OPAQUE"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000002"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 196226 "OPACITY_TRANSLUCENT"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000000"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 196354 "OPACITY_MASK"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000002"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 196482 "PLANE_ALPHA_LT_ONE"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000004"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 196610 "PLANE_ALPHA_EQ_ONE"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000000"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 196738 "PLANE_ALPHA_MASK"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000004"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 196866 "TEXTURE_OFF"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000000"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 196994 "TEXTURE_EXT"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000008"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 197122 "TEXTURE_2D"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000010"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 197250 "TEXTURE_MASK"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000018"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 197378 "COLOR_MATRIX_OFF"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000000"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 197506 "COLOR_MATRIX_ON"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000020"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+
+	  attribute 197634 "COLOR_MATRIX_MASK"
+	    public type class_ref 159106 // anonymous22
+	    init_value "       0x00000020"
+	    cpp_decl "  ${name}${value},${comment}"
+	    java_decl ""
+	    php_decl ""
+	    python_decl ""
+	    idl_decl ""
+	  end
+	end
+
+	operation 233346 "Key"
+	  cpp_inline public explicit_return_type ""
+	  nparams 0
+	  cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw} : mKey(0) { };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 233474 "Key"
+	  cpp_inline public explicit_return_type ""
+	  nparams 1
+	    param in name "rhs" type class_ref 158722 // Key
+	  cpp_decl "    ${comment}${inline}${name}${(}const ${t0} & ${p0}${v0}${)}${volatile}${throw} : mKey(rhs.mKey) { };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 233602 "set"
+	  cpp_inline public return_type class_ref 158722 // Key
+	  nparams 2
+	    param in name "mask" type class_ref 158978 // key_t
+	    param in name "value" type class_ref 158978 // key_t
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract} {
+            mKey = (mKey & ~mask) | value;
+            return *this;
+        };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 233730 "isTexturing"
+	  const cpp_inline public explicit_return_type "bool"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+            return (mKey & TEXTURE_MASK) != TEXTURE_OFF;
+        };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 233858 "getTextureTarget"
+	  const cpp_inline public explicit_return_type "int"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+            return (mKey & TEXTURE_MASK);
+        };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 233986 "isPremultiplied"
+	  const cpp_inline public explicit_return_type "bool"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+            return (mKey & BLEND_MASK) == BLEND_PREMULT;
+        };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 234114 "isOpaque"
+	  const cpp_inline public explicit_return_type "bool"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+            return (mKey & OPACITY_MASK) == OPACITY_OPAQUE;
+        };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 234242 "hasPlaneAlpha"
+	  const cpp_inline public explicit_return_type "bool"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+            return (mKey & PLANE_ALPHA_MASK) == PLANE_ALPHA_LT_ONE;
+        };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 234370 "hasColorMatrix"
+	  const cpp_inline public explicit_return_type "bool"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+            return (mKey & COLOR_MATRIX_MASK) == COLOR_MATRIX_ON;
+        };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 234498 "strictly_order_type"
+	  friend cpp_inline public explicit_return_type "int"
+	  nparams 2
+	    param in name "lhs" type class_ref 158722 // Key
+	    param in name "rhs" type class_ref 158722 // Key
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}, const ${t1} & ${p1}${v1}${)}${const}${volatile}${throw}${abstract} {
+            return  (lhs.mKey < rhs.mKey) ? 1 : 0;
+        };
+"
+	  
+	  
+	  
+	  
+	  comment " this is the definition of a friend function -- not a method of class Needs"
+	end
+      end
+
+      classrelation 151810 // <generalisation>
+	relation 151810 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 151810 // <generalisation>
+	  b parent class_ref 158850 // typedef25
+      end
+
+      operation 234626 "ProgramCache"
+	public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 234754 "~ProgramCache"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 234882 "useProgram"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "description" type class_ref 157058 // Description
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " useProgram lookup a suitable program in the cache or generates one
+ if none can be found."
+      end
+
+      operation 235010 "primeCache"
+	preserve_cpp_body_indent private explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " Generate shaders to populate the cache"
+      end
+
+      operation 235138 "computeKey"
+	class_operation preserve_cpp_body_indent private return_type class_ref 158722 // Key
+	nparams 1
+	  param in name "description" type class_ref 157058 // Description
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " compute a cache Key from a Description"
+      end
+
+      operation 235266 "generateProgram"
+	class_operation preserve_cpp_body_indent private return_type class_ref 157186 // Program
+	nparams 1
+	  param in name "needs" type class_ref 158722 // Key
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} * ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " generates a program from the Key"
+      end
+
+      operation 235394 "generateVertexShader"
+	class_operation preserve_cpp_body_indent private explicit_return_type "String8"
+	nparams 1
+	  param in name "needs" type class_ref 158722 // Key
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " generates the vertex shader from the Key"
+      end
+
+      operation 235522 "generateFragmentShader"
+	class_operation preserve_cpp_body_indent private explicit_return_type "String8"
+	nparams 1
+	  param in name "needs" type class_ref 158722 // Key
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " generates the fragment shader from the Key"
+      end
+
+      classrelation 152194 // mCache (<directional composition>)
+	relation 152194 *-->
+	  stereotype "DefaultKeyedVector"
+	  a role_name "mCache" private
+	    comment " Key/Value map used for caching Programs. Currently the cache
+ is never shrunk."
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type},Program*> ${name}${value};
+"
+	    classrelation_ref 152194 // mCache (<directional composition>)
+	  b parent class_ref 158722 // Key
+      end
+    end
+
+    class 157442 "GLES10RenderEngine"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " ---------------------------------------------------------------------------
+ ---------------------------------------------------------------------------"
+      classrelation 150786 // <generalisation>
+	relation 150786 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 150786 // <generalisation>
+	  b parent class_ref 157570 // GLES11RenderEngine
+      end
+
+      operation 223490 "~GLES10RenderEngine"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 223618 "setupLayerBlending"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 3
+	  param in name "premultipliedAlpha" explicit_type "bool"
+	  param in name "opaque" explicit_type "bool"
+	  param in name "alpha" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 157570 "GLES11RenderEngine"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 150914 // <generalisation>
+	relation 150914 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 150914 // <generalisation>
+	  b parent class_ref 157698 // RenderEngine
+      end
+
+      attribute 190466 "mProtectedTexName"
+	private explicit_type "GLuint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 190594 "mMaxViewportDims"
+	private explicit_type "GLint"
+	multiplicity "[2]"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${multiplicity}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 190722 "mMaxTextureSize"
+	private explicit_type "GLint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 223746 "bindImageAsFramebuffer"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "void"
+	nparams 4
+	  param in name "image" explicit_type "EGLImageKHR"
+	  param inout name "texName" explicit_type "uint32_t"
+	  param inout name "fbName" explicit_type "uint32_t"
+	  param inout name "status" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} * ${p1}${v1}, ${t2} * ${p2}${v2}, ${t3} * ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} * ${p1}, ${t2} * ${p2}, ${t3} * ${p3}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 223874 "unbindFramebuffer"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "void"
+	nparams 2
+	  param in name "texName" explicit_type "uint32_t"
+	  param in name "fbName" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 224002 "GLES11RenderEngine"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 224130 "~GLES11RenderEngine"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 224258 "dump"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 1
+	  param inout name "result" explicit_type "String8"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 224386 "setViewportAndProjection"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 6
+	  param in name "vpw" explicit_type "size_t"
+	  param in name "vph" explicit_type "size_t"
+	  param in name "sourceCrop" explicit_type "Rect"
+	  param in name "hwh" explicit_type "size_t"
+	  param in name "yswap" explicit_type "bool"
+	  param in name "rotation" type class_ref 153346 // orientation_flags
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}, ${t4} ${p4}${v4}, ${t5} ${p5}${v5}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}, ${t4} ${p4}, ${t5} ${p5}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 224514 "setupLayerBlending"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 3
+	  param in name "premultipliedAlpha" explicit_type "bool"
+	  param in name "opaque" explicit_type "bool"
+	  param in name "alpha" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 224642 "setupDimLayerBlending"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 1
+	  param in name "alpha" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 224770 "setupLayerTexturing"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 1
+	  param in name "texture" type class_ref 150786 // Texture
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 224898 "setupLayerBlackedOut"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 225026 "setupFillWithColor"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 4
+	  param in name "r" explicit_type "float"
+	  param in name "g" explicit_type "float"
+	  param in name "b" explicit_type "float"
+	  param in name "a" explicit_type "float"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 225154 "disableTexturing"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 225282 "disableBlending"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 225410 "drawMesh"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 1
+	  param in name "mesh" type class_ref 150274 // Mesh
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 225538 "beginGroup"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 1
+	  param in name "colorTransform" explicit_type "mat4"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 225666 "endGroup"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 225794 "getMaxTextureSize"
+	preserve_cpp_body_indent const cpp_virtual protected explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 225922 "getMaxViewportDims"
+	preserve_cpp_body_indent const cpp_virtual protected explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 157698 "RenderEngine"
+      abstract visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      class 159234 "GlesVersion"
+	visibility package stereotype "enum"
+	cpp_decl "${comment}enum ${name} {
+${items}
+};
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 197762 "GLES_VERSION_1_0"
+	  public type class_ref 159234 // GlesVersion
+	  init_value " 0x10000"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 197890 "GLES_VERSION_1_1"
+	  public type class_ref 159234 // GlesVersion
+	  init_value " 0x10001"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 198018 "GLES_VERSION_2_0"
+	  public type class_ref 159234 // GlesVersion
+	  init_value " 0x20000"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 198146 "GLES_VERSION_3_0"
+	  public type class_ref 159234 // GlesVersion
+	  init_value " 0x30000"
+	  cpp_decl "  ${name}${value},${comment}"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      operation 235650 "parseGlesVersion"
+	class_operation preserve_cpp_body_indent private return_type class_ref 159234 // GlesVersion
+	nparams 1
+	  param in name "str" explicit_type "char"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} * ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      attribute 198274 "mEGLConfig"
+	private explicit_type "EGLConfig"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 198402 "mEGLContext"
+	private explicit_type "EGLContext"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 235778 "setEGLHandles"
+	preserve_cpp_body_indent private explicit_return_type "void"
+	nparams 2
+	  param in name "config" explicit_type "EGLConfig"
+	  param in name "ctxt" explicit_type "EGLContext"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 235906 "bindImageAsFramebuffer"
+	abstract cpp_virtual private explicit_return_type "void"
+	nparams 4
+	  param in name "image" explicit_type "EGLImageKHR"
+	  param inout name "texName" explicit_type "uint32_t"
+	  param inout name "fbName" explicit_type "uint32_t"
+	  param inout name "status" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} * ${p1}${v1}, ${t2} * ${p2}${v2}, ${t3} * ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 236034 "unbindFramebuffer"
+	abstract cpp_virtual private explicit_return_type "void"
+	nparams 2
+	  param in name "texName" explicit_type "uint32_t"
+	  param in name "fbName" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 236162 "RenderEngine"
+	preserve_cpp_body_indent protected explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)} : mEGLContext(EGL_NO_CONTEXT) ${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 236290 "~RenderEngine"
+	abstract preserve_cpp_body_indent cpp_virtual protected explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	
+	
+	
+	
+      end
+
+      operation 236418 "create"
+	class_operation preserve_cpp_body_indent public return_type class_ref 157698 // RenderEngine
+	nparams 2
+	  param in name "display" explicit_type "EGLDisplay"
+	  param in name "hwcFormat" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} * ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} * ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 236546 "chooseEglConfig"
+	class_operation preserve_cpp_body_indent public explicit_return_type "EGLConfig"
+	nparams 2
+	  param in name "display" explicit_type "EGLDisplay"
+	  param in name "format" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 236674 "dump"
+	preserve_cpp_body_indent cpp_virtual public explicit_return_type "void"
+	nparams 1
+	  param inout name "result" explicit_type "String8"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " dump the extension strings. always call the base class."
+      end
+
+      operation 236802 "clearWithColor"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 4
+	  param in name "red" explicit_type "float"
+	  param in name "green" explicit_type "float"
+	  param in name "blue" explicit_type "float"
+	  param in name "alpha" explicit_type "float"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " helpers"
+      end
+
+      operation 236930 "fillRegionWithColor"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 6
+	  param in name "region" explicit_type "Region"
+	  param in name "height" explicit_type "uint32_t"
+	  param in name "red" explicit_type "float"
+	  param in name "green" explicit_type "float"
+	  param in name "blue" explicit_type "float"
+	  param in name "alpha" explicit_type "float"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}, ${t4} ${p4}${v4}, ${t5} ${p5}${v5}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}, ${t4} ${p4}, ${t5} ${p5}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 237058 "setScissor"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 4
+	  param in name "left" explicit_type "uint32_t"
+	  param in name "bottom" explicit_type "uint32_t"
+	  param in name "right" explicit_type "uint32_t"
+	  param in name "top" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " common to all GL versions"
+      end
+
+      operation 237186 "disableScissor"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 237314 "genTextures"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 2
+	  param in name "count" explicit_type "size_t"
+	  param inout name "names" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} * ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 237442 "deleteTextures"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 2
+	  param in name "count" explicit_type "size_t"
+	  param in name "names" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, const ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, const ${t1} * ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 237570 "readPixels"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 5
+	  param in name "l" explicit_type "size_t"
+	  param in name "b" explicit_type "size_t"
+	  param in name "w" explicit_type "size_t"
+	  param in name "h" explicit_type "size_t"
+	  param inout name "pixels" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}, ${t4} * ${p4}${v4}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}, ${t4} * ${p4}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      class 159362 "BindImageAsFramebuffer"
+	visibility package 
+	cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 152322 // mEngine (<unidirectional association>)
+	  relation 152322 --->
+	    a role_name "mEngine" private
+	      cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} & ${name}${value};
+"
+	      classrelation_ref 152322 // mEngine (<unidirectional association>)
+	    b parent class_ref 157698 // RenderEngine
+	end
+
+	attribute 198530 "mStatus"
+	  private explicit_type "uint32_t"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	operation 237698 "BindImageAsFramebuffer"
+	  preserve_cpp_body_indent public explicit_return_type ""
+	  nparams 2
+	    param inout name "engine" type class_ref 157698 // RenderEngine
+	    param in name "image" explicit_type "EGLImageKHR"
+	  cpp_decl "    ${comment}${inline}${name}${(}${t0} & ${p0}${v0}, ${t1} ${p1}${v1}${)}${volatile}${throw};
+"
+	  cpp_def "// ---------------------------------------------------------------------------
+
+${inline}${class}::${name}${(}${t0} & ${p0}, ${t1} ${p1}${)} : mEngine(engine)
+${throw}{
+  ${body}}
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 237826 "~BindImageAsFramebuffer"
+	  preserve_cpp_body_indent public explicit_return_type ""
+	  nparams 0
+	  cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	  cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 237954 "getStatus"
+	  preserve_cpp_body_indent const public explicit_return_type "int"
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	  cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	  
+	  
+	  
+	  
+	end
+      end
+
+      operation 238082 "checkErrors"
+	preserve_cpp_body_indent const cpp_virtual public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+	comment " set-up"
+      end
+
+      operation 238210 "setViewportAndProjection"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 6
+	  param in name "vpw" explicit_type "size_t"
+	  param in name "vph" explicit_type "size_t"
+	  param in name "sourceCrop" explicit_type "Rect"
+	  param in name "hwh" explicit_type "size_t"
+	  param in name "yswap" explicit_type "bool"
+	  param in name "rotation" type class_ref 153346 // orientation_flags
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}, ${t4} ${p4}${v4}, ${t5} ${p5}${v5}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 238338 "setupLayerBlending"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 3
+	  param in name "premultipliedAlpha" explicit_type "bool"
+	  param in name "opaque" explicit_type "bool"
+	  param in name "alpha" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 238466 "setupDimLayerBlending"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 1
+	  param in name "alpha" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 238594 "setupLayerTexturing"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 1
+	  param in name "texture" type class_ref 150786 // Texture
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 238722 "setupLayerBlackedOut"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 238850 "setupFillWithColor"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 4
+	  param in name "r" explicit_type "float"
+	  param in name "g" explicit_type "float"
+	  param in name "b" explicit_type "float"
+	  param in name "a" explicit_type "float"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 238978 "disableTexturing"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 239106 "disableBlending"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 239234 "drawMesh"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 1
+	  param in name "mesh" type class_ref 150274 // Mesh
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment " drawing"
+      end
+
+      operation 239362 "beginGroup"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 1
+	  param in name "colorTransform" explicit_type "mat4"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment " grouping
+ creates a color-transform group, everything drawn in the group will be
+ transformed by the given color transform when endGroup() is called."
+      end
+
+      operation 239490 "endGroup"
+	abstract cpp_virtual public explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 239618 "getMaxTextureSize"
+	abstract const cpp_virtual public explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+	comment " queries"
+      end
+
+      operation 239746 "getMaxViewportDims"
+	abstract const cpp_virtual public explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	
+	
+	
+	
+      end
+
+      operation 239874 "getEGLConfig"
+	preserve_cpp_body_indent const public explicit_return_type "EGLConfig"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 240002 "getEGLContext"
+	preserve_cpp_body_indent const public explicit_return_type "EGLContext"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 157826 "GLES20RenderEngine"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 151042 // <generalisation>
+	relation 151042 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 151042 // <generalisation>
+	  b parent class_ref 157698 // RenderEngine
+      end
+
+      attribute 190850 "mProtectedTexName"
+	private explicit_type "GLuint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 190978 "mMaxViewportDims"
+	private explicit_type "GLint"
+	multiplicity "[2]"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${multiplicity}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 191106 "mMaxTextureSize"
+	private explicit_type "GLint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 191234 "mVpWidth"
+	private explicit_type "GLuint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 191362 "mVpHeight"
+	private explicit_type "GLuint"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      class 157954 "Group"
+	visibility package stereotype "struct"
+	cpp_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 191490 "texture"
+	  public explicit_type "GLuint"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 191618 "fbo"
+	  public explicit_type "GLuint"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 191746 "width"
+	  public explicit_type "GLuint"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 191874 "height"
+	  public explicit_type "GLuint"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	attribute 192002 "colorTransform"
+	  public explicit_type "mat4"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+      end
+
+      classrelation 151170 // mState (<directional composition>)
+	relation 151170 *-->
+	  a role_name "mState" private
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	    classrelation_ref 151170 // mState (<directional composition>)
+	  b parent class_ref 157058 // Description
+      end
+
+      classrelation 151298 // mGroupStack (<directional composition>)
+	relation 151298 *-->
+	  stereotype "Vector"
+	  a role_name "mGroupStack" private
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	    classrelation_ref 151298 // mGroupStack (<directional composition>)
+	  b parent class_ref 157954 // Group
+      end
+
+      operation 226050 "bindImageAsFramebuffer"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "void"
+	nparams 4
+	  param in name "image" explicit_type "EGLImageKHR"
+	  param inout name "texName" explicit_type "uint32_t"
+	  param inout name "fbName" explicit_type "uint32_t"
+	  param inout name "status" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} * ${p1}${v1}, ${t2} * ${p2}${v2}, ${t3} * ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} * ${p1}, ${t2} * ${p2}, ${t3} * ${p3}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 226178 "unbindFramebuffer"
+	preserve_cpp_body_indent cpp_virtual private explicit_return_type "void"
+	nparams 2
+	  param in name "texName" explicit_type "uint32_t"
+	  param in name "fbName" explicit_type "uint32_t"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 226306 "GLES20RenderEngine"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+${inline}${class}::${name}${(}${)} :
+        mVpWidth(0), mVpHeight(0) ${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 226434 "~GLES20RenderEngine"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${virtual}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 226562 "dump"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 1
+	  param inout name "result" explicit_type "String8"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 226690 "setViewportAndProjection"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 6
+	  param in name "vpw" explicit_type "size_t"
+	  param in name "vph" explicit_type "size_t"
+	  param in name "sourceCrop" explicit_type "Rect"
+	  param in name "hwh" explicit_type "size_t"
+	  param in name "yswap" explicit_type "bool"
+	  param in name "rotation" type class_ref 153346 // orientation_flags
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}, ${t4} ${p4}${v4}, ${t5} ${p5}${v5}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}, ${t4} ${p4}, ${t5} ${p5}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 226818 "setupLayerBlending"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 3
+	  param in name "premultipliedAlpha" explicit_type "bool"
+	  param in name "opaque" explicit_type "bool"
+	  param in name "alpha" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 226946 "setupDimLayerBlending"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 1
+	  param in name "alpha" explicit_type "int"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 227074 "setupLayerTexturing"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 1
+	  param in name "texture" type class_ref 150786 // Texture
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 227202 "setupLayerBlackedOut"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 227330 "setupFillWithColor"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 4
+	  param in name "r" explicit_type "float"
+	  param in name "g" explicit_type "float"
+	  param in name "b" explicit_type "float"
+	  param in name "a" explicit_type "float"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}, ${t1} ${p1}${v1}, ${t2} ${p2}${v2}, ${t3} ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 227458 "disableTexturing"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 227586 "disableBlending"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 227714 "drawMesh"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 1
+	  param in name "mesh" type class_ref 150274 // Mesh
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 227842 "beginGroup"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 1
+	  param in name "colorTransform" explicit_type "mat4"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 227970 "endGroup"
+	preserve_cpp_body_indent cpp_virtual protected explicit_return_type "void"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 228098 "getMaxTextureSize"
+	preserve_cpp_body_indent const cpp_virtual protected explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 228226 "getMaxViewportDims"
+	preserve_cpp_body_indent const cpp_virtual protected explicit_return_type "size_t"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 158082 "GLExtensions"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment " ---------------------------------------------------------------------------"
+      classrelation 151426 // <generalisation>
+	relation 151426 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 151426 // <generalisation>
+	  b parent class_ref 158210 // typedef24
+      end
+
+      extra_member 135042 "friend"
+	
+	cpp "
+    friend class Singleton<GLExtensions>;" ""
+	java ""
+	php ""
+	python ""
+	idl ""
+      end
+
+      attribute 192130 "mHaveFramebufferObject"
+	private explicit_type "bool"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value} : 1;
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 192258 "mVendor"
+	private explicit_type "String8"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 192386 "mRenderer"
+	private explicit_type "String8"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 192514 "mVersion"
+	private explicit_type "String8"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 192642 "mExtensions"
+	private explicit_type "String8"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 192770 "mExtensionList"
+	private explicit_type "String8"
+	stereotype "SortedVector"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 228354 "GLExtensions"
+	private explicit_return_type ""
+	nparams 1
+	  param in name "" type class_ref 158082 // GLExtensions
+	cpp_decl "    ${comment}${inline}${name}${(}const ${t0} & ${p0}${v0}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}const ${t0} & ${p0}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 228482 "operator ="
+	private return_type class_ref 158082 // GLExtensions
+	nparams 1
+	  param in name "" type class_ref 158082 // GLExtensions
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} & ${class}::${name}${(}const ${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 228610 "GLExtensions"
+	protected explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw};
+"
+	cpp_def "${comment}${inline}${class}::${name}${(}${)}${throw}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 228738 "haveFramebufferObject"
+	const cpp_inline public explicit_return_type "bool"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        return mHaveFramebufferObject;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 228866 "initWithGLStrings"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 4
+	  param in name "vendor" explicit_type "GLubyte"
+	  param in name "renderer" explicit_type "GLubyte"
+	  param in name "version" explicit_type "GLubyte"
+	  param in name "extensions" explicit_type "GLubyte"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}, const ${t1} * ${p1}${v1}, const ${t2} * ${p2}${v2}, const ${t3} * ${p3}${v3}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} * ${p0}, const ${t1} * ${p1}, const ${t2} * ${p2}, const ${t3} * ${p3}${)}${const}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 228994 "getVendor"
+	preserve_cpp_body_indent const public explicit_return_type "char"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}const ${type} * ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 229122 "getRenderer"
+	preserve_cpp_body_indent const public explicit_return_type "char"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}const ${type} * ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 229250 "getVersion"
+	preserve_cpp_body_indent const public explicit_return_type "char"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}const ${type} * ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 229378 "getExtension"
+	preserve_cpp_body_indent const public explicit_return_type "char"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}const ${type} * ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}const ${type} * ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 229506 "hasExtension"
+	preserve_cpp_body_indent const public explicit_return_type "bool"
+	nparams 1
+	  param in name "extension" explicit_type "char"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} * ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} ${class}::${name}${(}const ${t0} * ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 158210 "typedef24"
+      visibility package stereotype "typedef" explicit_base_type "Singleton<GLExtensions>"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 158850 "typedef25"
+      visibility package stereotype "typedef" explicit_base_type "Singleton<ProgramCache>"
+      cpp_decl "${comment}typedef ${type} ${name};
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 161410 "Formatter"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 203522 "mString"
+	private explicit_type "String8"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 203650 "mIndent"
+	private explicit_type "int"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      class 161538 "FormaterManipFunc"
+	visibility package stereotype "typedef" base_type class_ref 161410 // Formatter
+	cpp_decl "${comment}typedef ${type}& (* ${name})(Formatter&);
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 154626 // <dependency>
+	  relation 154626 -_->
+	    a default
+	      cpp default "#include in source"
+	      classrelation_ref 154626 // <dependency>
+	    b parent class_ref 161410 // Formatter
+	end
+      end
+
+      operation 247938 "indent"
+	preserve_cpp_body_indent friend private return_type class_ref 161410 // Formatter
+	nparams 1
+	  param inout name "f" type class_ref 161410 // Formatter
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} & ${class}::${name}${(}${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 248066 "dedent"
+	preserve_cpp_body_indent friend private return_type class_ref 161410 // Formatter
+	nparams 1
+	  param inout name "f" type class_ref 161410 // Formatter
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract};
+"
+	cpp_def "${comment}${inline}${type} & ${class}::${name}${(}${t0} & ${p0}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	
+      end
+
+      operation 248194 "Formatter"
+	cpp_inline public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw} : mIndent(0) {};
+"
+	
+	
+	
+	
+      end
+
+      operation 248322 "getString"
+	const cpp_inline public explicit_return_type "String8"
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract} {
+        return mString;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 248450 "operator <<"
+	friend cpp_inline public return_type class_ref 161410 // Formatter
+	nparams 2
+	  param inout name "out" type class_ref 161410 // Formatter
+	  param in name "in" explicit_type "char"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}${t0} & ${p0}${v0}, const ${t1} * ${p1}${v1}${)}${const}${volatile}${throw}${abstract} {
+        for (int i=0 ; i<out.mIndent ; i++) {
+            out.mString.append(\"    \");
+        }
+        out.mString.append(in);
+        out.mString.append(\"\\n\");
+        return out;
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 248578 "operator <<"
+	friend cpp_inline public return_type class_ref 161410 // Formatter
+	nparams 2
+	  param inout name "out" type class_ref 161410 // Formatter
+	  param in name "in" explicit_type "String8"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}${t0} & ${p0}${v0}, const ${t1} & ${p1}${v1}${)}${const}${volatile}${throw}${abstract} {
+        return operator << (out, in.string());
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 248706 "operator <<"
+	friend cpp_inline public return_type class_ref 161410 // Formatter
+	nparams 2
+	  param inout name "to" type class_ref 161410 // Formatter
+	  param in name "func" type class_ref 161538 // FormaterManipFunc
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} & ${name}${(}${t0} & ${p0}${v0}, ${t1} ${p1}${v1}${)}${const}${volatile}${throw}${abstract} {
+        return (*func)(to);
+    };
+"
+	
+	
+	
+	
+      end
+    end
+
+    class 161666 "EGLAttributeVector"
+      visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      extra_member 135170 "Attribute"
+	
+	stereotype "struct"
+	cpp "    struct Attribute;
+" ""
+	java ""
+	php ""
+	python ""
+	idl ""
+      end
+
+      extra_member 135298 "Adder"
+	
+	stereotype "class"
+	cpp "    class Adder;
+" ""
+	java ""
+	php ""
+	python ""
+	idl ""
+      end
+
+      class 161794 "Adder"
+	visibility package 
+	cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	classrelation 155010 // <dependency>
+	  relation 155010 -_->
+	    stereotype "friend"
+	    a default
+	      cpp default "Generated"
+	      classrelation_ref 155010 // <dependency>
+	    b parent class_ref 161666 // EGLAttributeVector
+	end
+
+	classrelation 155138 // v (<unidirectional association>)
+	  relation 155138 --->
+	    a role_name "v" private
+	      cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} & ${name}${value};
+"
+	      classrelation_ref 155138 // v (<unidirectional association>)
+	    b parent class_ref 161666 // EGLAttributeVector
+	end
+
+	attribute 203906 "attribute"
+	  private explicit_type "EGLint"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	operation 249218 "Adder"
+	  cpp_inline private explicit_return_type ""
+	  nparams 2
+	    param inout name "v" type class_ref 161666 // EGLAttributeVector
+	    param in name "attribute" explicit_type "EGLint"
+	  cpp_decl "    ${comment}${inline}${name}${(}${t0} & ${p0}${v0}, ${t1} ${p1}${v1}${)}${volatile}${throw} : v(v), attribute(attribute) {
+        };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 249346 "operator ="
+	  cpp_inline public explicit_return_type "void"
+	  nparams 1
+	    param in name "value" explicit_type "EGLint"
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+            if (attribute != EGL_NONE) {
+                v.mList.add(attribute, value);
+            }
+        };
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 249474 "operator EGLint"
+	  const cpp_inline public explicit_return_type ""
+	  nparams 0
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${name}${(}${)}${const}${volatile}${throw}${abstract} { return v.mList[attribute]; };
+"
+	  
+	  
+	  
+	  
+	end
+      end
+
+      classrelation 154754 // <dependency>
+	relation 154754 -_->
+	  stereotype "friend"
+	  a default
+	    cpp default "Generated"
+	    classrelation_ref 154754 // <dependency>
+	  b parent class_ref 161794 // Adder
+      end
+
+      class 161922 "Attribute"
+	visibility package stereotype "struct"
+	cpp_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+	java_decl ""
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	operation 248834 "Attribute"
+	  cpp_inline public explicit_return_type ""
+	  nparams 0
+	  cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw} {};
+"
+	  
+	  
+	  
+	  
+	end
+
+	operation 248962 "Attribute"
+	  cpp_inline public explicit_return_type ""
+	  nparams 1
+	    param in name "v" explicit_type "EGLint"
+	  cpp_decl "    ${comment}${inline}${name}${(}${t0} ${p0}${v0}${)}${volatile}${throw} : v(v) { };
+"
+	  
+	  
+	  
+	  
+	end
+
+	attribute 203778 "v"
+	  public explicit_type "EGLint"
+	  cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	  java_decl ""
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	end
+
+	operation 249090 "operator <"
+	  const cpp_inline public explicit_return_type "bool"
+	  nparams 1
+	    param in name "other" type class_ref 161922 // Attribute
+	  cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}const ${t0} & ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+            // this places EGL_NONE at the end
+            EGLint lhs(v);
+            EGLint rhs(other.v);
+            if (lhs == EGL_NONE) lhs = 0x7FFFFFFF;
+            if (rhs == EGL_NONE) rhs = 0x7FFFFFFF;
+            return lhs < rhs;
+        };
+"
+	  
+	  
+	  
+	  
+	end
+      end
+
+      classrelation 154882 // mList (<directional composition>)
+	relation 154882 *-->
+	  stereotype "KeyedVector"
+	  a role_name "mList" private
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type},EGLint> ${name}${value};
+"
+	    classrelation_ref 154882 // mList (<directional composition>)
+	  b parent class_ref 161922 // Attribute
+      end
+
+      operation 249602 "EGLAttributeVector"
+	cpp_inline public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${inline}${name}${(}${)}${volatile}${throw} {
+        mList.add(EGL_NONE, EGL_NONE);
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 249730 "remove"
+	cpp_inline public explicit_return_type "void"
+	nparams 1
+	  param in name "attribute" explicit_type "EGLint"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        if (attribute != EGL_NONE) {
+            mList.removeItem(attribute);
+        }
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 249858 "operator []"
+	cpp_inline public return_type class_ref 161794 // Adder
+	nparams 1
+	  param in name "attribute" explicit_type "EGLint"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+        return Adder(*this, attribute);
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 249986 "operator []"
+	const cpp_inline public explicit_return_type "EGLint"
+	nparams 1
+	  param in name "attribute" explicit_type "EGLint"
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${t0} ${p0}${v0}${)}${const}${volatile}${throw}${abstract} {
+       return mList[attribute];
+    };
+"
+	
+	
+	
+	
+      end
+
+      operation 250114 "operator EGLintconst*"
+	const cpp_inline public explicit_return_type ""
+	nparams 0
+	cpp_decl "    ${comment}${friend}${static}${inline}${virtual}${name}${(}${)}${const}${volatile}${throw}${abstract} { return &mList.keyAt(0).v; };
+"
+	
+	
+	
+	
+	comment " cast-operator to (EGLint const*)"
+      end
+    end
+  end
+
+  deploymentview 135554 "RenderEngine"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 144898 "Description"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 157058 // Description
+      end
+    end
+
+    artifact 145026 "GLES10RenderEngine"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 157442 // GLES10RenderEngine
+      end
+    end
+
+    artifact 145154 "GLES11RenderEngine"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 157570 // GLES11RenderEngine
+      end
+    end
+
+    artifact 145282 "GLES20RenderEngine"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 157826 // GLES20RenderEngine
+      end
+    end
+
+    artifact 145410 "GLExtensions"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 158210 // typedef24
+	class_ref 158082 // GLExtensions
+      end
+    end
+
+    artifact 145538 "Mesh"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 150274 // Mesh
+      end
+    end
+
+    artifact 145666 "Program"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 157186 // Program
+      end
+    end
+
+    artifact 145794 "ProgramCache"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 158850 // typedef25
+	class_ref 157314 // ProgramCache
+      end
+    end
+
+    artifact 145922 "RenderEngine"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 157698 // RenderEngine
+      end
+    end
+
+    artifact 146050 "Texture"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 150786 // Texture
+      end
+    end
+
+    artifact 147330 "Formatter"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 161410 // Formatter
+      end
+    end
+
+    artifact 147458 "EGLAttributeVector"
+      stereotype "source"
+      cpp_h "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+      cpp_src "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+      associated_classes
+	class_ref 161666 // EGLAttributeVector
+      end
+    end
+  end
+end

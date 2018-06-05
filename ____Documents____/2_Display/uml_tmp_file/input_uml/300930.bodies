@@ -1,0 +1,43 @@
+class BigPictureStyle
+!!!1696386.java!!!	BigPictureStyle(inout builder : Notification::Builder)
+            setBuilder(builder);
+!!!1696514.java!!!	setBigContentTitle(inout title : CharSequence) : Notification::BigPictureStyle
+            internalSetBigContentTitle(safeCharSequence(title));
+            return this;
+!!!1696642.java!!!	setSummaryText(inout cs : CharSequence) : Notification::BigPictureStyle
+            internalSetSummaryText(safeCharSequence(cs));
+            return this;
+!!!1696770.java!!!	bigPicture(inout b : Bitmap) : Notification::BigPictureStyle
+            mPicture = b;
+            return this;
+!!!1696898.java!!!	bigLargeIcon(inout b : Bitmap) : Notification::BigPictureStyle
+            mBigLargeIconSet = true;
+            mBigLargeIcon = b;
+            return this;
+!!!1697026.java!!!	makeBigContentView() : RemoteViews
+            RemoteViews contentView = getStandardView(mBuilder.getBigPictureLayoutResource());
+
+            contentView.setImageViewBitmap(R.id.big_picture, mPicture);
+
+            applyTopPadding(contentView);
+
+            boolean twoTextLines = mBuilder.mSubText != null && mBuilder.mContentText != null;
+            mBuilder.addProfileBadge(contentView,
+                    twoTextLines ? R.id.profile_badge_line2 : R.id.profile_badge_line3);
+            return contentView;
+!!!1697154.java!!!	addExtras(inout extras : Bundle) : void
+            super.addExtras(extras);
+
+            if (mBigLargeIconSet) {
+                extras.putParcelable(EXTRA_LARGE_ICON_BIG, mBigLargeIcon);
+            }
+            extras.putParcelable(EXTRA_PICTURE, mPicture);
+!!!1697282.java!!!	restoreFromExtras(inout extras : Bundle) : void
+            super.restoreFromExtras(extras);
+
+            if (extras.containsKey(EXTRA_LARGE_ICON_BIG)) {
+                mBigLargeIcon = extras.getParcelable(EXTRA_LARGE_ICON_BIG);
+            }
+            mPicture = extras.getParcelable(EXTRA_PICTURE);
+!!!1697410.java!!!	populateBigContentView(inout wip : Notification) : void
+            mBuilder.setBuilderBigContentView(wip, makeBigContentView());

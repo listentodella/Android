@@ -1,0 +1,6 @@
+class TextDisplayList
+!!!2228226.java!!!	TextDisplayList(in name : String)
+            isDirty = true;
+            displayList = RenderNode.create(name, null);
+!!!2228354.java!!!	needsRecord() : boolean
+ return isDirty || !displayList.isValid();

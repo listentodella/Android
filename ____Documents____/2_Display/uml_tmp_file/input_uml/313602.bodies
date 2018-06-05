@@ -1,0 +1,43 @@
+class UsageStats
+!!!1827330.java!!!	UsageStats(inout stats : UsageStats)
+        mPackageName = stats.mPackageName;
+        mBeginTimeStamp = stats.mBeginTimeStamp;
+        mEndTimeStamp = stats.mEndTimeStamp;
+        mLastTimeUsed = stats.mLastTimeUsed;
+        mTotalTimeInForeground = stats.mTotalTimeInForeground;
+        mLaunchCount = stats.mLaunchCount;
+        mLastEvent = stats.mLastEvent;
+!!!1827458.java!!!	getPackageName() : String
+        return mPackageName;
+!!!1827586.java!!!	getFirstTimeStamp() : long
+        return mBeginTimeStamp;
+!!!1827714.java!!!	getLastTimeStamp() : long
+        return mEndTimeStamp;
+!!!1827842.java!!!	getLastTimeUsed() : long
+        return mLastTimeUsed;
+!!!1827970.java!!!	getTotalTimeInForeground() : long
+        return mTotalTimeInForeground;
+!!!1828098.java!!!	add(inout right : UsageStats) : void
+        if (!mPackageName.equals(right.mPackageName)) {
+            throw new IllegalArgumentException("Can't merge UsageStats for package '" +
+                    mPackageName + "' with UsageStats for package '" + right.mPackageName + "'.");
+        }
+
+        if (right.mEndTimeStamp > mEndTimeStamp) {
+            mLastEvent = right.mLastEvent;
+            mEndTimeStamp = right.mEndTimeStamp;
+            mLastTimeUsed = right.mLastTimeUsed;
+        }
+        mBeginTimeStamp = Math.min(mBeginTimeStamp, right.mBeginTimeStamp);
+        mTotalTimeInForeground += right.mTotalTimeInForeground;
+        mLaunchCount += right.mLaunchCount;
+!!!1828226.java!!!	describeContents() : int
+        return 0;
+!!!1828354.java!!!	writeToParcel(inout dest : Parcel, in flags : int) : void
+        dest.writeString(mPackageName);
+        dest.writeLong(mBeginTimeStamp);
+        dest.writeLong(mEndTimeStamp);
+        dest.writeLong(mLastTimeUsed);
+        dest.writeLong(mTotalTimeInForeground);
+        dest.writeInt(mLaunchCount);
+        dest.writeInt(mLastEvent);

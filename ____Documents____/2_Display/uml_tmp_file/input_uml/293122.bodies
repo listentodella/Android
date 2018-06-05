@@ -1,0 +1,3 @@
+class ActivityWaiter
+!!!1634434.java!!!	ActivityWaiter(inout _intent : Intent)
+            intent = _intent;

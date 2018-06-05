@@ -1,0 +1,99 @@
+class Chronometer
+!!!2157442.java!!!	Chronometer(inout context : Context)
+        this(context, null, 0);
+!!!2157570.java!!!	Chronometer(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!2157698.java!!!	Chronometer(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2157826.java!!!	Chronometer(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        final TypedArray a = context.obtainStyledAttributes(
+                attrs, com.android.internal.R.styleable.Chronometer, defStyleAttr, defStyleRes);
+        setFormat(a.getString(com.android.internal.R.styleable.Chronometer_format));
+        a.recycle();
+
+        init();
+!!!2157954.java!!!	init() : void
+        mBase = SystemClock.elapsedRealtime();
+        updateText(mBase);
+!!!2158082.java!!!	setBase(in base : long) : void
+        mBase = base;
+        dispatchChronometerTick();
+        updateText(SystemClock.elapsedRealtime());
+!!!2158210.java!!!	getBase() : long
+        return mBase;
+!!!2158338.java!!!	setFormat(in format : String) : void
+        mFormat = format;
+        if (format != null && mFormatBuilder == null) {
+            mFormatBuilder = new StringBuilder(format.length() * 2);
+        }
+!!!2158466.java!!!	getFormat() : String
+        return mFormat;
+!!!2158594.java!!!	setOnChronometerTickListener(inout listener : Chronometer::OnChronometerTickListener) : void
+        mOnChronometerTickListener = listener;
+!!!2158722.java!!!	getOnChronometerTickListener() : Chronometer::OnChronometerTickListener
+        return mOnChronometerTickListener;
+!!!2158850.java!!!	start() : void
+        mStarted = true;
+        updateRunning();
+!!!2158978.java!!!	stop() : void
+        mStarted = false;
+        updateRunning();
+!!!2159106.java!!!	setStarted(inout started : boolean) : void
+        mStarted = started;
+        updateRunning();
+!!!2159234.java!!!	onDetachedFromWindow() : void
+        super.onDetachedFromWindow();
+        mVisible = false;
+        updateRunning();
+!!!2159362.java!!!	onWindowVisibilityChanged(in visibility : int) : void
+        super.onWindowVisibilityChanged(visibility);
+        mVisible = visibility == VISIBLE;
+        updateRunning();
+!!!2159490.java!!!	updateText(in now : long) : void
+        long seconds = now - mBase;
+        seconds /= 1000;
+        String text = DateUtils.formatElapsedTime(mRecycle, seconds);
+
+        if (mFormat != null) {
+            Locale loc = Locale.getDefault();
+            if (mFormatter == null || !loc.equals(mFormatterLocale)) {
+                mFormatterLocale = loc;
+                mFormatter = new Formatter(mFormatBuilder, loc);
+            }
+            mFormatBuilder.setLength(0);
+            mFormatterArgs[0] = text;
+            try {
+                mFormatter.format(mFormat, mFormatterArgs);
+                text = mFormatBuilder.toString();
+            } catch (IllegalFormatException ex) {
+                if (!mLogged) {
+                    Log.w(TAG, "Illegal format string: " + mFormat);
+                    mLogged = true;
+                }
+            }
+        }
+        setText(text);
+!!!2159618.java!!!	updateRunning() : void
+        boolean running = mVisible && mStarted;
+        if (running != mRunning) {
+            if (running) {
+                updateText(SystemClock.elapsedRealtime());
+                dispatchChronometerTick();
+                mHandler.sendMessageDelayed(Message.obtain(mHandler, TICK_WHAT), 1000);
+            } else {
+                mHandler.removeMessages(TICK_WHAT);
+            }
+            mRunning = running;
+        }
+!!!2159746.java!!!	dispatchChronometerTick() : void
+        if (mOnChronometerTickListener != null) {
+            mOnChronometerTickListener.onChronometerTick(this);
+        }
+!!!2159874.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(Chronometer.class.getName());
+!!!2160002.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(Chronometer.class.getName());

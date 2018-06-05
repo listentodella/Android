@@ -1,0 +1,9 @@
+class StaticServiceFetcher
+!!!1562498.java!!!	getService(inout unused : ContextImpl) : Object
+            synchronized (StaticServiceFetcher.this) {
+                Object service = mCachedInstance;
+                if (service != null) {
+                    return service;
+                }
+                return mCachedInstance = createStaticService();
+            }

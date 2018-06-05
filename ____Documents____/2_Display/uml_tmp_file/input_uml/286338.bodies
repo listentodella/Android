@@ -1,0 +1,177 @@
+class Builder
+!!!1494146.java!!!	Builder(inout context : Context)
+            this(context, resolveDialogTheme(context, 0));
+!!!1494274.java!!!	Builder(inout context : Context, in theme : int)
+            P = new AlertController.AlertParams(new ContextThemeWrapper(
+                    context, resolveDialogTheme(context, theme)));
+            mTheme = theme;
+!!!1494402.java!!!	getContext() : Context
+            return P.mContext;
+!!!1494530.java!!!	setTitle(in titleId : int) : AlertDialog::Builder
+            P.mTitle = P.mContext.getText(titleId);
+            return this;
+!!!1494658.java!!!	setTitle(inout title : CharSequence) : AlertDialog::Builder
+            P.mTitle = title;
+            return this;
+!!!1494786.java!!!	setCustomTitle(inout customTitleView : View) : AlertDialog::Builder
+            P.mCustomTitleView = customTitleView;
+            return this;
+!!!1494914.java!!!	setMessage(in messageId : int) : AlertDialog::Builder
+            P.mMessage = P.mContext.getText(messageId);
+            return this;
+!!!1495042.java!!!	setMessage(inout message : CharSequence) : AlertDialog::Builder
+            P.mMessage = message;
+            return this;
+!!!1495170.java!!!	setIcon(in iconId : int) : AlertDialog::Builder
+            P.mIconId = iconId;
+            return this;
+!!!1495298.java!!!	setIcon(inout icon : Drawable) : AlertDialog::Builder
+            P.mIcon = icon;
+            return this;
+!!!1495426.java!!!	setIconAttribute(in attrId : int) : AlertDialog::Builder
+            TypedValue out = new TypedValue();
+            P.mContext.getTheme().resolveAttribute(attrId, out, true);
+            P.mIconId = out.resourceId;
+            return this;
+!!!1495554.java!!!	setPositiveButton(in textId : int, in listener : OnClickListener) : AlertDialog::Builder
+            P.mPositiveButtonText = P.mContext.getText(textId);
+            P.mPositiveButtonListener = listener;
+            return this;
+!!!1495682.java!!!	setPositiveButton(inout text : CharSequence, in listener : OnClickListener) : AlertDialog::Builder
+            P.mPositiveButtonText = text;
+            P.mPositiveButtonListener = listener;
+            return this;
+!!!1495810.java!!!	setNegativeButton(in textId : int, in listener : OnClickListener) : AlertDialog::Builder
+            P.mNegativeButtonText = P.mContext.getText(textId);
+            P.mNegativeButtonListener = listener;
+            return this;
+!!!1495938.java!!!	setNegativeButton(inout text : CharSequence, in listener : OnClickListener) : AlertDialog::Builder
+            P.mNegativeButtonText = text;
+            P.mNegativeButtonListener = listener;
+            return this;
+!!!1496066.java!!!	setNeutralButton(in textId : int, in listener : OnClickListener) : AlertDialog::Builder
+            P.mNeutralButtonText = P.mContext.getText(textId);
+            P.mNeutralButtonListener = listener;
+            return this;
+!!!1496194.java!!!	setNeutralButton(inout text : CharSequence, in listener : OnClickListener) : AlertDialog::Builder
+            P.mNeutralButtonText = text;
+            P.mNeutralButtonListener = listener;
+            return this;
+!!!1496322.java!!!	setCancelable(inout cancelable : boolean) : AlertDialog::Builder
+            P.mCancelable = cancelable;
+            return this;
+!!!1496450.java!!!	setOnCancelListener(inout onCancelListener : OnCancelListener) : AlertDialog::Builder
+            P.mOnCancelListener = onCancelListener;
+            return this;
+!!!1496578.java!!!	setOnDismissListener(inout onDismissListener : OnDismissListener) : AlertDialog::Builder
+            P.mOnDismissListener = onDismissListener;
+            return this;
+!!!1496706.java!!!	setOnKeyListener(inout onKeyListener : OnKeyListener) : AlertDialog::Builder
+            P.mOnKeyListener = onKeyListener;
+            return this;
+!!!1496834.java!!!	setItems(in itemsId : int, in listener : OnClickListener) : AlertDialog::Builder
+            P.mItems = P.mContext.getResources().getTextArray(itemsId);
+            P.mOnClickListener = listener;
+            return this;
+!!!1496962.java!!!	setItems(inout items : CharSequence, in listener : OnClickListener) : AlertDialog::Builder
+            P.mItems = items;
+            P.mOnClickListener = listener;
+            return this;
+!!!1497090.java!!!	setAdapter(in adapter : ListAdapter, in listener : OnClickListener) : AlertDialog::Builder
+            P.mAdapter = adapter;
+            P.mOnClickListener = listener;
+            return this;
+!!!1497218.java!!!	setCursor(in cursor : Cursor, in listener : OnClickListener, in labelColumn : String) : AlertDialog::Builder
+            P.mCursor = cursor;
+            P.mLabelColumn = labelColumn;
+            P.mOnClickListener = listener;
+            return this;
+!!!1497346.java!!!	setMultiChoiceItems(in itemsId : int, inout checkedItems : boolean, in listener : OnMultiChoiceClickListener) : AlertDialog::Builder
+            P.mItems = P.mContext.getResources().getTextArray(itemsId);
+            P.mOnCheckboxClickListener = listener;
+            P.mCheckedItems = checkedItems;
+            P.mIsMultiChoice = true;
+            return this;
+!!!1497474.java!!!	setMultiChoiceItems(inout items : CharSequence, inout checkedItems : boolean, in listener : OnMultiChoiceClickListener) : AlertDialog::Builder
+            P.mItems = items;
+            P.mOnCheckboxClickListener = listener;
+            P.mCheckedItems = checkedItems;
+            P.mIsMultiChoice = true;
+            return this;
+!!!1497602.java!!!	setMultiChoiceItems(inout cursor : Cursor, in isCheckedColumn : String, in labelColumn : String, in listener : OnMultiChoiceClickListener) : AlertDialog::Builder
+            P.mCursor = cursor;
+            P.mOnCheckboxClickListener = listener;
+            P.mIsCheckedColumn = isCheckedColumn;
+            P.mLabelColumn = labelColumn;
+            P.mIsMultiChoice = true;
+            return this;
+!!!1497730.java!!!	setSingleChoiceItems(in itemsId : int, in checkedItem : int, in listener : OnClickListener) : AlertDialog::Builder
+            P.mItems = P.mContext.getResources().getTextArray(itemsId);
+            P.mOnClickListener = listener;
+            P.mCheckedItem = checkedItem;
+            P.mIsSingleChoice = true;
+            return this;
+!!!1497858.java!!!	setSingleChoiceItems(inout cursor : Cursor, in checkedItem : int, in labelColumn : String, in listener : OnClickListener) : AlertDialog::Builder
+            P.mCursor = cursor;
+            P.mOnClickListener = listener;
+            P.mCheckedItem = checkedItem;
+            P.mLabelColumn = labelColumn;
+            P.mIsSingleChoice = true;
+            return this;
+!!!1497986.java!!!	setSingleChoiceItems(inout items : CharSequence, in checkedItem : int, in listener : OnClickListener) : AlertDialog::Builder
+            P.mItems = items;
+            P.mOnClickListener = listener;
+            P.mCheckedItem = checkedItem;
+            P.mIsSingleChoice = true;
+            return this;
+!!!1498114.java!!!	setSingleChoiceItems(inout adapter : ListAdapter, in checkedItem : int, in listener : OnClickListener) : AlertDialog::Builder
+            P.mAdapter = adapter;
+            P.mOnClickListener = listener;
+            P.mCheckedItem = checkedItem;
+            P.mIsSingleChoice = true;
+            return this;
+!!!1498242.java!!!	setOnItemSelectedListener(in listener : AdapterView.OnItemSelectedListener) : AlertDialog::Builder
+            P.mOnItemSelectedListener = listener;
+            return this;
+!!!1498370.java!!!	setView(in layoutResId : int) : AlertDialog::Builder
+            P.mView = null;
+            P.mViewLayoutResId = layoutResId;
+            P.mViewSpacingSpecified = false;
+            return this;
+!!!1498498.java!!!	setView(inout view : View) : AlertDialog::Builder
+            P.mView = view;
+            P.mViewLayoutResId = 0;
+            P.mViewSpacingSpecified = false;
+            return this;
+!!!1498626.java!!!	setView(inout view : View, in viewSpacingLeft : int, in viewSpacingTop : int, in viewSpacingRight : int, in viewSpacingBottom : int) : AlertDialog::Builder
+            P.mView = view;
+            P.mViewLayoutResId = 0;
+            P.mViewSpacingSpecified = true;
+            P.mViewSpacingLeft = viewSpacingLeft;
+            P.mViewSpacingTop = viewSpacingTop;
+            P.mViewSpacingRight = viewSpacingRight;
+            P.mViewSpacingBottom = viewSpacingBottom;
+            return this;
+!!!1498754.java!!!	setInverseBackgroundForced(inout useInverseBackground : boolean) : AlertDialog::Builder
+            P.mForceInverseBackground = useInverseBackground;
+            return this;
+!!!1498882.java!!!	setRecycleOnMeasureEnabled(inout enabled : boolean) : AlertDialog::Builder
+            P.mRecycleOnMeasure = enabled;
+            return this;
+!!!1499010.java!!!	create() : AlertDialog
+            final AlertDialog dialog = new AlertDialog(P.mContext, mTheme, false);
+            P.apply(dialog.mAlert);
+            dialog.setCancelable(P.mCancelable);
+            if (P.mCancelable) {
+                dialog.setCanceledOnTouchOutside(true);
+            }
+            dialog.setOnCancelListener(P.mOnCancelListener);
+            dialog.setOnDismissListener(P.mOnDismissListener);
+            if (P.mOnKeyListener != null) {
+                dialog.setOnKeyListener(P.mOnKeyListener);
+            }
+            return dialog;
+!!!1499138.java!!!	show() : AlertDialog
+            AlertDialog dialog = create();
+            dialog.show();
+            return dialog;

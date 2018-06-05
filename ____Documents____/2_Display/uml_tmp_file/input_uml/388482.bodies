@@ -1,0 +1,19 @@
+class ResourceCursorTreeAdapter
+!!!2403842.java!!!	ResourceCursorTreeAdapter(inout context : Context, inout cursor : Cursor, in collapsedGroupLayout : int, in expandedGroupLayout : int, in childLayout : int, in lastChildLayout : int)
+        super(cursor, context);
+        
+        mCollapsedGroupLayout = collapsedGroupLayout;
+        mExpandedGroupLayout = expandedGroupLayout;
+        mChildLayout = childLayout;
+        mLastChildLayout = lastChildLayout;
+        
+        mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+!!!2403970.java!!!	ResourceCursorTreeAdapter(inout context : Context, inout cursor : Cursor, in collapsedGroupLayout : int, in expandedGroupLayout : int, in childLayout : int)
+        this(context, cursor, collapsedGroupLayout, expandedGroupLayout, childLayout, childLayout);
+!!!2404098.java!!!	ResourceCursorTreeAdapter(inout context : Context, inout cursor : Cursor, in groupLayout : int, in childLayout : int)
+        this(context, cursor, groupLayout, groupLayout, childLayout, childLayout);
+!!!2404226.java!!!	newChildView(inout context : Context, inout cursor : Cursor, inout isLastChild : boolean, inout parent : ViewGroup) : View
+        return mInflater.inflate((isLastChild) ? mLastChildLayout : mChildLayout, parent, false);
+!!!2404354.java!!!	newGroupView(inout context : Context, inout cursor : Cursor, inout isExpanded : boolean, inout parent : ViewGroup) : View
+        return mInflater.inflate((isExpanded) ? mExpandedGroupLayout : mCollapsedGroupLayout,
+                parent, false);

@@ -1,0 +1,223 @@
+class Display
+!!!561922.java!!!	Display(inout global : DisplayManagerGlobal, in displayId : int, inout displayInfo : DisplayInfo, inout daj : DisplayAdjustments)
+        mGlobal = global;
+        mDisplayId = displayId;
+        mDisplayInfo = displayInfo;
+        mDisplayAdjustments = new DisplayAdjustments(daj);
+        mIsValid = true;
+
+        // Cache properties that cannot change as long as the display is valid.
+        mLayerStack = displayInfo.layerStack;
+        mFlags = displayInfo.flags;
+        mType = displayInfo.type;
+        mAddress = displayInfo.address;
+        mOwnerUid = displayInfo.ownerUid;
+        mOwnerPackageName = displayInfo.ownerPackageName;
+!!!562050.java!!!	getDisplayId() : int
+        return mDisplayId;
+!!!562178.java!!!	isValid() : boolean
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            return mIsValid;
+        }
+!!!562306.java!!!	getDisplayInfo(inout outDisplayInfo : DisplayInfo) : boolean
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            outDisplayInfo.copyFrom(mDisplayInfo);
+            return mIsValid;
+        }
+!!!562434.java!!!	getLayerStack() : int
+        return mLayerStack;
+!!!562562.java!!!	getFlags() : int
+        return mFlags;
+!!!562690.java!!!	getType() : int
+        return mType;
+!!!562818.java!!!	getAddress() : String
+        return mAddress;
+!!!562946.java!!!	getOwnerUid() : int
+        return mOwnerUid;
+!!!563074.java!!!	getOwnerPackageName() : String
+        return mOwnerPackageName;
+!!!563202.java!!!	getDisplayAdjustments() : DisplayAdjustments
+        return mDisplayAdjustments;
+!!!563330.java!!!	getName() : String
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            return mDisplayInfo.name;
+        }
+!!!563458.java!!!	getSize(inout outSize : Point) : void
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            mDisplayInfo.getAppMetrics(mTempMetrics, mDisplayAdjustments);
+            outSize.x = mTempMetrics.widthPixels;
+            outSize.y = mTempMetrics.heightPixels;
+        }
+!!!563586.java!!!	getRectSize(inout outSize : Rect) : void
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            mDisplayInfo.getAppMetrics(mTempMetrics, mDisplayAdjustments);
+            outSize.set(0, 0, mTempMetrics.widthPixels, mTempMetrics.heightPixels);
+        }
+!!!563714.java!!!	getCurrentSizeRange(inout outSmallestSize : Point, inout outLargestSize : Point) : void
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            outSmallestSize.x = mDisplayInfo.smallestNominalAppWidth;
+            outSmallestSize.y = mDisplayInfo.smallestNominalAppHeight;
+            outLargestSize.x = mDisplayInfo.largestNominalAppWidth;
+            outLargestSize.y = mDisplayInfo.largestNominalAppHeight;
+        }
+!!!563842.java!!!	getMaximumSizeDimension() : int
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            return Math.max(mDisplayInfo.logicalWidth, mDisplayInfo.logicalHeight);
+        }
+!!!563970.java!!!	getWidth() : int
+        synchronized (this) {
+            updateCachedAppSizeIfNeededLocked();
+            return mCachedAppWidthCompat;
+        }
+!!!564098.java!!!	getHeight() : int
+        synchronized (this) {
+            updateCachedAppSizeIfNeededLocked();
+            return mCachedAppHeightCompat;
+        }
+!!!564226.java!!!	getOverscanInsets(inout outRect : Rect) : void
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            outRect.set(mDisplayInfo.overscanLeft, mDisplayInfo.overscanTop,
+                    mDisplayInfo.overscanRight, mDisplayInfo.overscanBottom);
+        }
+!!!564354.java!!!	getRotation() : int
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            return mDisplayInfo.rotation;
+        }
+!!!564482.java!!!	getOrientation() : int
+        return getRotation();
+!!!564610.java!!!	getPixelFormat() : int
+        return PixelFormat.RGBA_8888;
+!!!564738.java!!!	getRefreshRate() : float
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            return mDisplayInfo.refreshRate;
+        }
+!!!564866.java!!!	getSupportedRefreshRates() : float
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            final float[] refreshRates = mDisplayInfo.supportedRefreshRates;
+            return Arrays.copyOf(refreshRates, refreshRates.length);
+        }
+!!!564994.java!!!	getAppVsyncOffsetNanos() : long
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            return mDisplayInfo.appVsyncOffsetNanos;
+        }
+!!!565122.java!!!	getPresentationDeadlineNanos() : long
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            return mDisplayInfo.presentationDeadlineNanos;
+        }
+!!!565250.java!!!	getMetrics(inout outMetrics : DisplayMetrics) : void
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            mDisplayInfo.getAppMetrics(outMetrics, mDisplayAdjustments);
+        }
+!!!565378.java!!!	getRealSize(inout outSize : Point) : void
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            outSize.x = mDisplayInfo.logicalWidth;
+            outSize.y = mDisplayInfo.logicalHeight;
+        }
+!!!565506.java!!!	getRealMetrics(inout outMetrics : DisplayMetrics) : void
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            mDisplayInfo.getLogicalMetrics(outMetrics,
+                    CompatibilityInfo.DEFAULT_COMPATIBILITY_INFO,
+                    mDisplayAdjustments.getActivityToken());
+        }
+!!!565634.java!!!	getState() : int
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            return mIsValid ? mDisplayInfo.state : STATE_UNKNOWN;
+        }
+!!!565762.java!!!	hasAccess(in uid : int) : boolean
+        return Display.hasAccess(uid, mFlags, mOwnerUid);
+!!!565890.java!!!	hasAccess(in uid : int, in flags : int, in ownerUid : int) : boolean
+        return (flags & Display.FLAG_PRIVATE) == 0
+                || uid == ownerUid
+                || uid == Process.SYSTEM_UID
+                || uid == 0;
+!!!566018.java!!!	isPublicPresentation() : boolean
+        return (mFlags & (Display.FLAG_PRIVATE | Display.FLAG_PRESENTATION)) ==
+                Display.FLAG_PRESENTATION;
+!!!566146.java!!!	updateDisplayInfoLocked() : void
+        // Note: The display manager caches display info objects on our behalf.
+        DisplayInfo newInfo = mGlobal.getDisplayInfo(mDisplayId);
+        if (newInfo == null) {
+            // Preserve the old mDisplayInfo after the display is removed.
+            if (mIsValid) {
+                mIsValid = false;
+                if (DEBUG) {
+                    Log.d(TAG, "Logical display " + mDisplayId + " was removed.");
+                }
+            }
+        } else {
+            // Use the new display info.  (It might be the same object if nothing changed.)
+            mDisplayInfo = newInfo;
+            if (!mIsValid) {
+                mIsValid = true;
+                if (DEBUG) {
+                    Log.d(TAG, "Logical display " + mDisplayId + " was recreated.");
+                }
+            }
+        }
+!!!566274.java!!!	updateCachedAppSizeIfNeededLocked() : void
+        long now = SystemClock.uptimeMillis();
+        if (now > mLastCachedAppSizeUpdate + CACHED_APP_SIZE_DURATION_MILLIS) {
+            updateDisplayInfoLocked();
+            mDisplayInfo.getAppMetrics(mTempMetrics, mDisplayAdjustments);
+            mCachedAppWidthCompat = mTempMetrics.widthPixels;
+            mCachedAppHeightCompat = mTempMetrics.heightPixels;
+            mLastCachedAppSizeUpdate = now;
+        }
+!!!566402.java!!!	toString() : String
+        synchronized (this) {
+            updateDisplayInfoLocked();
+            mDisplayInfo.getAppMetrics(mTempMetrics, mDisplayAdjustments);
+            return "Display id " + mDisplayId + ": " + mDisplayInfo
+                    + ", " + mTempMetrics + ", isValid=" + mIsValid;
+        }
+!!!566530.java!!!	typeToString(in type : int) : String
+        switch (type) {
+            case TYPE_UNKNOWN:
+                return "UNKNOWN";
+            case TYPE_BUILT_IN:
+                return "BUILT_IN";
+            case TYPE_HDMI:
+                return "HDMI";
+            case TYPE_WIFI:
+                return "WIFI";
+            case TYPE_OVERLAY:
+                return "OVERLAY";
+            case TYPE_VIRTUAL:
+                return "VIRTUAL";
+            default:
+                return Integer.toString(type);
+        }
+!!!566658.java!!!	stateToString(in state : int) : String
+        switch (state) {
+            case STATE_UNKNOWN:
+                return "UNKNOWN";
+            case STATE_OFF:
+                return "OFF";
+            case STATE_ON:
+                return "ON";
+            case STATE_DOZE:
+                return "DOZE";
+            case STATE_DOZE_SUSPEND:
+                return "DOZE_SUSPEND";
+            default:
+                return Integer.toString(state);
+        }
+!!!566786.java!!!	isSuspendedState(in state : int) : boolean
+        return state == STATE_OFF || state == STATE_DOZE_SUSPEND;

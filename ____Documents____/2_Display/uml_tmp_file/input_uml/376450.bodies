@@ -1,0 +1,27 @@
+class SelectionStartHandleView
+!!!2253954.java!!!	SelectionStartHandleView(inout drawableLtr : Drawable, inout drawableRtl : Drawable)
+            super(drawableLtr, drawableRtl);
+!!!2254082.java!!!	getHotspotX(inout drawable : Drawable, inout isRtlRun : boolean) : int
+            if (isRtlRun) {
+                return drawable.getIntrinsicWidth() / 4;
+            } else {
+                return (drawable.getIntrinsicWidth() * 3) / 4;
+            }
+!!!2254210.java!!!	getHorizontalGravity(inout isRtlRun : boolean) : int
+            return isRtlRun ? Gravity.RIGHT : Gravity.LEFT;
+!!!2254338.java!!!	getCurrentCursorOffset() : int
+            return mTextView.getSelectionStart();
+!!!2254466.java!!!	updateSelection(in offset : int) : void
+            Selection.setSelection((Spannable) mTextView.getText(), offset,
+                    mTextView.getSelectionEnd());
+            updateDrawable();
+!!!2254594.java!!!	updatePosition(in x : float, in y : float) : void
+            int offset = mTextView.getOffsetForPosition(x, y);
+
+            // Handles can not cross and selection is at least one character
+            final int selectionEnd = mTextView.getSelectionEnd();
+            if (offset >= selectionEnd) offset = Math.max(0, selectionEnd - 1);
+
+            positionAtCursorOffset(offset, false);
+!!!2254722.java!!!	getActionPopupWindow() : Editor::ActionPopupWindow
+            return mActionPopupWindow;

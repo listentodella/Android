@@ -1,0 +1,18 @@
+class GLES20RecordingCanvas
+!!!721922.java!!!	GLES20RecordingCanvas()
+        super();
+!!!722050.java!!!	obtain(inout node : RenderNode) : GLES20RecordingCanvas
+        if (node == null) throw new IllegalArgumentException("node cannot be null");
+        GLES20RecordingCanvas canvas = sPool.acquire();
+        if (canvas == null) {
+            canvas = new GLES20RecordingCanvas();
+        }
+        canvas.mNode = node;
+        return canvas;
+!!!722178.java!!!	recycle() : void
+        mNode = null;
+        sPool.release(this);
+!!!722306.java!!!	finishRecording() : long
+        return nFinishRecording(mRenderer);
+!!!722434.java!!!	isRecordingFor(inout o : Object) : boolean
+        return o == mNode;

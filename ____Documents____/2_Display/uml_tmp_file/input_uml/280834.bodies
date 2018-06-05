@@ -1,0 +1,30 @@
+class ResultInfo
+!!!1725058.java!!!	ResultInfo(in resultWho : String, in requestCode : int, in resultCode : int, inout data : Intent)
+        mResultWho = resultWho;
+        mRequestCode = requestCode;
+        mResultCode = resultCode;
+        mData = data;
+!!!1725186.java!!!	toString() : String
+        return "ResultInfo{who=" + mResultWho + ", request=" + mRequestCode
+            + ", result=" + mResultCode + ", data=" + mData + "}";
+!!!1725314.java!!!	describeContents() : int
+        return 0;
+!!!1725442.java!!!	writeToParcel(inout out : Parcel, in flags : int) : void
+        out.writeString(mResultWho);
+        out.writeInt(mRequestCode);
+        out.writeInt(mResultCode);
+        if (mData != null) {
+            out.writeInt(1);
+            mData.writeToParcel(out, 0);
+        } else {
+            out.writeInt(0);
+        }
+!!!1725570.java!!!	ResultInfo(inout in : Parcel)
+        mResultWho = in.readString();
+        mRequestCode = in.readInt();
+        mResultCode = in.readInt();
+        if (in.readInt() != 0) {
+            mData = Intent.CREATOR.createFromParcel(in);
+        } else {
+            mData = null;
+        }

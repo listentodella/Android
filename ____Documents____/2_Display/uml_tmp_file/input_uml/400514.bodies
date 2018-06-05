@@ -1,0 +1,45 @@
+class ZoomButton
+!!!2560770.java!!!	ZoomButton(inout context : Context)
+        this(context, null);
+!!!2560898.java!!!	ZoomButton(inout context : Context, inout attrs : AttributeSet)
+        this(context, attrs, 0);
+!!!2561026.java!!!	ZoomButton(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int)
+        this(context, attrs, defStyleAttr, 0);
+!!!2561154.java!!!	ZoomButton(inout context : Context, inout attrs : AttributeSet, in defStyleAttr : int, in defStyleRes : int)
+        super(context, attrs, defStyleAttr, defStyleRes);
+        mHandler = new Handler();
+        setOnLongClickListener(this);
+!!!2561282.java!!!	onTouchEvent(inout event : MotionEvent) : boolean
+        if ((event.getAction() == MotionEvent.ACTION_CANCEL)
+                || (event.getAction() == MotionEvent.ACTION_UP)) {
+            mIsInLongpress = false;
+        }
+        return super.onTouchEvent(event);
+!!!2561410.java!!!	setZoomSpeed(in speed : long) : void
+        mZoomSpeed = speed;
+!!!2561538.java!!!	onLongClick(inout v : View) : boolean
+        mIsInLongpress = true;
+        mHandler.post(mRunnable);
+        return true;
+!!!2561666.java!!!	onKeyUp(in keyCode : int, inout event : KeyEvent) : boolean
+        mIsInLongpress = false;
+        return super.onKeyUp(keyCode, event);
+!!!2561794.java!!!	setEnabled(inout enabled : boolean) : void
+        if (!enabled) {
+            
+            /* If we're being disabled reset the state back to unpressed
+             * as disabled views don't get events and therefore we won't
+             * get the up event to reset the state.
+             */
+            setPressed(false);
+        }
+        super.setEnabled(enabled);
+!!!2561922.java!!!	dispatchUnhandledMove(inout focused : View, in direction : int) : boolean
+        clearFocus();
+        return super.dispatchUnhandledMove(focused, direction);
+!!!2562050.java!!!	onInitializeAccessibilityEvent(inout event : AccessibilityEvent) : void
+        super.onInitializeAccessibilityEvent(event);
+        event.setClassName(ZoomButton.class.getName());
+!!!2562178.java!!!	onInitializeAccessibilityNodeInfo(inout info : AccessibilityNodeInfo) : void
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(ZoomButton.class.getName());

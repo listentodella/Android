@@ -1,0 +1,66 @@
+class StrictModeFlash
+!!!1221890.java!!!	StrictModeFlash(inout display : Display, inout session : SurfaceSession)
+        SurfaceControl ctrl = null;
+        try {
+            ctrl = new SurfaceControl(session, "StrictModeFlash",
+                1, 1, PixelFormat.TRANSLUCENT, SurfaceControl.HIDDEN);
+            ctrl.setLayerStack(display.getLayerStack());
+            ctrl.setLayer(WindowManagerService.TYPE_LAYER_MULTIPLIER * 101);  // one more than Watermark? arbitrary.
+            ctrl.setPosition(0, 0);
+            ctrl.show();
+            mSurface.copyFrom(ctrl);
+        } catch (OutOfResourcesException e) {
+        }
+        mSurfaceControl = ctrl;
+        mDrawNeeded = true;
+!!!1222018.java!!!	drawIfNeeded() : void
+        if (!mDrawNeeded) {
+            return;
+        }
+        mDrawNeeded = false;
+        final int dw = mLastDW;
+        final int dh = mLastDH;
+
+        Rect dirty = new Rect(0, 0, dw, dh);
+        Canvas c = null;
+        try {
+            c = mSurface.lockCanvas(dirty);
+        } catch (IllegalArgumentException e) {
+        } catch (Surface.OutOfResourcesException e) {
+        }
+        if (c == null) {
+            return;
+        }
+
+        // Top
+        c.clipRect(new Rect(0, 0, dw, mThickness), Region.Op.REPLACE);
+        c.drawColor(Color.RED);
+        // Left
+        c.clipRect(new Rect(0, 0, mThickness, dh), Region.Op.REPLACE);
+        c.drawColor(Color.RED);
+        // Right
+        c.clipRect(new Rect(dw - mThickness, 0, dw, dh), Region.Op.REPLACE);
+        c.drawColor(Color.RED);
+        // Bottom
+        c.clipRect(new Rect(0, dh - mThickness, dw, dh), Region.Op.REPLACE);
+        c.drawColor(Color.RED);
+
+        mSurface.unlockCanvasAndPost(c);
+!!!1222146.java!!!	setVisibility(inout on : boolean) : void
+        if (mSurfaceControl == null) {
+            return;
+        }
+        drawIfNeeded();
+        if (on) {
+            mSurfaceControl.show();
+        } else {
+            mSurfaceControl.hide();
+        }
+!!!1222274.java!!!	positionSurface(in dw : int, in dh : int) : void
+        if (mLastDW == dw && mLastDH == dh) {
+            return;
+        }
+        mLastDW = dw;
+        mLastDH = dh;
+        mSurfaceControl.setSize(dw, dh);
+        mDrawNeeded = true;

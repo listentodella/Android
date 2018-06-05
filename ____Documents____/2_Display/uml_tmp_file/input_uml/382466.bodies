@@ -1,0 +1,4 @@
+class DisallowIntercept
+!!!2348930.java!!!	run() : void
+                final ViewParent parent = mSrc.getParent();
+                parent.requestDisallowInterceptTouchEvent(true);

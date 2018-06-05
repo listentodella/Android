@@ -1,0 +1,30 @@
+class AccessibilityAction
+!!!1091458.java!!!	AccessibilityAction(in actionId : int, inout label : CharSequence)
+            if ((actionId & ACTION_TYPE_MASK) == 0 && Integer.bitCount(actionId) != 1) {
+                throw new IllegalArgumentException("Invalid standard action id");
+            }
+
+            mActionId = actionId;
+            mLabel = label;
+!!!1091586.java!!!	getId() : int
+            return mActionId;
+!!!1091714.java!!!	getLabel() : CharSequence
+            return mLabel;
+!!!1091842.java!!!	hashCode() : int
+            return mActionId;
+!!!1091970.java!!!	equals(inout other : Object) : boolean
+            if (other == null) {
+                return false;
+            }
+
+            if (other == this) {
+                return true;
+            }
+
+            if (getClass() != other.getClass()) {
+                return false;
+            }
+
+            return mActionId == ((AccessibilityAction)other).mActionId;
+!!!1092098.java!!!	toString() : String
+            return "AccessibilityAction: " + getActionSymbolicName(mActionId) + " - " + mLabel;

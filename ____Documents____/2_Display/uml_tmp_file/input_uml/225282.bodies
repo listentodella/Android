@@ -1,0 +1,9 @@
+class InflateException
+!!!733954.java!!!	InflateException()
+        super();
+!!!734082.java!!!	InflateException(in detailMessage : String, inout throwable : Throwable)
+        super(detailMessage, throwable);
+!!!734210.java!!!	InflateException(in detailMessage : String)
+        super(detailMessage);
+!!!734338.java!!!	InflateException(inout throwable : Throwable)
+        super(throwable);

@@ -1,0 +1,3 @@
+class MatchLabelForPredicate
+!!!696578.java!!!	apply(inout view : View) : boolean
+            return (view.mLabelForId == mLabeledId);
