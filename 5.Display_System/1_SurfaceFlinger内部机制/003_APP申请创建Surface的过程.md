@@ -22,6 +22,92 @@ APP-->Binder:sur = new SurfaceControl()
 `handle`:`sp<IBinder> handle;`
 `gbp`:`sp<IGraphicBufferProducer>`,生产者 代理类`BpGraphicBufferProducer`
 
+## 入口resize.cpp
+```
+    // create a client to surfaceflinger
+    sp<SurfaceComposerClient> client = new SurfaceComposerClient();
+
+    sp<SurfaceControl> surfaceControl = client->createSurface(String8("resize"),
+            160, 240, PIXEL_FORMAT_RGB_565, 0);
+
+    sp<Surface> surface = surfaceControl->getSurface();
+```
+
+
+### `createSurface`
+~~由前一篇可知，`mClient`指向`conn`，而这里的`conn`其实就可以理解为`BpSurfaceComposerClient conn`了，它已经是一个代理类了，因此这里的`createSurface`自然是调用的以下的实现~~
+```
+//SurfaceComposerClient.cpp
+sp<SurfaceControl> SurfaceComposerClient::createSurface(
+        const String8& name,
+        uint32_t w,
+        uint32_t h,
+        PixelFormat format,
+        uint32_t flags)
+{
+    sp<SurfaceControl> sur;
+    if (mStatus == NO_ERROR) {
+☆        sp<IBinder> handle;
+☆        sp<IGraphicBufferProducer> gbp;
+    //mClient会调用到Client.cpp里的实现
+☆        status_t err = mClient->createSurface(name, w, h, format, flags,
+                &handle, &gbp);
+        ALOGE_IF(err, "SurfaceComposerClient::createSurface error %s", strerror(-err));
+        if (err == NO_ERROR) {
+            sur = new SurfaceControl(this, handle, gbp);
+        }
+    }
+    return sur;
+}
+
+//Client.cpp
+status_t Client::createSurface(
+        const String8& name,
+        uint32_t w, uint32_t h, PixelFormat format, uint32_t flags,
+        sp<IBinder>* handle,
+        sp<IGraphicBufferProducer>* gbp)
+{
+    /*
+     * createSurface must be called from the GL thread so that it can
+     * have access to the GL context.
+     */
+//父类 MessageBase 很重要!!!===>>>>>>>> MessageQueue.h/cpp
+☆    class MessageCreateLayer : public MessageBase {
+        SurfaceFlinger* flinger;
+        Client* client;
+        sp<IBinder>* handle;
+        sp<IGraphicBufferProducer>* gbp;
+        status_t result;
+        const String8& name;
+        uint32_t w, h;
+        PixelFormat format;
+        uint32_t flags;
+    public:
+☆        MessageCreateLayer(SurfaceFlinger* flinger,
+                const String8& name, Client* client,
+                uint32_t w, uint32_t h, PixelFormat format, uint32_t flags,
+                sp<IBinder>* handle,
+                sp<IGraphicBufferProducer>* gbp)
+            : flinger(flinger), client(client),
+              handle(handle), gbp(gbp),
+              name(name), w(w), h(h), format(format), flags(flags) {
+        }
+        status_t getResult() const { return result; }
+        virtual bool handler() {
+☆            result = flinger->createLayer(name, client, w, h, format, flags,
+                    handle, gbp);
+            return true;
+        }
+    };
+
+☆    sp<MessageBase> msg = new MessageCreateLayer(mFlinger.get(),
+            name, this, w, h, format, flags, handle, gbp);
+    mFlinger->postMessageSync(msg);
+    return static_cast<MessageCreateLayer*>( msg.get() )->getResult();
+}
+
+```
+
 ```
 //ISurfaceComposerClient.cpp
 *gbp = interface_cast<IGraphicBufferProducer>(reply.readStrongBinder());//读
