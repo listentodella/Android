@@ -36,6 +36,7 @@ APP-->Binder:sur = new SurfaceControl()
 
 ### `createSurface`的主要流程
 ~~由前一篇可知，`mClient`指向`conn`，而这里的`conn`其实就可以理解为`BpSurfaceComposerClient conn`了，它已经是一个代理类了，因此这里的`createSurface`自然是调用的以下的实现~~
+* app侧的`mClient`是`BpSurfaceComposerClient`代理类，相对应的，sf侧的`client`则是`BnSurfaceComposerClient`类
 ```
 //app先调用client->createSurface(),这里的client是sp<SurfaceComposerClient> 对象
 //SurfaceComposerClient.cpp
@@ -136,7 +137,8 @@ status_t SurfaceFlinger::createLayer(
 
     switch (flags & ISurfaceComposerClient::eFXSurfaceMask) {
         case ISurfaceComposerClient::eFXSurfaceNormal:
-            result = createNormalLayer(client,
+		//一般是NormalLayer
+★            result = createNormalLayer(client,
                     name, w, h, flags, format,
                     handle, gbp, &layer);
             break;
@@ -236,7 +238,20 @@ public:
     }
     ...
 }
-
+↓
+↓
+↓
+//Client.cpp
+status_t Client::onTransact(
+    uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
+{
+	...
+		//这里的code自然是CREATE_SURFACE
+★     return BnSurfaceComposerClient::onTransact(code, data, reply, flags);
+}
+↓
+↓
+↓
 //发起binder写操作
 //ISurfaceComposerClient.cpp
 status_t BnSurfaceComposerClient::onTransact(uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
