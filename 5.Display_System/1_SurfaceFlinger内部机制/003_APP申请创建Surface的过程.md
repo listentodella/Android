@@ -34,9 +34,10 @@ APP-->Binder:sur = new SurfaceControl()
 ```
 
 
-### `createSurface`
+### `createSurface`的主要流程
 ~~由前一篇可知，`mClient`指向`conn`，而这里的`conn`其实就可以理解为`BpSurfaceComposerClient conn`了，它已经是一个代理类了，因此这里的`createSurface`自然是调用的以下的实现~~
 ```
+//app先调用client->createSurface(),这里的client是sp<SurfaceComposerClient> 对象
 //SurfaceComposerClient.cpp
 sp<SurfaceControl> SurfaceComposerClient::createSurface(
         const String8& name,
@@ -47,9 +48,11 @@ sp<SurfaceControl> SurfaceComposerClient::createSurface(
 {
     sp<SurfaceControl> sur;
     if (mStatus == NO_ERROR) {
+        //注意此处handle与gbp的创建
 ☆        sp<IBinder> handle;
 ☆        sp<IGraphicBufferProducer> gbp;
-    //mClient会调用到Client.cpp里的实现
+    //mClient最终会调用到Client.cpp里的实现(通过binder)
+    //mClient是 BpSurfaceComposerClient 代理类,调用代理类提供的 createSurface,会发起binder调用,这将会导致 BnSurfaceComposerClient 的onTransact下的createSurface被调用
 ☆        status_t err = mClient->createSurface(name, w, h, format, flags,
                 &handle, &gbp);
         ALOGE_IF(err, "SurfaceComposerClient::createSurface error %s", strerror(-err));
@@ -59,6 +62,10 @@ sp<SurfaceControl> SurfaceComposerClient::createSurface(
     }
     return sur;
 }
+
+↓
+↓ 通过binder最后调用到
+↓
 
 //Client.cpp
 status_t Client::createSurface(
@@ -94,6 +101,7 @@ status_t Client::createSurface(
         }
         status_t getResult() const { return result; }
         virtual bool handler() {
+            //这里会调用到SurfaceFlinger实现的createLayer()
 ☆            result = flinger->createLayer(name, client, w, h, format, flags,
                     handle, gbp);
             return true;
@@ -106,64 +114,79 @@ status_t Client::createSurface(
     return static_cast<MessageCreateLayer*>( msg.get() )->getResult();
 }
 
-```
-
-```
-//ISurfaceComposerClient.cpp
-*gbp = interface_cast<IGraphicBufferProducer>(reply.readStrongBinder());//读
-```
-* 通过`binder`读取`reply`，由`BnSurfaceComposerClient`中设置`gbp`的返回值
-```
-//ISurfaceComposerClient.cpp
-status_t BnSurfaceComposerClient::onTransact(uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
+|
+▽
+//SurfaceFlinger.cpp
+status_t SurfaceFlinger::createLayer(
+        const String8& name,
+        const sp<Client>& client,
+        uint32_t w, uint32_t h, PixelFormat format, uint32_t flags,
+        sp<IBinder>* handle, sp<IGraphicBufferProducer>* gbp)
 {
-switch(code) {
-    case CREATE_SURFACE: {
-        ...
-        sp<IBinder> handle;
-        sp<IGraphicBufferProducer> gbp;
-        status_t result = createSurface(name, w, h, format, flags,
-                &handle, &gbp);
-        reply->writeStrongBinder(handle);
-        reply->writeStrongBinder(gbp->asBinder());//写
-        ...
-        return NO_ERROR;
-    } break;
-...
-}
-```
-
-### 以APP侧`resize.cpp`为入口分析：
-* APP侧`client = new SurfaceComposerClient()`（注意`sp`）,其对象`mClient`是`BpSurfaceComposerClient`代理类(`ISurfaceComposerClient.cpp`),指向SF的client
-
-```
-SurfaceComposerClient::SurfaceComposerClient()
-    : mStatus(NO_INIT), mComposer(Composer::getInstance())
-{
-}
-
-void SurfaceComposerClient::onFirstRef() {
-    sp<ISurfaceComposer> sm(ComposerService::getComposerService());
-    if (sm != 0) {
-        sp<ISurfaceComposerClient> conn;
-        if (conn != 0) {
-/*
-class SurfaceComposerClient : public RefBase {
-...
-    sp<ISurfaceComposerClient>  mClient;//ISurfaceComposerClient.cpp
-...
-}
-*/
-☆            mClient = conn;
-            mStatus = NO_ERROR;
-        }
+    //ALOGD("createLayer for (%d x %d), name=%s", w, h, name.string());
+    if (int32_t(w|h) < 0) {
+        ALOGE("createLayer() failed, w or h is negative (w=%d, h=%d)",
+                int(w), int(h));
+        return BAD_VALUE;
     }
+
+    status_t result = NO_ERROR;
+//创建Layer,注意sp!
+☆    sp<Layer> layer;
+
+    switch (flags & ISurfaceComposerClient::eFXSurfaceMask) {
+        case ISurfaceComposerClient::eFXSurfaceNormal:
+            result = createNormalLayer(client,
+                    name, w, h, flags, format,
+                    handle, gbp, &layer);
+            break;
+        case ISurfaceComposerClient::eFXSurfaceDim:
+            result = createDimLayer(client,
+                    name, w, h, flags,
+                    handle, gbp, &layer);
+            break;
+        default:
+            result = BAD_VALUE;
+            break;
+    }
+
+    if (result == NO_ERROR) {
+        addClientLayer(client, *handle, *gbp, layer);
+        setTransactionFlags(eTransactionNeeded);
+    }
+    return result;
 }
 ```
-* SurfaceFlinger侧的client派生自`BnSurfaceComposerClient`
-* 当APP侧的`client->createSurface()`(`SurfaceComposerClient`对象)调用时会导致`mClient->createSurface()`被调用，通过`binder`远程调用SF的`client->createSurface()`.对于APP的每一个`Surface`创建一个`Layer`，`Layer`里有生产者和消费者，它们指向同一个`BufferQueueCore`,它含有`BufferQueueSlot[]`
+
+* 对于`layer`的第一次创建，不能忽略`onFirstRef()`的调用，因为它涉及了消费者`consumer`与生产者`producer`的创建
 
 ```
+void Layer::onFirstRef() {
+    // Creates a custom BufferQueue for SurfaceFlingerConsumer to use
+☆    sp<IGraphicBufferProducer> producer;
+☆    sp<IGraphicBufferConsumer> consumer;
+☆    BufferQueue::createBufferQueue(&producer, &consumer);
+    mProducer = new MonitoredProducer(producer, mFlinger);
+☆    mSurfaceFlingerConsumer = new SurfaceFlingerConsumer(consumer, mTextureName);
+    mSurfaceFlingerConsumer->setConsumerUsageBits(getEffectiveUsage(0));
+    mSurfaceFlingerConsumer->setContentsChangedListener(this);
+    mSurfaceFlingerConsumer->setName(mName);
+
+#ifdef TARGET_DISABLE_TRIPLE_BUFFERING
+#warning "disabling triple buffering"
+    mSurfaceFlingerConsumer->setDefaultMaxBufferCount(2);
+#else
+    mSurfaceFlingerConsumer->setDefaultMaxBufferCount(3);
+#endif
+
+    const sp<const DisplayDevice> hw(mFlinger->getDefaultDisplayDevice());
+    updateTransformHint(hw);
+}
+```
+#### `gbp`与`handle`的创建——`createSurface()`的`binder`调用
+回到开头的`createSurface()`,里面首先创建了几个重要的对象,其中就有`gbp`与`handle`的创建
+```
+//SurfaceComposerClient.cpp
 sp<SurfaceControl> SurfaceComposerClient::createSurface(
         const String8& name,
         uint32_t w,
@@ -173,21 +196,28 @@ sp<SurfaceControl> SurfaceComposerClient::createSurface(
 {
     sp<SurfaceControl> sur;
     if (mStatus == NO_ERROR) {
+        //注意此处handle与gbp的创建
 ☆        sp<IBinder> handle;
 ☆        sp<IGraphicBufferProducer> gbp;
 ☆        status_t err = mClient->createSurface(name, w, h, format, flags,
-                &handle, &gbp);//看见handle看见需要有binder调用了
-        ALOGE_IF(err, "SurfaceComposerClient::createSurface error %s", strerror(-err));
-        if (err == NO_ERROR) {
-☆            sur = new SurfaceControl(this, handle, gbp);
-        }
-    }
-    return sur;
+                &handle, &gbp);//看见handle需要意识到有binder调用了
+...
 }
-|
-▽
-//mClient->createSurface()调用到 ISurfaceComposerClient.cpp里的
-virtual status_t createSurface(const String8& name, uint32_t w,
+```
+
+* 在app调用`createSurface`时,`mClient->createSurface()`会导致`BpSurfaceComposerClient`中通过发起`binder`读操作读取`reply`，则由`BnSurfaceComposerClient`中发起`binder`写操作设置`reply`
+
+```
+//发起binder读操作
+//ISurfaceComposerClient.cpp
+class BpSurfaceComposerClient : public BpInterface<ISurfaceComposerClient>
+{
+public:
+    BpSurfaceComposerClient(const sp<IBinder>& impl)
+        : BpInterface<ISurfaceComposerClient>(impl) {
+    }
+
+    virtual status_t createSurface(const String8& name, uint32_t w,
             uint32_t h, PixelFormat format, uint32_t flags,
             sp<IBinder>* handle,
             sp<IGraphicBufferProducer>* gbp) {
@@ -198,14 +228,38 @@ virtual status_t createSurface(const String8& name, uint32_t w,
         data.writeInt32(h);
         data.writeInt32(format);
         data.writeInt32(flags);
-☆        remote()->transact(CREATE_SURFACE, data, &reply);//导致binder调用
-        *handle = reply.readStrongBinder();
-        *gbp = interface_cast<IGraphicBufferProducer>(reply.readStrongBinder());
+        remote()->transact(CREATE_SURFACE, data, &reply);
+        //binder读操作
+☆        *handle = reply.readStrongBinder();
+☆        *gbp = interface_cast<IGraphicBufferProducer>(reply.readStrongBinder());
         return reply.readInt32();
+    }
+    ...
+}
+
+//发起binder写操作
+//ISurfaceComposerClient.cpp
+status_t BnSurfaceComposerClient::onTransact(uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
+{
+switch(code) {
+    case CREATE_SURFACE: {
+        ...
+        sp<IBinder> handle;
+        sp<IGraphicBufferProducer> gbp;
+        //这里将会调用sf的client->createSurface,即Client.cpp里的createSurface
+☆        status_t result = createSurface(name, w, h, format, flags,
+                &handle, &gbp);
+        //binder写操作
+☆        reply->writeStrongBinder(handle);
+☆        reply->writeStrongBinder(gbp->asBinder());
+        ...
+        return NO_ERROR;
+    } break;
+...
 }
 ```
 
-## 创建`Layer`的过程：
+#### 创建`Layer`的过程：
 * 创建生产者和消费者
 ```
 BufferQueue::createBufferQueue(&producer, &consumer);
@@ -236,6 +290,80 @@ mSurfaceFlingerConsumer = new SurfaceFlingerConsumer(consumer, mTextureName);
 
 ```
 `gbp`指向`mProducer`这个`MonitoredProducer`对象，而`gbp->asBinder()`则指向了`mProducer`的`mProducer`成员，它实际上是一个`BufferQueueProducer`对象——生产者
+
+
+### 以APP侧`resize.cpp`为入口分析：
+* APP侧`sp<SurfaceComposerClient> client = new SurfaceComposerClient()`（注意`sp`）完成后,其对象`mClient`是`BpSurfaceComposerClient`代理类(`ISurfaceComposerClient.cpp`),指向SF的client
+
+```
+SurfaceComposerClient::SurfaceComposerClient()
+    : mStatus(NO_INIT), mComposer(Composer::getInstance())
+{
+}
+
+void SurfaceComposerClient::onFirstRef() {
+    sp<ISurfaceComposer> sm(ComposerService::getComposerService());
+    if (sm != 0) {
+        sp<ISurfaceComposerClient> conn;
+        if (conn != 0) {
+/*
+class SurfaceComposerClient : public RefBase {
+...
+    sp<ISurfaceComposerClient>  mClient;//ISurfaceComposerClient.cpp
+...
+}
+*/
+☆            mClient = conn;
+            mStatus = NO_ERROR;
+        }
+    }
+}
+```
+
+* SurfaceFlinger侧的client派生自`BnSurfaceComposerClient`
+* 当APP侧的`client->createSurface()`(`SurfaceComposerClient`对象)调用时会导致`mClient->createSurface()`被调用，通过`binder`远程调用SF的`client->createSurface()`.对于APP的每一个`Surface`创建一个`Layer`，`Layer`里有生产者和消费者，它们指向同一个`BufferQueueCore`,它含有`BufferQueueSlot[]`
+
+```
+sp<SurfaceControl> SurfaceComposerClient::createSurface(
+        const String8& name,
+        uint32_t w,
+        uint32_t h,
+        PixelFormat format,
+        uint32_t flags)
+{
+    sp<SurfaceControl> sur;
+    if (mStatus == NO_ERROR) {
+☆        sp<IBinder> handle;
+☆        sp<IGraphicBufferProducer> gbp;
+☆        status_t err = mClient->createSurface(name, w, h, format, flags,
+                &handle, &gbp);//看见handle需要意识到有binder调用了
+        ALOGE_IF(err, "SurfaceComposerClient::createSurface error %s", strerror(-err));
+        if (err == NO_ERROR) {
+☆            sur = new SurfaceControl(this, handle, gbp);
+        }
+    }
+    return sur;
+}
+|
+▽
+//mClient->createSurface()调用到 ISurfaceComposerClient.cpp里的
+virtual status_t createSurface(const String8& name, uint32_t w,
+            uint32_t h, PixelFormat format, uint32_t flags,
+            sp<IBinder>* handle,
+            sp<IGraphicBufferProducer>* gbp) {
+        Parcel data, reply;
+        data.writeInterfaceToken(ISurfaceComposerClient::getInterfaceDescriptor());
+        data.writeString8(name);
+        data.writeInt32(w);
+        data.writeInt32(h);
+        data.writeInt32(format);
+        data.writeInt32(flags);
+☆        remote()->transact(CREATE_SURFACE, data, &reply);//导致binder调用
+        *handle = reply.readStrongBinder();
+☆        *gbp = interface_cast<IGraphicBufferProducer>(reply.readStrongBinder());
+        return reply.readInt32();
+}
+```
 
 #### 总结
 app->client
