@@ -36,7 +36,7 @@ APP-->Binder:sur = new SurfaceControl()
 
 ### `createSurface`的主要流程
 ~~由前一篇可知，`mClient`指向`conn`，而这里的`conn`其实就可以理解为`BpSurfaceComposerClient conn`了，它已经是一个代理类了，因此这里的`createSurface`自然是调用的以下的实现~~
-* app侧的`mClient`是`BpSurfaceComposerClient`代理类，相对应的，sf侧的`client`则是`BnSurfaceComposerClient`类
+* app侧的`mClient`是`BpSurfaceComposerClient`代理类，相对应的，sf侧的`client`(它是在`createConnection`时创建的`sp<Client>`对象)则是`BnSurfaceComposerClient`类(`class Client : public BnSurfaceComposerClient`)
 ```
 //app先调用client->createSurface(),这里的client是sp<SurfaceComposerClient> 对象
 //SurfaceComposerClient.cpp
@@ -185,8 +185,9 @@ void Layer::onFirstRef() {
     updateTransformHint(hw);
 }
 ```
-#### `gbp`与`handle`的创建——`createSurface()`的`binder`调用
-回到开头的`createSurface()`,里面首先创建了几个重要的对象,其中就有`gbp`与`handle`的创建
+#### `createSurface()`的`binder`调用
+* `gbp`与`handle`的创建
+回到开头的`createSurface()`,里面首先创建了几个重要的对象,其中就有`gbp`与`handle`的创建(通过`binder`调用实现创建、传递)
 ```
 //SurfaceComposerClient.cpp
 sp<SurfaceControl> SurfaceComposerClient::createSurface(
@@ -207,7 +208,7 @@ sp<SurfaceControl> SurfaceComposerClient::createSurface(
 }
 ```
 
-* 在app调用`createSurface`时,`mClient->createSurface()`会导致`BpSurfaceComposerClient`中通过发起`binder`读操作读取`reply`，则由`BnSurfaceComposerClient`中发起`binder`写操作设置`reply`
+* 在app调用`createSurface`时,`mClient->createSurface()`会导致`BpSurfaceComposerClient`中通过发起`binder`读操作读取`reply`,则由`BnSurfaceComposerClient`中发起`binder`写操作设置`reply`,这里的`reply`里就保存着`gbp`和`handle`
 
 ```
 //发起binder读操作
@@ -241,7 +242,7 @@ public:
 ↓
 ↓
 ↓
-//Client.cpp
+//Client.cpp( class Client : public BnSurfaceComposerClient )
 status_t Client::onTransact(
     uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
 {
@@ -272,42 +273,270 @@ switch(code) {
     } break;
 ...
 }
+↓
+↓最后又会调用到子类的实现
+↓
+//Client.cpp
+status_t Client::createSurface(
+        const String8& name,
+        uint32_t w, uint32_t h, PixelFormat format, uint32_t flags,
+        sp<IBinder>* handle,
+        sp<IGraphicBufferProducer>* gbp)
+{
+    ...
+}
 ```
+以上便是`createSurface()`大致的`binder`调用流程。
 
 #### 创建`Layer`的过程：
-* 创建生产者和消费者
+```
+//Client.cpp
+status_t Client::createSurface(
+        const String8& name,
+        uint32_t w, uint32_t h, PixelFormat format, uint32_t flags,
+        sp<IBinder>* handle,
+        sp<IGraphicBufferProducer>* gbp)
+{
+    /*
+     * createSurface must be called from the GL thread so that it can
+     * have access to the GL context.
+     */
+//父类 MessageBase 很重要!!!===>>>>>>>> MessageQueue.h/cpp
+☆    class MessageCreateLayer : public MessageBase {
+        SurfaceFlinger* flinger;
+        Client* client;
+        sp<IBinder>* handle;
+        sp<IGraphicBufferProducer>* gbp;
+        status_t result;
+        const String8& name;
+        uint32_t w, h;
+        PixelFormat format;
+        uint32_t flags;
+    public:
+☆        MessageCreateLayer(SurfaceFlinger* flinger,
+                const String8& name, Client* client,
+                uint32_t w, uint32_t h, PixelFormat format, uint32_t flags,
+                sp<IBinder>* handle,
+                sp<IGraphicBufferProducer>* gbp)
+            : flinger(flinger), client(client),
+              handle(handle), gbp(gbp),
+              name(name), w(w), h(h), format(format), flags(flags) {
+        }
+        status_t getResult() const { return result; }
+        virtual bool handler() {
+            //这里会调用到SurfaceFlinger实现的createLayer()
+☆            result = flinger->createLayer(name, client, w, h, format, flags,
+                    handle, gbp);
+            return true;
+        }
+    };
+
+☆    sp<MessageBase> msg = new MessageCreateLayer(mFlinger.get(),
+            name, this, w, h, format, flags, handle, gbp);
+    mFlinger->postMessageSync(msg);
+    return static_cast<MessageCreateLayer*>( msg.get() )->getResult();
+}
+
+|
+▽
+//SurfaceFlinger.cpp
+status_t SurfaceFlinger::createLayer(
+        const String8& name,
+        const sp<Client>& client,
+        uint32_t w, uint32_t h, PixelFormat format, uint32_t flags,
+        sp<IBinder>* handle, sp<IGraphicBufferProducer>* gbp)
+{
+    //ALOGD("createLayer for (%d x %d), name=%s", w, h, name.string());
+    if (int32_t(w|h) < 0) {
+        ALOGE("createLayer() failed, w or h is negative (w=%d, h=%d)",
+                int(w), int(h));
+        return BAD_VALUE;
+    }
+
+    status_t result = NO_ERROR;
+//创建Layer,注意sp!
+☆    sp<Layer> layer;
+
+    switch (flags & ISurfaceComposerClient::eFXSurfaceMask) {
+        case ISurfaceComposerClient::eFXSurfaceNormal:
+		//一般是NormalLayer
+★            result = createNormalLayer(client,
+                    name, w, h, flags, format,
+                    handle, gbp, &layer);
+            break;
+        case ISurfaceComposerClient::eFXSurfaceDim:
+            result = createDimLayer(client,
+                    name, w, h, flags,
+                    handle, gbp, &layer);
+            break;
+        default:
+            result = BAD_VALUE;
+            break;
+    }
+
+    if (result == NO_ERROR) {
+        addClientLayer(client, *handle, *gbp, layer);
+        setTransactionFlags(eTransactionNeeded);
+    }
+    return result;
+}
+```
+
+* 对于`layer`的第一次创建，不能忽略`onFirstRef()`的调用，它涉及了消费者`consumer`与生产者`producer`的创建
+
+```
+void Layer::onFirstRef() {
+    // Creates a custom BufferQueue for SurfaceFlingerConsumer to use
+☆    sp<IGraphicBufferProducer> producer;
+☆    sp<IGraphicBufferConsumer> consumer;
+☆    BufferQueue::createBufferQueue(&producer, &consumer);
+☆    mProducer = new MonitoredProducer(producer, mFlinger);
+☆    mSurfaceFlingerConsumer = new SurfaceFlingerConsumer(consumer, mTextureName);
+    mSurfaceFlingerConsumer->setConsumerUsageBits(getEffectiveUsage(0));
+    mSurfaceFlingerConsumer->setContentsChangedListener(this);
+    mSurfaceFlingerConsumer->setName(mName);
+
+#ifdef TARGET_DISABLE_TRIPLE_BUFFERING
+#warning "disabling triple buffering"
+    mSurfaceFlingerConsumer->setDefaultMaxBufferCount(2);
+#else
+    mSurfaceFlingerConsumer->setDefaultMaxBufferCount(3);
+#endif
+
+    const sp<const DisplayDevice> hw(mFlinger->getDefaultDisplayDevice());
+    updateTransformHint(hw);
+}
+```
+
+* 在创建生产者和消费者之前，来看一下`sp<IGraphicBufferAlloc>& allocator`：
+###### `mSlots`
+```
+对于 mSlots： BufferQueueCore.h 里有定义:
+    BufferQueueDefs::SlotsType mSlots;
+而 BufferQueueDefs::SlotsType 则在 BufferQueueDefs.h中有定义:
+    typedef BufferSlot SlotsType[NUM_BUFFER_SLOTS];//(NUM_BUFFER_SLOTS = 64)
+而 BufferSlot 则是一个结构体了
+
+这样定义相当于：BufferSlot mSlots[64]
+```
+###### `mAllocator`
+```
+先看看在 BufferQueueCore.h 的定义
+// mAllocator is the connection to SurfaceFlinger that is used to allocate new GraphicBuffer objects.
+    sp<IGraphicBufferAlloc> mAllocator;
+
+IGraphicBufferAlloc里提供了Bpxxx代理类，后续binder调用就会通过它来实现
+```
+* `mSlots`与`mAllocator`的创建
 ```
 BufferQueue::createBufferQueue(&producer, &consumer);
 //native/.../BufferQueue.cpp
 void BufferQueue::createBufferQueue(sp<IGraphicBufferProducer>* outProducer,
         sp<IGraphicBufferConsumer>* outConsumer,
         const sp<IGraphicBufferAlloc>& allocator) {
-//里面有mAllocator、BufferSlot mSlots[64]
-    sp<BufferQueueCore> core(new BufferQueueCore(allocator));
-//.mCore指向上面创建的Core，mSlots引用上面创建的mSlots
-    sp<IGraphicBufferProducer> producer(new BufferQueueProducer(core));
-//.mCore .mSlots引用，同上
-    sp<IGraphicBufferConsumer> consumer(new BufferQueueConsumer(core));
+    ...
+    //里面有 mAllocator 、 BufferSlot mSlots[64]
+☆    sp<BufferQueueCore> core(new BufferQueueCore(allocator));
+    ...
+}
+↓
+↓
+↓
+BufferQueueCore::BufferQueueCore(const sp<IGraphicBufferAlloc>& allocator) :
+☆    mAllocator(allocator),//将创建的IGraphicBufferAlloc对象赋值给它
+...
+    mConsumerListener(),
+...
+    mConnectedProducerListener(),
+☆    mSlots(),//创建好的BufferSlot 数组
+    mQueue(),
+...
+{
+    if (allocator == NULL) {
+        //这里会获取surfaceflinger服务
+        sp<ISurfaceComposer> composer(ComposerService::getComposerService());
+        //调用surfaceflinger服务提供的函数
+☆        mAllocator = composer->createGraphicBufferAlloc();
+        if (mAllocator == NULL) {
+            BQ_LOGE("createGraphicBufferAlloc failed");
+        }
+    }
+}
+↓
+↓// class GraphicBufferAlloc : public BnGraphicBufferAlloc
+↓
+sp<IGraphicBufferAlloc> SurfaceFlinger::createGraphicBufferAlloc()
+{
+    sp<GraphicBufferAlloc> gba(new GraphicBufferAlloc());
+    return gba;
+}
 
+```
+至此，`sp<BufferQueueCore> core`对象里就含有`mSlots`与`mAllocator`
+* 消费者与生产者的创建
+```
+//native/.../BufferQueue.cpp
+void BufferQueue::createBufferQueue(sp<IGraphicBufferProducer>* outProducer,
+        sp<IGraphicBufferConsumer>* outConsumer,
+        const sp<IGraphicBufferAlloc>& allocator) {
+    ...
+//.mCore指向上面创建的core，mSlots引用上面创建的mSlots
+☆    sp<IGraphicBufferProducer> producer(new BufferQueueProducer(core));
+☆    sp<IGraphicBufferConsumer> consumer(new BufferQueueConsumer(core));
+
+    //将创建好的消费者、生产者返回
     *outProducer = producer;
     *outConsumer = consumer;
 }
+↓
+↓core里就含有mSlots
+↓
+//BufferQueueProducer.cpp，生产者的创建
+BufferQueueProducer::BufferQueueProducer(const sp<BufferQueueCore>& core) :
+    mCore(core),//mCore指向上面创建的core
+    mSlots(core->mSlots),//mSlots引用上面创建的mSlots
+    mConsumerName(),
+    mStickyTransform(0) {}
+
+//BufferQueueConsumer.cpp，消费者的创建
+BufferQueueConsumer::BufferQueueConsumer(const sp<BufferQueueCore>& core) :
+    mCore(core),//mCore指向上面创建的core
+    mSlots(core->mSlots),//mSlots引用上面创建的mSlots
+    mConsumerName() {}
 ```
+可见(同一个`Layer`)创建的消费者、生产者都指向同一个`sp<BufferQueueCore> core`和 `BufferSlot mSlots[64]`。
 
+再来看`onFirstRef`的后续：
 ```
-mProducer = new MonitoredProducer(producer, mFlinger);
-//.mProducer指向前面创建的producer
+void Layer::onFirstRef() {
+...
+☆    mProducer = new MonitoredProducer(producer, mFlinger);
+☆    mSurfaceFlingerConsumer = new SurfaceFlingerConsumer(consumer, mTextureName);
+...
+}
+↓将创建好的生产者、消费者传入
+↓
+//mProducer指向前面创建的producer, mFlinger则指向surfacefinger
+MonitoredProducer::MonitoredProducer(const sp<IGraphicBufferProducer>& producer,
+        const sp<SurfaceFlinger>& flinger) :
+    mProducer(producer),
+    mFlinger(flinger) {}
 
-
-
-mSurfaceFlingerConsumer = new SurfaceFlingerConsumer(consumer, mTextureName);
-//.mConsumer指向前面创建的consumer
-
+//mConsumer指向前面创建的consumer(尽管不是直接就实现的，但是跟进一下GLConsumer的构造函数很容易)
+SurfaceFlingerConsumer(const sp<IGraphicBufferConsumer>& consumer,
+        uint32_t tex)
+    : GLConsumer(consumer, tex, GLConsumer::TEXTURE_EXTERNAL, false, false),
+      mTransformToDisplayInverse(false)
+{}
 ```
-`gbp`指向`mProducer`这个`MonitoredProducer`对象，而`gbp->asBinder()`则指向了`mProducer`的`mProducer`成员，它实际上是一个`BufferQueueProducer`对象——生产者
+至此 生产者、消费者也创建完成，一个`Layer`的创建也算差不多完成了。
 
-
-### 以APP侧`resize.cpp`为入口分析：
+### Tips：关于`gbp`
+`gbp`指向`mProducer`这个`MonitoredProducer`对象，而`gbp->asBinder()`则指向了`mProducer`的`mProducer`成员，它实际上是一个`BufferQueueProducer`对象——生产者，从`binder`调用的代码就可以看出。
+```
+*gbp = interface_cast<IGraphicBufferProducer>(reply.readStrongBinder());
+```
+###### 以APP侧`resize.cpp`为入口分析：
 * APP侧`sp<SurfaceComposerClient> client = new SurfaceComposerClient()`（注意`sp`）完成后,其对象`mClient`是`BpSurfaceComposerClient`代理类(`ISurfaceComposerClient.cpp`),指向SF的client
 
 ```
