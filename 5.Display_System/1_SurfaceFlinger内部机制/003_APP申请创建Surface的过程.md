@@ -532,9 +532,16 @@ SurfaceFlingerConsumer(const sp<IGraphicBufferConsumer>& consumer,
 至此 生产者、消费者也创建完成，一个`Layer`的创建也算差不多完成了。
 
 ### Tips：关于`gbp`
-`gbp`指向`mProducer`这个`MonitoredProducer`对象，而`gbp->asBinder()`则指向了`mProducer`的`mProducer`成员，它实际上是一个`BufferQueueProducer`对象——生产者，从`binder`调用的代码就可以看出。
+`gbp`指向`mProducer`这个`MonitoredProducer`对象，而`gbp->asBinder()`则指向了（`Layer.h`）`mProducer`成员对象的`mProducer`成员，它实际上是一个`BufferQueueProducer`对象——生产者，从`binder`调用的代码就可以看出。
 ```
 *gbp = interface_cast<IGraphicBufferProducer>(reply.readStrongBinder());
+
+
+当 reply->writeStrongBinder(gbp->asBinder()) 调用的时候，会导致 MonitoredProducer.cpp里
+IBinder* MonitoredProducer::onAsBinder() {
+    return mProducer->asBinder().get();
+}
+
 ```
 ###### 以APP侧`resize.cpp`为入口分析：
 * APP侧`sp<SurfaceComposerClient> client = new SurfaceComposerClient()`（注意`sp`）完成后,其对象`mClient`是`BpSurfaceComposerClient`代理类(`ISurfaceComposerClient.cpp`),指向SF的client
@@ -610,11 +617,12 @@ virtual status_t createSurface(const String8& name, uint32_t w,
 ```
 
 #### 总结
-app->client
-surfaceControl-->Layer
-.gbp-->.mProducer(MonitoredProducer)的 .mProduer(BufferQueueProducer)
-它们都遵循同一套接口`IGraphicsBufferProducer`->`BnGraphicBufferProducer`->`BufferQueueProduer`
-`IGraphicsBufferProducer`->`BpGraphicBufferProducer`--`gbp`是实例化对象
+app侧->sf侧有一个client对应
+app侧surfaceControl-->sf侧就有一个Layer对应
+app侧.gbp-->sf侧就有.mProducer(MonitoredProducer)的 .mProduer(BufferQueueProducer)
+它们都遵循同一套接口`IGraphicsBufferProducer`
+对于sf侧：`IGraphicsBufferProducer`->`BnGraphicBufferProducer`->`BufferQueueProduer`
+对于app侧：`IGraphicsBufferProducer`->`BpGraphicBufferProducer`--`gbp`就是这个代理类的实例化对象
 
 ### 如何得到Surface
 ```
