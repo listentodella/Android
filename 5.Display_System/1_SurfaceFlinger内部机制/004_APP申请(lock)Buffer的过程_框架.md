@@ -27,12 +27,12 @@ SurfaceFlinger进程中中进行：
 返回fd给app
 ```
 
-* app获得fd'，mmap获得地址，通过Gralloc HAL来mmp
+* app获得fd'，mmap获得地址，通过Gralloc HAL来mmap
 以上主要步骤都是在APP进程中进行，因此fd是通过Binder驱动传回给APP
 
 ## 关键点
-* 由SurfaceFlinger分配buffer
-* 由SurfaceFlinger返回fd给app
+* 由`SurfaceFlinger`分配buffer
+* 由`SurfaceFlinger`返回fd给app
 * app mmap
 
 ```
@@ -56,10 +56,12 @@ status_t Surface::lock(
 
     ANativeWindowBuffer* out;
     int fenceFd = -1;
-    status_t err = dequeueBuffer(&out, &fenceFd);
+    //分配buffer，如果成功，buffer信息会存放于out中
+☆    status_t err = dequeueBuffer(&out, &fenceFd);
     ALOGE_IF(err, "dequeueBuffer failed (%s)", strerror(-err));
     if (err == NO_ERROR) {
-        sp<GraphicBuffer> backBuffer(GraphicBuffer::getSelf(out));
+        //从out中取出buffer
+☆        sp<GraphicBuffer> backBuffer(GraphicBuffer::getSelf(out));
         const Rect bounds(backBuffer->width, backBuffer->height);
 
         Region newDirtyRegion;
@@ -110,7 +112,8 @@ status_t Surface::lock(
         }
 
         void* vaddr;
-        status_t res = backBuffer->lockAsync(
+        //这里的lockAsync()最终会调用到HAL层与gralloc对应的函数
+☆        status_t res = backBuffer->lockAsync(
                 GRALLOC_USAGE_SW_READ_OFTEN | GRALLOC_USAGE_SW_WRITE_OFTEN,
                 newDirtyRegion.bounds(), &vaddr, fenceFd);
 
@@ -121,11 +124,12 @@ status_t Surface::lock(
             err = INVALID_OPERATION;
         } else {
             mLockedBuffer = backBuffer;
+            //将buffer的相关信息返回
             outBuffer->width  = backBuffer->width;
             outBuffer->height = backBuffer->height;
             outBuffer->stride = backBuffer->stride;
             outBuffer->format = backBuffer->format;
-            outBuffer->bits   = vaddr;
+☆            outBuffer->bits   = vaddr; //这就是最后要填充内容的地址
         }
     }
     return err;
@@ -135,23 +139,54 @@ status_t Surface::lock(
 * app请求返回fd，然后再mmap，`SurfaceFlinger`则负责返回一个fd
 ```
 status_t err = dequeueBuffer(&out, &fenceFd);
-//app向SurfaceFlinger发出buffer申请，导致对方分配alloc buffer
-status_t result = mGraphicBufferProducer->dequeueBuffer(&buf, &fence, swapIntervalZero,
-        reqW, reqH, reqFormat, reqUsage);
+↓
+↓
+//Surface.cpp
+int Surface::dequeueBuffer(android_native_buffer_t** buffer, int* fenceFd) {
+...
+    int buf = -1;
+    sp<Fence> fence;
+
+    //app向SurfaceFlinger发出buffer申请，导致对方分配alloc buffer
+    //这里涉及到binder调用，后续分析
+☆    status_t result = mGraphicBufferProducer->dequeueBuffer(&buf, &fence, swapIntervalZero,
+            reqW, reqH, reqFormat, reqUsage);
+
+...
 
 //向SurfaceFlinger请求返回fd，然后在App这边mmap
-if ((result & IGraphicBufferProducer::BUFFER_NEEDS_REALLOCATION) || gbuf == 0) {
-    result = mGraphicBufferProducer->requestBuffer(buf, &gbuf);
- 
-```
-```
-sp<GraphicBuffer> backBuffer(GraphicBuffer::getSelf(out));
-```
+    if ((result & IGraphicBufferProducer::BUFFER_NEEDS_REALLOCATION) || gbuf == 0) {
+☆        result = mGraphicBufferProducer->requestBuffer(buf, &gbuf);
+        if (result != NO_ERROR) {
+            ALOGE("dequeueBuffer: IGraphicBufferProducer::requestBuffer failed: %d", result);
+            mGraphicBufferProducer->cancelBuffer(buf, fence);
+            return result;
+        }
+    }
+
+    if (fence->isValid()) {
+        //surfaceflinger这边返回一个fd，注意这里的dup
+☆        *fenceFd = fence->dup();
+        if (*fenceFd == -1) {
+            ALOGE("dequeueBuffer: error duping fence: %d", errno);
+            // dup() should never fail; something is badly wrong. Soldier on
+            // and hope for the best; the worst that should happen is some
+            // visible corruption that lasts until the next frame.
+        }
+    } else {
+        *fenceFd = -1;
+    }
+
+    *buffer = gbuf.get();
+    return OK;
+}
 
 ```
-status_t res = backBuffer->lockAsync(
-        GRALLOC_USAGE_SW_READ_OFTEN | GRALLOC_USAGE_SW_WRITE_OFTEN,
-        newDirtyRegion.bounds(), &vaddr, fenceFd);
-...
-    outBuffer->bits   = vaddr;//这就是最后要填充内容的地址
-```
+## 总结
+以上便是app申请buffer的大致过程，可以看出app侧通过调用`Surface`提供的`lock()`、`dequeueBuffer`，完成以下关键点：
+
+* app向发出buffer申请，`SurfaceFlinger`负责分配alloc buffer
+* app请求返回fd，然后再mmap，`SurfaceFlinger`则负责返回一个fd
+* 由`SurfaceFlinger`分配buffer
+* 由`SurfaceFlinger`返回fd(dup)给app
+* app获得fd'，mmap获得地址，通过Gralloc HAL来mmap
