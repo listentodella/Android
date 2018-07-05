@@ -16,6 +16,8 @@ Note right of SurfaceFlinger:向ashmem申请buffer
 Note left of App:填充数据到vaddr后，上交给SF
 App->SurfaceFlinger: unlockAndPost
 ```
+![绘制一个surface的大致流程](绘制一个surface的大致流程.png)
+
 * `SurfaceControl`里的生产者代理指向`Layer`里的生产者
 * 生产者、消费者里都含有`mCore`、`mSlots`(引用)
 * 两个`mCore`都指向同一个`BufferQueueCore`对象
@@ -31,5 +33,3 @@ App->SurfaceFlinger: unlockAndPost
 ## 消费者通知Layer
 ## Layer通知client
 ## client通知SurfaceFlinger
-
-
