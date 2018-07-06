@@ -6,12 +6,12 @@
 
 # `SurfaceFlinger`使用`Vsync`过程
 
- 1. app -> sf
- 2. sf 发送`Vsync`请求给`EventThread`(sf)
- 3. `EventThread` 发送Vsync请求 给 `DispSyncThread`
- 4. `H/W or S/W 产生的Vsync 唤醒 `DispSyncThread`
- 5. `DispSyncThread` -> `EventThread` -> sf
- 
+ 1. app -> `SurfaceFlinger`线程
+ 2. `SurfaceFlinger`线程 发送`Vsync`请求给`EventThread for sf`线程
+ 3. `EventThread`线程 发送`Vsync`请求给 `DispSyncThread`线程
+ 4. `H/W or S/W`产生的`Vsync`信号 唤醒 `DispSyncThread`线程
+ 5. `DispSyncThread`线程 -> `EventThread`线程 -> `EventThread for sf`-> `SurfaceFlinger`线程
+
 ```seq
 app->sf:①发送data
 sf->EventThread:②request Vsync
@@ -29,44 +29,106 @@ Note left of sf:⑦sf处理Vsync
 
 
 ## 步骤①
+首先由app发送数据给`SurfaceFlinger`线程:
 ```
-surface->postAndUnlock
-queueBuffer
+surface->postAndUnlock()//buffer同步
+queueBuffer()//buffer出队
 ```
 ## 步骤②
+在 `queueBuffer()` 出队时，会调用 `onFrameAvailable()` 最终通知到 `SurfaceFlinger` 进程,进而`SurfaceFlinger`线程向`EventThread for sf`线程请求`Vsync`信号:
 `signalLayerupdate`
 ```
+/frameworks/native/services/surfaceflinger/Layer.cpp
+void Layer::onFrameAvailable() {
+    android_atomic_inc(&mQueuedFrames);
+☆    mFlinger->signalLayerUpdate();
+}
+↓
+↓
+↓
 //SurfaceFlinger.cpp
 void SurfaceFlinger::signalLayerUpdate() {
     mEventQueue.invalidate();
 }
+↓
 //MessageQueue.cpp
 void MessageQueue::invalidate() {
 #if INVALIDATE_ON_VSYNC
-    mEvents->requestNextVsync();
+☆    mEvents->requestNextVsync();//定义为 sp<IDisplayEventConnection> mEvents;
 #else
     mHandler->dispatchInvalidate();
 #endif
 }
-
+↓
+↓ mEvents 是 BpDisplayEventConnection 代理类对象
+↓
+/frameworks/native/libs/gui/IDisplayEventConnection.cpp
+class BpDisplayEventConnection : public BpInterface<IDisplayEventConnection>
+{
+public:
+    virtual void requestNextVsync() {
+        Parcel data, reply;
+        data.writeInterfaceToken(IDisplayEventConnection::getInterfaceDescriptor());
+        //发起 binder 调用，导致 BnDisplayEventConnection 对应项本地方法调用
+☆        remote()->transact(REQUEST_NEXT_VSYNC, data, &reply, IBinder::FLAG_ONEWAY);
+    }
+}
+↓
+↓ BnDisplayEventConnection 对应项本地方法调用
+↓
+status_t BnDisplayEventConnection::onTransact(
+    uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
+{
+    switch(code) {
+...
+        case REQUEST_NEXT_VSYNC: {
+            CHECK_INTERFACE(IDisplayEventConnection, data, reply);
+            //调用本地实现
+☆            requestNextVsync();
+            return NO_ERROR;
+        } break;
+    }
+}
+```
+`EventThread`类中定义了`Connection`类,它继承了`BnDisplayEventConnection`,并实现了本地方法:
+```
+/frameworks/native/services/surfaceflinger/EventThread.h
+class EventThread : public Thread, private VSyncSource::Callback {
+   class Connection : public BnDisplayEventConnection {
+☆       virtual void requestNextVsync();    // asynchronous
+       ...
+}
+...
+}
+↓
+↓ 本地方法调用,注意 requestNextVsync(...) 被重载,这里比较好区分,可以通过传参区别;实际上发起调用的对象也不同,也可以用来作区分
+↓
 //EventThread.cpp
 void EventThread::Connection::requestNextVsync() {
-    mEventThread->requestNextVsync(this);
+    //转而调用 EventThread 提供的方法
+    mEventThread->requestNextVsync(this);//定义为 sp<EventThread> mEventThread;
 }
-//虽然是在EventThread.cpp里实现，但是是在SurfaceFlinger线程里执行
-//发送广播，唤醒EventThread线程
+↓
+↓
+↓
+//虽然是在 EventThread.cpp 里实现，但是是在 SurfaceFlinger 线程里执行
+//发送广播，唤醒 EventThread 线程
 void EventThread::requestNextVsync(
         const sp<EventThread::Connection>& connection) {
     Mutex::Autolock _l(mLock);
     if (connection->count < 0) {//count >= 0代表需要得到Vsync信号
         connection->count = 0;
-        mCondition.broadcast();
+        //发送广播，唤醒 EventThread 线程
+☆        mCondition.broadcast();//应该是EventThread.h中定义的 mutable Condition mCondition;
     }
 }
 ```
+以上便完成了`SurfaceFlinger`线程接收到app发过来的数据buffer后，向`EventThread`线程发出`Vsync`信号的请求的流程。
+`SurfaceFlinger`线程请求`Vsync`信号这一行为可以理解为等到`Vsync`信号来了`EventThread`线程及时通知`SurfaceFlinger`线程。
+
 ## 步骤③`waitforEvent`、⑥
-* `向DispSyncThread`发出Vsync请求
-判断所有`connection->count` 是否有 >= 0，如果有一个满足表示需要得到Vsync信号，则调用`enableVSyncLocked()`
+* `EventThread`向`DispSyncThread`发出`Vsync`请求
+判断所有`connection->count` 是否有 >= 0，如果有一个满足表示需要得到`Vsync`信号，则调用`enableVSyncLocked()`
 ```
 bool EventThread::threadLoop() {
     DisplayEventReceiver::Event event;
