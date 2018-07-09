@@ -28,13 +28,13 @@ Note left of sf:⑦sf处理Vsync
 ![surface对Vsync使用过程](surface%E5%AF%B9Vsync%E4%BD%BF%E7%94%A8%E8%BF%87%E7%A8%8B.jpg)
 
 
-## 步骤①
+## 步骤① —— 发送data
 首先由app发送数据给`SurfaceFlinger`线程:
 ```
 surface->postAndUnlock()//buffer同步
 queueBuffer()//buffer出队
 ```
-## 步骤②
+## 步骤② —— request Vsync
 在 `queueBuffer()` 出队时，会调用 `onFrameAvailable()` 最终通知到 `SurfaceFlinger` 进程,进而`SurfaceFlinger`线程向`EventThread for sf`线程请求`Vsync`信号:
 `signalLayerupdate`
 ```
@@ -126,25 +126,81 @@ void EventThread::requestNextVsync(
 以上便完成了`SurfaceFlinger`线程接收到app发过来的数据buffer后，向`EventThread`线程发出`Vsync`信号的请求的流程。
 `SurfaceFlinger`线程请求`Vsync`信号这一行为可以理解为等到`Vsync`信号来了`EventThread`线程及时通知`SurfaceFlinger`线程。
 
-## 步骤③`waitforEvent`、⑥
-* `EventThread`向`DispSyncThread`发出`Vsync`请求
-判断所有`connection->count` 是否有 >= 0，如果有一个满足表示需要得到`Vsync`信号，则调用`enableVSyncLocked()`
+## 步骤③ —— 发送请求、⑥ —— `postEvent`
+### 步骤③ —— `waitForEvent`
+`EventThread`向`DispSyncThread`发出`Vsync`请求
+判断所有`connection->count` 是否有 `>= 0`，如果有一个满足表示需要得到`Vsync`信号，则调用`enableVSyncLocked()`.
+首先,`SurfaceFlinger`线程在`main_surfaceflinger.cpp`中执行时有：
 ```
+/frameworks/native/services/surfaceflinger/main_surfaceflinger.cpp
+int main(int, char**) {
+...
+    // run in this thread
+    //进入查看它是个死循环，在 waitevent，它与 EventThread 通过一个文件句柄传输数据
+☆    flinger->run();
+
+    return 0;
+}
+↓
+↓
+↓
+/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
+void SurfaceFlinger::run() {
+    do {
+☆        waitForEvent();
+    } while (true);
+}
+↓
+void SurfaceFlinger::waitForEvent() {
+    mEventQueue.waitMessage();//定义为 mutable MessageQueue mEventQueue;
+}
+↓
+↓
+↓
+/frameworks/native/services/surfaceflinger/MessageQueue.cpp
+void MessageQueue::waitMessage() {
+    do {
+☆        IPCThreadState::self()->flushCommands();
+☆        int32_t ret = mLooper->pollOnce(-1);// JNI调用
+        switch (ret) {
+            ...
+        }
+    } while (true);
+}
+↓
+↓ 使用 binder 进行 IPC 通信
+↓
+/frameworks/native/libs/binder/IPCThreadState.cpp
+void IPCThreadState::flushCommands()
+{
+    if (mProcess->mDriverFD <= 0)
+        return;
+    talkWithDriver(false);
+}
+```
+
+运行`SurfaceFlinger`线程时执行了一个死循环，在 `waitevent()`，它与 `EventThread` 通过一个文件句柄传输数据。
+现在来看一下 `EventThread` 线程一直在循环的任务:
+
+```
+/frameworks/native/services/surfaceflinger/EventThread.cpp
 bool EventThread::threadLoop() {
     DisplayEventReceiver::Event event;
     Vector< sp<EventThread::Connection> > signalConnections;
-//1.向DispSyncThread发出Vsync请求
-//2.等待Vsync信号
-    signalConnections = waitForEvent(&event);
+//1.向 DispSyncThread 发出 Vsync 请求
+//2.等待 Vsync 信号
+☆    signalConnections = waitForEvent(&event);
 
 ...
 //步骤⑥
-        status_t err = conn->postEvent(event);
+☆        status_t err = conn->postEvent(event);
 ...
     return true;
 }
-
-
+↓ 根据源码英文注释了解到, waitForEvent() 返回的条件:
+↓ 1. 接收到一次 Vsync 事件
+↓ 2. 在 waiting 时至少有一个 connection 希望获取 Vsync 事件
+/frameworks/native/services/surfaceflinger/EventThread.cpp
 Vector< sp<EventThread::Connection> > EventThread::waitForEvent(
         DisplayEventReceiver::Event* event)
 {
@@ -158,6 +214,7 @@ Vector< sp<EventThread::Connection> > EventThread::waitForEvent(
                 if (connection->count >= 0) {
                     // we need vsync events because at least
                     // one connection is waiting for it
+//这里根据之前设置的 count 值来判断是否需要设置标志
 ★★★                    waitForVSync = true;
                     if (timestamp) {
                         // we consume the event only if it's time
@@ -202,7 +259,9 @@ Vector< sp<EventThread::Connection> > EventThread::waitForEvent(
             // at the vsync rate, e.g. 60fps.  If we can accurately
             // track the current state we could avoid making this call
             // so often.)
-   ★★★         enableVSyncLocked();
+//根据上面设置的标志判断是否需要 enableVSync
+//目前(直到8.0仍然，后续是否会有措施未知) 该调用频率根据帧率决定，所以还是很频繁的
+★★★         enableVSyncLocked();
         }
 ...
 
@@ -212,30 +271,79 @@ Vector< sp<EventThread::Connection> > EventThread::waitForEvent(
                 // interested in receiving vsync again.
 ★★★ 休眠               mCondition.wait(mLock);
 
-
 ...
     return signalConnections;
 }
-
-
-//EventThread.cpp
+↓
+↓ 设置 Callback,收到 Vsync 信号后处理
+↓
+/frameworks/native/services/surfaceflinger/EventThread.cpp
 void EventThread::enableVSyncLocked() {
     if (!mUseSoftwareVSync) {
         // never enable h/w VSYNC when screen is off
         if (!mVsyncEnabled) {
             mVsyncEnabled = true;
-            //给DispSyncThread设置callback，当DispSyncThread收到Vsync信号后就会调用这里设置的callback函数
-            mVSyncSource->setCallback(static_cast<VSyncSource::Callback*>(this));
+//给 DispSyncThread 设置 Callback, 当 DispSyncThread 收到 Vsync 信号后就会调用这里设置的 Callback 函数
+//sp<VSyncSource> mVSyncSource,但它是个纯虚类
+//该类下的DispSync 对象会周期性地调用 onDispSyncEvent()
+☆            mVSyncSource->setCallback(static_cast<VSyncSource::Callback*>(this));
             mVSyncSource->setVSyncEnabled(true);
         }
     }
     mDebugVsyncEnabled = true;
     sendVsyncHintOnLocked();
 }
+↓
+/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
+virtual void setCallback(const sp<VSyncSource::Callback>& callback) {
+    Mutex::Autolock lock(mMutex);
+    mCallback = callback;
+}
+↓ 会周期性地调用它，进而调用到 Callback
+/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
+virtual void onDispSyncEvent(nsecs_t when) {
+        sp<VSyncSource::Callback> callback;
+        {
+            Mutex::Autolock lock(mMutex);
+            callback = mCallback;
 
+            if (mTraceVsync) {
+                mValue = (mValue + 1) % 2;
+                ATRACE_INT(mVsyncEventLabel.string(), mValue);
+            }
+        }
+
+        if (callback != NULL) {
+            //最终导致 EventThread 的 onVsyncEvent() 被调用？
+            callback->onVSyncEvent(when);
+        }
+}
 ```
-## 步骤④
-调用`SurfaceFlinger::onVsyncRecevied()`
+以上分析了`SurfaceFlinger`线程、`DispSyncThread`线程和`EventThread`线程之间对于`Vsync`信号进行`waitForEvent()`的工作，下面来看一下它们对于`Vsync`信号的`postEvent()`工作。
+### 步骤⑥ —— `postEvent`
+```
+/frameworks/native/services/surfaceflinger/EventThread.cpp
+bool EventThread::threadLoop() {
+        // dispatch events to listeners...
+//步骤⑥
+☆        status_t err = conn->postEvent(event);
+...
+    return true;
+}
+↓
+↓
+/frameworks/native/services/surfaceflinger/EventThread.cpp
+status_t EventThread::Connection::postEvent(
+        const DisplayEventReceiver::Event& event) {
+    ssize_t size = DisplayEventReceiver::sendEvents(mChannel, &event, 1);
+    return size < 0 ? status_t(size) : status_t(NO_ERROR);
+}
+```
+以上就是对于一次`Vysnc`信号请求从wait到post的流程。
+
+## 步骤④ —— 唤醒 `DispSyncThread` 线程，即收到`Vsync`信号
+调用`SurfaceFlinger::onVSyncReceived()`。
+`VsyncThread`线程用于产生`Vsync`信号。因为实际上`Vsync`信号应该是和硬件相关的，所以最开始的构造函数走的是`HWComposer()`而不是直接走`VsyncThread`的构造函数。这里分析的是软件产生的`Vsync`信号。
 ```
 HWComposer.cpp
 bool HWComposer::VSyncThread::threadLoop() {
@@ -268,13 +376,14 @@ bool HWComposer::VSyncThread::threadLoop() {
     } while (err<0 && errno == EINTR);
 
     if (err == 0) {
-        mHwc.mEventHandler.onVSyncReceived(0, next_vsync);
+☆        mHwc.mEventHandler.onVSyncReceived(0, next_vsync);
     }
 
     return true;
 }
-
-//无论是硬件还是软件Vsync都会调用它发送Vsync信号
+↓
+↓ //无论是硬件还是软件产生的 Vsync 都会调用它发送 Vsync 信号
+↓
 //SurfaceFlinger.cpp
 void SurfaceFlinger::onVSyncReceived(int type, nsecs_t timestamp) {
     bool needsHwVsync = false;
@@ -282,7 +391,8 @@ void SurfaceFlinger::onVSyncReceived(int type, nsecs_t timestamp) {
     { // Scope for the lock
         Mutex::Autolock _l(mHWVsyncLock);
         if (type == 0 && mPrimaryHWVsyncEnabled) {
-            needsHwVsync = mPrimaryDispSync.addResyncSample(timestamp);
+            //无论是硬件还是软件产生的 Vsync 都会调先用它发送 Vsync 信号
+☆            needsHwVsync = mPrimaryDispSync.addResyncSample(timestamp);
         }
     }
 
@@ -292,7 +402,7 @@ void SurfaceFlinger::onVSyncReceived(int type, nsecs_t timestamp) {
         disableHardwareVsync(false);
     }
 }
-
+↓
 //DispSync.cpp
 bool DispSync::addResyncSample(nsecs_t timestamp) {
 ...
@@ -300,13 +410,15 @@ bool DispSync::addResyncSample(nsecs_t timestamp) {
 ...
     return mPeriod == 0 || mError > kErrorThreshold;
 }
-
+↓
+//DispSync.cpp
 void DispSync::updateModelLocked() {
 ...
         mThread->updateModel(mPeriod, mPhase);
 ...
 }
-
+↓
+//DispSync.cpp
 class DispSyncThread: public Thread {
 public:
 
@@ -323,13 +435,17 @@ public:
         Mutex::Autolock lock(mMutex);
         mPeriod = period;
         mPhase = phase;
-        mCond.signal();
+☆唤醒        mCond.signal();
     }
 ...
 }
 ```
-## 步骤⑤
-* Listener(`EventThread`发现`connection->coun`t >= 0时，向`DispSyncThrea`d注册callback=>callback变成Listener)
+以上就是`VsyncThread`线程收到`Vysnc`信号后(不管是软件产生还是硬件产生)，唤醒`DispSyncThread`的流程。
+
+## 步骤⑤ —— `DispSyncThread`唤醒`EventThread`
+* `DispSyncThread` 线程传递到`EventThread` 线程
+`DispSyncThread` 线程被唤醒后，需要先唤醒`EventThread`线程。
+`Listener`(`EventThread`发现`connection->count >= 0`时，向`DispSyncThread`注册`Callback`=>callback变成Listener)
 ```
 DispSync.cpp
 virtual bool threadLoop() {
@@ -341,35 +457,70 @@ virtual bool threadLoop() {
         if (now < targetTime) {
             err = mCond.waitRelative(mMutex, targetTime - now);
 ...
-//收集callback函数
+//收集Callback函数
         callbackInvocations = gatherCallbackInvocationsLocked(now);
-//调用callback=>最终导致EventThread的onVsyncEvent()被调用
+//调用Callback=>最终导致 EventThread 的 onVsyncEvent() 被调用
         if (callbackInvocations.size() > 0) {
             fireCallbackInvocations(callbackInvocations);
 ...
 }
 
+void fireCallbackInvocations(const Vector<CallbackInvocation>& callbacks) {
+    for (size_t i = 0; i < callbacks.size(); i++) {
+        callbacks[i].mCallback->onDispSyncEvent(callbacks[i].mEventTime);
+    }
+}
+↓
+↓  调用 EventThread 的 onVsyncEvent()
+↓
 EventThread.cpp
-//通过广播唤醒EventThread::threadLoop线程(因为该线程在waitForEvent)
 void EventThread::onVSyncEvent(nsecs_t timestamp) {
     Mutex::Autolock _l(mLock);
     mVSyncEvent[0].header.type = DisplayEventReceiver::DISPLAY_EVENT_VSYNC;
     mVSyncEvent[0].header.id = 0;
     mVSyncEvent[0].header.timestamp = timestamp;
     mVSyncEvent[0].vsync.count++;
+    //通过广播唤醒 EventThread::threadLoop 线程(因为有需求的线程在 waitForEvent )
     mCondition.broadcast();
 }
-
-//唤醒EventThread线程,向sf或app发出信号
-//postEvent会通过connection的fd发送数据写给sf,sf通过得到的数据调用对应的函数
+```
+唤醒 `EventThread`后，最后传递到`SurfaceFlinger`：
+```
+//唤醒 EventThread 线程,向sf或app发出信号
+//postEvent 会通过 connection 的fd发送数据写给sf,sf通过得到的数据调用对应的函数
 status_t EventThread::Connection::postEvent(
         const DisplayEventReceiver::Event& event) {
     ssize_t size = DisplayEventReceiver::sendEvents(mChannel, &event, 1);
     return size < 0 ? status_t(size) : status_t(NO_ERROR);
 }
 ```
-## 步骤⑦ SF对Vsync的处理
+以上就是`DispSyncThread` 线程唤醒`EventThread` 线程的流程。
+
+## 步骤⑦ `SurfaceFlinger`对`Vsync`的处理
+回顾一下创建`EventThread for sf`时
 ```
+//SurfaceFlinger.cpp
+void SurfaceFlinger::init() {
+...
+☆    sp<VSyncSource> sfVsyncSrc = new DispSyncSource(&mPrimaryDispSync,
+            sfVsyncPhaseOffsetNs, true, "sf");
+    mSFEventThread = new EventThread(sfVsyncSrc);
+☆    mEventQueue.setEventThread(mSFEventThread);
+...
+}
+↓
+↓
+/frameworks/native/services/surfaceflinger/MessageQueue.cpp
+void MessageQueue::setEventThread(const sp<EventThread>& eventThread)
+{
+    mEventThread = eventThread;
+    mEvents = eventThread->createEventConnection();
+    mEventTube = mEvents->getDataChannel();
+    mLooper->addFd(mEventTube->getFd(), 0, Looper::EVENT_INPUT,
+☆            MessageQueue::cb_eventReceiver, this);
+}
+↓
+↓
 //MessageQueue.cpp
 int MessageQueue::cb_eventReceiver(int fd, int events, void* data) {
     MessageQueue* queue = reinterpret_cast<MessageQueue *>(data);
