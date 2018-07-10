@@ -516,19 +516,26 @@ void MessageQueue::setEventThread(const sp<EventThread>& eventThread)
     mEventThread = eventThread;
     mEvents = eventThread->createEventConnection();
     mEventTube = mEvents->getDataChannel();
+    //从 EventThread 中取出文件句柄 fd 后，将其添加给 looper 轮询
+    //如果callback非空，则 fd 上有数据时，它就会被调用
+    //int addFd(int fd, int ident, int events, const sp<LooperCallback>& callback, void* data);
+    //int addFd(int fd, int ident, int events, Looper_callbackFunc callback, void* data);
+
     mLooper->addFd(mEventTube->getFd(), 0, Looper::EVENT_INPUT,
 ☆            MessageQueue::cb_eventReceiver, this);
 }
 ↓
+↓ 当 fd 上有数据时(这里是指有 Vsync 信号?), 执行这个 callback
 ↓
 //MessageQueue.cpp
 int MessageQueue::cb_eventReceiver(int fd, int events, void* data) {
     MessageQueue* queue = reinterpret_cast<MessageQueue *>(data);
     return queue->eventReceiver(fd, events);
 }
-
+↓
 int MessageQueue::eventReceiver(int /*fd*/, int /*events*/) {
 ...
+// INVALIDATE,使无效，意思指当 vsync 信号来到时某些工作无效化？
 #if INVALIDATE_ON_VSYNC
                 mHandler->dispatchInvalidate();
 #else
@@ -540,7 +547,7 @@ int MessageQueue::eventReceiver(int /*fd*/, int /*events*/) {
     }
     return 1;
 }
-
+↓
 void MessageQueue::Handler::dispatchInvalidate() {
     if ((android_atomic_or(eventMaskInvalidate, &mEventMask) & eventMaskInvalidate) == 0) {
         mQueue.mLooper->sendMessage(this, Message(MessageQueue::INVALIDATE));
@@ -549,7 +556,7 @@ void MessageQueue::Handler::dispatchInvalidate() {
 
 void MessageQueue::Handler::handleMessage(const Message& message) {
     switch (message.what) {
-        case INVALIDATE:
+☆        case INVALIDATE:
             android_atomic_and(~eventMaskInvalidate, &mEventMask);
             mQueue.mFlinger->onMessageReceived(message.what);
             break;
@@ -571,10 +578,10 @@ void SurfaceFlinger::onMessageReceived(int32_t what) {
     case MessageQueue::TRANSACTION:
         handleMessageTransaction();
         break;
-    ★case MessageQueue::INVALIDATE:
+☆    case MessageQueue::INVALIDATE:
         handleMessageTransaction();
         handleMessageInvalidate();
-        signalRefresh();
+        signalRefresh();//刷新界面
         break;
     case MessageQueue::REFRESH:
         handleMessageRefresh();
@@ -583,3 +590,14 @@ void SurfaceFlinger::onMessageReceived(int32_t what) {
 }
 
 ```
+以上便是`SurfaceFlinger`线程对`Vsync`信号的处理流程。
+
+## 总结
+从请求`Vsync`信号到处理`Vsync`信号，大致可分为以下7个步骤：
+* 首先由app通过`queueBuffer()`使buffer出队时,发送数据给`SurfaceFlinger`线程,并调用`onFrameAvailable()`通知它
+* `SurfaceFlinger`线程收到通知后,会向`EventThread for sf`申请`Vsync`信号(请求信号到来时计时通知它),因此要与`SurfaceFlinger`建立连接`connection`
+* `EventThread`线程发送该请求给`DispSyncThread`,然后进行`waitForEvent`,如果此时有`connection`,就调用`enableVSyncLocked()`设置`Callback`,
+* `DispSyncThread`收到`H/W`或者`S/W`(`VsyncThread`)产生的`Vsync`信号就会被唤醒
+* `DispSyncThread`继而会唤醒`EventThread`线程:收集之前设置过的`Callback`,并调用`onVSyncEvent()`发送广播唤醒`EventThread`线程
+* 唤醒`EventThread`(for sf?)后调用`postEvent()`,通过`connection`的fd发送数据写给`SurfaceFlinger`,`SurfaceFlinger`通过得到的数据调用对应的函数传递到`SurfaceFlinger`线程
+* `SurfaceFlinger`线程处理`Vsync`信号
