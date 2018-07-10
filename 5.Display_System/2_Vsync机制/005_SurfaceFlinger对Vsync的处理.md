@@ -428,4 +428,178 @@ bindToTextureTarget->glEGLImageTargetTexture2DOES:
 
 ![Buffer过程](Buffer%E8%BF%87%E7%A8%8B.jpg)
 
+```
+/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
+void SurfaceFlinger::handleMessageInvalidate() {
+    ATRACE_CALL();
+☆    handlePageFlip();
+}
+↓
+↓
+↓
+void SurfaceFlinger::handlePageFlip()
+{
+    Region dirtyRegion;
+
+    bool visibleRegions = false;
+    const LayerVector& layers(mDrawingState.layersSortedByZ);
+
+    // Store the set of layers that need updates. This set must not change as
+    // buffers are being latched, as this could result in a deadlock.
+    // Example: Two producers share the same command stream and:
+    // 1.) Layer 0 is latched
+    // 2.) Layer 0 gets a new frame
+    // 2.) Layer 1 gets a new frame
+    // 3.) Layer 1 is latched.
+    // Display is now waiting on Layer 1's frame, which is behind layer 0's
+    // second frame. But layer 0's second frame could be waiting on display.
+    Vector<Layer*> layersWithQueuedFrames;
+    for (size_t i = 0, count = layers.size(); i<count ; i++) {
+        const sp<Layer>& layer(layers[i]);
+        if (layer->hasQueuedFrame())
+            layersWithQueuedFrames.push_back(layer.get());
+    }
+    for (size_t i = 0, count = layersWithQueuedFrames.size() ; i<count ; i++) {
+        Layer* layer = layersWithQueuedFrames[i];
+☆        const Region dirty(layer->latchBuffer(visibleRegions));
+        const Layer::State& s(layer->getDrawingState());
+        invalidateLayerStack(s.layerStack, dirty);
+    }
+
+    mVisibleRegionsDirty |= visibleRegions;
+}
+↓
+↓
+↓
+/frameworks/native/services/surfaceflinger/Layer.cpp
+Region Layer::latchBuffer(bool& recomputeVisibleRegions)
+{
+    ATRACE_CALL();
+...
+☆    status_t updateResult = mSurfaceFlingerConsumer->updateTexImage(&r,
+         mFlinger->mPrimaryDispSync);
+    if (updateResult == BufferQueue::PRESENT_LATER) {
+     // Producer doesn't want buffer to be displayed yet.  Signal a
+     // layer update so we check again at the next opportunity.
+     mFlinger->signalLayerUpdate();
+     return outDirtyRegion;
+    }
+...
+}
+↓
+↓
+↓
+/frameworks/native/services/surfaceflinger/SurfaceFlingerConsumer.cpp
+status_t SurfaceFlingerConsumer::updateTexImage(BufferRejecter* rejecter,
+        const DispSync& dispSync)
+{
+    ATRACE_CALL();
+    ALOGV("updateTexImage");
+    Mutex::Autolock lock(mMutex);
+
+    if (mAbandoned) {
+        ALOGE("updateTexImage: GLConsumer is abandoned!");
+        return NO_INIT;
+    }
+...
+    if (!SyncFeatures::getInstance().useNativeFenceSync()) {
+        // Bind the new buffer to the GL texture.
+        //
+        // Older devices require the "implicit" synchronization provided
+        // by glEGLImageTargetTexture2DOES, which this method calls.  Newer
+        // devices will either call this in Layer::onDraw, or (if it's not
+        // a GL-composited layer) not at all.
+☆        err = bindTextureImageLocked();
+    }
+
+    return err;
+}
+↓
+↓
+↓
+/frameworks/native/libs/gui/GLConsumer.cpp
+status_t GLConsumer::bindTextureImageLocked() {
+    if (mEglDisplay == EGL_NO_DISPLAY) {
+        ALOGE("bindTextureImage: invalid display");
+        return INVALID_OPERATION;
+    }
+
+    GLint error;
+    while ((error = glGetError()) != GL_NO_ERROR) {
+        ST_LOGW("bindTextureImage: clearing GL error: %#04x", error);
+    }
+
+    glBindTexture(mTexTarget, mTexName);
+    if (mCurrentTexture == BufferQueue::INVALID_BUFFER_SLOT &&
+            mCurrentTextureImage == NULL) {
+        ST_LOGE("bindTextureImage: no currently-bound texture");
+        return NO_INIT;
+    }
+
+    status_t err = mCurrentTextureImage->createIfNeeded(mEglDisplay,
+                                                        mCurrentCrop);
+    if (err != NO_ERROR) {
+        ST_LOGW("bindTextureImage: can't create image on display=%p slot=%d",
+                mEglDisplay, mCurrentTexture);
+        return UNKNOWN_ERROR;
+    }
+☆    mCurrentTextureImage->bindToTextureTarget(mTexTarget);
+
+    // In the rare case that the display is terminated and then initialized
+    // again, we can't detect that the display changed (it didn't), but the
+    // image is invalid. In this case, repeat the exact same steps while
+    // forcing the creation of a new image.
+    if ((error = glGetError()) != GL_NO_ERROR) {
+        glBindTexture(mTexTarget, mTexName);
+        status_t err = mCurrentTextureImage->createIfNeeded(mEglDisplay,
+                                                            mCurrentCrop,
+                                                            true);
+        if (err != NO_ERROR) {
+            ST_LOGW("bindTextureImage: can't create image on display=%p slot=%d",
+                    mEglDisplay, mCurrentTexture);
+            return UNKNOWN_ERROR;
+        }
+☆        mCurrentTextureImage->bindToTextureTarget(mTexTarget);
+        if ((error = glGetError()) != GL_NO_ERROR) {
+            ST_LOGE("bindTextureImage: error binding external image: %#04x", error);
+            return UNKNOWN_ERROR;
+        }
+    }
+
+    // Wait for the new buffer to be ready.
+    return doGLFenceWaitLocked();
+}
+↓
+↓ 调用 OpenGL 的方法
+↓
+void GLConsumer::EglImage::bindToTextureTarget(uint32_t texTarget) {
+    glEGLImageTargetTexture2DOES(texTarget, (GLeglImageOES)mEglImage);
+}
+```
+
 ### 发出`Refresh`信号`signalRefresh()`
+将新的数据刷新到当前界面。
+```
+/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
+void SurfaceFlinger::signalRefresh() {
+    mEventQueue.refresh();
+}
+↓
+↓
+↓
+void MessageQueue::refresh() {
+#if INVALIDATE_ON_VSYNC
+☆    mHandler->dispatchRefresh();
+#else
+    mEvents->requestNextVsync();
+#endif
+}
+↓
+↓
+↓
+void MessageQueue::Handler::dispatchRefresh() {
+    if ((android_atomic_or(eventMaskRefresh, &mEventMask) & eventMaskRefresh) == 0) {
+        mQueue.mLooper->sendMessage(this, Message(MessageQueue::REFRESH));
+    }
+}
+```
