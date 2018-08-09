@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     class MyButtonListener implements View.OnClickListener{
         public void onClick(View v) {
 
-            iLedService iLedService = new iLedService();
+            //iLedService iLedService = new iLedService();
 
             ledon = !ledon;
             if(ledon){

@@ -20,6 +20,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".MyBroadcastReceiver">
+            <!-- android:priority属性是设置此接收者的优先级（从-1000到1000） -->
+            <intent-filter android:priority="20">
+                <action android:name="android.intent.action.GLOBAL_BUTTON"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
