@@ -68,6 +68,7 @@ static int __devinit multitouch_probe(struct i2c_client *client, const struct i2
     // could generate what classes of events
     set_bit(EV_SYN, ts_dev->evbit);
     set_bit(EV_ABS, ts_dev->evbit);
+    set_bit(INPUT_PROP_DIRECT, ts_dev->propbit);// could without idc config file
 
     // could generate what kinds of these classes
     set_bit(ABS_MT_TRACKING_ID, ts_dev->absbit);
