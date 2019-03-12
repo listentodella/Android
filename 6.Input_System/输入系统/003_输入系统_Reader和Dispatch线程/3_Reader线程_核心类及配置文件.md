@@ -223,7 +223,8 @@ sendevent /dev/input/event5 0 0 0
 ```
 
 ## Note!!!
-> keylayout:只是用来表示驱动上报的scancode对应哪一个android按键(AKEYCODE_x),只是表示按键被按下,它对应哪一个字符，由kcm文件决定
+> keylayout:只是用来表示驱动上报的scancode对应哪一个android按键(AKEYCODE_x),只是表示按键被按下,它对应哪一个字符，由kcm文件决定.可以想象为有一个空白的键盘，在实际的A的位置按下,kcl可以将其理解为A按下,但究竟是A还是a,还得由kcm决定
+
 > kcm: 用来表示android按键(AKEYCODE_x)对应哪一个字符,表示同时按下其他按键后，对应哪个字符
 
 * 如果不想修改kcm、kl文件，也可以使用组合键（基于常用的pc键盘的对应关系）
